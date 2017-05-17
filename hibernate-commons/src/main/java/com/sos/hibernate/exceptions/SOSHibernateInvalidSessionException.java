@@ -18,6 +18,10 @@ public class SOSHibernateInvalidSessionException extends SOSHibernateException {
         super(msg, stmt);
     }
 
+    public SOSHibernateInvalidSessionException(IllegalStateException cause) {
+        super(cause);
+    }
+
     public SOSHibernateInvalidSessionException(IllegalStateException cause, String stmt) {
         super(cause, stmt);
     }

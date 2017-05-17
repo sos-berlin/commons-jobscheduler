@@ -15,7 +15,7 @@ public class SOSHibernateFactoryBuildException extends SOSHibernateException {
     }
 
     public SOSHibernateFactoryBuildException(SOSHibernateConfigurationException cause, Optional<Path> file) {
-        super(cause.getMessage());
+        super("");
         Throwable e = cause;
         while (e != null) {
             if (e instanceof XMLStreamException) {
@@ -26,6 +26,7 @@ public class SOSHibernateFactoryBuildException extends SOSHibernateException {
             }
             e = e.getCause();
         }
+        setMessage(getErrorMessage(cause.toString(), file));
         initCause(cause);
     }
 

@@ -10,6 +10,10 @@ public class SOSHibernateConnectionException extends SOSHibernateException {
         super(msg);
     }
 
+    public SOSHibernateConnectionException(IllegalStateException cause) {
+        super(cause);
+    }
+
     public SOSHibernateConnectionException(IllegalStateException cause, String stmt) {
         super(cause, stmt);
     }

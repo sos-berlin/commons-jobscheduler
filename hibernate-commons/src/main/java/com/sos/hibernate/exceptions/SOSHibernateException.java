@@ -29,26 +29,13 @@ public class SOSHibernateException extends SOSException {
     @SuppressWarnings("deprecation")
     public SOSHibernateException(String msg, Query<?> query) {
         message = msg;
-        statement = query.getQueryString();
+        if (query != null) {
+            statement = query.getQueryString();
+        }
     }
 
     public SOSHibernateException(String msg, Throwable cause) {
         message = msg;
-        initCause(cause);
-    }
-
-    @SuppressWarnings("deprecation")
-    public SOSHibernateException(Throwable cause, Query<?> query) {
-        if (cause instanceof IllegalStateException) {
-            if (cause.getCause() != null) {
-                message = cause.getCause().getMessage();
-            } else {
-                message = cause.getMessage();
-            }
-        } else {
-            message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
-        }
-        statement = query.getQueryString();
         initCause(cause);
     }
 
@@ -98,17 +85,45 @@ public class SOSHibernateException extends SOSException {
         statement = stmt;
     }
 
+    public SOSHibernateException(IllegalStateException cause) {
+        if (cause.getCause() == null) {
+            initCause(cause);
+            message = cause.getMessage();
+        } else {
+            initCause(cause.getCause());
+            message = cause.getCause().getMessage();
+        }
+    }
+
     public SOSHibernateException(IllegalStateException cause, String stmt) {
-        initCause(cause);
-        message = cause.getMessage();
+        if (cause.getCause() == null) {
+            initCause(cause);
+            message = cause.getMessage();
+        } else {
+            initCause(cause.getCause());
+            message = cause.getCause().getMessage();
+        }
         statement = stmt;
     }
 
     @SuppressWarnings("deprecation")
     public SOSHibernateException(IllegalStateException cause, Query<?> query) {
+        if (cause.getCause() == null) {
+            initCause(cause);
+            message = cause.getMessage();
+        } else {
+            initCause(cause.getCause());
+            message = cause.getCause().getMessage();
+        }
+        if (query != null) {
+            statement = query.getQueryString();
+        }
+    }
+
+    public SOSHibernateException(SQLException cause) {
         initCause(cause);
-        message = cause.getMessage();
-        statement = query.getQueryString();
+        sqlException = cause;
+        message = String.format("%d %s", sqlException.getErrorCode(), sqlException.getMessage());
     }
 
     public SOSHibernateException(SQLException cause, String sql) {
@@ -126,12 +141,16 @@ public class SOSHibernateException extends SOSException {
         return statement;
     }
 
+    protected void setStatement(String val) {
+        statement = val;
+    }
+
     @Override
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String val) {
+    protected void setMessage(String val) {
         message = val;
     }
 

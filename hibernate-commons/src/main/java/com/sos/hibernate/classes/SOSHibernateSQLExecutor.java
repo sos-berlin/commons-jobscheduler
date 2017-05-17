@@ -172,7 +172,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 }
             }
         } catch (SQLException e) {
-            throw new SOSHibernateSQLExecutorException(e, null);
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -201,7 +201,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 }
             }
         } catch (SQLException e) {
-            throw new SOSHibernateSQLExecutorException(e, null);
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -282,7 +282,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 }
             }
         } catch (SQLException e) {
-            throw new SOSHibernateSQLExecutorException(e, null);
+            throw new SOSHibernateSQLExecutorException(e);
         }
         return record;
     }
@@ -319,7 +319,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
             result = stmt.executeBatch();
         } catch (SQLException e) {
-            throw new SOSHibernateSQLExecutorException(e, null);
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
