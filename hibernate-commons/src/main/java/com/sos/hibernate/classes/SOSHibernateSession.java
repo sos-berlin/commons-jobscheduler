@@ -795,7 +795,7 @@ public class SOSHibernateSession implements Serializable {
         return getSingleValue(createNativeQuery(sql));
     }
 
-    /** return a single field or null
+    /** return a single field value or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException, return single value as string */
     @SuppressWarnings("deprecation")
@@ -848,16 +848,18 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> Map<String, String> getSingleResultNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public <T> Map<String, String> getSingleResultNativeQuery(String sql) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
         return getSingleResultNativeQuery(sql, null);
     }
 
     public <T> Map<String, String> getSingleResultNativeQuery(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
-            SOSHibernateQueryException {
+            SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
         return getSingleResult(createNativeQuery(sql), dateTimeFormat);
     }
 
-    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
         return getSingleResult(query, null);
     }
 
@@ -866,12 +868,16 @@ public class SOSHibernateSession implements Serializable {
      * Map - see getResultList */
     @SuppressWarnings("deprecation")
     public <T> Map<String, String> getSingleResult(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
-            SOSHibernateQueryException {
+            SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: nativeQuery[sql=%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
         Map<String, String> result = null;
         List<Map<String, String>> resultList = getResultList(nativeQuery, dateTimeFormat);
         if (resultList != null && !resultList.isEmpty()) {
+            if (resultList.size() > 1) {
+                throw new SOSHibernateQueryNonUniqueResultException(String.format("query did not return a unique result: %d", resultList.size()),
+                        nativeQuery);
+            }
             result = new HashMap<String, String>();
             Map<String, String> map = resultList.get(0);
             for (String key : map.keySet()) {
@@ -927,7 +933,7 @@ public class SOSHibernateSession implements Serializable {
                             String value = "";
                             if (origValue != null) {
                                 value = origValue + "";
-                                if (origValue instanceof java.sql.Timestamp && dateTimeFormat != null) {
+                                if (dateTimeFormat != null && origValue instanceof java.sql.Timestamp) {
                                     try {
                                         value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
                                     } catch (Exception e) {
