@@ -27,4 +27,8 @@ public class SOSHibernateQueryException extends SOSHibernateException {
     public SOSHibernateQueryException(PersistenceException cause, Query<?> query) {
         super(cause, query);
     }
+
+    public SOSHibernateQueryException(PersistenceException cause, String stmt) {
+        super(cause, stmt);
+    }
 }

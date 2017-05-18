@@ -63,18 +63,20 @@ public class SOSHibernateException extends SOSException {
         message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
     }
 
-    @SuppressWarnings("deprecation")
     public SOSHibernateException(PersistenceException cause, Query<?> query) {
         this(cause);
-        if ((statement == null || statement.equals(STATEMENT_NOT_AVAILABLE)) && query != null) {
-            statement = query.getQueryString();
-            if (message != null) {
-                // message can contains sql as [Query is:<new line> sql statement]
-                int index = message.indexOf("Query is:");
-                if (index > 0) {
-                    message = message.substring(0, index).trim();
-                }
-            }
+        handleStatement(query);
+    }
+
+    public SOSHibernateException(PersistenceException cause, String stmt) {
+        this(cause);
+        handleStatement(stmt);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void handleStatement(Query<?> query) {
+        if (query != null) {
+            handleStatement(query.getQueryString());
         }
     }
 
@@ -176,5 +178,18 @@ public class SOSHibernateException extends SOSException {
             return String.format("%s [%s]", super.toString(), statement);
         }
         return super.toString();
+    }
+
+    private void handleStatement(String stmt) {
+        if ((statement == null || statement.equals(STATEMENT_NOT_AVAILABLE)) && stmt != null) {
+            statement = stmt;
+            if (message != null) {
+                // message can contains sql as [Query is:<new line> sql statement]
+                int index = message.indexOf("Query is:");
+                if (index > 0) {
+                    message = message.substring(0, index).trim();
+                }
+            }
+        }
     }
 }

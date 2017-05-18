@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
+import javax.persistence.Entity;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.JDBCException;
+import org.hibernate.NonUniqueResultException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
@@ -32,15 +35,16 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.exception.SOSException;
 import com.sos.hibernate.exceptions.SOSDBException;
+import com.sos.hibernate.exceptions.SOSJDBCException;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
 import com.sos.hibernate.exceptions.SOSHibernateCriteriaException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
+import com.sos.hibernate.exceptions.SOSHibernateQueryNonUniqueResultException;
 import com.sos.hibernate.exceptions.SOSHibernateSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateTransactionException;
-import com.sos.hibernate.exceptions.SOSJDBCException;
 
 import sos.util.SOSDate;
 
@@ -219,7 +223,8 @@ public class SOSHibernateSession implements Serializable {
         return ex;
     }
 
-    public String getLastSequenceValue(String sequenceName) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public String getLastSequenceValue(String sequenceName) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         String stmt = factory.getSequenceLastValString(sequenceName);
         return stmt == null ? null : getSingleValueNativeQuery(stmt);
     }
@@ -696,7 +701,7 @@ public class SOSHibernateSession implements Serializable {
         } catch (IllegalArgumentException e) {
             throw new SOSHibernateQueryException(e, hql);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, hql);
         }
         return q;
     }
@@ -734,7 +739,7 @@ public class SOSHibernateSession implements Serializable {
         } catch (IllegalArgumentException e) {
             throw new SOSHibernateQueryException(e, sql);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, sql);
         }
         return q;
     }
@@ -775,82 +780,70 @@ public class SOSHibernateSession implements Serializable {
         } catch (IllegalArgumentException e) {
             throw new SOSHibernateQueryException(e, sql);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, sql);
         }
         return q;
     }
 
-    public String getSingleValue(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public String getSingleValue(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         return getSingleValue(createQuery(hql));
     }
 
-    public String getSingleValueNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public String getSingleValueNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         return getSingleValue(createNativeQuery(sql));
     }
 
-    /** return the first possible value or null
+    /** return a single field or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException, return single value as string */
     @SuppressWarnings("deprecation")
-    public <T> String getSingleValue(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public <T> String getSingleValue(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         String method = getMethodName("getSingleValue");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", query);
-        }
-        String result = null;
-        List<T> results = null;
-        try {
-            results = query.getResultList();
-        } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, query);
-            } else {
-                throw new SOSHibernateQueryException(e, query);
+        T result = getSingleResult(query);
+        if (result != null) {
+            if (result.getClass().getAnnotation(Entity.class) != null) {
+                throw new SOSHibernateQueryNonUniqueResultException("query return an entity object and not a unique field result", query);
             }
-        } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            return result + "";
         }
-        if (results != null && !results.isEmpty()) {
-            if (results.get(0) instanceof Object[]) {
-                Object[] obj = (Object[]) results.get(0);
-                result = obj[0] + "";
-            } else {
-                result = results.get(0) + "";
-            }
-        }
-        return result;
+        return null;
     }
 
-    public <T> T getSingleResult(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public <T> T getSingleResult(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         return getSingleResult(createQuery(hql));
     }
 
-    /** return the first possible result or null
+    /** return a single row or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException */
     @SuppressWarnings("deprecation")
-    public <T> T getSingleResult(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public <T> T getSingleResult(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("session is NULL", query);
         }
         T result = null;
-        List<T> results = null;
         try {
-            results = query.getResultList();
+            result = query.getSingleResult();
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
                 throw new SOSHibernateInvalidSessionException(e, query);
             } else {
                 throw new SOSHibernateQueryException(e, query);
             }
+        } catch (NoResultException e) {
+            result = null;
+        } catch (NonUniqueResultException e) {
+            throw new SOSHibernateQueryNonUniqueResultException(e, query);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
-        }
-        if (results != null && !results.isEmpty()) {
-            result = results.get(0);
+            throw new SOSHibernateQueryException(e, query);
         }
         return result;
     }
@@ -868,7 +861,7 @@ public class SOSHibernateSession implements Serializable {
         return getSingleResult(query, null);
     }
 
-    /** return a single row represented by Map<String,String>
+    /** return a single row represented by Map<String,String> or null
      * 
      * Map - see getResultList */
     @SuppressWarnings("deprecation")
@@ -961,7 +954,7 @@ public class SOSHibernateSession implements Serializable {
                 throw new SOSHibernateQueryException(e, nativeQuery);
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, nativeQuery);
         }
     }
 
@@ -981,7 +974,7 @@ public class SOSHibernateSession implements Serializable {
                 throw new SOSHibernateQueryException(e, query);
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, query);
         }
     }
 
