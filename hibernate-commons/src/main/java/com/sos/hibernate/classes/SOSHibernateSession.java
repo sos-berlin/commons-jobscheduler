@@ -785,12 +785,12 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
-    public String getSingleValue(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+    public <T> T getSingleValue(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
             SOSHibernateQueryException {
         return getSingleValue(createQuery(hql));
     }
 
-    public String getSingleValueNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+    public <T> T getSingleValueNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
             SOSHibernateQueryException {
         return getSingleValue(createNativeQuery(sql));
     }
@@ -799,7 +799,7 @@ public class SOSHibernateSession implements Serializable {
      * 
      * difference to Query.getSingleResult - not throw NoResultException, return single value as string */
     @SuppressWarnings("deprecation")
-    public <T> String getSingleValue(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+    public <T> T getSingleValue(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
             SOSHibernateQueryException {
         String method = getMethodName("getSingleValue");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
@@ -814,6 +814,33 @@ public class SOSHibernateSession implements Serializable {
                     throw new SOSHibernateQueryNonUniqueResultException("query return an entity object and not a unique field result", query);
                 }
             }
+            return result;
+        }
+        return null;
+    }
+
+    public <T> String getSingleValueAsString(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
+        T result = getSingleValue(hql);
+        if (result != null) {
+            return result + "";
+        }
+        return null;
+    }
+
+    public <T> String getSingleValueNativeQueryAsString(String sql) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
+        T result = getSingleValueNativeQuery(sql);
+        if (result != null) {
+            return result + "";
+        }
+        return null;
+    }
+
+    public <T> String getSingleValueAsString(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,
+            SOSHibernateQueryException {
+        T result = getSingleValue(query);
+        if (result != null) {
             return result + "";
         }
         return null;
