@@ -852,7 +852,7 @@ public class SOSHibernateSession implements Serializable {
         if (results != null && !results.isEmpty()) {
             result = results.get(0);
         }
-        return null;
+        return result;
     }
 
     public <T> Map<String, String> getSingleResultNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
