@@ -805,8 +805,14 @@ public class SOSHibernateSession implements Serializable {
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
         T result = getSingleResult(query);
         if (result != null) {
-            if (result.getClass().getAnnotation(Entity.class) != null) {
-                throw new SOSHibernateQueryNonUniqueResultException("query return an entity object and not a unique field result", query);
+            if (query instanceof NativeQuery<?>) {
+                if (result instanceof Object[]) {
+                    throw new SOSHibernateQueryNonUniqueResultException("query return a row and not a unique field result", query);
+                }
+            } else {
+                if (result.getClass().getAnnotation(Entity.class) != null) {
+                    throw new SOSHibernateQueryNonUniqueResultException("query return an entity object and not a unique field result", query);
+                }
             }
             return result + "";
         }
@@ -866,23 +872,28 @@ public class SOSHibernateSession implements Serializable {
     /** return a single row represented by Map<String,String> or null
      * 
      * Map - see getResultList */
-    @SuppressWarnings("deprecation")
-    public <T> Map<String, String> getSingleResult(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public Map<String, String> getSingleResult(NativeQuery<?> nativeQuery, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
             SOSHibernateQueryNonUniqueResultException, SOSHibernateQueryException {
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: nativeQuery[sql=%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
+
+        nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
         Map<String, String> result = null;
-        List<Map<String, String>> resultList = getResultList(nativeQuery, dateTimeFormat);
-        if (resultList != null && !resultList.isEmpty()) {
-            if (resultList.size() > 1) {
-                throw new SOSHibernateQueryNonUniqueResultException(String.format("query did not return a unique result: %d", resultList.size()),
-                        nativeQuery);
+        try {
+            result = (Map<String, String>) nativeQuery.getSingleResult();
+        } catch (IllegalStateException e) {
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, nativeQuery);
+            } else {
+                throw new SOSHibernateQueryException(e, nativeQuery);
             }
-            result = new HashMap<String, String>();
-            Map<String, String> map = resultList.get(0);
-            for (String key : map.keySet()) {
-                result.put(key, map.get(key));
-            }
+        } catch (NoResultException e) {
+            result = null;
+        } catch (NonUniqueResultException e) {
+            throw new SOSHibernateQueryNonUniqueResultException(e, nativeQuery);
+        } catch (PersistenceException e) {
+            throw new SOSHibernateQueryException(e, nativeQuery);
         }
         return result;
     }
@@ -919,39 +930,7 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSHibernateInvalidSessionException("session is NULL", nativeQuery);
         }
         try {
-            nativeQuery.setResultTransformer(new ResultTransformer() {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public Object transformTuple(Object[] tuple, String[] aliases) {
-                    Map<String, String> result = new HashMap<String, String>(tuple.length);
-                    for (int i = 0; i < tuple.length; i++) {
-                        String alias = aliases[i];
-                        if (alias != null) {
-                            Object origValue = tuple[i];
-                            String value = "";
-                            if (origValue != null) {
-                                value = origValue + "";
-                                if (dateTimeFormat != null && origValue instanceof java.sql.Timestamp) {
-                                    try {
-                                        value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
-                                    } catch (Exception e) {
-                                    }
-                                }
-                            }
-                            result.put(alias.toLowerCase(), value);
-                        }
-                    }
-                    return result;
-                }
-
-                @SuppressWarnings("rawtypes")
-                @Override
-                public List<?> transformList(List collection) {
-                    return collection;
-                }
-            });
+            nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
             return (List<Map<String, String>>) nativeQuery.getResultList();
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
@@ -962,6 +941,42 @@ public class SOSHibernateSession implements Serializable {
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e, nativeQuery);
         }
+    }
+
+    private ResultTransformer getNativeQueryResultToMapTransformer(String dateTimeFormat) {
+        return new ResultTransformer() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                Map<String, String> result = new HashMap<String, String>(tuple.length);
+                for (int i = 0; i < tuple.length; i++) {
+                    String alias = aliases[i];
+                    if (alias != null) {
+                        Object origValue = tuple[i];
+                        String value = "";
+                        if (origValue != null) {
+                            value = origValue + "";
+                            if (dateTimeFormat != null && origValue instanceof java.sql.Timestamp) {
+                                try {
+                                    value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                        result.put(alias.toLowerCase(), value);
+                    }
+                }
+                return result;
+            }
+
+            @SuppressWarnings("rawtypes")
+            @Override
+            public List<?> transformList(List collection) {
+                return collection;
+            }
+        };
     }
 
     @SuppressWarnings("deprecation")
