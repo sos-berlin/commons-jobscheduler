@@ -509,7 +509,8 @@ public class SOSHibernateSession implements Serializable {
                 try {
                     id = SOSHibernate.getId(item);
                     if (id == null) {
-                        throw new SOSHibernateException(String.format("not found @Id annotated method [%s]", item.getClass().getName()));
+                        throw new SOSHibernateException(String.format("not found @Id annotated public getter method [%s]", item.getClass()
+                                .getName()));
                     }
                 } catch (SOSHibernateException e) {
                     throw new SOSHibernateSessionException(e.getMessage(), e.getCause());

@@ -1,10 +1,10 @@
 package com.sos.hibernate.classes;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
 
-import javax.persistence.Column;
 import javax.persistence.Id;
 
 import org.hibernate.exception.LockAcquisitionException;
@@ -26,14 +26,16 @@ public class SOSHibernate {
 
     public static Object getId(Object item) throws SOSHibernateException {
         if (item != null) {
-            Optional<Method> idAnnotatedMethod = Arrays.stream(item.getClass().getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Column.class)
-                    && m.isAnnotationPresent(Id.class) && m.getName().startsWith("get")).findFirst();
-            if (idAnnotatedMethod.isPresent()) {
+            Optional<Method> om = Arrays.stream(item.getClass().getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Id.class) && Modifier
+                    .isPublic(m.getModifiers()) && !m.getReturnType().equals(void.class) && m.getName().startsWith("get")).findFirst();
+            if (om.isPresent()) {
+                Method m = om.get();
                 try {
-                    return idAnnotatedMethod.get().invoke(item);
+                    m.setAccessible(true);// make invoke faster
+                    return m.invoke(item);
                 } catch (Throwable e) {
-                    throw new SOSHibernateException(String.format("couldn't invoke @Id annotated method [%s.%s]", item.getClass().getName(),
-                            idAnnotatedMethod.get().getName()), e);
+                    throw new SOSHibernateException(String.format("couldn't invoke @Id annotated public getter method [%s.%s]", item.getClass()
+                            .getName(), m.getName()), e);
                 }
             }
         }
