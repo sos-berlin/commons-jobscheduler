@@ -665,44 +665,6 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
-    /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
-    @Deprecated
-    public SQLQuery<?> createSQLQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
-        return createSQLQuery(sql, null);
-    }
-
-    /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
-    @Deprecated
-    public SQLQuery<?> createSQLQuery(String sql, Class<?> entityClass) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
-        String method = getMethodName("createSQLQuery");
-        LOGGER.debug(String.format("%s: sql=%s", method, sql));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", sql);
-        }
-        SQLQuery<?> q = null;
-        try {
-            if (isStatelessSession) {
-                q = ((StatelessSession) currentSession).createSQLQuery(sql);
-            } else {
-                q = ((Session) currentSession).createSQLQuery(sql);
-            }
-            if (q != null && entityClass != null) {
-                q.addEntity(entityClass);
-            }
-        } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, sql);
-            } else {
-                throw new SOSHibernateQueryException(e, sql);
-            }
-        } catch (IllegalArgumentException e) {
-            throw new SOSHibernateQueryException(e, sql);
-        } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, sql);
-        }
-        return q;
-    }
-
     public <T> NativeQuery<T> createNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return createNativeQuery(sql, null);
     }

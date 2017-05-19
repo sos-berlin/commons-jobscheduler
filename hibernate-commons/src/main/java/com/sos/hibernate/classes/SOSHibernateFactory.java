@@ -221,14 +221,6 @@ public class SOSHibernateFactory implements Serializable {
         return value + "";
     }
 
-    /** @deprecated use quoteColumn instead
-     * 
-     *             method for compatibility with the 1.11.0 an 1.11.1 versions */
-    @Deprecated
-    public String quoteFieldName(String columnName) {
-        return quoteColumn(columnName);
-    }
-
     public String quoteColumn(String columnName) {
         if (dialect != null && columnName != null) {
             String[] arr = columnName.split("\\.");
@@ -326,7 +318,11 @@ public class SOSHibernateFactory implements Serializable {
 
     /** Hibernate Dialect does not provide the functions to identify the last inserted sequence value.
      * 
-     * only for the next value: e.g. dialiect.getSelectSequenceNextValString(sequenceName), dialect.getSequenceNextValString(sequenceName) */
+     * only for the next value:
+     * 
+     * e.g. dialiect.getSelectSequenceNextValString(sequenceName),
+     * 
+     * dialect.getSequenceNextValString(sequenceName) */
     public String getSequenceLastValString(String sequenceName) {
         if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
             return "SELECT @@IDENTITY";
