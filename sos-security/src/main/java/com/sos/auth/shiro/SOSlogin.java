@@ -33,7 +33,11 @@ public class SOSlogin {
     public void setInifile(String inifile) {
         this.inifile = inifile;
     }
-
+    
+    public String getInifile() {
+        return inifile;
+    }
+    
     public void createSubject(String user, String pwd) {
         UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
         try {
