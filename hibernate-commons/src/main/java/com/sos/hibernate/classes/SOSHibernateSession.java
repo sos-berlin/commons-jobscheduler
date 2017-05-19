@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
 import com.sos.hibernate.exceptions.SOSHibernateCriteriaException;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
@@ -504,16 +505,20 @@ public class SOSHibernateSession implements Serializable {
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
-                /*
-                 * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at
-                 * position 9 is not set HHH000010: On release of batch it still contained JDBC statements in a stateless session it is better to check if the
-                 * item is a new entry and then call save() or an existing item and then call update() there is no need to create an error to switch the
-                 * statement afterwards
-                 */
+                Object id = null;
                 try {
-                    session.update(item);
-                } catch (Exception e) {
+                    id = SOSHibernate.getId(item);
+                    if (id == null) {
+                        throw new SOSHibernateException(String.format("not found @Id annotated method [%s]", item.getClass().getName()));
+                    }
+                } catch (SOSHibernateException e) {
+                    throw new SOSHibernateSessionException(e.getMessage(), e.getCause());
+                }
+                Object dbItem = get(item.getClass(), (Serializable) id);
+                if (dbItem == null) {
                     session.insert(item);
+                } else {
+                    session.update(item);
                 }
             } else {
                 Session session = ((Session) currentSession);
@@ -595,7 +600,8 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public Object get(Class<?> entityClass, Serializable id) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
+    @SuppressWarnings("unchecked")
+    public <T> T get(Class<T> entityClass, Serializable id) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("get");
         LOGGER.debug(String.format("%s: entityClass=%s", method, entityClass.getName()));
         if (currentSession == null) {
@@ -603,7 +609,7 @@ public class SOSHibernateSession implements Serializable {
         }
         try {
             if (isStatelessSession) {
-                return ((StatelessSession) currentSession).get(entityClass, id);
+                return (T) ((StatelessSession) currentSession).get(entityClass, id);
             } else {
                 return ((Session) currentSession).get(entityClass, id);
             }
