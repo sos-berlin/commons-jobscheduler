@@ -1,6 +1,8 @@
 package com.sos.hibernate.classes;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -24,20 +26,14 @@ public class SOSHibernate {
 
     public static Object getId(Object item) throws SOSHibernateException {
         if (item != null) {
-            Method[] ms = item.getClass().getDeclaredMethods();
-            for (Method m : ms) {
-                if (m.getName().startsWith("get")) {
-                    Column c = m.getAnnotation(Column.class);
-                    if (c != null) {
-                        if (m.getAnnotation(Id.class) != null) {
-                            try {
-                                return m.invoke(item);
-                            } catch (Throwable e) {
-                                throw new SOSHibernateException(String.format("couldn't invoke @Id annotated method [%s.%s]", item.getClass()
-                                        .getName(), m.getName()), e);
-                            }
-                        }
-                    }
+            Optional<Method> idAnnotatedMethod = Arrays.stream(item.getClass().getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Column.class)
+                    && m.isAnnotationPresent(Id.class) && m.getName().startsWith("get")).findFirst();
+            if (idAnnotatedMethod.isPresent()) {
+                try {
+                    return idAnnotatedMethod.get().invoke(item);
+                } catch (Throwable e) {
+                    throw new SOSHibernateException(String.format("couldn't invoke @Id annotated method [%s.%s]", item.getClass().getName(),
+                            idAnnotatedMethod.get().getName()), e);
                 }
             }
         }
