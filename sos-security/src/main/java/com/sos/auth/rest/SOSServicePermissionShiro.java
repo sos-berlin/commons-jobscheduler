@@ -31,6 +31,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
@@ -60,7 +61,16 @@ public class SOSServicePermissionShiro {
 
     public JOCDefaultResponse getJocCockpitPermissions(String accessToken, String user, String pwd) {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-        return JOCDefaultResponse.responseStatus200(createJocCockpitPermissionObject(accessToken, user, pwd));
+        SOSPermissionJocCockpit sosPermissionJocCockpit = createJocCockpitPermissionObject(accessToken, user, pwd);
+        if (currentUser.getSelectedInstance() != null) {
+            sosPermissionJocCockpit.setJobschedulerId(currentUser.getSelectedInstance().getSchedulerId());
+            if (currentUser.getSelectedInstance().getPrecedence() == null) {
+                sosPermissionJocCockpit.setPrecedence(-1);
+            } else {
+                sosPermissionJocCockpit.setPrecedence(currentUser.getSelectedInstance().getPrecedence());
+            }
+        }
+        return JOCDefaultResponse.responseStatus200(sosPermissionJocCockpit);
     }
 
     private JOCDefaultResponse getCommandPermissions(String accessToken, String user, String pwd) {

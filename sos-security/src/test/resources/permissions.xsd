@@ -459,6 +459,8 @@
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
 			<xs:attribute name="accessToken" type="xs:string"/>
+			<xs:attribute name="jobschedulerId" type="xs:string"/>
+			<xs:attribute name="precedence" type="xs:int"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="SOSPermissionCommands">
