@@ -87,7 +87,10 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties();
         if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
             Map<String, String> allEnvVars = new HashMap<String, String>();
-            allEnvVars.putAll(getSchedulerEnvironmentVariables());
+            Map<String, String> schedulerMasterEnvVars = getSchedulerEnvironmentVariables();
+            if (schedulerMasterEnvVars != null) {
+                allEnvVars.putAll(schedulerMasterEnvVars);
+            }
             allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
             ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
         }
@@ -148,7 +151,12 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         if (os.indexOf("nt") > -1 || os.indexOf("windows") > -1) {
             win = true;
         }
-        Variable_set env = spooler_task.create_subprocess().env();
+        Variable_set env;
+        try {
+            env = spooler_task.create_subprocess().env();
+        } catch (Exception e) {
+            return null;
+        }
         StringTokenizer t = new StringTokenizer(env.names(), ";");
         while (t.hasMoreTokens()) {
             String envname = t.nextToken();
