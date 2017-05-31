@@ -35,6 +35,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final Logger LOGGER = Logger.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
     private static final String COMMAND_DELIMITER = ";";
+    private static final String DEFAULT_LINUX_DELIMITER = ";";
+    private static final String DEFAULT_WINDOWS_DELIMITER = "&";
     private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
     private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
     private String tempFileName;
@@ -44,7 +46,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map schedulerEnvVars;
     private Future<Void> commandExecution;
-    private String cmdDelimiter = COMMAND_DELIMITER;
 
     @Override
     public ISOSVFSHandler getVFSSSH2Handler() {
@@ -120,12 +121,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             for (String strCmd : strCommands2Execute) {
                 executedCommand = strCmd;
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value());
-                if(objOptions.getCommandDelimiter().isNotEmpty() && objOptions.getCommandDelimiter().isDirty()) {
-                    cmdDelimiter = objOptions.getCommandDelimiter().getValue();
-                } else {
-                    cmdDelimiter = COMMAND_DELIMITER;
-                }
-                LOGGER.debug("Delimiter: " + cmdDelimiter);
                 if (objOptions.getCreateEnvironmentVariables().value()) {
                     completeCommand = getEnvCommand() + getPreCommand() + strCmd;
                 } else {
@@ -257,22 +252,34 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     @Override
     public String getPreCommand() {
+        String delimiter;
+        if(isWindows()) {
+            delimiter = DEFAULT_WINDOWS_DELIMITER;
+        } else {
+            delimiter = DEFAULT_LINUX_DELIMITER;
+        }
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            strb.append(ssh_job_get_pid_command).append(cmdDelimiter).append(ssh_job_get_pid_command);
-            strb.append(" >> ").append(pidFileName).append(cmdDelimiter);
+            strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
+            strb.append(" >> ").append(pidFileName).append(delimiter);
             strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-            strb.append(cmdDelimiter);
+            strb.append(delimiter);
             return strb.toString();
         }
-        strb.append(ssh_job_get_pid_command).append(cmdDelimiter);
+        strb.append(ssh_job_get_pid_command).append(delimiter);
         strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-        strb.append(cmdDelimiter);
+        strb.append(delimiter);
         return strb.toString();
     }
 
     private String getEnvCommand() {
+        String delimiter;
+        if(isWindows()) {
+            delimiter = DEFAULT_WINDOWS_DELIMITER;
+        } else {
+            delimiter = DEFAULT_LINUX_DELIMITER;
+        }
         StringBuilder sb = new StringBuilder();
         if (schedulerEnvVars != null) {
             for (Object key : schedulerEnvVars.keySet()) {
@@ -295,7 +302,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                     if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
                         sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
-                        sb.append(cmdDelimiter);
+                        sb.append(delimiter);
                     }
                 }
             }
@@ -415,4 +422,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         this.schedulerEnvVars = schedulerEnvVars;
     }
 
+    private boolean isWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        boolean win = false;
+        Map<String, String> envvars = new HashMap<String, String>();
+        if (os.indexOf("nt") > -1 || os.indexOf("windows") > -1) {
+            win = true;
+        }
+        return win;
+    }
 }
