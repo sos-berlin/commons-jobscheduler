@@ -44,6 +44,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map schedulerEnvVars;
     private Future<Void> commandExecution;
+    private String cmdDelimiter = COMMAND_DELIMITER;
 
     @Override
     public ISOSVFSHandler getVFSSSH2Handler() {
@@ -119,6 +120,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             for (String strCmd : strCommands2Execute) {
                 executedCommand = strCmd;
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value());
+                if(objOptions.getCommandDelimiter().isNotEmpty() && objOptions.getCommandDelimiter().isDirty()) {
+                    cmdDelimiter = objOptions.getCommandDelimiter().getValue();
+                } else {
+                    cmdDelimiter = COMMAND_DELIMITER;
+                }
+                LOGGER.debug("Delimiter: " + cmdDelimiter);
                 if (objOptions.getCreateEnvironmentVariables().value()) {
                     completeCommand = getEnvCommand() + getPreCommand() + strCmd;
                 } else {
@@ -253,15 +260,15 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            strb.append(ssh_job_get_pid_command).append(COMMAND_DELIMITER).append(ssh_job_get_pid_command);
-            strb.append(" >> ").append(pidFileName).append(COMMAND_DELIMITER);
+            strb.append(ssh_job_get_pid_command).append(cmdDelimiter).append(ssh_job_get_pid_command);
+            strb.append(" >> ").append(pidFileName).append(cmdDelimiter);
             strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-            strb.append(COMMAND_DELIMITER);
+            strb.append(cmdDelimiter);
             return strb.toString();
         }
-        strb.append(ssh_job_get_pid_command).append(COMMAND_DELIMITER);
+        strb.append(ssh_job_get_pid_command).append(cmdDelimiter);
         strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-        strb.append(COMMAND_DELIMITER);
+        strb.append(cmdDelimiter);
         return strb.toString();
     }
 
@@ -288,7 +295,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                     if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
                         sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
-                        sb.append(COMMAND_DELIMITER);
+                        sb.append(cmdDelimiter);
                     }
                 }
             }
