@@ -2,10 +2,15 @@ package com.sos.hibernate.exceptions;
 
 import javax.persistence.PersistenceException;
 
-/** if session/connection can't be acquired (for example, database is not running), occur: */
-/** - by openSession() methods if c3p0 not configured */
-/** - if c3p0 configured - occur later in the next methods (for example, by createQuery ... as SOSHibernateQueryException) */
-public class SOSHibernateOpenSessionException extends SOSHibernateException {
+/** can occurs if openSession() methods are called
+ * 
+ * occurs if session/connection can't be acquired (for example, database is not running)
+ * 
+ * not occurs with openSession() methods if c3p0 pool has been configured
+ * 
+ * if c3p0 pool has been configured and session/connection can't be acquired exception will be catched in the other methods like createQuery() etc as
+ * SOSHibernateInvalidSessionException */
+public class SOSHibernateOpenSessionException extends SOSHibernateInvalidSessionException {
 
     private static final long serialVersionUID = 1L;
 
@@ -15,9 +20,5 @@ public class SOSHibernateOpenSessionException extends SOSHibernateException {
 
     public SOSHibernateOpenSessionException(IllegalStateException cause) {
         super(cause);
-    }
-
-    public SOSHibernateOpenSessionException(IllegalStateException cause, String stmt) {
-        super(cause, stmt);
     }
 }

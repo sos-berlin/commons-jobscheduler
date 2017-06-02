@@ -2,6 +2,7 @@ package com.sos.hibernate.exceptions;
 
 import java.sql.SQLException;
 
+/** can occurs if SOSHibernateSQLExecutor methods are called */
 public class SOSHibernateSQLExecutorException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;

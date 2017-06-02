@@ -73,13 +73,6 @@ public class SOSHibernateException extends SOSException {
         handleStatement(stmt);
     }
 
-    @SuppressWarnings("deprecation")
-    private void handleStatement(Query<?> query) {
-        if (query != null) {
-            handleStatement(query.getQueryString());
-        }
-    }
-
     public SOSHibernateException(IllegalArgumentException cause, String stmt) {
         Throwable e = cause;
         while (e != null) {
@@ -87,7 +80,7 @@ public class SOSHibernateException extends SOSException {
                 QuerySyntaxException je = (QuerySyntaxException) e;
 
                 initCause(je);
-                message = je.getMessage();// message contains hql as [hql statement]
+                message = je.getMessage();// message can contains hql as [hql statement]
                 statement = je.getQueryString();
                 // remove hql statement from the message
                 if (message != null && statement != null) {
@@ -178,6 +171,13 @@ public class SOSHibernateException extends SOSException {
             return String.format("%s [%s]", super.toString(), statement);
         }
         return super.toString();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void handleStatement(Query<?> query) {
+        if (query != null) {
+            handleStatement(query.getQueryString());
+        }
     }
 
     private void handleStatement(String stmt) {

@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.persistence.PersistenceException;
 import javax.xml.stream.XMLStreamException;
 
+/** can occurs if factory.build() method are called */
 public class SOSHibernateFactoryBuildException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
