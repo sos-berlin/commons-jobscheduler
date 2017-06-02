@@ -4,6 +4,7 @@ import javax.persistence.PersistenceException;
 
 import org.hibernate.query.Query;
 
+/** can occurs if Query/NativeQuery methods are called */
 public class SOSHibernateQueryException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;

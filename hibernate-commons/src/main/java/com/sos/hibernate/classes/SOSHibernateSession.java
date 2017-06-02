@@ -11,30 +11,22 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 
 import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.NonUniqueResultException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
-import com.sos.hibernate.exceptions.SOSHibernateCriteriaException;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
@@ -955,121 +947,6 @@ public class SOSHibernateSession implements Serializable {
     public <T> List<T> getResultList(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         Query<T> query = createQuery(hql);
         return getResultList(query);
-    }
-
-    @Deprecated
-    public Criteria createCriteria(Class<?> cl, String alias) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
-        String method = getMethodName("createCriteria");
-        LOGGER.debug(String.format("%s: class=%s", method, cl.getSimpleName()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
-        Criteria cr = null;
-        try {
-            if (isStatelessSession) {
-                cr = ((StatelessSession) currentSession).createCriteria(cl, alias);
-            } else {
-                cr = ((Session) currentSession).createCriteria(cl, alias);
-            }
-        } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
-                throw new SOSHibernateCriteriaException(e);
-            }
-        } catch (PersistenceException e) {
-            throw new SOSHibernateCriteriaException(e);
-        }
-        return cr;
-    }
-
-    @Deprecated
-    public Criteria createCriteria(Class<?> cl) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
-        return createCriteria(cl, (String) null);
-    }
-
-    @Deprecated
-    public Criteria createCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
-        return createCriteria(cl, selectProperties, null);
-    }
-
-    @Deprecated
-    public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws SOSHibernateInvalidSessionException,
-            SOSHibernateCriteriaException {
-        Criteria cr = createCriteria(cl);
-        if (cr == null) {
-            throw new SOSHibernateCriteriaException("criteria is NULL");
-        }
-        try {
-            if (selectProperties != null) {
-                ProjectionList pl = Projections.projectionList();
-                for (String property : selectProperties) {
-                    pl.add(Projections.property(property), property);
-                }
-                cr.setProjection(pl);
-            }
-            if (transformer != null) {
-                cr.setResultTransformer(transformer);
-            }
-        } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
-                throw new SOSHibernateCriteriaException(e);
-            }
-        } catch (PersistenceException e) {
-            throw new SOSHibernateCriteriaException(e);
-        }
-        return cr;
-    }
-
-    @Deprecated
-    public Criteria createSingleListTransform2BeanCriteria(Class<?> cl, String selectProperty) throws SOSHibernateInvalidSessionException,
-            SOSHibernateCriteriaException {
-        return createSingleListCriteria(cl, selectProperty, Transformers.aliasToBean(cl));
-    }
-
-    @Deprecated
-    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty) throws SOSHibernateInvalidSessionException,
-            SOSHibernateCriteriaException {
-        return createSingleListCriteria(cl, selectProperty, null);
-    }
-
-    @Deprecated
-    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer)
-            throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
-        return createCriteria(cl, new String[] { selectProperty }, transformer);
-    }
-
-    @Deprecated
-    public Criteria createTransform2BeanCriteria(Class<?> cl) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
-        return createCriteria(cl, null, null);
-    }
-
-    @Deprecated
-    public Criteria createTransform2BeanCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateInvalidSessionException,
-            SOSHibernateCriteriaException {
-        return createCriteria(cl, selectProperties, Transformers.aliasToBean(cl));
-    }
-
-    public static Criterion createInCriterion(String propertyName, List<?> list) {
-        Criterion criterion = null;
-        int size = list.size();
-
-        for (int i = 0; i < size; i += LIMIT_IN_CLAUSE) {
-            List<?> subList;
-            if (size > i + LIMIT_IN_CLAUSE) {
-                subList = list.subList(i, (i + LIMIT_IN_CLAUSE));
-            } else {
-                subList = list.subList(i, size);
-            }
-            if (criterion != null) {
-                criterion = Restrictions.or(criterion, Restrictions.in(propertyName, subList));
-            } else {
-                criterion = Restrictions.in(propertyName, subList);
-            }
-        }
-        return criterion;
     }
 
     private String getMethodName(String name) {

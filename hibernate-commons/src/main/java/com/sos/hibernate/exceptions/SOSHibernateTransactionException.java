@@ -2,6 +2,7 @@ package com.sos.hibernate.exceptions;
 
 import javax.persistence.PersistenceException;
 
+/** can occurs if transaction methods are called: beginTransaction, commit, getTransaction, rollback */
 public class SOSHibernateTransactionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;

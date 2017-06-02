@@ -2,6 +2,7 @@ package com.sos.hibernate.exceptions;
 
 import javax.persistence.PersistenceException;
 
+/** can occurs if following methods are called: clearSession, delete, get, refresh, save, saveOrUpdate, update, sessionDoWork */
 public class SOSHibernateSessionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
