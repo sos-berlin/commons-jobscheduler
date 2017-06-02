@@ -253,7 +253,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public String getPreCommand() {
         String delimiter;
-        if(isWindows()) {
+        if(flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
@@ -275,7 +275,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     private String getEnvCommand() {
         String delimiter;
-        if(isWindows()) {
+        if(flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
@@ -422,13 +422,4 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         this.schedulerEnvVars = schedulerEnvVars;
     }
 
-    private boolean isWindows() {
-        String os = System.getProperty("os.name").toLowerCase();
-        boolean win = false;
-        Map<String, String> envvars = new HashMap<String, String>();
-        if (os.indexOf("nt") > -1 || os.indexOf("windows") > -1) {
-            win = true;
-        }
-        return win;
-    }
 }
