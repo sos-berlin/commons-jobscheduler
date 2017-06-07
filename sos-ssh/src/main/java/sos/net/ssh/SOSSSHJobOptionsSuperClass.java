@@ -216,7 +216,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     @JSOptionDefinition(name = "preCommand", description = "the preCommand to set an environmental variable on the remote host", key = "preCommand", 
             type = "SOSOptionString", mandatory = false)
     public SOSOptionString preCommand = new SOSOptionString(this, CLASSNAME + ".preCommand", 
-            "the preCommand to set an environmental variable on the remote host", "export %s=%s", "export %s=%s", false);
+            "the preCommand to set an environmental variable on the remote host", "export %s='%s'", "export %s='%s'", false);
 
     public SOSOptionString getPreCommand() {
         return preCommand;
