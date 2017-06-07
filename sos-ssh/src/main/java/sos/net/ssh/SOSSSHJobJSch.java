@@ -296,7 +296,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         LOGGER.debug("*******************************");
                     }
                     envVarValue = envVarValue.replaceAll("\"", "\\\"");
-                    envVarValue = "'" + envVarValue + "'";
+                    // do not wrap between ' because it would cause problems under windows, use the pre-command format instead
+//                    envVarValue = "'" + envVarValue + "'";
                     if (!flgIsWindowsShell) {
                         envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
                     }
