@@ -1,5 +1,7 @@
 package com.sos.hibernate.exceptions;
 
+import java.sql.SQLException;
+
 import javax.persistence.PersistenceException;
 
 import org.hibernate.query.Query;
@@ -35,5 +37,13 @@ public class SOSHibernateInvalidSessionException extends SOSHibernateException {
 
     public SOSHibernateInvalidSessionException(PersistenceException cause) {
         super(cause);
+    }
+
+    public SOSHibernateInvalidSessionException(PersistenceException cause, String stmt) {
+        super(cause, stmt);
+    }
+
+    public SOSHibernateInvalidSessionException(SQLException cause, String stmt) {
+        super(cause, stmt);
     }
 }
