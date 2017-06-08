@@ -38,6 +38,7 @@ import com.sos.hibernate.exceptions.SOSHibernateSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateTransactionException;
 
 import sos.util.SOSDate;
+import sos.util.SOSString;
 
 public class SOSHibernateSession implements Serializable {
 
@@ -147,11 +148,11 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateConnectionException */
     public Connection getConnection() throws SOSHibernateException {
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("getConnection");
         LOGGER.debug(String.format("%s", method));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
@@ -241,11 +242,14 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("deprecation")
     public int executeUpdate(Query<?> query) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("executeUpdate");
         LOGGER.debug(String.format("%s: query[%s]", method, query.getQueryString()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             return query.executeUpdate();
         } catch (IllegalStateException e) {
@@ -259,11 +263,11 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public void clearSession() throws SOSHibernateException {
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("clearSession");
         LOGGER.debug(String.format("%s", method));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (!isStatelessSession) {
                 Session session = (Session) currentSession;
@@ -278,11 +282,14 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public void sessionDoWork(Work work) throws SOSHibernateException {
+        if (work == null) {
+            throw new SOSHibernateSessionException("work is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("sessionDoWork");
         LOGGER.debug(String.format("%s", method));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (!isStatelessSession) {
                 Session session = (Session) currentSession;
@@ -329,10 +336,10 @@ public class SOSHibernateSession implements Serializable {
         } catch (SOSHibernateConfigurationException e) {
             throw new SOSHibernateTransactionException("can't get configured autocommit", e);
         }
-        LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
+        LOGGER.debug(String.format("%s", method));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -403,10 +410,10 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateTransactionException */
     public Transaction getTransaction() throws SOSHibernateException {
-        Transaction tr = null;
         if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
+        Transaction tr = null;
         try {
             if (isStatelessSession) {
                 StatelessSession s = ((StatelessSession) currentSession);
@@ -425,11 +432,14 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public void save(Object item) throws SOSHibernateException {
+        if (item == null) {
+            throw new SOSHibernateSessionException("item is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("save");
         LOGGER.debug(String.format("%s: item=%s", method, item));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -448,11 +458,14 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public void update(Object item) throws SOSHibernateException {
+        if (item == null) {
+            throw new SOSHibernateSessionException("item is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("update");
         LOGGER.debug(String.format("%s: item=%s", method, item));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -471,11 +484,14 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public Object saveOrUpdate(Object item) throws SOSHibernateException {
+        if (item == null) {
+            throw new SOSHibernateSessionException("item is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("saveOrUpdate");
         LOGGER.debug(String.format("%s: item=%s", method, item));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -510,11 +526,14 @@ public class SOSHibernateSession implements Serializable {
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     public void delete(Object item) throws SOSHibernateException {
+        if (item == null) {
+            throw new SOSHibernateSessionException("item is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("delete");
         LOGGER.debug(String.format("%s: item=%s", method, item));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -532,31 +551,34 @@ public class SOSHibernateSession implements Serializable {
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
-    public void refresh(Object object) throws SOSHibernateException {
-        refresh(null, object);
+    public void refresh(Object item) throws SOSHibernateException {
+        refresh(null, item);
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
-    public void refresh(String entityName, Object object) throws SOSHibernateException {
+    public void refresh(String entityName, Object item) throws SOSHibernateException {
+        if (item == null) {
+            throw new SOSHibernateSessionException("item is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("refresh");
         LOGGER.debug(String.format("%s: entityName=%s", method, entityName));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
                 if (entityName == null) {
-                    session.refresh(object);
+                    session.refresh(item);
                 } else {
-                    session.refresh(entityName, object);
+                    session.refresh(entityName, item);
                 }
             } else {
                 Session session = (Session) currentSession;
                 if (entityName == null) {
-                    session.refresh(object);
+                    session.refresh(item);
                 } else {
-                    session.refresh(entityName, object);
+                    session.refresh(entityName, item);
                 }
             }
         } catch (IllegalStateException e) {
@@ -569,11 +591,17 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> entityClass, Serializable id) throws SOSHibernateException {
+        if (entityClass == null) {
+            throw new SOSHibernateSessionException("entityClass is NULL");
+        }
+        if (id == null) {
+            throw new SOSHibernateSessionException("id is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL");
+        }
         String method = getMethodName("get");
         LOGGER.debug(String.format("%s: entityClass=%s", method, entityClass.getName()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL");
-        }
         try {
             if (isStatelessSession) {
                 return (T) ((StatelessSession) currentSession).get(entityClass, id);
@@ -597,11 +625,15 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("unchecked")
     public <T> Query<T> createQuery(String hql, Class<T> entityClass) throws SOSHibernateException {
+        if (SOSString.isEmpty(hql)) {
+            throw new SOSHibernateQueryException("hql statement is empty");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", hql);
+        }
+
         String method = getMethodName("createQuery");
         LOGGER.debug(String.format("%s: hql=%s", method, hql));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", hql);
-        }
         Query<T> q = null;
         try {
             if (isStatelessSession) {
@@ -635,11 +667,14 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("unchecked")
     public <T> NativeQuery<T> createNativeQuery(String sql, Class<T> entityClass) throws SOSHibernateException {
+        if (SOSString.isEmpty(sql)) {
+            throw new SOSHibernateQueryException("sql statement is empty");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", sql);
+        }
         String method = getMethodName("createNativeQuery");
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", sql);
-        }
         NativeQuery<T> q = null;
         try {
             if (isStatelessSession) {
@@ -684,6 +719,9 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
     @SuppressWarnings("deprecation")
     public <T> T getSingleValue(Query<T> query) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
         String method = getMethodName("getSingleValue");
         LOGGER.debug(String.format("%s: query[%s]", method, query.getQueryString()));
         T result = getSingleResult(query);
@@ -743,11 +781,14 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
     @SuppressWarnings("deprecation")
     public <T> T getSingleResult(Query<T> query) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", query);
+        }
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: query[%s]", method, query.getQueryString()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", query);
-        }
         T result = null;
         try {
             result = query.getSingleResult();
@@ -785,9 +826,14 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
     @SuppressWarnings({ "deprecation", "unchecked" })
     public Map<String, String> getSingleResult(NativeQuery<?> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+        if (nativeQuery == null) {
+            throw new SOSHibernateQueryException("nativeQuery is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
+        }
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
-
         nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
         Map<String, String> result = null;
         try {
@@ -833,11 +879,14 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings({ "deprecation", "unchecked" })
     public <T> List<Map<String, String>> getResultList(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+        if (nativeQuery == null) {
+            throw new SOSHibernateQueryException("nativeQuery is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
+        }
         String method = getMethodName("getResultList");
         LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", nativeQuery);
-        }
         try {
             nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
             return (List<Map<String, String>>) nativeQuery.getResultList();
@@ -891,11 +940,14 @@ public class SOSHibernateSession implements Serializable {
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("deprecation")
     public <T> List<T> getResultList(Query<T> query) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", query);
+        }
         String method = getMethodName("getResultList");
         LOGGER.debug(String.format("%s: query[%s]", method, query.getQueryString()));
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("session is NULL", query);
-        }
         try {
             return query.getResultList();
         } catch (IllegalStateException e) {
