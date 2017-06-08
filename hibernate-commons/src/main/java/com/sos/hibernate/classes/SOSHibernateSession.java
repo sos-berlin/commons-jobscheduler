@@ -2,6 +2,7 @@ package com.sos.hibernate.classes;
 
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.hibernate.exception.JDBCConnectionException;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
@@ -158,13 +160,19 @@ public class SOSHibernateSession implements Serializable {
                 return sf.connection();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateConnectionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateConnectionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateConnectionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -243,13 +251,19 @@ public class SOSHibernateSession implements Serializable {
         try {
             return query.executeUpdate();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, query);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, query);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -265,13 +279,19 @@ public class SOSHibernateSession implements Serializable {
                 session.clear();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -287,13 +307,19 @@ public class SOSHibernateSession implements Serializable {
                 session.doWork(work);
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -342,13 +368,19 @@ public class SOSHibernateSession implements Serializable {
                 session.beginTransaction();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateTransactionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -373,13 +405,19 @@ public class SOSHibernateSession implements Serializable {
             }
             tr.commit();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateTransactionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -401,13 +439,19 @@ public class SOSHibernateSession implements Serializable {
         try {
             tr.rollback();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateTransactionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -425,13 +469,20 @@ public class SOSHibernateSession implements Serializable {
                 tr = s.getTransaction();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateTransactionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateTransactionException(e);
+            } else {
+                throw ise;
+            }
+
         }
         return tr;
     }
@@ -452,13 +503,19 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -478,13 +535,19 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -519,13 +582,19 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
         return item;
     }
@@ -546,13 +615,19 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -583,13 +658,19 @@ public class SOSHibernateSession implements Serializable {
                 }
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -607,13 +688,19 @@ public class SOSHibernateSession implements Serializable {
                 return ((Session) currentSession).get(entityClass, id);
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
                 throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateSessionException(e);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e);
+            if (ise == null) {
+                throw new SOSHibernateSessionException(e);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -644,15 +731,21 @@ public class SOSHibernateSession implements Serializable {
                 }
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, hql);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, hql);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, hql);
+            } else {
+                throw ise;
             }
         } catch (IllegalArgumentException e) {
             throw new SOSHibernateQueryException(e, hql);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, hql);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, hql);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, hql);
+            } else {
+                throw ise;
+            }
         }
         return q;
     }
@@ -685,15 +778,21 @@ public class SOSHibernateSession implements Serializable {
                 }
             }
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, sql);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, sql);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, sql);
+            } else {
+                throw ise;
             }
         } catch (IllegalArgumentException e) {
             throw new SOSHibernateQueryException(e, sql);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, sql);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, sql);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, sql);
+            } else {
+                throw ise;
+            }
         }
         return q;
     }
@@ -783,17 +882,23 @@ public class SOSHibernateSession implements Serializable {
         try {
             result = query.getSingleResult();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, query);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
             }
         } catch (NoResultException e) {
             result = null;
         } catch (NonUniqueResultException e) {
             throw new SOSHibernateQueryNonUniqueResultException(e, query);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, query);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
+            }
         }
         return result;
     }
@@ -827,17 +932,23 @@ public class SOSHibernateSession implements Serializable {
         try {
             result = (Map<String, String>) nativeQuery.getSingleResult();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, nativeQuery);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, nativeQuery);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, nativeQuery);
+            } else {
+                throw ise;
             }
         } catch (NoResultException e) {
             result = null;
         } catch (NonUniqueResultException e) {
             throw new SOSHibernateQueryNonUniqueResultException(e, nativeQuery);
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, nativeQuery);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, nativeQuery);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, nativeQuery);
+            } else {
+                throw ise;
+            }
         }
         return result;
     }
@@ -877,13 +988,19 @@ public class SOSHibernateSession implements Serializable {
             nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
             return (List<Map<String, String>>) nativeQuery.getResultList();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, nativeQuery);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, nativeQuery);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, nativeQuery);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, nativeQuery);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, nativeQuery);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, nativeQuery);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -934,13 +1051,19 @@ public class SOSHibernateSession implements Serializable {
         try {
             return query.getResultList();
         } catch (IllegalStateException e) {
-            if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, query);
-            } else {
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
                 throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
             }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(e, query);
+            SOSHibernateInvalidSessionException ise = findInvalidSessionException(e, query);
+            if (ise == null) {
+                throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw ise;
+            }
         }
     }
 
@@ -992,4 +1115,41 @@ public class SOSHibernateSession implements Serializable {
         currentSession = null;
     }
 
+    private SOSHibernateInvalidSessionException findInvalidSessionException(PersistenceException cause) {
+        return findInvalidSessionException(cause, (String) null);
+    }
+
+    @SuppressWarnings("deprecation")
+    private SOSHibernateInvalidSessionException findInvalidSessionException(PersistenceException cause, Query<?> query) {
+        return findInvalidSessionException(cause, query == null ? null : query.getQueryString());
+    }
+
+    private SOSHibernateInvalidSessionException findInvalidSessionException(PersistenceException cause, String stmt) {
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof JDBCConnectionException) {
+                return new SOSHibernateInvalidSessionException((JDBCConnectionException) e, stmt);
+            } else if (e instanceof SQLNonTransientConnectionException) {// can occur without hibernate JDBCConnectionException
+                return new SOSHibernateInvalidSessionException((SQLNonTransientConnectionException) e, stmt);
+            }
+            e = e.getCause();
+        }
+        return null;
+    }
+
+    private SOSHibernateInvalidSessionException findInvalidSessionException(IllegalStateException cause) {
+        return findInvalidSessionException(cause, (String) null);
+    }
+
+    @SuppressWarnings("deprecation")
+    private SOSHibernateInvalidSessionException findInvalidSessionException(IllegalStateException cause, Query<?> query) {
+        return findInvalidSessionException(cause, query == null ? null : query.getQueryString());
+    }
+
+    private SOSHibernateInvalidSessionException findInvalidSessionException(IllegalStateException cause, String stmt) {
+        if (cause.getCause() == null) {
+            return new SOSHibernateInvalidSessionException(cause, stmt);
+        }
+        return null;
+    }
 }

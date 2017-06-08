@@ -181,7 +181,7 @@ public class SOSHibernateException extends SOSException {
     }
 
     private void handleStatement(String stmt) {
-        if ((statement == null || statement.equals(STATEMENT_NOT_AVAILABLE)) && stmt != null) {
+        if (stmt != null && (statement == null || statement.equals(STATEMENT_NOT_AVAILABLE))) {
             statement = stmt;
             if (message != null) {
                 // message can contains sql as [Query is:<new line> sql statement]
