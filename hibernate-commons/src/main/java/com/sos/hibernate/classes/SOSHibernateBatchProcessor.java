@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.exceptions.SOSHibernateBatchProcessorException;
-import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
-import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 
 public class SOSHibernateBatchProcessor implements Serializable {
 
@@ -36,8 +35,8 @@ public class SOSHibernateBatchProcessor implements Serializable {
         countCurrentBatches = 0;
     }
 
-    public void createInsertBatch(Class<?> entity) throws SOSHibernateInvalidSessionException, SOSHibernateConnectionException,
-            SOSHibernateBatchProcessorException {
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException */
+    public void createInsertBatch(Class<?> entity) throws SOSHibernateException {
         String method = "createInsertBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
         if (session == null) {
@@ -163,7 +162,8 @@ public class SOSHibernateBatchProcessor implements Serializable {
         countCurrentBatches++;
     }
 
-    public int[] executeBatch() throws SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException {
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException */
+    public int[] executeBatch() throws SOSHibernateException {
         String method = "executeBatch";
         LOGGER.debug(String.format("%s", method));
         if (countCurrentBatches == 0) {
