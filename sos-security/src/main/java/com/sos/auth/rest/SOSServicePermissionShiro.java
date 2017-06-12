@@ -941,7 +941,13 @@ public class SOSServicePermissionShiro {
     }
 
     private void addPermission(List<String> sosPermission, String permission) {
-        if (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated()) {
+        if (currentUser != null && currentUser.isAuthenticated()) {
+            sosPermission.add(permission);
+        }
+    }
+
+    private void addUserPermission(List<String> sosPermission, String permission) {
+        if (isPermitted(permission)){
             sosPermission.add(permission);
         }
 
