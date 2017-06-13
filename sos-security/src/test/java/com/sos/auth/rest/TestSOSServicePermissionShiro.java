@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
+import com.sos.joc.Globals;
 
 public class TestSOSServicePermissionShiro {
 
@@ -15,9 +16,15 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testGetPermissions() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","", LDAP_USER, LDAP_PASSWORD);
-        String permissisonsCommand = sosPermissionShiro.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
-        String permissisonsJoc = sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(0);
+        SOSPermissionShiro sosPermissionShiroAll = sosServicePermissionShiro.getPermissions("","",false, LDAP_USER, LDAP_PASSWORD);
+        Globals.sosShiroProperties = null;
+        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","",true, LDAP_USER, LDAP_PASSWORD);
+        for (int i=0;i< sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().size();i++){
+            System.out.println(sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(i));
+        }
+        sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
+        String permissisonsCommand = sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
+        String permissisonsJoc = sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(0);
 
     }
 

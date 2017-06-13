@@ -339,11 +339,15 @@ public class SOSServicePermissionShiro {
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
-            @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+            @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") Boolean forUser, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
 
+        if (forUser == null){
+            forUser = false;
+        }
+        
         ObjectFactory o = new ObjectFactory();
         SOSPermissionShiro sosPermissionShiro = o.createSOSPermissionShiro();
 
@@ -353,194 +357,188 @@ public class SOSServicePermissionShiro {
             sosPermissionShiro.setAccessToken(currentUser.getAccessToken());
             sosPermissionShiro.setUser(currentUser.getUsername());
 
-            SOSPermissionRoles roles = o.createSOSPermissionRoles();
-
-            Section s = getIni().getSection("roles");
-
-            for (String role : s.keySet()) {
-                addAllRole(roles.getSOSPermissionRole(), role);
-            }
+            SOSPermissionRoles roles = getRoles(forUser);
 
             SOSPermissions sosPermissions = o.createSOSPermissions();
 
             SOSPermissionListJoc sosPermissionJoc = o.createSOSPermissionListJoc();
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:parameter");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:mainlog");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:restart:terminate");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:restart:abort");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:pause");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:continue");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:terminate");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:abort");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:stop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:manage_categories");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:edit_permissions");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:remove_old_instances");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:parameter");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:view:mainlog");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:restart:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:restart:abort");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:pause");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:continue");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:abort");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:execute:stop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:manage_categories");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:edit_permissions");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:administration:remove_old_instances");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate_fail_safe");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:restart");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate_fail_safe");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:restart");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:abort");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:terminate");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:abort");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:abort");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:abort");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:terminate");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:daily_plan:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:history:view");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:order_log");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:start_and_end_node");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:time_for_adhoc_orders");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:parameter");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:run_time");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:state");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:hot_folder");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:start");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:update");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:suspend");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:resume");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:reset");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:remove_setback");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:delete:permanent");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:delete:temporary");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:history");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:stop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:unstop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:add_order");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:skip_jobchain_node");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:process_jobchain_node");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:stop_jobchain_node");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:daily_plan:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:history:view");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:order_log");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:start_and_end_node");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:time_for_adhoc_orders");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:parameter");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:run_time");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:state");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:start");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:update");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:suspend");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:resume");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:reset");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:execute:remove_setback");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:delete:permanent");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:delete:temporary");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:history");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:stop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:unstop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:add_order");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:skip_jobchain_node");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:process_jobchain_node");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:execute:stop_jobchain_node");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job_chain:change:hot_folder");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:task_log");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:history");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:change:run_time");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:change:hot_folder");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:start");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:stop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:terminate");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:kill");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:end_all_tasks");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:suspend_all_tasks");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:continue_all_tasks");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:task_log");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:view:history");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:change:run_time");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:start");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:stop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:terminate");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:kill");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:end_all_tasks");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:suspend_all_tasks");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:continue_all_tasks");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:process_class:change:hot_folder");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:remove");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:add_substitute");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:edit_content");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:remove");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:add_substitute");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:edit_content");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:hot_folder");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:change:hot_folder");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:configuration");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:change:hot_folder");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:delete");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:delete");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:create_event_manually");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:create_event_manually");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:holiday_calendar:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:holiday_calendar:view:status");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:view");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:delete");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:edit_content");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:shared_status:make_private");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:shared_status:make_share");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:view");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:delete");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:edit_content");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:shared_status:make_private");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:shared_status:make_share");
 
             sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
             SOSPermissionListCommands sosPermissionCommands = o.createSOSPermissionListCommands();
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:calendar");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:parameter");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:terminate");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:abort");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:pause");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:continue");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:terminate");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:abort");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:stop");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:administration:manage_categories");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:calendar");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:parameter");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:terminate");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:abort");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:pause");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:continue");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:terminate");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:abort");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:stop");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:administration:manage_categories");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate_fail_safe");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:restart");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate_fail_safe");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:restart");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:history:view");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:history:view");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:start");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:update");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:suspend");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:resume");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:reset");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:remove_setback");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:delete");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:start_and_end_node");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:time_for_adhoc_orders");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:parameter");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:run_time");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:state");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:other");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:start");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:update");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:suspend");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:resume");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:reset");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:execute:remove_setback");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:delete");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:start_and_end_node");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:time_for_adhoc_orders");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:parameter");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:run_time");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:state");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:other");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:change:hot_folder");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:stop");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:unstop");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:add_order");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:skip_jobchain_node");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:process_jobchain_node");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:stop_jobchain_node");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:change:hot_folder");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:remove");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:stop");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:unstop");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:add_order");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:skip_jobchain_node");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:process_jobchain_node");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:stop_jobchain_node");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:remove");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:start");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:stop");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:unstop");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:terminate");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:kill");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:end_all_tasks");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:suspend_all_tasks");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:continue_all_tasks");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:change:run_time");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:start");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:stop");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:unstop");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:terminate");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:kill");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:end_all_tasks");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:suspend_all_tasks");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:execute:continue_all_tasks");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:change:run_time");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:change:hot_folder");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:edit_content");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:remove");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:edit_content");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:remove");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:hot_folder");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:change:add_substitute");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:change:add_substitute");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:change:hot_folder");
 
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:remove");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:edit_content");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:hot_folder");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:remove");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:edit_content");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:hot_folder");
 
             sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
@@ -913,7 +911,7 @@ public class SOSServicePermissionShiro {
     private SOSPermissionJocCockpit createJocCockpitPermissionObject(String accessToken, String user, String pwd) {
 
         SOSPermissionJocCockpit sosPermissionJocCockpit = getSosPermissionJocCockpit();
-        sosPermissionJocCockpit.setSOSPermissionRoles(getRoles());
+        sosPermissionJocCockpit.setSOSPermissionRoles(getRoles(true));
 
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
         Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
@@ -924,7 +922,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionJocCockpit sosPermissionJocCockpit = getSosPermissionJocCockpit();
         SOSPermissionCommands sosPermissionCommands = getSosPermissionCommands();
-        sosPermissionJocCockpit.setSOSPermissionRoles(getRoles());
+        sosPermissionJocCockpit.setSOSPermissionRoles(getRoles(true));
 
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
         currentUser.setSosPermissionCommands(sosPermissionCommands);
@@ -940,30 +938,20 @@ public class SOSServicePermissionShiro {
         return isPermitted(permission);
     }
 
-    private void addPermission(List<String> sosPermission, String permission) {
-        if (currentUser != null && currentUser.isAuthenticated()) {
+    private void addPermission(Boolean forUser, List<String> sosPermission, String permission) {
+        if (!forUser || isPermitted(permission)) {
             sosPermission.add(permission);
         }
     }
 
-    private void addUserPermission(List<String> sosPermission, String permission) {
-        if (isPermitted(permission)){
-            sosPermission.add(permission);
-        }
-
-    }
-
-    private void addRole(List<String> sosRoles, String role) {
-        if (currentUser != null && currentUser.hasRole(role) && currentUser.isAuthenticated()) {
-            sosRoles.add(role);
+    private void addRole(List<String> sosRoles, String role, boolean forUser ) {
+        if (currentUser != null && (!forUser || currentUser.hasRole(role)) && currentUser.isAuthenticated()) {
+            if (!sosRoles.contains(role)) {
+                sosRoles.add(role);
+            }
         }
     }
 
-    private void addAllRole(List<String> sosRoles, String role) {
-        if (currentUser != null && currentUser.isAuthenticated()) {
-            sosRoles.add(role);
-        }
-    }
 
     private void createUser() throws Exception {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
@@ -1053,10 +1041,10 @@ public class SOSServicePermissionShiro {
 
     }
 
-    private String getRolesAsString() {
+    private String getRolesAsString(boolean forUser) {
         String roles = "  ";
         if (currentUser != null) {
-            SOSPermissionRoles listOfRoles = getRoles();
+            SOSPermissionRoles listOfRoles = getRoles(forUser);
             for (int i = 0; i < listOfRoles.getSOSPermissionRole().size(); i++) {
                 roles = roles + listOfRoles.getSOSPermissionRole().get(i) + ",";
             }
@@ -1066,20 +1054,37 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    public SOSPermissionRoles getRoles() {
+    public SOSPermissionRoles getRoles(boolean forUser) {
 
-        if (roles == null) {
+        if (roles == null || !forUser) {
             ObjectFactory o = new ObjectFactory();
             roles = o.createSOSPermissionRoles();
 
             ini = getIni();
             Section s = ini.getSection("roles");
-            for (String role : s.keySet()) {
-                addRole(roles.getSOSPermissionRole(), role);
+
+            if (s != null) {
+                for (String role : s.keySet()) {
+                    addRole(roles.getSOSPermissionRole(), role, forUser);
+                }
+            }
+
+            s = ini.getSection("folders");
+            if (s != null) {
+                for (String role : s.keySet()) {
+                    String[] key = role.split("\\|");
+                    if (key.length == 1) {
+                        addRole(roles.getSOSPermissionRole(), role, forUser);
+                    }
+                    if (key.length == 2) {
+                        addRole(roles.getSOSPermissionRole(), key[1], forUser);
+                    }
+                }
             }
         }
         return roles;
     }
+
 
     public Ini getIni() {
 
@@ -1113,7 +1118,7 @@ public class SOSServicePermissionShiro {
             LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
 
             JocAuditLog jocAuditLog = new JocAuditLog(currentUser.getUsername(), "./login");
-            SecurityAudit s = new SecurityAudit(getRolesAsString());
+            SecurityAudit s = new SecurityAudit(getRolesAsString(true));
             jocAuditLog.logAuditMessage(s);
             jocAuditLog.storeAuditLogEntry(s);
 
