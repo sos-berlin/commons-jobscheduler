@@ -43,7 +43,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         session = sess;
     }
 
-    /** see executeQuery */
+    /** see getResultSet */
     public void close(ResultSet rs) {
         if (rs != null) {
             try {
@@ -554,7 +554,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return extractor.extractCommands(content);
     }
 
-    /** see executeQuery */
+    /** see getResultSet */
     public Map<String, String> next(ResultSet rs) throws SOSHibernateSQLExecutorException {
         Map<String, String> record = new LinkedHashMap<String, String>();
         try {
