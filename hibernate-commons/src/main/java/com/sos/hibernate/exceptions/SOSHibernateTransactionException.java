@@ -7,10 +7,6 @@ public class SOSHibernateTransactionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateTransactionException(String msg) {
-        super(msg);
-    }
-
     public SOSHibernateTransactionException(IllegalStateException cause) {
         super(cause);
     }
@@ -19,11 +15,15 @@ public class SOSHibernateTransactionException extends SOSHibernateException {
         super(cause, stmt);
     }
 
-    public SOSHibernateTransactionException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
     public SOSHibernateTransactionException(PersistenceException cause) {
         super(cause);
+    }
+
+    public SOSHibernateTransactionException(String msg) {
+        super(msg);
+    }
+
+    public SOSHibernateTransactionException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

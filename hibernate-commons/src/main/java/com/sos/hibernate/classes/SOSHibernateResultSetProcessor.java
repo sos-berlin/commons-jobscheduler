@@ -24,32 +24,43 @@ import org.slf4j.LoggerFactory;
 
 public class SOSHibernateResultSetProcessor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateResultSetProcessor.class);
-    private SOSHibernateSession session;
-    private Statement statement;
-    private ResultSet resultSet;
+    private static final long serialVersionUID = 1L;
     private Class<?> entity;
     private HashMap<String, Method> entityGetMethods;
     private HashMap<String, Method> entitySetMethods;
+    private ResultSet resultSet;
+    private SOSHibernateSession session;
     private String sqlStatement;
+    private Statement statement;
 
     public SOSHibernateResultSetProcessor(SOSHibernateSession sess) {
         session = sess;
     }
 
-    public ResultSet createResultSet(Criteria criteria, ScrollMode scrollMode) throws Exception {
-        return createResultSet(null, criteria, scrollMode, null);
+    public void close() {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (Exception ex) {
+                //
+            }
+        }
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (Exception ex) {
+                //
+            }
+        }
+        dispose();
     }
 
     public ResultSet createResultSet(Class<?> resultEntity, Criteria criteria, ScrollMode scrollMode) throws Exception {
         return createResultSet(resultEntity, criteria, scrollMode, null);
     }
 
-    public ResultSet createResultSet(Criteria criteria, ScrollMode scrollMode, Optional<Integer> fetchSize) throws Exception {
-        return createResultSet(null, criteria, scrollMode, fetchSize);
-    }
-
+    @SuppressWarnings("deprecation")
     public ResultSet createResultSet(Class<?> resultEntity, Criteria criteria, ScrollMode scrollMode, Optional<Integer> fetchSize) throws Exception {
         String method = "createResultSet";
         try {
@@ -77,6 +88,14 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         return resultSet;
     }
 
+    public ResultSet createResultSet(Criteria criteria, ScrollMode scrollMode) throws Exception {
+        return createResultSet(null, criteria, scrollMode, null);
+    }
+
+    public ResultSet createResultSet(Criteria criteria, ScrollMode scrollMode, Optional<Integer> fetchSize) throws Exception {
+        return createResultSet(null, criteria, scrollMode, fetchSize);
+    }
+
     public ResultSet createResultSet(String sql, ScrollMode scrollMode, boolean isReadOnly) throws Exception {
         return createResultSet(sql, scrollMode, isReadOnly, null);
     }
@@ -95,62 +114,6 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         resultSet = statement.executeQuery(sqlStatement);
         LOGGER.debug(String.format("%s: statement.getFetchSize = %s", method, statement.getFetchSize()));
         return resultSet;
-    }
-
-    private String createSqlStatement(CriteriaQueryTranslator translator, String hibernateSqlString) throws Exception {
-        String where = translator.getWhereCondition();
-        QueryParameters qp = translator.getQueryParameters();
-        Type[] types = qp.getPositionalParameterTypes();
-        Object[] values = qp.getPositionalParameterValues();
-        for (int i = 0; i < values.length; i++) {
-            int index = where.indexOf("?");
-            if (index > 0) {
-                String val = session.getFactory().quote(types[i], values[i]);
-                where = where.replaceFirst("\\?", val);
-            }
-        }
-        return hibernateSqlString.replace(translator.getWhereCondition(), where);
-    }
-
-    private void createMetadata(CriteriaQueryTranslator translator) throws Exception {
-        String method = "createMetadata";
-        if (translator.getRootCriteria().getProjection() == null) {
-            throw new Exception(String.format(
-                    "%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition", method));
-        }
-        entityGetMethods = new HashMap<String, Method>();
-        entitySetMethods = new HashMap<String, Method>();
-        String[] properties = translator.getProjectedAliases();
-        String[] propertiesColumnAliases = translator.getProjectedColumnAliases();
-        for (int i = 0; i < properties.length; i++) {
-            String property = properties[i];
-            if (property == null) {
-                throw new Exception(String.format("%s: property is NULL. Please use the field aliases in the Projection definition", method));
-            }
-            Method getter = new PropertyDescriptor(property, entity).getReadMethod();
-            Method setter = new PropertyDescriptor(property, entity).getWriteMethod();
-            entityGetMethods.put(propertiesColumnAliases[i], getter);
-            entitySetMethods.put(propertiesColumnAliases[i], setter);
-        }
-    }
-
-    private int getConcurrencyMode(boolean readOnly) {
-        return readOnly ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
-    }
-
-    private int getResultSetType(ScrollMode scrollMode) throws Exception {
-        String method = "getResultSetType";
-        int type = 0;
-        if (scrollMode.equals(ScrollMode.FORWARD_ONLY)) {
-            type = ResultSet.TYPE_FORWARD_ONLY;
-        } else if (scrollMode.equals(ScrollMode.SCROLL_INSENSITIVE)) {
-            type = ResultSet.TYPE_SCROLL_INSENSITIVE;
-        } else if (scrollMode.equals(ScrollMode.SCROLL_SENSITIVE)) {
-            type = ResultSet.TYPE_SCROLL_SENSITIVE;
-        } else {
-            throw new Exception(String.format("%s: not supported scroll mode = %s", method, scrollMode.toString()));
-        }
-        return type;
     }
 
     public Object get() throws Exception {
@@ -197,6 +160,47 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         return bean;
     }
 
+    public String getSqlStatement() {
+        return sqlStatement;
+    }
+
+    private void createMetadata(CriteriaQueryTranslator translator) throws Exception {
+        String method = "createMetadata";
+        if (translator.getRootCriteria().getProjection() == null) {
+            throw new Exception(String.format(
+                    "%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition", method));
+        }
+        entityGetMethods = new HashMap<String, Method>();
+        entitySetMethods = new HashMap<String, Method>();
+        String[] properties = translator.getProjectedAliases();
+        String[] propertiesColumnAliases = translator.getProjectedColumnAliases();
+        for (int i = 0; i < properties.length; i++) {
+            String property = properties[i];
+            if (property == null) {
+                throw new Exception(String.format("%s: property is NULL. Please use the field aliases in the Projection definition", method));
+            }
+            Method getter = new PropertyDescriptor(property, entity).getReadMethod();
+            Method setter = new PropertyDescriptor(property, entity).getWriteMethod();
+            entityGetMethods.put(propertiesColumnAliases[i], getter);
+            entitySetMethods.put(propertiesColumnAliases[i], setter);
+        }
+    }
+
+    private String createSqlStatement(CriteriaQueryTranslator translator, String hibernateSqlString) throws Exception {
+        String where = translator.getWhereCondition();
+        QueryParameters qp = translator.getQueryParameters();
+        Type[] types = qp.getPositionalParameterTypes();
+        Object[] values = qp.getPositionalParameterValues();
+        for (int i = 0; i < values.length; i++) {
+            int index = where.indexOf("?");
+            if (index > 0) {
+                String val = session.getFactory().quote(types[i], values[i]);
+                where = where.replaceFirst("\\?", val);
+            }
+        }
+        return hibernateSqlString.replace(translator.getWhereCondition(), where);
+    }
+
     private void dispose() {
         resultSet = null;
         statement = null;
@@ -206,26 +210,23 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         sqlStatement = null;
     }
 
-    public void close() {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (Exception ex) {
-                //
-            }
-        }
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (Exception ex) {
-                //
-            }
-        }
-        dispose();
+    private int getConcurrencyMode(boolean readOnly) {
+        return readOnly ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
     }
 
-    public String getSqlStatement() {
-        return sqlStatement;
+    private int getResultSetType(ScrollMode scrollMode) throws Exception {
+        String method = "getResultSetType";
+        int type = 0;
+        if (scrollMode.equals(ScrollMode.FORWARD_ONLY)) {
+            type = ResultSet.TYPE_FORWARD_ONLY;
+        } else if (scrollMode.equals(ScrollMode.SCROLL_INSENSITIVE)) {
+            type = ResultSet.TYPE_SCROLL_INSENSITIVE;
+        } else if (scrollMode.equals(ScrollMode.SCROLL_SENSITIVE)) {
+            type = ResultSet.TYPE_SCROLL_SENSITIVE;
+        } else {
+            throw new Exception(String.format("%s: not supported scroll mode = %s", method, scrollMode.toString()));
+        }
+        return type;
     }
 
 }

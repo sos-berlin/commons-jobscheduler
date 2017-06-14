@@ -11,28 +11,16 @@ public class SOSHibernateInvalidSessionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateInvalidSessionException(String msg) {
-        super(msg);
-    }
-
-    public SOSHibernateInvalidSessionException(String msg, Query<?> query) {
-        super(msg, query);
-    }
-
-    public SOSHibernateInvalidSessionException(String msg, String stmt) {
-        super(msg, stmt);
-    }
-
     public SOSHibernateInvalidSessionException(IllegalStateException cause) {
         super(cause);
     }
 
-    public SOSHibernateInvalidSessionException(IllegalStateException cause, String stmt) {
-        super(cause, stmt);
-    }
-
     public SOSHibernateInvalidSessionException(IllegalStateException cause, Query<?> query) {
         super(cause, query);
+    }
+
+    public SOSHibernateInvalidSessionException(IllegalStateException cause, String stmt) {
+        super(cause, stmt);
     }
 
     public SOSHibernateInvalidSessionException(PersistenceException cause) {
@@ -45,5 +33,17 @@ public class SOSHibernateInvalidSessionException extends SOSHibernateException {
 
     public SOSHibernateInvalidSessionException(SQLException cause, String stmt) {
         super(cause, stmt);
+    }
+
+    public SOSHibernateInvalidSessionException(String msg) {
+        super(msg);
+    }
+
+    public SOSHibernateInvalidSessionException(String msg, Query<?> query) {
+        super(msg, query);
+    }
+
+    public SOSHibernateInvalidSessionException(String msg, String stmt) {
+        super(msg, stmt);
     }
 }

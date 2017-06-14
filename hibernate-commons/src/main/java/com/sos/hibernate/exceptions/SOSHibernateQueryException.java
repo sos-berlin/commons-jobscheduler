@@ -9,8 +9,8 @@ public class SOSHibernateQueryException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateQueryException(String msg) {
-        super(msg);
+    public SOSHibernateQueryException(IllegalArgumentException cause, String stmt) {
+        super(cause, stmt);
     }
 
     public SOSHibernateQueryException(IllegalStateException cause, Query<?> query) {
@@ -18,10 +18,6 @@ public class SOSHibernateQueryException extends SOSHibernateException {
     }
 
     public SOSHibernateQueryException(IllegalStateException cause, String stmt) {
-        super(cause, stmt);
-    }
-
-    public SOSHibernateQueryException(IllegalArgumentException cause, String stmt) {
         super(cause, stmt);
     }
 
@@ -35,5 +31,9 @@ public class SOSHibernateQueryException extends SOSHibernateException {
 
     public SOSHibernateQueryException(PersistenceException cause, String stmt) {
         super(cause, stmt);
+    }
+
+    public SOSHibernateQueryException(String msg) {
+        super(msg);
     }
 }

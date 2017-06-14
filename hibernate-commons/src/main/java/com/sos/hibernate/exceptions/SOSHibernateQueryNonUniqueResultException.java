@@ -8,12 +8,12 @@ public class SOSHibernateQueryNonUniqueResultException extends SOSHibernateExcep
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateQueryNonUniqueResultException(String msg, Query<?> query) {
-        super(msg, query);
-    }
-
     public SOSHibernateQueryNonUniqueResultException(NonUniqueResultException cause, Query<?> query) {
         super(cause.getMessage(), query);
         initCause(cause);
+    }
+
+    public SOSHibernateQueryNonUniqueResultException(String msg, Query<?> query) {
+        super(msg, query);
     }
 }

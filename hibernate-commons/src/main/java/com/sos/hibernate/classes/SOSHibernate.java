@@ -13,6 +13,8 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 
 public class SOSHibernate {
 
+    public static final int LIMIT_IN_CLAUSE = 1000;
+
     public static LockAcquisitionException findLockException(SOSHibernateException cause) {
         Throwable e = cause;
         while (e != null) {

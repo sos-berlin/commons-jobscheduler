@@ -7,10 +7,6 @@ public class SOSHibernateConnectionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateConnectionException(String msg) {
-        super(msg);
-    }
-
     public SOSHibernateConnectionException(IllegalStateException cause) {
         super(cause);
     }
@@ -21,5 +17,9 @@ public class SOSHibernateConnectionException extends SOSHibernateException {
 
     public SOSHibernateConnectionException(PersistenceException cause) {
         super(cause);
+    }
+
+    public SOSHibernateConnectionException(String msg) {
+        super(msg);
     }
 }
