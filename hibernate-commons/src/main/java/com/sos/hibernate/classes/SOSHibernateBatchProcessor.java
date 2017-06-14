@@ -22,17 +22,90 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 
 public class SOSHibernateBatchProcessor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateBatchProcessor.class);
-    private SOSHibernateSession session;
-    private PreparedStatement preparedStatement;
-    private String sqlStatement;
-    private LinkedHashMap<String, Method> fieldsMetadata;
+    private static final long serialVersionUID = 1L;
     private int countCurrentBatches;
+    private LinkedHashMap<String, Method> fieldsMetadata;
+    private PreparedStatement preparedStatement;
+    private SOSHibernateSession session;
+    private String sqlStatement;
 
     public SOSHibernateBatchProcessor(SOSHibernateSession sess) {
         session = sess;
         countCurrentBatches = 0;
+    }
+
+    public static int getExecutedBatchSize(int[] arr) {
+        int count = 0;
+        if (arr != null) {
+            for (int i = 0; i < arr.length; i++) {
+                count += arr[i];
+            }
+        }
+        return count;
+    }
+
+    public void addBatch(Object entity) throws SOSHibernateBatchProcessorException {
+        String method = "addBatch";
+        LOGGER.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
+        if (fieldsMetadata == null) {
+            throw new SOSHibernateBatchProcessorException("fieldsMetadata is NULL");
+        }
+        if (preparedStatement == null) {
+            throw new SOSHibernateBatchProcessorException("preparedStatement is NULL");
+        }
+        int index = 1;
+        try {
+            for (Map.Entry<String, Method> entry : fieldsMetadata.entrySet()) {
+                Method m = entry.getValue();
+                Object obj = m.invoke(entity);
+                if (obj == null) {
+                    String rt = m.getReturnType().getSimpleName();
+                    if ("boolean".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
+                    } else if ("long".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
+                    } else if ("date".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.TIMESTAMP);
+                    } else {
+                        preparedStatement.setString(index, null);
+                    }
+                } else {
+                    if (obj instanceof Date) {
+                        Date d = (Date) obj;
+                        preparedStatement.setTimestamp(index, new Timestamp(d.getTime()));
+                    } else if (obj instanceof Long) {
+                        preparedStatement.setLong(index, (Long) obj);
+                    } else if (obj instanceof Integer) {
+                        preparedStatement.setInt(index, (Integer) obj);
+                    } else if (obj instanceof Boolean) {
+                        preparedStatement.setInt(index, (Boolean) obj ? 1 : 0);
+                    } else {
+                        preparedStatement.setString(index, obj.toString());
+                    }
+                }
+                index++;
+            }
+            preparedStatement.addBatch();
+        } catch (ReflectiveOperationException e) {
+            throw new SOSHibernateBatchProcessorException(String.format("can't invoke method for entity %s", entity.getClass().getSimpleName()), e);
+        } catch (SQLException e) {
+            throw new SOSHibernateBatchProcessorException(e, sqlStatement);
+        }
+        countCurrentBatches++;
+    }
+
+    public void close() {
+        String method = "close";
+        LOGGER.debug(String.format("%s", method));
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (Exception ex) {
+                //
+            }
+        }
+        dispose();
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException */
@@ -112,56 +185,6 @@ public class SOSHibernateBatchProcessor implements Serializable {
         }
     }
 
-    public void addBatch(Object entity) throws SOSHibernateBatchProcessorException {
-        String method = "addBatch";
-        LOGGER.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
-        if (fieldsMetadata == null) {
-            throw new SOSHibernateBatchProcessorException("fieldsMetadata is NULL");
-        }
-        if (preparedStatement == null) {
-            throw new SOSHibernateBatchProcessorException("preparedStatement is NULL");
-        }
-        int index = 1;
-        try {
-            for (Map.Entry<String, Method> entry : fieldsMetadata.entrySet()) {
-                Method m = entry.getValue();
-                Object obj = m.invoke(entity);
-                if (obj == null) {
-                    String rt = m.getReturnType().getSimpleName();
-                    if ("boolean".equalsIgnoreCase(rt)) {
-                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                    } else if ("long".equalsIgnoreCase(rt)) {
-                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                    } else if ("date".equalsIgnoreCase(rt)) {
-                        preparedStatement.setNull(index, java.sql.Types.TIMESTAMP);
-                    } else {
-                        preparedStatement.setString(index, null);
-                    }
-                } else {
-                    if (obj instanceof Date) {
-                        Date d = (Date) obj;
-                        preparedStatement.setTimestamp(index, new Timestamp(d.getTime()));
-                    } else if (obj instanceof Long) {
-                        preparedStatement.setLong(index, (Long) obj);
-                    } else if (obj instanceof Integer) {
-                        preparedStatement.setInt(index, (Integer) obj);
-                    } else if (obj instanceof Boolean) {
-                        preparedStatement.setInt(index, (Boolean) obj ? 1 : 0);
-                    } else {
-                        preparedStatement.setString(index, obj.toString());
-                    }
-                }
-                index++;
-            }
-            preparedStatement.addBatch();
-        } catch (ReflectiveOperationException e) {
-            throw new SOSHibernateBatchProcessorException(String.format("can't invoke method for entity %s", entity.getClass().getSimpleName()), e);
-        } catch (SQLException e) {
-            throw new SOSHibernateBatchProcessorException(e, sqlStatement);
-        }
-        countCurrentBatches++;
-    }
-
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException */
     public int[] executeBatch() throws SOSHibernateException {
         String method = "executeBatch";
@@ -197,27 +220,12 @@ public class SOSHibernateBatchProcessor implements Serializable {
         return countCurrentBatches;
     }
 
-    public static int getExecutedBatchSize(int[] arr) {
-        int count = 0;
-        if (arr != null) {
-            for (int i = 0; i < arr.length; i++) {
-                count += arr[i];
-            }
-        }
-        return count;
+    public PreparedStatement getPreparedStatement() {
+        return preparedStatement;
     }
 
-    public void close() {
-        String method = "close";
-        LOGGER.debug(String.format("%s", method));
-        if (preparedStatement != null) {
-            try {
-                preparedStatement.close();
-            } catch (Exception ex) {
-                //
-            }
-        }
-        dispose();
+    public String getSqlStatement() {
+        return sqlStatement;
     }
 
     private void dispose() {
@@ -225,14 +233,6 @@ public class SOSHibernateBatchProcessor implements Serializable {
         preparedStatement = null;
         sqlStatement = null;
         fieldsMetadata = null;
-    }
-
-    public PreparedStatement getPreparedStatement() {
-        return preparedStatement;
-    }
-
-    public String getSqlStatement() {
-        return sqlStatement;
     }
 
 }

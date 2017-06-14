@@ -35,42 +35,34 @@ import sos.util.SOSString;
 
 public class SOSHibernateFactory implements Serializable {
 
-    public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
+    public enum Dbms {
+        DB2, FBSQL, MSSQL, MYSQL, ORACLE, PGSQL, SYBASE, UNKNOWN
+    }
+
     public static final String HIBERNATE_PROPERTY_AUTO_COMMIT = "hibernate.connection.autocommit";
-    public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
     public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
-    public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
     public static final String HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS = "hibernate.id.new_generator_mappings";
     public static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
-    public static final int LIMIT_IN_CLAUSE = 1000;
+    public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
+    public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
+    public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateFactory.class);
-
+    private static final long serialVersionUID = 1L;
+    private ClassList classMapping;
     private Optional<Path> configFile = Optional.empty();
     private Configuration configuration;
-    private SessionFactory sessionFactory;
-    private Dialect dialect;
-    private Properties defaultConfigurationProperties;
     private Properties configurationProperties;
-    private ClassList classMapping;
-    private boolean useDefaultConfigurationProperties = true;
+    private Enum<SOSHibernateFactory.Dbms> dbms = Dbms.UNKNOWN;
+    private Properties defaultConfigurationProperties;
+    private Dialect dialect;
     private String identifier;
     private Optional<Integer> jdbcFetchSize = Optional.empty();
-    private Enum<SOSHibernateFactory.Dbms> dbms = Dbms.UNKNOWN;
-
-    public enum Dbms {
-        UNKNOWN, DB2, FBSQL, MSSQL, MYSQL, ORACLE, PGSQL, SYBASE
-    }
+    private SessionFactory sessionFactory;
+    private boolean useDefaultConfigurationProperties = true;
 
     public SOSHibernateFactory() throws SOSHibernateConfigurationException {
         this((String) null);
-    }
-
-    public SOSHibernateFactory(String hibernateConfigFile) throws SOSHibernateConfigurationException {
-        setConfigFile(hibernateConfigFile);
-        initClassMapping();
-        initConfigurationProperties();
     }
 
     public SOSHibernateFactory(Path hibernateConfigFile) throws SOSHibernateConfigurationException {
@@ -79,49 +71,113 @@ public class SOSHibernateFactory implements Serializable {
         initConfigurationProperties();
     }
 
+    public SOSHibernateFactory(String hibernateConfigFile) throws SOSHibernateConfigurationException {
+        setConfigFile(hibernateConfigFile);
+        initClassMapping();
+        initConfigurationProperties();
+    }
+
+    public static String getTransactionIsolationName(int isolationLevel) throws SOSHibernateConfigurationException {
+        switch (isolationLevel) {
+        case Connection.TRANSACTION_NONE:
+            return "TRANSACTION_NONE";
+        case Connection.TRANSACTION_READ_UNCOMMITTED:
+            return "TRANSACTION_READ_UNCOMMITTED";
+        case Connection.TRANSACTION_READ_COMMITTED:
+            return "TRANSACTION_READ_COMMITTED";
+        case Connection.TRANSACTION_REPEATABLE_READ:
+            return "TRANSACTION_REPEATABLE_READ";
+        case Connection.TRANSACTION_SERIALIZABLE:
+            return "TRANSACTION_SERIALIZABLE";
+        default:
+            throw new SOSHibernateConfigurationException(String.format("Invalid transaction isolation level = %s.", isolationLevel));
+        }
+    }
+
+    public void addClassMapping(Class<?> c) {
+        classMapping.add(c);
+    }
+
     public void addClassMapping(ClassList list) {
         for (Class<?> c : list.getClasses()) {
             classMapping.add(c);
         }
     }
 
-    public void setIdentifier(String val) {
-        identifier = val;
-    }
-
-    public void setAutoCommit(boolean commit) {
-        configurationProperties.put(HIBERNATE_PROPERTY_AUTO_COMMIT, String.valueOf(commit));
-    }
-
-    public void setTransactionIsolation(int level) {
-        configurationProperties.put(HIBERNATE_PROPERTY_TRANSACTION_ISOLATION, String.valueOf(level));
-    }
-
-    public void setConfigFile(String hibernateConfigFile) throws SOSHibernateConfigurationException {
-        setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
-    }
-
-    public void setConfigFile(Path hibernateConfigFile) throws SOSHibernateConfigurationException {
-        if (hibernateConfigFile != null) {
-            if (!Files.exists(hibernateConfigFile)) {
-                throw new SOSHibernateConfigurationException(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
-            }
-            configFile = Optional.of(hibernateConfigFile);
+    public void build() throws SOSHibernateFactoryBuildException {
+        String method = getMethodName("build");
+        try {
+            initConfiguration();
+            initSessionFactory();
+            String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString() : "without config file";
+            int isolationLevel = getTransactionIsolation();
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
+                    isolationLevel), connFile));
+        } catch (SOSHibernateConfigurationException ex) {
+            throw new SOSHibernateFactoryBuildException(ex, configFile);
+        } catch (PersistenceException ex) {
+            throw new SOSHibernateFactoryBuildException(ex);
         }
     }
 
-    public void setConfigurationProperties(Properties properties) {
-        if (configurationProperties.isEmpty()) {
-            configurationProperties = properties;
-        } else {
-            if (properties != null) {
-                for (Map.Entry<?, ?> entry : properties.entrySet()) {
-                    String key = (String) entry.getKey();
-                    String value = (String) entry.getValue();
-                    configurationProperties.setProperty(key, value);
-                }
+    public void close() {
+        String method = getMethodName("close");
+        LOGGER.debug(String.format("%s", method));
+        try {
+            if (sessionFactory != null && !sessionFactory.isClosed()) {
+                sessionFactory.close();
             }
+        } catch (Throwable e) {
+            LOGGER.warn(String.format("%s:%s", method, e.toString()), e);
         }
+        sessionFactory = null;
+    }
+
+    public boolean dbmsIsPostgres() {
+        return dbms == SOSHibernateFactory.Dbms.PGSQL;
+    }
+
+    public boolean getAutoCommit() throws SOSHibernateConfigurationException {
+        if (configuration == null) {
+            throw new SOSHibernateConfigurationException("configuration is NULL");
+        }
+        String p = configuration.getProperty(HIBERNATE_PROPERTY_AUTO_COMMIT);
+        if (SOSString.isEmpty(p)) {
+            throw new SOSHibernateConfigurationException(String.format("\"%s\" property is not configured ", HIBERNATE_PROPERTY_AUTO_COMMIT));
+        }
+        return Boolean.parseBoolean(p);
+    }
+
+    public ClassList getClassMapping() {
+        return classMapping;
+    }
+
+    public Optional<Path> getConfigFile() {
+        return configFile;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public Properties getConfigurationProperties() {
+        return configurationProperties;
+    }
+
+    public SOSHibernateSession getCurrentSession() throws SOSHibernateOpenSessionException {
+        return getCurrentSession(identifier);
+    }
+
+    public SOSHibernateSession getCurrentSession(String identifier) throws SOSHibernateOpenSessionException {
+        SOSHibernateSession session = new SOSHibernateSession(this);
+        session.setIsGetCurrentSession(true);
+        session.setIdentifier(identifier);
+        session.openSession();
+        return session;
+    }
+
+    public Enum<SOSHibernateFactory.Dbms> getDbms() {
+        return dbms;
     }
 
     public Enum<SOSHibernateFactory.Dbms> getDbmsBeforeBuild() throws SOSHibernateConfigurationException {
@@ -142,20 +198,68 @@ public class SOSHibernateFactory implements Serializable {
         return getDbms(dt);
     }
 
-    public void build() throws SOSHibernateFactoryBuildException {
-        String method = getMethodName("build");
-        try {
-            initConfiguration();
-            initSessionFactory();
-            String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString() : "without config file";
-            int isolationLevel = getTransactionIsolation();
-            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
-                    isolationLevel), connFile));
-        } catch (SOSHibernateConfigurationException ex) {
-            throw new SOSHibernateFactoryBuildException(ex, configFile);
-        } catch (PersistenceException ex) {
-            throw new SOSHibernateFactoryBuildException(ex);
+    public Properties getDefaultConfigurationProperties() {
+        return defaultConfigurationProperties;
+    }
+
+    public Dialect getDialect() {
+        return dialect;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public Optional<Integer> getJdbcFetchSize() {
+        return jdbcFetchSize;
+    }
+
+    /** Hibernate Dialect does not provide the functions to identify the last inserted sequence value.
+     * 
+     * only for the next value:
+     * 
+     * e.g. dialiect.getSelectSequenceNextValString(sequenceName),
+     * 
+     * dialect.getSequenceNextValString(sequenceName) */
+    public String getSequenceLastValString(String sequenceName) {
+        if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
+            return "SELECT @@IDENTITY";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
+            return "SELECT LAST_INSERT_ID();";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.ORACLE)) {
+            return "SELECT " + sequenceName + ".currval FROM DUAL";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.PGSQL)) {
+            return "SELECT currval('" + sequenceName + "');";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.DB2)) {
+            return "SELECT IDENTITY_VAL_LOCAL() AS INSERT_ID FROM SYSIBM.SYSDUMMY1";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.SYBASE)) {
+            return "SELECT @@IDENTITY";
         }
+        return null;
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public int getTransactionIsolation() throws SOSHibernateConfigurationException {
+        if (configuration == null) {
+            throw new SOSHibernateConfigurationException("configuration is NULL");
+        }
+        String p = configuration.getProperty(HIBERNATE_PROPERTY_TRANSACTION_ISOLATION);
+        if (SOSString.isEmpty(p)) {
+            throw new SOSHibernateConfigurationException(String.format("\"%s\" property is not configured ",
+                    HIBERNATE_PROPERTY_TRANSACTION_ISOLATION));
+        }
+        return Integer.parseInt(p);
+    }
+
+    public boolean isUseDefaultConfigurationProperties() {
+        return useDefaultConfigurationProperties;
+    }
+
+    public SOSHibernateSession openSession() throws SOSHibernateOpenSessionException {
+        return openSession(identifier);
     }
 
     public SOSHibernateSession openSession(String identifier) throws SOSHibernateOpenSessionException {
@@ -165,8 +269,8 @@ public class SOSHibernateFactory implements Serializable {
         return session;
     }
 
-    public SOSHibernateSession openSession() throws SOSHibernateOpenSessionException {
-        return openSession(identifier);
+    public SOSHibernateSession openStatelessSession() throws SOSHibernateOpenSessionException {
+        return openStatelessSession(identifier);
     }
 
     public SOSHibernateSession openStatelessSession(String identifier) throws SOSHibernateOpenSessionException {
@@ -175,22 +279,6 @@ public class SOSHibernateFactory implements Serializable {
         session.setIdentifier(identifier);
         session.openSession();
         return session;
-    }
-
-    public SOSHibernateSession openStatelessSession() throws SOSHibernateOpenSessionException {
-        return openStatelessSession(identifier);
-    }
-
-    public SOSHibernateSession getCurrentSession(String identifier) throws SOSHibernateOpenSessionException {
-        SOSHibernateSession session = new SOSHibernateSession(this);
-        session.setIsGetCurrentSession(true);
-        session.setIdentifier(identifier);
-        session.openSession();
-        return session;
-    }
-
-    public SOSHibernateSession getCurrentSession() throws SOSHibernateOpenSessionException {
-        return getCurrentSession(identifier);
     }
 
     public String quote(Type type, Object value) throws SOSHibernateConvertException {
@@ -239,144 +327,47 @@ public class SOSHibernateFactory implements Serializable {
         return columnName;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public void setAutoCommit(boolean commit) {
+        configurationProperties.put(HIBERNATE_PROPERTY_AUTO_COMMIT, String.valueOf(commit));
     }
 
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public Optional<Integer> getJdbcFetchSize() {
-        return jdbcFetchSize;
-    }
-
-    public Dialect getDialect() {
-        return dialect;
-    }
-
-    public Enum<SOSHibernateFactory.Dbms> getDbms() {
-        return dbms;
-    }
-
-    public boolean dbmsIsPostgres() {
-        return dbms == SOSHibernateFactory.Dbms.PGSQL;
-    }
-
-    public void close() {
-        String method = getMethodName("close");
-        LOGGER.debug(String.format("%s", method));
-        try {
-            if (sessionFactory != null && !sessionFactory.isClosed()) {
-                sessionFactory.close();
+    public void setConfigFile(Path hibernateConfigFile) throws SOSHibernateConfigurationException {
+        if (hibernateConfigFile != null) {
+            if (!Files.exists(hibernateConfigFile)) {
+                throw new SOSHibernateConfigurationException(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
             }
-        } catch (Throwable e) {
-            LOGGER.warn(String.format("%s:%s", method, e.toString()), e);
-        }
-        sessionFactory = null;
-    }
-
-    public boolean getAutoCommit() throws SOSHibernateConfigurationException {
-        if (configuration == null) {
-            throw new SOSHibernateConfigurationException("configuration is NULL");
-        }
-        String p = configuration.getProperty(HIBERNATE_PROPERTY_AUTO_COMMIT);
-        if (SOSString.isEmpty(p)) {
-            throw new SOSHibernateConfigurationException(String.format("\"%s\" property is not configured ", HIBERNATE_PROPERTY_AUTO_COMMIT));
-        }
-        return Boolean.parseBoolean(p);
-    }
-
-    public int getTransactionIsolation() throws SOSHibernateConfigurationException {
-        if (configuration == null) {
-            throw new SOSHibernateConfigurationException("configuration is NULL");
-        }
-        String p = configuration.getProperty(HIBERNATE_PROPERTY_TRANSACTION_ISOLATION);
-        if (SOSString.isEmpty(p)) {
-            throw new SOSHibernateConfigurationException(String.format("\"%s\" property is not configured ",
-                    HIBERNATE_PROPERTY_TRANSACTION_ISOLATION));
-        }
-        return Integer.parseInt(p);
-    }
-
-    public static String getTransactionIsolationName(int isolationLevel) throws SOSHibernateConfigurationException {
-        switch (isolationLevel) {
-        case Connection.TRANSACTION_NONE:
-            return "TRANSACTION_NONE";
-        case Connection.TRANSACTION_READ_UNCOMMITTED:
-            return "TRANSACTION_READ_UNCOMMITTED";
-        case Connection.TRANSACTION_READ_COMMITTED:
-            return "TRANSACTION_READ_COMMITTED";
-        case Connection.TRANSACTION_REPEATABLE_READ:
-            return "TRANSACTION_REPEATABLE_READ";
-        case Connection.TRANSACTION_SERIALIZABLE:
-            return "TRANSACTION_SERIALIZABLE";
-        default:
-            throw new SOSHibernateConfigurationException(String.format("Invalid transaction isolation level = %s.", isolationLevel));
+            configFile = Optional.of(hibernateConfigFile);
         }
     }
 
-    /** Hibernate Dialect does not provide the functions to identify the last inserted sequence value.
-     * 
-     * only for the next value:
-     * 
-     * e.g. dialiect.getSelectSequenceNextValString(sequenceName),
-     * 
-     * dialect.getSequenceNextValString(sequenceName) */
-    public String getSequenceLastValString(String sequenceName) {
-        if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
-            return "SELECT @@IDENTITY";
-        } else if (dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
-            return "SELECT LAST_INSERT_ID();";
-        } else if (dbms.equals(SOSHibernateFactory.Dbms.ORACLE)) {
-            return "SELECT " + sequenceName + ".currval FROM DUAL";
-        } else if (dbms.equals(SOSHibernateFactory.Dbms.PGSQL)) {
-            return "SELECT currval('" + sequenceName + "');";
-        } else if (dbms.equals(SOSHibernateFactory.Dbms.DB2)) {
-            return "SELECT IDENTITY_VAL_LOCAL() AS INSERT_ID FROM SYSIBM.SYSDUMMY1";
-        } else if (dbms.equals(SOSHibernateFactory.Dbms.SYBASE)) {
-            return "SELECT @@IDENTITY";
+    public void setConfigFile(String hibernateConfigFile) throws SOSHibernateConfigurationException {
+        setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
+    }
+
+    public void setConfigurationProperties(Properties properties) {
+        if (configurationProperties.isEmpty()) {
+            configurationProperties = properties;
+        } else {
+            if (properties != null) {
+                for (Map.Entry<?, ?> entry : properties.entrySet()) {
+                    String key = (String) entry.getKey();
+                    String value = (String) entry.getValue();
+                    configurationProperties.setProperty(key, value);
+                }
+            }
         }
-        return null;
     }
 
-    public Optional<Path> getConfigFile() {
-        return configFile;
+    public void setIdentifier(String val) {
+        identifier = val;
     }
 
-    public boolean isUseDefaultConfigurationProperties() {
-        return useDefaultConfigurationProperties;
+    public void setTransactionIsolation(int level) {
+        configurationProperties.put(HIBERNATE_PROPERTY_TRANSACTION_ISOLATION, String.valueOf(level));
     }
 
     public void setUseDefaultConfigurationProperties(boolean val) {
         useDefaultConfigurationProperties = val;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public Properties getConfigurationProperties() {
-        return configurationProperties;
-    }
-
-    public ClassList getClassMapping() {
-        return classMapping;
-    }
-
-    public Properties getDefaultConfigurationProperties() {
-        return defaultConfigurationProperties;
-    }
-
-    private void initConfiguration() throws SOSHibernateConfigurationException {
-        String method = getMethodName("initConfiguration");
-        LOGGER.debug(String.format("%s", method));
-        configuration = new Configuration();
-        setConfigurationClassMapping();
-        setDefaultConfigurationProperties();
-        configure();
-        setConfigurationProperties();
-        logConfigurationProperties();
     }
 
     private void configure() throws SOSHibernateConfigurationException {
@@ -397,21 +388,47 @@ public class SOSHibernateFactory implements Serializable {
         }
     }
 
-    private void initSessionFactory() {
-        String method = getMethodName("initSessionFactory");
-        LOGGER.debug(String.format("%s", method));
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-        SessionFactoryImplementor impl = (SessionFactoryImplementor) sessionFactory;
-        if (impl != null) {
-            dialect = impl.getJdbcServices().getDialect();
-            setDbms(dialect);
+    private Enum<SOSHibernateFactory.Dbms> getDbms(Dialect dialect) {
+        SOSHibernateFactory.Dbms db = SOSHibernateFactory.Dbms.UNKNOWN;
+        if (dialect != null) {
+            String dialectClassName = dialect.getClass().getSimpleName().toLowerCase();
+            if (dialectClassName.contains("db2")) {
+                db = Dbms.DB2;
+            } else if (dialectClassName.contains("firebird")) {
+                db = Dbms.FBSQL;
+            } else if (dialectClassName.contains("sqlserver")) {
+                db = Dbms.MSSQL;
+            } else if (dialectClassName.contains("mysql")) {
+                db = Dbms.MYSQL;
+            } else if (dialectClassName.contains("oracle")) {
+                db = Dbms.ORACLE;
+            } else if (dialectClassName.contains("postgre")) {
+                db = Dbms.PGSQL;
+            } else if (dialectClassName.contains("sybase")) {
+                db = Dbms.SYBASE;
+            }
         }
+        return db;
+    }
+
+    private String getMethodName(String name) {
+        String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
+        return String.format("%s%s", prefix, name);
     }
 
     private void initClassMapping() {
         classMapping = new ClassList();
+    }
+
+    private void initConfiguration() throws SOSHibernateConfigurationException {
+        String method = getMethodName("initConfiguration");
+        LOGGER.debug(String.format("%s", method));
+        configuration = new Configuration();
+        setConfigurationClassMapping();
+        setDefaultConfigurationProperties();
+        configure();
+        setConfigurationProperties();
+        logConfigurationProperties();
     }
 
     private void initConfigurationProperties() {
@@ -423,6 +440,19 @@ public class SOSHibernateFactory implements Serializable {
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE, "none");
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS, "false");
         configurationProperties = new Properties();
+    }
+
+    private void initSessionFactory() {
+        String method = getMethodName("initSessionFactory");
+        LOGGER.debug(String.format("%s", method));
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+        SessionFactoryImplementor impl = (SessionFactoryImplementor) sessionFactory;
+        if (impl != null) {
+            dialect = impl.getJdbcServices().getDialect();
+            setDbms(dialect);
+        }
     }
 
     private void logConfigurationProperties() {
@@ -440,18 +470,6 @@ public class SOSHibernateFactory implements Serializable {
             for (Class<?> c : classMapping.getClasses()) {
                 configuration.addAnnotatedClass(c);
                 LOGGER.debug(String.format("%s: mapping. class = %s", method, c.getCanonicalName()));
-            }
-        }
-    }
-
-    private void setDefaultConfigurationProperties() {
-        String method = getMethodName("setDefaultConfigurationProperties");
-        if (useDefaultConfigurationProperties && defaultConfigurationProperties != null) {
-            for (Map.Entry<?, ?> entry : defaultConfigurationProperties.entrySet()) {
-                String key = (String) entry.getKey();
-                String value = (String) entry.getValue();
-                configuration.setProperty(key, value);
-                LOGGER.debug(String.format("%s: default properties. property: %s = %s", method, key, value));
             }
         }
     }
@@ -479,35 +497,15 @@ public class SOSHibernateFactory implements Serializable {
         dbms = getDbms(dialect);
     }
 
-    private Enum<SOSHibernateFactory.Dbms> getDbms(Dialect dialect) {
-        SOSHibernateFactory.Dbms db = SOSHibernateFactory.Dbms.UNKNOWN;
-        if (dialect != null) {
-            String dialectClassName = dialect.getClass().getSimpleName().toLowerCase();
-            if (dialectClassName.contains("db2")) {
-                db = Dbms.DB2;
-            } else if (dialectClassName.contains("firebird")) {
-                db = Dbms.FBSQL;
-            } else if (dialectClassName.contains("sqlserver")) {
-                db = Dbms.MSSQL;
-            } else if (dialectClassName.contains("mysql")) {
-                db = Dbms.MYSQL;
-            } else if (dialectClassName.contains("oracle")) {
-                db = Dbms.ORACLE;
-            } else if (dialectClassName.contains("postgre")) {
-                db = Dbms.PGSQL;
-            } else if (dialectClassName.contains("sybase")) {
-                db = Dbms.SYBASE;
+    private void setDefaultConfigurationProperties() {
+        String method = getMethodName("setDefaultConfigurationProperties");
+        if (useDefaultConfigurationProperties && defaultConfigurationProperties != null) {
+            for (Map.Entry<?, ?> entry : defaultConfigurationProperties.entrySet()) {
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                configuration.setProperty(key, value);
+                LOGGER.debug(String.format("%s: default properties. property: %s = %s", method, key, value));
             }
         }
-        return db;
-    }
-
-    public void addClassMapping(Class<?> c) {
-        classMapping.add(c);
-    }
-
-    private String getMethodName(String name) {
-        String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
-        return String.format("%s%s", prefix, name);
     }
 }

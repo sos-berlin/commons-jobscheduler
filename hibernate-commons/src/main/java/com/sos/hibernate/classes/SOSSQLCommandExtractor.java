@@ -15,17 +15,17 @@ import sos.util.SOSString;
 
 public class SOSSQLCommandExtractor {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(SOSSQLCommandExtractor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SOSSQLCommandExtractor.class);
 
+    private static final String REPLACE_BACKSLASH = "\\\\'";
+    private static final String REPLACE_DOUBLE_APOSTROPHE = "''";
+    private static final String REPLACEMENT_BACKSLASH = "XxxxX";
+    private static final String REPLACEMENT_DOUBLE_APOSTROPHE = "YyyyY";
+
+    private String beginProcedure = "";
     private final Enum<SOSHibernateFactory.Dbms> dbms;
     private int majorVersion = -1;
     private int minorVersion = -1;
-
-    private static final String REPLACE_BACKSLASH = "\\\\'";
-    private static final String REPLACEMENT_BACKSLASH = "XxxxX";
-    private static final String REPLACE_DOUBLE_APOSTROPHE = "''";
-    private static final String REPLACEMENT_DOUBLE_APOSTROPHE = "YyyyY";
-    private String beginProcedure = "";
 
     public SOSSQLCommandExtractor(Enum<SOSHibernateFactory.Dbms> dbms) {
         this.dbms = dbms;
@@ -70,6 +70,47 @@ public class SOSSQLCommandExtractor {
 
         }
         return commands;
+    }
+
+    private boolean endsWithEnd(String statement) {
+        // END END; END$$; END MY_PROCEDURE;
+        String patterns = "end[\\s]*[\\S]*[;]*$";
+        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
+
+        Matcher matcher = p.matcher(statement);
+        return matcher.find();
+    }
+
+    private boolean isProcedureSyntax(String command) throws SOSHibernateSQLCommandExtractorException {
+        if (command == null) {
+            throw new SOSHibernateSQLCommandExtractorException("command is empty");
+        }
+        command = command.toLowerCase().trim();
+        if (command.startsWith("procedure") || command.startsWith("function") || command.startsWith("declare") || command.startsWith("begin")) {
+            return true;
+        }
+        StringBuilder patterns = new StringBuilder();
+        patterns.append("^(re)?create+[\\s]*procedure");
+        patterns.append("|^create+[\\s]*function");
+        patterns.append("|^create+[\\s]*operator");
+        patterns.append("|^create+[\\s]*package");
+        patterns.append("|^create+[\\s]*trigger");
+        patterns.append("|^drop+[\\s]*function");
+        patterns.append("|^drop+[\\s]*operator");
+        patterns.append("|^drop+[\\s]*package");
+        patterns.append("|^drop+[\\s]*procedure");
+        patterns.append("|^drop+[\\s]*trigger");
+        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*procedure");
+        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*function");
+        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*package");
+        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*operator");
+        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*trigger");
+        Pattern p = Pattern.compile(patterns.toString());
+        Matcher matcher = p.matcher(command);
+        if (matcher.find()) {
+            return true;
+        }
+        return false;
     }
 
     private StringBuffer replace(String value) {
@@ -131,58 +172,17 @@ public class SOSSQLCommandExtractor {
         }
     }
 
-    private boolean isProcedureSyntax(String command) throws SOSHibernateSQLCommandExtractorException {
-        if (command == null) {
-            throw new SOSHibernateSQLCommandExtractorException("command is empty");
-        }
-        command = command.toLowerCase().trim();
-        if (command.startsWith("procedure") || command.startsWith("function") || command.startsWith("declare") || command.startsWith("begin")) {
-            return true;
-        }
-        StringBuilder patterns = new StringBuilder();
-        patterns.append("^(re)?create+[\\s]*procedure");
-        patterns.append("|^create+[\\s]*function");
-        patterns.append("|^create+[\\s]*operator");
-        patterns.append("|^create+[\\s]*package");
-        patterns.append("|^create+[\\s]*trigger");
-        patterns.append("|^drop+[\\s]*function");
-        patterns.append("|^drop+[\\s]*operator");
-        patterns.append("|^drop+[\\s]*package");
-        patterns.append("|^drop+[\\s]*procedure");
-        patterns.append("|^drop+[\\s]*trigger");
-        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*procedure");
-        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*function");
-        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*package");
-        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*operator");
-        patterns.append("|^create+[\\s]*or+[\\s]*replace+[\\s]*trigger");
-        Pattern p = Pattern.compile(patterns.toString());
-        Matcher matcher = p.matcher(command);
-        if (matcher.find()) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean endsWithEnd(String statement) {
-        // END END; END$$; END MY_PROCEDURE;
-        String patterns = "end[\\s]*[\\S]*[;]*$";
-        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
-
-        Matcher matcher = p.matcher(statement);
-        return matcher.find();
-    }
-
     public class Preparer {
 
+        private boolean addCommandCloser;
+        private String commandCloser;
+        private String[] commands;
+        private String commandSpltter;
+
+        private final String content;
         private final Enum<SOSHibernateFactory.Dbms> dbms;
         private final int majorVersion;
         private final int minorVersion;
-        private final String content;
-
-        private String commandSpltter;
-        private String commandCloser;
-        private boolean addCommandCloser;
-        private String[] commands;
 
         public Preparer(Enum<SOSHibernateFactory.Dbms> dbms, int majorVersion, int minorVersion, String content) {
             this.dbms = dbms;
@@ -190,16 +190,6 @@ public class SOSSQLCommandExtractor {
             this.minorVersion = minorVersion;
             this.content = content;
 
-        }
-
-        public void prepare() throws SOSHibernateSQLCommandExtractorException {
-            String content = init();
-            content = stripComments(content);
-            commands = content.split(commandSpltter);
-        }
-
-        public String[] getCommands() {
-            return commands;
         }
 
         public boolean addCommandCloser() {
@@ -210,8 +200,18 @@ public class SOSSQLCommandExtractor {
             return commandCloser;
         }
 
+        public String[] getCommands() {
+            return commands;
+        }
+
         public String getCommandSplitter() {
             return commandSpltter;
+        }
+
+        public void prepare() throws SOSHibernateSQLCommandExtractorException {
+            String content = init();
+            content = stripComments(content);
+            commands = content.split(commandSpltter);
         }
 
         private String init() throws SOSHibernateSQLCommandExtractorException {
