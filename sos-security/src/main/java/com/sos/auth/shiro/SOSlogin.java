@@ -12,7 +12,6 @@ import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 
-  
 public class SOSlogin {
 
     private static final Logger LOGGER = Logger.getLogger(SOSlogin.class);
@@ -25,7 +24,7 @@ public class SOSlogin {
     public SOSlogin() {
         this.inifile = DEFAULT_INI_FILE;
     }
-    
+
     public SOSlogin(String inifile) {
         this.inifile = inifile;
     }
@@ -33,23 +32,29 @@ public class SOSlogin {
     public void setInifile(String inifile) {
         this.inifile = inifile;
     }
-    
+
     public String getInifile() {
         return inifile;
     }
-    
+
     public void createSubject(String user, String pwd) {
         UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
-        try {
-            currentUser.login(token);
-          } catch (UnknownAccountException uae) {
-            setMsg("There is no user with username/password combination of " + token.getPrincipal());
-        } catch (IncorrectCredentialsException ice) {
-            setMsg("Password for account " + token.getPrincipal() + " was incorrect!");
-        } catch (LockedAccountException lae) {
-            setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
-        } catch (Exception ee) {
-            setMsg("Exception while logging in " + token.getPrincipal() + ee.getMessage());
+        if (currentUser != null) {
+            try {
+                currentUser.login(token);
+            } catch (UnknownAccountException uae) {
+                setMsg("There is no user with username/password combination of " + token.getPrincipal());
+                currentUser = null;
+            } catch (IncorrectCredentialsException ice) {
+                setMsg("Password for account " + token.getPrincipal() + " was incorrect!");
+                currentUser = null;
+            } catch (LockedAccountException lae) {
+                setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
+                currentUser = null;
+            } catch (Exception ee) {
+                setMsg("Exception while logging in " + token.getPrincipal() + ee.getMessage());
+                currentUser = null;
+            }
         }
     }
 
@@ -76,11 +81,13 @@ public class SOSlogin {
         Factory<SecurityManager> factory = new IniSecurityManagerFactory(inifile);
         SecurityManager securityManager = factory.getInstance();
         SecurityUtils.setSecurityManager(securityManager);
-        currentUser = SecurityUtils.getSubject();
+        
+        currentUser = new Subject.Builder().buildSubject();
+        
         try {
             logout();
         } catch (InvalidSessionException e) {
-            //this is raised always?
+            // ignore this.
         } catch (Exception e) {
             LOGGER.info(String.format("Shiro init: %1$s: %2$s", e.getClass().getSimpleName(), e.getMessage()));
         }
