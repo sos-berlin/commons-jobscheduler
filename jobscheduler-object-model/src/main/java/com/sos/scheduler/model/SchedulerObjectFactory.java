@@ -8,6 +8,7 @@ import static com.sos.scheduler.model.messages.JSMessages.JOM_D_0040;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -324,7 +325,11 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public Object unMarshall(final File pobjFile) {
         Object objC = null;
         try {
-            objC = u.unmarshal(pobjFile);
+            try {
+                objC = u.unmarshal(new FileInputStream(pobjFile));
+            } catch (FileNotFoundException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
         }
