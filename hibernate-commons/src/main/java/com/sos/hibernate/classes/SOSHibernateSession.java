@@ -50,11 +50,16 @@ public class SOSHibernateSession implements Serializable {
     private String identifier;
     private boolean isGetCurrentSession = false;
     private boolean isStatelessSession = false;
+    private boolean setLockTimeoutExecuted = false;
     private SOSHibernateSQLExecutor sqlExecutor;
 
     /** use factory.openSession() or factory.openStatelessSession(); */
     protected SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
+    }
+
+    protected boolean isSetLockTimeoutExecuted() {
+        return setLockTimeoutExecuted;
     }
 
     /** @throws SOSHibernateOpenSessionException */
@@ -80,6 +85,7 @@ public class SOSHibernateSession implements Serializable {
                 }
                 currentSession = session;
             }
+            onOpenSession();
         } catch (IllegalStateException e) {
             throw new SOSHibernateOpenSessionException(e);
         } catch (PersistenceException e) {
@@ -1005,6 +1011,29 @@ public class SOSHibernateSession implements Serializable {
                 return result;
             }
         };
+    }
+
+    private void onOpenSession() {
+        String method = getMethodName("onOpenSession");
+        try {
+            if (getFactory().getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
+                String value = getFactory().getConfiguration().getProperties().getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_MSSQL_LOCK_TIMEOUT);
+                if (value != null) {
+                    try {
+                        int lockTimeout = Integer.parseInt(value);
+                        if (lockTimeout > 0) {
+                            getSQLExecutor().execute("set LOCK_TIMEOUT " + lockTimeout);
+                            setLockTimeoutExecuted = true;
+                        }
+                    } catch (Exception e) {
+                        throw new Exception(String.format("can't apply configuration property %s=%s: %s",
+                                SOSHibernate.HIBERNATE_SOS_PROPERTY_MSSQL_LOCK_TIMEOUT, value, e.toString()));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn(String.format("%s: %s", method, e.toString()));
+        }
     }
 
     private void throwException(IllegalStateException cause, SOSHibernateException ex) throws SOSHibernateException {

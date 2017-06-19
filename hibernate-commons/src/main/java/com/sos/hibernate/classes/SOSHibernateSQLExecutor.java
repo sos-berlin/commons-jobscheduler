@@ -585,8 +585,12 @@ public class SOSHibernateSQLExecutor implements Serializable {
         if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
             String dateFormat = "set DATEFORMAT ymd";
             String language = "set LANGUAGE British";
-            String lockTimeout = "set LOCK_TIMEOUT 3000";
-            execute(dateFormat, language, lockTimeout);
+            if (session.isSetLockTimeoutExecuted()) {
+                execute(dateFormat, language);
+            } else {
+                String lockTimeout = "set LOCK_TIMEOUT 3000";
+                execute(dateFormat, language, lockTimeout);
+            }
         } else if (dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
             execute("SET SESSION SQL_MODE='ANSI_QUOTES'");
         } else if (dbms.equals(SOSHibernateFactory.Dbms.ORACLE)) {
