@@ -461,34 +461,6 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public <T> ScrollableResults scroll(Query<T> query) throws SOSHibernateException {
-        return scroll(query, ScrollMode.FORWARD_ONLY);
-    }
-
-    /** execute a SELECT query(NativeQuery or Query)
-     * 
-     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    @SuppressWarnings("deprecation")
-    public <T> ScrollableResults scroll(Query<T> query, ScrollMode scrollMode) throws SOSHibernateException {
-        if (query == null) {
-            throw new SOSHibernateQueryException("query is NULL");
-        }
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("currentSession is NULL", query);
-        }
-        String method = getMethodName("scroll");
-        LOGGER.debug(String.format("%s: query[%s], scrollMode=%s", method, query.getQueryString(), scrollMode));
-        try {
-            return query.scroll(scrollMode);
-        } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateQueryException(e, query));
-            return null;
-        } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateQueryException(e, query));
-            return null;
-        }
-    }
-
     /** execute a SELECT query(Query)
      * 
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
@@ -575,7 +547,7 @@ public class SOSHibernateSession implements Serializable {
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    public <T> List<Map<String, String>> getResultListNativeQuery(String sql) throws SOSHibernateException {
+    public <T> List<T> getResultListNativeQuery(String sql) throws SOSHibernateException {
         return getResultList(createNativeQuery(sql));
     }
 
@@ -704,6 +676,11 @@ public class SOSHibernateSession implements Serializable {
             throwException(e, new SOSHibernateQueryException(e, nativeQuery));
         }
         return result;
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> T getSingleResultNativeQuery(String sql) throws SOSHibernateException {
+        return getSingleResult(createNativeQuery(sql));
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
@@ -988,6 +965,34 @@ public class SOSHibernateSession implements Serializable {
             throwException(e, new SOSHibernateSessionException(e));
         }
         return item;
+    }
+
+    public <T> ScrollableResults scroll(Query<T> query) throws SOSHibernateException {
+        return scroll(query, ScrollMode.FORWARD_ONLY);
+    }
+
+    /** execute a SELECT query(NativeQuery or Query)
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    @SuppressWarnings("deprecation")
+    public <T> ScrollableResults scroll(Query<T> query, ScrollMode scrollMode) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", query);
+        }
+        String method = getMethodName("scroll");
+        LOGGER.debug(String.format("%s: query[%s], scrollMode=%s", method, query.getQueryString(), scrollMode));
+        try {
+            return query.scroll(scrollMode);
+        } catch (IllegalStateException e) {
+            throwException(e, new SOSHibernateQueryException(e, query));
+            return null;
+        } catch (PersistenceException e) {
+            throwException(e, new SOSHibernateQueryException(e, query));
+            return null;
+        }
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateSessionException */
