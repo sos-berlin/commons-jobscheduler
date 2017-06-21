@@ -14,6 +14,8 @@ import javax.persistence.PersistenceException;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.NonUniqueResultException;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -53,7 +55,7 @@ public class SOSHibernateSession implements Serializable {
     private boolean setLockTimeoutExecuted = false;
     private SOSHibernateSQLExecutor sqlExecutor;
 
-    /** use factory.openSession() or factory.openStatelessSession(); */
+    /** use factory.openSession(), factory.openStatelessSession() or factory.getCurrentSession() */
     protected SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
     }
@@ -316,7 +318,7 @@ public class SOSHibernateSession implements Serializable {
         close();
     }
 
-    /** execute NativeQuery or Query
+    /** execute an update or delete (NativeQuery or Query)
      * 
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("deprecation")
@@ -392,8 +394,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
-        String method = getMethodName("getConnection");
-        LOGGER.debug(String.format("%s", method));
         try {
             if (isStatelessSession) {
                 StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
@@ -437,46 +437,7 @@ public class SOSHibernateSession implements Serializable {
         return stmt == null ? null : getSingleValueNativeQuery(stmt);
     }
 
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    public <T> List<Map<String, String>> getResultList(NativeQuery<T> query) throws SOSHibernateException {
-        return getResultList(query, null);
-    }
-
-    /** return a list of rows represented by Map<String,String>:
-     * 
-     * Map key - column name (lower case), Map value - value as string
-     * 
-     * 
-     * setResultTransformer is deprecated (see below), but currently without alternative
-     * 
-     * excerpt from Query.setResultTransformer comment:
-     * 
-     * deprecated (since 5.2), todo develop a new approach to result transformers
-     * 
-     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    @SuppressWarnings({ "deprecation", "unchecked" })
-    public <T> List<Map<String, String>> getResultList(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
-        if (nativeQuery == null) {
-            throw new SOSHibernateQueryException("nativeQuery is NULL");
-        }
-        if (currentSession == null) {
-            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
-        }
-        String method = getMethodName("getResultList");
-        LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
-        try {
-            nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
-            return (List<Map<String, String>>) nativeQuery.getResultList();
-        } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
-            return null;
-        } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
-            return null;
-        }
-    }
-
-    /** execute NativeQuery or Query
+    /** execute a SELECT query(NativeQuery or Query)
      * 
      * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings("deprecation")
@@ -500,61 +461,142 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    public <T> ScrollableResults scroll(Query<T> query) throws SOSHibernateException {
+        return scroll(query, ScrollMode.FORWARD_ONLY);
+    }
+
+    /** execute a SELECT query(NativeQuery or Query)
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    @SuppressWarnings("deprecation")
+    public <T> ScrollableResults scroll(Query<T> query, ScrollMode scrollMode) throws SOSHibernateException {
+        if (query == null) {
+            throw new SOSHibernateQueryException("query is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", query);
+        }
+        String method = getMethodName("scroll");
+        LOGGER.debug(String.format("%s: query[%s], scrollMode=%s", method, query.getQueryString(), scrollMode));
+        try {
+            return query.scroll(scrollMode);
+        } catch (IllegalStateException e) {
+            throwException(e, new SOSHibernateQueryException(e, query));
+            return null;
+        } catch (PersistenceException e) {
+            throwException(e, new SOSHibernateQueryException(e, query));
+            return null;
+        }
+    }
+
+    /** execute a SELECT query(Query)
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     public <T> List<T> getResultList(String hql) throws SOSHibernateException {
         Query<T> query = createQuery(hql);
         return getResultList(query);
     }
 
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    public <T> List<Map<String, String>> getResultListNativeQuery(String sql) throws SOSHibernateException {
-        return getResultListNativeQuery(sql, null);
-    }
-
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
-    public <T> List<Map<String, String>> getResultListNativeQuery(String sql, String dateTimeFormat) throws SOSHibernateException {
-        return getResultList(createNativeQuery(sql), dateTimeFormat);
-    }
-
-    /** return a single row represented by Map<String,String> or null
+    /** execute a SELECT query(NativeQuery)
      * 
-     * Map - see getResultList
+     * return a list of rows represented by Map<String,Object>:
      * 
-     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+     * Map key - column name (lower case), Map value - object (null value as NULL)
+     * 
+     * 
+     * setResultTransformer is deprecated (see below), but currently without alternative
+     * 
+     * excerpt from Query.setResultTransformer comment:
+     * 
+     * deprecated (since 5.2), todo develop a new approach to result transformers
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
     @SuppressWarnings({ "deprecation", "unchecked" })
-    public Map<String, String> getSingleResult(NativeQuery<?> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+    public <T> List<Map<String, Object>> getResultListAsMaps(NativeQuery<T> nativeQuery) throws SOSHibernateException {
         if (nativeQuery == null) {
             throw new SOSHibernateQueryException("nativeQuery is NULL");
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
         }
-        String method = getMethodName("getSingleResult");
-        LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
-        nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(dateTimeFormat));
-        Map<String, String> result = null;
+        String method = getMethodName("getResultListAsMaps");
+        LOGGER.debug(String.format("%s: nativeQuery[%s]", method, nativeQuery.getQueryString()));
         try {
-            result = (Map<String, String>) nativeQuery.getSingleResult();
+            nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(false, null));
+            return (List<Map<String, Object>>) nativeQuery.getResultList();
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateQueryException(e, nativeQuery));
-        } catch (NoResultException e) {
-            result = null;
-        } catch (NonUniqueResultException e) {
-            throw new SOSHibernateQueryNonUniqueResultException(e, nativeQuery);
+            return null;
         } catch (PersistenceException e) {
             throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+            return null;
         }
-        return result;
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    public <T> List<Map<String, String>> getResultListAsStringMaps(NativeQuery<T> nativeQuery) throws SOSHibernateException {
+        return getResultListAsStringMaps(nativeQuery, null);
+    }
+
+    /** execute a SELECT query(NativeQuery)
+     * 
+     * return a list of rows represented by Map<String,String>:
+     * 
+     * Map key - column name (lower case), Map value - string representation (null value as an empty string)
+     * 
+     * 
+     * setResultTransformer is deprecated (see below), but currently without alternative
+     * 
+     * excerpt from Query.setResultTransformer comment:
+     * 
+     * deprecated (since 5.2), todo develop a new approach to result transformers
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public <T> List<Map<String, String>> getResultListAsStringMaps(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+        if (nativeQuery == null) {
+            throw new SOSHibernateQueryException("nativeQuery is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
+        }
+        String method = getMethodName("getResultListAsStringMaps");
+        LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
+        try {
+            nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(true, dateTimeFormat));
+            return (List<Map<String, String>>) nativeQuery.getResultList();
+        } catch (IllegalStateException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+            return null;
+        } catch (PersistenceException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+            return null;
+        }
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    public <T> List<Map<String, String>> getResultListNativeQuery(String sql) throws SOSHibernateException {
+        return getResultList(createNativeQuery(sql));
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException */
+    public <T> List<Map<String, Object>> getResultListNativeQueryAsMaps(String sql) throws SOSHibernateException {
+        return getResultListAsMaps(createNativeQuery(sql));
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
-    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws SOSHibernateException {
-        return getSingleResult(query, null);
+    public <T> List<Map<String, String>> getResultListNativeQueryAsStringMaps(String sql) throws SOSHibernateException {
+        return getResultListAsStringMaps(createNativeQuery(sql), null);
     }
 
-    /** return a single row or null
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> List<Map<String, String>> getResultListNativeQueryAsStringMaps(String sql, String dateTimeFormat) throws SOSHibernateException {
+        return getResultListAsStringMaps(createNativeQuery(sql), dateTimeFormat);
+    }
+
+    /** execute a SELECT query(NativeQuery or Query)
      * 
-     * execute NativeQuery or Query
+     * return a single row or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException
      * 
@@ -589,19 +631,99 @@ public class SOSHibernateSession implements Serializable {
         return getSingleResult(createQuery(hql));
     }
 
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
-    public <T> Map<String, String> getSingleResultNativeQuery(String sql) throws SOSHibernateException {
-        return getSingleResultNativeQuery(sql, null);
-    }
-
-    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
-    public <T> Map<String, String> getSingleResultNativeQuery(String sql, String dateTimeFormat) throws SOSHibernateException {
-        return getSingleResult(createNativeQuery(sql), dateTimeFormat);
-    }
-
-    /** return a single field value or null
+    /** execute a SELECT query(NativeQuery)
      * 
-     * execute NativeQuery or Query
+     * return a single row represented by Map<String,Object> or null
+     * 
+     * Map key - column name (lower case), Map value - object (null value as NULL)
+     * 
+     * see getResultListAsMaps
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public <T> Map<String, Object> getSingleResultAsMap(NativeQuery<T> nativeQuery) throws SOSHibernateException {
+        if (nativeQuery == null) {
+            throw new SOSHibernateQueryException("nativeQuery is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
+        }
+        String method = getMethodName("getSingleResultAsMap");
+        LOGGER.debug(String.format("%s: nativeQuery[%s]", method, nativeQuery.getQueryString()));
+        nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(false, null));
+        Map<String, Object> result = null;
+        try {
+            result = (Map<String, Object>) nativeQuery.getSingleResult();
+        } catch (IllegalStateException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+        } catch (NoResultException e) {
+            result = null;
+        } catch (NonUniqueResultException e) {
+            throw new SOSHibernateQueryNonUniqueResultException(e, nativeQuery);
+        } catch (PersistenceException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+        }
+        return result;
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> Map<String, String> getSingleResultAsStringMap(NativeQuery<T> query) throws SOSHibernateException {
+        return getSingleResultAsStringMap(query, null);
+    }
+
+    /** execute a SELECT query(NativeQuery)
+     * 
+     * return a single row represented by Map<String,String> or null
+     * 
+     * Map key - column name (lower case), Map value - string representation (null value as an empty string)
+     * 
+     * see getResultListAsStringMaps
+     * 
+     * @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public <T> Map<String, String> getSingleResultAsStringMap(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+        if (nativeQuery == null) {
+            throw new SOSHibernateQueryException("nativeQuery is NULL");
+        }
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("currentSession is NULL", nativeQuery);
+        }
+        String method = getMethodName("getSingleResultAsMap");
+        LOGGER.debug(String.format("%s: nativeQuery[%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
+        nativeQuery.setResultTransformer(getNativeQueryResultToMapTransformer(true, dateTimeFormat));
+        Map<String, String> result = null;
+        try {
+            result = (Map<String, String>) nativeQuery.getSingleResult();
+        } catch (IllegalStateException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+        } catch (NoResultException e) {
+            result = null;
+        } catch (NonUniqueResultException e) {
+            throw new SOSHibernateQueryNonUniqueResultException(e, nativeQuery);
+        } catch (PersistenceException e) {
+            throwException(e, new SOSHibernateQueryException(e, nativeQuery));
+        }
+        return result;
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> Map<String, Object> getSingleResultNativeQueryAsMap(String sql) throws SOSHibernateException {
+        return getSingleResultAsMap(createNativeQuery(sql));
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> Map<String, String> getSingleResultNativeQueryAsStringMap(String sql) throws SOSHibernateException {
+        return getSingleResultAsStringMap(createNativeQuery(sql), null);
+    }
+
+    /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateQueryException, SOSHibernateQueryNonUniqueResultException */
+    public <T> Map<String, String> getSingleResultNativeQueryAsStringMap(String sql, String dateTimeFormat) throws SOSHibernateException {
+        return getSingleResultAsStringMap(createNativeQuery(sql), dateTimeFormat);
+    }
+
+    /** execute a SELECT query(NativeQuery or Query)
+     * 
+     * return a single field value or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException, return single value as string
      * 
@@ -977,7 +1099,7 @@ public class SOSHibernateSession implements Serializable {
         return String.format("%s%s", prefix, name);
     }
 
-    private ResultTransformer getNativeQueryResultToMapTransformer(String dateTimeFormat) {
+    private ResultTransformer getNativeQueryResultToMapTransformer(boolean asString, String dateTimeFormat) {
         return new ResultTransformer() {
 
             private static final long serialVersionUID = 1L;
@@ -990,22 +1112,26 @@ public class SOSHibernateSession implements Serializable {
 
             @Override
             public Object transformTuple(Object[] tuple, String[] aliases) {
-                Map<String, String> result = new HashMap<String, String>(tuple.length);
+                Map<String, Object> result = new HashMap<String, Object>(tuple.length);
                 for (int i = 0; i < tuple.length; i++) {
                     String alias = aliases[i];
                     if (alias != null) {
                         Object origValue = tuple[i];
-                        String value = "";
-                        if (origValue != null) {
-                            value = origValue + "";
-                            if (dateTimeFormat != null && origValue instanceof java.sql.Timestamp) {
-                                try {
-                                    value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
-                                } catch (Exception e) {
+                        if (asString) {
+                            String value = "";
+                            if (origValue != null) {
+                                value = origValue + "";
+                                if (dateTimeFormat != null && origValue instanceof java.sql.Timestamp) {
+                                    try {
+                                        value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
+                                    } catch (Exception e) {
+                                    }
                                 }
                             }
+                            result.put(alias.toLowerCase(), value);
+                        } else {
+                            result.put(alias.toLowerCase(), origValue);
                         }
-                        result.put(alias.toLowerCase(), value);
                     }
                 }
                 return result;
