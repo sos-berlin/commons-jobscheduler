@@ -52,16 +52,11 @@ public class SOSHibernateSession implements Serializable {
     private String identifier;
     private boolean isGetCurrentSession = false;
     private boolean isStatelessSession = false;
-    private boolean setLockTimeoutExecuted = false;
     private SOSHibernateSQLExecutor sqlExecutor;
 
     /** use factory.openSession(), factory.openStatelessSession() or factory.getCurrentSession() */
     protected SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
-    }
-
-    protected boolean isSetLockTimeoutExecuted() {
-        return setLockTimeoutExecuted;
     }
 
     /** @throws SOSHibernateOpenSessionException */
@@ -1117,6 +1112,9 @@ public class SOSHibernateSession implements Serializable {
 
             @Override
             public Object transformTuple(Object[] tuple, String[] aliases) {
+                if (aliases.length == 0) {
+                    return tuple;
+                }
                 Map<String, Object> result = new HashMap<String, Object>(tuple.length);
                 for (int i = 0; i < tuple.length; i++) {
                     String alias = aliases[i];
@@ -1149,17 +1147,8 @@ public class SOSHibernateSession implements Serializable {
         try {
             if (getFactory().getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
                 String value = getFactory().getConfiguration().getProperties().getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_MSSQL_LOCK_TIMEOUT);
-                if (value != null) {
-                    try {
-                        int lockTimeout = Integer.parseInt(value);
-                        if (lockTimeout > 0) {
-                            getSQLExecutor().execute("set LOCK_TIMEOUT " + lockTimeout);
-                            setLockTimeoutExecuted = true;
-                        }
-                    } catch (Exception e) {
-                        throw new Exception(String.format("can't apply configuration property %s=%s: %s",
-                                SOSHibernate.HIBERNATE_SOS_PROPERTY_MSSQL_LOCK_TIMEOUT, value, e.toString()));
-                    }
+                if (value != null && value != "-1") {
+                    getSQLExecutor().execute("set LOCK_TIMEOUT " + value);
                 }
             }
         } catch (Exception e) {
