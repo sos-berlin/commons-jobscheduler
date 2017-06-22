@@ -583,14 +583,10 @@ public class SOSHibernateSQLExecutor implements Serializable {
         Enum<SOSHibernateFactory.Dbms> dbms = session.getFactory().getDbms();
         LOGGER.debug(String.format("%s: dbms=%s", method, dbms));
         if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
+            // default set LOCK_TIMEOUT 3000 was set by the SOSHibernateFactory
             String dateFormat = "set DATEFORMAT ymd";
             String language = "set LANGUAGE British";
-            if (session.isSetLockTimeoutExecuted()) {
-                execute(dateFormat, language);
-            } else {
-                String lockTimeout = "set LOCK_TIMEOUT 3000";
-                execute(dateFormat, language, lockTimeout);
-            }
+            execute(dateFormat, language);
         } else if (dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
             execute("SET SESSION SQL_MODE='ANSI_QUOTES'");
         } else if (dbms.equals(SOSHibernateFactory.Dbms.ORACLE)) {
