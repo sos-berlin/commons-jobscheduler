@@ -583,7 +583,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         Enum<SOSHibernateFactory.Dbms> dbms = session.getFactory().getDbms();
         LOGGER.debug(String.format("%s: dbms=%s", method, dbms));
         if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
-            // default set LOCK_TIMEOUT 3000 was set by the SOSHibernateFactory
+            // default set LOCK_TIMEOUT xxx was set by the SOSHibernateFactory
             String dateFormat = "set DATEFORMAT ymd";
             String language = "set LANGUAGE British";
             execute(dateFormat, language);
