@@ -555,7 +555,24 @@ public class SOSHibernateSQLExecutor implements Serializable {
     }
 
     /** see getResultSet */
-    public Map<String, String> next(ResultSet rs) throws SOSHibernateSQLExecutorException {
+    public Map<String, Object> next(ResultSet rs) throws SOSHibernateSQLExecutorException {
+        Map<String, Object> record = new LinkedHashMap<String, Object>();
+        try {
+            if (rs != null && rs.next()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int count = meta.getColumnCount();
+                for (int i = 1; i <= count; i++) {
+                    record.put(meta.getColumnName(i).toLowerCase(), rs.getObject(i));
+                }
+            }
+        } catch (SQLException e) {
+            throw new SOSHibernateSQLExecutorException(e);
+        }
+        return record;
+    }
+
+    /** see getResultSet */
+    public Map<String, String> nextAsStringMap(ResultSet rs) throws SOSHibernateSQLExecutorException {
         Map<String, String> record = new LinkedHashMap<String, String>();
         try {
             if (rs != null && rs.next()) {
