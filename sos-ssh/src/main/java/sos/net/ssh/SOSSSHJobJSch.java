@@ -290,8 +290,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         LOGGER.debug("  KEY BEFORE REPLACEMENT: " + key);
                         LOGGER.debug("*******************************");
                     }
-                    String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}", "_");
-                    if (key.toString().contains("()")) {
+                    String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}|\\p{Space}", "_");
+                    if (!key.toString().equalsIgnoreCase(keyVal)) {
                         LOGGER.debug("  KEY AFTER REPLACEMENT: " + keyVal);
                         LOGGER.debug("*******************************");
                     }

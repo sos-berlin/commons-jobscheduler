@@ -30,7 +30,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     private void initializeClazz() {
-        objSSH = new SOSSSHJobTrilead();
+        objSSH = new SOSSSHJobJSch();
         objOptions = objSSH.getOptions();
         objSSH.setJSJobUtilites(this);
         JSListenerClass.bolLogDebugInformation = true;
@@ -202,6 +202,21 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
         }
         return strTemp;
+    }
+
+    @Test
+    public void testExecuteCommandScripts() throws Exception {
+        initializeClazz();
+        String strArgs[] = new String[] { 
+                "-command_script", "echo 'BACKUP_LOC=backup_loc_test_value' &gt;&gt; $SCHEDULER_RETURN_VALUES;export;echo $BACKUP_LOC;echo &quot;test&quot;", 
+                "-auth_method", "password", 
+                "-host", "galadriel.sos",
+                "-user", "sos",
+                "-password", "sos"};
+        objOptions.commandLineArgs(strArgs);
+        objSSH.setJSJobUtilites(this);
+        objSSH.execute();
+        assertEquals("user", objOptions.user.getValue(), "sos");
     }
 
 }
