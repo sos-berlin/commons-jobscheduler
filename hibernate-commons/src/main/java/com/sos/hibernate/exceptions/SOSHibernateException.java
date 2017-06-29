@@ -115,6 +115,11 @@ public class SOSHibernateException extends SOSException {
         message = String.format("%d %s", sqlException.getErrorCode(), sqlException.getMessage());
     }
 
+    public SOSHibernateException(SQLException cause, Query<?> query) {
+        this(cause);
+        handleStatement(query);
+    }
+
     public SOSHibernateException(SQLException cause, String sql) {
         initCause(cause);
         sqlException = cause;

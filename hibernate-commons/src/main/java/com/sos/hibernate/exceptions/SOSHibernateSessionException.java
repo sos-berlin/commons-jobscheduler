@@ -2,7 +2,7 @@ package com.sos.hibernate.exceptions;
 
 import javax.persistence.PersistenceException;
 
-/** can occurs if following methods are called: clearSession, delete, get, refresh, save, saveOrUpdate, update, sessionDoWork */
+/** can occurs if following methods are called: clearSession, sessionDoWork */
 public class SOSHibernateSessionException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
@@ -11,19 +11,11 @@ public class SOSHibernateSessionException extends SOSHibernateException {
         super(cause);
     }
 
-    public SOSHibernateSessionException(IllegalStateException cause, String stmt) {
-        super(cause, stmt);
-    }
-
     public SOSHibernateSessionException(PersistenceException cause) {
         super(cause);
     }
 
     public SOSHibernateSessionException(String msg) {
         super(msg);
-    }
-
-    public SOSHibernateSessionException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

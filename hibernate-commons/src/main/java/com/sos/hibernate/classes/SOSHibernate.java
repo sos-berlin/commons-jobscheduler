@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import org.hibernate.exception.LockAcquisitionException;
 
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateLockAcquisitionException;
 
 public class SOSHibernate {
 
@@ -26,10 +27,12 @@ public class SOSHibernate {
     public static final String HIBERNATE_SOS_PROPERTY_SHOW_CONFIGURATION_PROPERTIES = "hibernate.sos.show_configuration_properties";
     public static final int LIMIT_IN_CLAUSE = 1000;
 
-    public static LockAcquisitionException findLockException(Exception cause) {
+    public static Exception findLockException(Exception cause) {
         Throwable e = cause;
         while (e != null) {
-            if (e instanceof LockAcquisitionException) {
+            if (e instanceof SOSHibernateLockAcquisitionException) {
+                return (SOSHibernateLockAcquisitionException) e;
+            } else if (e instanceof LockAcquisitionException) {
                 return (LockAcquisitionException) e;
             }
             e = e.getCause();
