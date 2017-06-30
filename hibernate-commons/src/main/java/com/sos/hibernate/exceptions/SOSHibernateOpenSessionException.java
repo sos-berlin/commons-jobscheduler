@@ -21,4 +21,8 @@ public class SOSHibernateOpenSessionException extends SOSHibernateInvalidSession
     public SOSHibernateOpenSessionException(PersistenceException cause) {
         super(cause);
     }
+
+    public SOSHibernateOpenSessionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

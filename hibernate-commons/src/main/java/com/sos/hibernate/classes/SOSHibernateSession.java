@@ -50,6 +50,7 @@ public class SOSHibernateSession implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateSession.class);
     private static final long serialVersionUID = 1L;
+    private boolean autoCommit = false;
     private Object currentSession;
     private FlushMode defaultHibernateFlushMode = FlushMode.ALWAYS;
     private final SOSHibernateFactory factory;
@@ -70,22 +71,32 @@ public class SOSHibernateSession implements Serializable {
             LOGGER.debug(String.format("%s: close currentSession", method));
             closeSession();
         }
-        LOGGER.debug(String.format("%s: isStatelessSession=%s, isGetCurrentSession=%s", method, isStatelessSession, isGetCurrentSession));
         try {
+            String sessionName = null;
             if (isStatelessSession) {
                 currentSession = factory.getSessionFactory().openStatelessSession();
+                sessionName = "StatelessSession";
             } else {
                 Session session = null;
                 if (isGetCurrentSession) {
                     session = factory.getSessionFactory().getCurrentSession();
+                    sessionName = "getCurrentSession";
                 } else {
                     session = factory.getSessionFactory().openSession();
+                    sessionName = "Session";
                 }
                 if (defaultHibernateFlushMode != null) {
                     session.setHibernateFlushMode(defaultHibernateFlushMode);
                 }
                 currentSession = session;
             }
+            try {
+                autoCommit = getFactory().getAutoCommit();
+            } catch (SOSHibernateConfigurationException e) {
+                throw new SOSHibernateOpenSessionException("can't get configured autocommit", e);
+            }
+
+            LOGGER.debug(String.format("%s: %s, autoCommit=%s", method, sessionName, autoCommit));
             onOpenSession();
         } catch (IllegalStateException e) {
             throw new SOSHibernateOpenSessionException(e);
@@ -105,13 +116,9 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateTransactionException */
     public void beginTransaction() throws SOSHibernateException {
         String method = getMethodName("beginTransaction");
-        try {
-            if (getFactory().getAutoCommit()) {
-                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-                return;
-            }
-        } catch (SOSHibernateConfigurationException e) {
-            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
+        if (autoCommit) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
@@ -161,13 +168,9 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateTransactionException */
     public void commit() throws SOSHibernateException {
         String method = getMethodName("commit");
-        try {
-            if (getFactory().getAutoCommit()) {
-                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-                return;
-            }
-        } catch (SOSHibernateConfigurationException e) {
-            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
+        if (autoCommit) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
         }
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
@@ -811,6 +814,10 @@ public class SOSHibernateSession implements Serializable {
         return tr;
     }
 
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
     public boolean isConnected() {
         if (currentSession != null) {
             if (isStatelessSession) {
@@ -894,13 +901,9 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateTransactionException */
     public void rollback() throws SOSHibernateException {
         String method = getMethodName("rollback");
-        try {
-            if (getFactory().getAutoCommit()) {
-                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-                return;
-            }
-        } catch (SOSHibernateConfigurationException e) {
-            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
+        if (autoCommit) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
         }
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
@@ -1033,6 +1036,11 @@ public class SOSHibernateSession implements Serializable {
         } catch (PersistenceException e) {
             throwException(e, new SOSHibernateSessionException(e));
         }
+    }
+
+    public void setAutoCommit(boolean val) {
+        LOGGER.debug(String.format("%s: %s", getMethodName("setAutoCommit"), val));
+        autoCommit = val;
     }
 
     public void setCacheMode(CacheMode cacheMode) {

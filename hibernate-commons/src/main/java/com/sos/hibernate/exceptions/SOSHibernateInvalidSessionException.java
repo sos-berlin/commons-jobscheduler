@@ -46,4 +46,8 @@ public class SOSHibernateInvalidSessionException extends SOSHibernateException {
     public SOSHibernateInvalidSessionException(String msg, String stmt) {
         super(msg, stmt);
     }
+
+    public SOSHibernateInvalidSessionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }
