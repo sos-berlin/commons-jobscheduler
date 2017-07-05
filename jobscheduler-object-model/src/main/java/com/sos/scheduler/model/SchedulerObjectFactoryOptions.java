@@ -6,6 +6,7 @@ import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
 import com.sos.JSHelper.Options.SOSOptionJSTransferMethod;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionString;
 
 /** @author KB */
 public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISOSSchedulerSocket {
@@ -44,6 +45,19 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
         return this;
     }
 
+    
+    @JSOptionDefinition(name = "command_url", description = "", key = "command_url", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString commandUrl = new SOSOptionString(this, conClassName + ".command_url", "", " ", " ", false);
+
+    public SOSOptionString getCommandUrl() {
+        return commandUrl;
+    }
+
+    public void setCommandUrl(SOSOptionString commandUrl) {
+        this.commandUrl = commandUrl;
+    }
+
+    
     @JSOptionDefinition(name = "PortNumber", description = "The scheduler communication port", key = "PortNumber", type = "SOSOptionPortNumber", mandatory = true)
     public SOSOptionPortNumber PortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".PortNumber", "The scheduler communication port", "0", "4444",
             true);

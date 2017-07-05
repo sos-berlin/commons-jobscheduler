@@ -575,7 +575,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         objOrder.setTitle("Test for UDP communication method");
         Params objParams = objSchedulerObjectFactory.setParams(new String[] { "Test1", "Test1", "scheduler_job_chain", "scheduler_sosftp_history" });
         objOrder.setParams(objParams);
-        objSchedulerObjectFactory.Options().TransferMethod.setValue(enuJSTransferModes.udp.description);
+        objSchedulerObjectFactory.getOptions().TransferMethod.setValue(enuJSTransferModes.udp.description);
         LOGGER.info(objOrder.toXMLString());
         objOrder.run();
     }

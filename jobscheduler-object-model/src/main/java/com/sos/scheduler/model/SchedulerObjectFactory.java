@@ -33,12 +33,15 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import sos.spooler.Variable_set;
+import sos.xml.SOSXMLXPath;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -117,11 +120,10 @@ import com.sos.scheduler.model.objects.ObjectFactory;
 import com.sos.scheduler.model.objects.Param;
 import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.Spooler;
+import com.sos.xml.SOSXmlCommand;
 
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
-    private static final String UTF_8 = "UTF-8";
-    private static final String DOM_IMPLEMENTATION = "XML 3.0 LS 3.0";
     private static final Class<Spooler> DEFAULT_MARSHALLER = Spooler.class;
     private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
     private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
@@ -137,7 +139,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     private Marshaller objM4Answers = null;
     private String strLastAnswer = null;
     private boolean useDefaultPeriod;
-    private boolean ommitXmlDeclaration=false;
+    private boolean ommitXmlDeclaration = false;
+    private sos.spooler.Spooler spooler;
 
     public void setOmmitXmlDeclaration(boolean ommitXmlDeclaration) {
         this.ommitXmlDeclaration = ommitXmlDeclaration;
@@ -152,9 +155,18 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         }
     }
 
+    public SchedulerObjectFactory(sos.spooler.Spooler spooler) {
+        super("com_sos_scheduler_model");
+        this.getOptions().setTransferMethod("api");
+        initMarshaller(DEFAULT_MARSHALLER);
+        this.spooler = spooler;
+        useDefaultPeriod = false;
+    }
+
     public SchedulerObjectFactory() {
         super("com_sos_scheduler_model");
         initMarshaller(DEFAULT_MARSHALLER);
+        this.spooler = spooler;
         useDefaultPeriod = false;
     }
 
@@ -166,8 +178,16 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public SchedulerObjectFactory(final String pstrServerName, final int pintPort) {
         this();
-        this.Options().ServerName.setValue(pstrServerName);
-        this.Options().PortNumber.value(pintPort);
+        this.getOptions().setTransferMethod("tcp");
+        this.getOptions().ServerName.setValue(pstrServerName);
+        this.getOptions().PortNumber.value(pintPort);
+        initMarshaller(DEFAULT_MARSHALLER);
+    }
+
+    public SchedulerObjectFactory(String commandUrl) {
+        this();
+        this.getOptions().setTransferMethod("http");
+        this.getOptions().commandUrl.setValue(commandUrl);
         initMarshaller(DEFAULT_MARSHALLER);
     }
 
@@ -197,19 +217,27 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public Answer run(final JSCmdBase pobjJSCmd) {
         final String conMethodName = "SchedulerObjectFactory::run";
         Answer objAnswer = null;
-        String strT = pobjJSCmd.toXMLString();
-        String strA = "";
+        String xmlCommand = pobjJSCmd.toXMLString();
         try {
-            LOGGER.trace(JOM_D_0010.get(conMethodName, strT));
+            LOGGER.trace(JOM_D_0010.get(conMethodName, xmlCommand));
             if (!isJSJobUtilitiesChanged()) {
-                if (objOptions.TransferMethod.isTcp()) {
+
+                if (objOptions.TransferMethod.isApi()) {
+                    objAnswer = getAnswerFromSpooler(pobjJSCmd);
+                } else if (objOptions.TransferMethod.isHttp()) {
+                    SOSXmlCommand sosXmlCommand= new SOSXmlCommand(objOptions.getCommandUrl().getValue()); 
+                    LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
+                    String answer = sosXmlCommand.executeXMLPost(xmlCommand);
+                    LOGGER.trace("Answer from JobScheduler:\n" + answer);
+                    objAnswer = getAnswer(answer);
+                    
+                } else if (objOptions.TransferMethod.isTcp()) {
                     this.getSocket().setSoTimeout(30000);
-                    this.getSocket().sendRequest(strT);
-                    LOGGER.trace("Request sended to JobScheduler:\n" + strT);
-                    strA = getSocket().getResponse();
-                    strLastAnswer = strA;
-                    LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
-                    objAnswer = getAnswer(strA);
+                    this.getSocket().sendRequest(xmlCommand);
+                    LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
+                    String answer = getSocket().getResponse();
+                    LOGGER.trace("Answer from JobScheduler:\n" + answer);
+                    objAnswer = getAnswer(answer);
                 } else if (objOptions.TransferMethod.isUdp()) {
                     DatagramSocket udpSocket = null;
                     int intPortNumber = 0;
@@ -218,10 +246,10 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
                         intPortNumber = objOptions.PortNumber.value();
                         InetAddress objInetAddress = objOptions.ServerName.getInetAddress();
                         udpSocket.connect(objInetAddress, intPortNumber);
-                        if (strT.indexOf("<?xml") == -1) {
-                            strT = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + strT;
+                        if (xmlCommand.indexOf("<?xml") == -1) {
+                            xmlCommand = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + xmlCommand;
                         }
-                        byte[] btyBuffer = strT.getBytes();
+                        byte[] btyBuffer = xmlCommand.getBytes();
                         udpSocket.send(new DatagramPacket(btyBuffer, btyBuffer.length, objInetAddress, intPortNumber));
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
@@ -241,12 +269,12 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             throw new JobSchedulerException(String.format("%1$s: %2$s", conMethodName, e.getMessage()), e);
         }
         if (objAnswer != null && objAnswer.getERROR() != null) {
-            throw new JobSchedulerException(Messages.getMsg("JOM_E_0010") + "\n" + "command:\n" + strT + "\n" + "answer:\n" + strLastAnswer);
+            throw new JobSchedulerException(Messages.getMsg("JOM_E_0010") + "\n" + "command:\n" + xmlCommand + "\n" + "answer:\n" + strLastAnswer);
         }
         return objAnswer;
     }
 
-    public Answer getAnswerFromSpooler(sos.spooler.Spooler spooler, JSCmdBase pobjJSCmd) {
+    public Answer getAnswerFromSpooler(JSCmdBase pobjJSCmd) {
         String command = pobjJSCmd.toXMLString();
         strLastAnswer = spooler.execute_xml(command);
         LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
@@ -293,7 +321,6 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         }
     }
 
-
     public void initMarshaller(String context) {
         try {
             if (jc == null) {
@@ -305,7 +332,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             LOGGER.error(e.getMessage(), e);
         }
     }
-    
+
     public void initAnswerMarshaller() {
         try {
             if (jc4Answers == null) {
@@ -437,8 +464,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     }
 
     private String toXMLString(final Object objO, final Marshaller objMarshaller) {
-        
-        
+
         String strT = "";
         try {
             XMLSerializer serializer = getXMLSerializer();
@@ -477,7 +503,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         initAnswerMarshaller();
         return toXMLString(objO, objM4Answers);
     }
-    
+
     private String cmdToXMLString(final Object objO) {
         StringWriter s = new StringWriter();
         try {
@@ -487,10 +513,10 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             objM.marshal(objO, s);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
-        } 
+        }
         return s.toString();
     }
-    
+
     private XMLSerializer getXMLSerializer() {
         OutputFormat of = new OutputFormat();
         of.setCDataElements(new String[] { "^description", "^script", "^scheduler_script", "^log_mail_to", "^log_mail_cc", "^log_mail_bcc" });
@@ -499,7 +525,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return serializer;
     }
 
-    public SchedulerObjectFactoryOptions Options() {
+    public SchedulerObjectFactoryOptions getOptions() {
         if (objOptions == null) {
             objOptions = new SchedulerObjectFactoryOptions();
         }
@@ -542,7 +568,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public Params setParams(final Properties pobjProperties) {
         Params objParams = super.createParams();
-        for (final Entry<Object,Object> element : pobjProperties.entrySet()) {
+        for (final Entry<Object, Object> element : pobjProperties.entrySet()) {
             Param objP = this.createParam(element.getKey().toString(), element.getValue().toString());
             objParams.getParamOrCopyParamsOrInclude().add(objP);
         }
