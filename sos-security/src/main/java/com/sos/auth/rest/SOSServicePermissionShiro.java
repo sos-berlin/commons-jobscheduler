@@ -58,6 +58,7 @@ public class SOSServicePermissionShiro {
     private SOSlogin sosLogin;
     private SOSPermissionRoles roles;
     private Ini ini;
+    
 
     public JOCDefaultResponse getJocCockpitPermissions(String accessToken, String user, String pwd) {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -427,9 +428,8 @@ public class SOSServicePermissionShiro {
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:start");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:stop");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
-            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:terminate");
-            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:unstop");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:kill");
+            addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:terminate");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:end_all_tasks");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:suspend_all_tasks");
             addPermission(forUser,sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:job:execute:continue_all_tasks");
@@ -724,8 +724,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getJob().getExecute().setStop(haveRight("sos:products:joc_cockpit:job:execute:stop"));
             sosPermissionJocCockpit.getJob().getExecute().setUnstop(haveRight("sos:products:joc_cockpit:job:execute:unstop"));
             sosPermissionJocCockpit.getJob().getExecute().setTerminate(haveRight("sos:products:joc_cockpit:job:execute:terminate"));
-            sosPermissionJocCockpit.getJob().getExecute().setKill(haveRight("sos:products:joc_cockpit:job:execute:unstop"));
-            sosPermissionJocCockpit.getJob().getExecute().setUnstop(haveRight("sos:products:joc_cockpit:job:execute:kill"));
+            sosPermissionJocCockpit.getJob().getExecute().setKill(haveRight("sos:products:joc_cockpit:job:execute:kill"));
             sosPermissionJocCockpit.getJob().getExecute().setEndAllTasks(haveRight("sos:products:joc_cockpit:job:execute:end_all_tasks"));
             sosPermissionJocCockpit.getJob().getExecute().setSuspendAllTasks(haveRight("sos:products:joc_cockpit:job:execute:suspend_all_tasks"));
             sosPermissionJocCockpit.getJob().getExecute().setContinueAllTasks(haveRight("sos:products:joc_cockpit:job:execute:continue_all_tasks"));
@@ -886,8 +885,7 @@ public class SOSServicePermissionShiro {
             sosPermissionCommands.getJob().getExecute().setStop(haveRight("sos:products:commands:job:execute:stop"));
             sosPermissionCommands.getJob().getExecute().setUnstop(haveRight("sos:products:commands:job:execute:unstop"));
             sosPermissionCommands.getJob().getExecute().setTerminate(haveRight("sos:products:commands:job:execute:terminate"));
-            sosPermissionCommands.getJob().getExecute().setKill(haveRight("sos:products:commands:job:execute:unstop"));
-            sosPermissionCommands.getJob().getExecute().setUnstop(haveRight("sos:products:commands:job:execute:kill"));
+            sosPermissionCommands.getJob().getExecute().setKill(haveRight("sos:products:commands:job:execute:kill"));
             sosPermissionCommands.getJob().getExecute().setEndAllTasks(haveRight("sos:products:commands:job:execute:end_all_tasks"));
             sosPermissionCommands.getJob().getExecute().setSuspendAllTasks(haveRight("sos:products:commands:job:execute:suspend_all_tasks"));
             sosPermissionCommands.getJob().getExecute().setContinueAllTasks(haveRight("sos:products:commands:job:execute:continue_all_tasks"));
