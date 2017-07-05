@@ -46,7 +46,7 @@ abstract class JSCommand implements Runnable {
             throw new JobSchedulerException("Command not set - please call setCommand() first.");
         }
         try {
-            objectFactory.Options().TransferMethod.setValue("tcp");
+            objectFactory.getOptions().TransferMethod.setValue("tcp");
             doCommand(jsCommand);
         } catch (Exception e) {
             String msg = "Error fetching command.";
