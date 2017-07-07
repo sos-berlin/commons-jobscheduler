@@ -54,7 +54,7 @@ public class DbItem {
     }
 
     protected String null2Blank(String s) {
-        if (s == null) {
+        if (".".equals(s) || s == null) {
             return "";
         } else {
             return s;
