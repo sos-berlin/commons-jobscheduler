@@ -28,6 +28,7 @@ public class JobSchedulerEventXPath {
             NamedNodeMap attrParam = params.item(0).getAttributes();
             String eventString = getText(attrParam.getNamedItem("value"));
             eventString = eventString.replaceAll(String.valueOf((char) 254), "<").replaceAll(String.valueOf((char) 255), ">");
+            eventString = eventString.replaceAll("(\\uC3BE|þ|Ã¾)", "<").replaceAll("(\\uC3BF|ÿ|Ã¿)", ">");
             return eventString;
         } catch (Exception e) {
             throw new Exception("error occurred reading Job Scheduler answer: " + e.getMessage());
