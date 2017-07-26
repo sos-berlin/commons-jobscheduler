@@ -1012,7 +1012,9 @@ public class SOSServicePermissionShiro {
 
         int idx = authorization.indexOf(':');
         if (idx == -1) {
-            user = authorization;
+            if (!basicAuthorization.isEmpty()) {
+                user = authorization;
+            }
         } else {
             user = authorization.substring(0, idx);
             pwd = authorization.substring(idx + 1);
