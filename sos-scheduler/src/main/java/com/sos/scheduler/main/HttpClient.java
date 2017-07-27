@@ -24,10 +24,11 @@ public class HttpClient {
     private static final String HTTP_PORT_OPTION = "-http-port=";
     private static final String WITH_INDENT_OPTION = "-with-indent";
     private static final String XML_COMMAND_OPTION = "-xml-command=";
-    private static final String XML_COMMAND_API_PATH = "http://localhost:%1$s/jobscheduler/master/api/command";
+    private static final String XML_COMMAND_API_PATH = "http://%1$s/jobscheduler/master/api/command";
 
     public static void main(String[] args) {
         String port = null;
+        String hostPort = null;
         String xmlCommand = null;
         String schedulerXml = null;
         String portFromCommandLine = null;
@@ -56,7 +57,11 @@ public class HttpClient {
             if (port == null) {
                 throw new IllegalArgumentException("http port is required"); 
             }
-            SOSXmlCommand sosXmlCommand = new SOSXmlCommand(String.format(XML_COMMAND_API_PATH, port));
+            hostPort = "localhost:" + port;
+            if (port.indexOf(":") > -1) {
+                hostPort = port.replaceFirst("^0\\.0\\.0\\.0", "localhost");
+            }
+            SOSXmlCommand sosXmlCommand = new SOSXmlCommand(String.format(XML_COMMAND_API_PATH, hostPort));
             sosXmlCommand.setConnectTimeout(5000);
             sosXmlCommand.setReadTimeout(5000);
             String response = sosXmlCommand.executeXMLPost(xmlCommand);
