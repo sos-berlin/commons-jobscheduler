@@ -91,11 +91,7 @@ public class HttpClient {
 
     private static String getPortFromSchedulerXml(String schedulerXml) throws Exception {
         SOSXMLXPath sosXmlPath = new SOSXMLXPath(schedulerXml);
-        String httpPort = sosXmlPath.selectSingleNodeValue("/spooler/config/@http_port", null);
-        if (httpPort != null && httpPort.indexOf(":") > -1) {
-            httpPort = httpPort.split(":")[1];
-        }
-        return httpPort;
+        return sosXmlPath.selectSingleNodeValue("/spooler/config/@http_port", null);
     }
     
     private static String getIndentAnswer(boolean answerWithIndent, SOSXmlCommand sosXmlCommand, String response) {
