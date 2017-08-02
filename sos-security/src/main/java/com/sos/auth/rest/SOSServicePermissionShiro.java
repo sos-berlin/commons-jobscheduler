@@ -31,7 +31,6 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;

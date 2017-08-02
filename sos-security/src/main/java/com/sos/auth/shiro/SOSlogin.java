@@ -52,7 +52,7 @@ public class SOSlogin {
                 setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
                 currentUser = null;
             } catch (Exception ee) {
-                setMsg("Exception while logging in " + token.getPrincipal() + ee.getMessage());
+                setMsg("Exception while logging in " + token.getPrincipal() + " " + ee.getMessage());
                 currentUser = null;
             }
         }
