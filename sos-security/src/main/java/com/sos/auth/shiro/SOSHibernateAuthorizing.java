@@ -47,7 +47,6 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         for (SOSUserDBItem sosUserDBItem : sosUserList) {
             for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
                 if (sosUser2RoleDBItem.getSosUserRoleDBItem() != null) {
-                    System.out.println(sosUser2RoleDBItem.getSosUserRoleDBItem().getSosUserRole());
                     authorizationInfo.addRole(sosUser2RoleDBItem.getSosUserRoleDBItem().getSosUserRole());
                 }
             }

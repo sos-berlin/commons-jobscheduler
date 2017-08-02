@@ -19,6 +19,7 @@ public class LanguageDescriptorList {
     public static final String JAVASCRIPT = "javascript";
     public static final String SHELL = "shell";
     public static final String JAVA = "java";
+    public static final String DOTNET = "dotnet";
     public static final String SQL_PLUS = "sql*plus";
     public static final String SSH = "ssh";
     public static final String POWERSHELL = "powershell";
@@ -26,14 +27,15 @@ public class LanguageDescriptorList {
     private static List<LanguageDescriptor> lstLanguages = Arrays.asList(
             new LanguageDescriptor(SHELL, 0, false, SHELL, "", "", true, false),
             new LanguageDescriptor(JAVA, 1, false, JAVA, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_JAVASCRIPT, 2, false, JAVAX_JAVASCRIPT, "", "", true, true),
-            new LanguageDescriptor(PERL_SCRIPT, 3, false, PERL_SCRIPT, "", "",true, true), 
-            new LanguageDescriptor(POWERSHELL, 4, false, POWERSHELL, "", "", true, true), 
-            new LanguageDescriptor(VB_SCRIPT, 5, false, VB_SCRIPT, "", "", true, true), 
-            new LanguageDescriptor(VB_SCRIPT_CONTROL, 6, false, VB_SCRIPT_CONTROL, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 7, false, JAVAX_SCRIPT_RHINO, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 8, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), 
-            new LanguageDescriptor(JAVASCRIPT, 9, false, JAVASCRIPT, "", "", true, true)
+            new LanguageDescriptor(DOTNET, 2, false, DOTNET, "", "", true, true), 
+            new LanguageDescriptor(JAVAX_JAVASCRIPT, 3, false, JAVAX_JAVASCRIPT, "", "", true, true),
+            new LanguageDescriptor(PERL_SCRIPT, 4, false, PERL_SCRIPT, "", "",true, true), 
+            new LanguageDescriptor(POWERSHELL, 5, false, POWERSHELL, "", "", true, true), 
+            new LanguageDescriptor(VB_SCRIPT, 6, false, VB_SCRIPT, "", "", true, true), 
+            new LanguageDescriptor(VB_SCRIPT_CONTROL, 7, false, VB_SCRIPT_CONTROL, "", "", true, true), 
+            new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 8, false, JAVAX_SCRIPT_RHINO, "", "", true, true), 
+            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 9, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), 
+            new LanguageDescriptor(JAVASCRIPT, 10, false, JAVASCRIPT, "", "", true, true)
             );
 
     public LanguageDescriptorList() {
