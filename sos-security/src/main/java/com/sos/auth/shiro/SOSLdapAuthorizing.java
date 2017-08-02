@@ -1,8 +1,6 @@
 package com.sos.auth.shiro;
 
 import java.util.Collection;
-import java.util.StringTokenizer;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -16,9 +14,7 @@ import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
-import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-
 import com.sos.joc.Globals;
 
 public class SOSLdapAuthorizing {
@@ -103,7 +99,6 @@ public class SOSLdapAuthorizing {
             	LOGGER.debug("getting all attribute values using attribute" +  memberOf);
             	Collection<String> groupNames = LdapUtils.getAllAttributeValues(memberOf);
                 getRoleNamesForGroups(groupNames);
-                // groups.add(new GrantedAuthorityImpl(att.get().toString()));
             }
 
         }
