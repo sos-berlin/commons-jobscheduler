@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -70,8 +71,8 @@ public class SOSMail {
     protected String language = "de";
     protected String dateFormat = "dd.MM.yyyy";
     protected String datetimeFormat = "dd.MM.yyyy HH:mm";
-    protected HashMap dateFormats = new HashMap();
-    protected HashMap datetimeFormats = new HashMap();
+    protected HashMap <String,String>dateFormats = new HashMap<String,String>();
+    protected HashMap <String,String>datetimeFormats = new HashMap<String,String>();
     protected String attachmentCharset = "iso-8859-1";
     protected String charset = "iso-8859-1";
     protected String alternativeCharset = "iso-8859-1";
@@ -81,10 +82,10 @@ public class SOSMail {
     protected String alternativeEncoding = "7bit";
     protected String attachmentEncoding = "Base64";
     protected String attachmentContentType = "application/octet-stream";
-    protected LinkedList toList = new LinkedList();
-    protected LinkedList ccList = new LinkedList();
-    protected LinkedList bccList = new LinkedList();
-    protected TreeMap attachmentList = new TreeMap();
+    protected LinkedList <String> toList = new LinkedList<String>();
+    protected LinkedList <String>ccList = new LinkedList<String>();
+    protected LinkedList <String>bccList = new LinkedList<String>();
+    protected TreeMap <String,SOSMailAttachment>attachmentList = new TreeMap<String,SOSMailAttachment>();
     protected Properties templates = new Properties();
     protected SOSSettings sosSettings = null;
     protected String tableSettings = "SETTINGS";
@@ -102,7 +103,7 @@ public class SOSMail {
     private byte[] messageBytes;
     private MimeMessage message = null;
     private SOSMailAuthenticator authenticator = null;
-    private final ArrayList file_input_streams = new ArrayList();
+    private final ArrayList<FileInputStream> file_input_streams = new ArrayList<FileInputStream>();
     private ByteArrayOutputStream raw_email_byte_stream = null;
     private String lastError = "";
     private boolean changed = false;
@@ -243,6 +244,17 @@ public class SOSMail {
         clearAttachments();
     }
 
+
+    public void setProperties(Properties smtpProperties) {
+        Properties props = System.getProperties();
+        for (Map.Entry<Object, Object> e : smtpProperties.entrySet()) {
+            String key = (String) e.getKey();
+            String value = (String) e.getValue();
+            props.put(key, value);
+          }
+    }
+
+    
     public void initMessage() throws Exception {
         createMessage(createSession());
         initPriority();
@@ -434,9 +446,9 @@ public class SOSMail {
     }
 
     @Deprecated
-    public String substitute(String content, final HashMap replacements, final boolean nl2br) throws Exception {
-        Object key = null;
-        Object value = null;
+    private String substitute(String content, final HashMap<String, String> replacements, final boolean nl2br) throws Exception {
+        String key = null;
+        String value = null;
         if ("de".equalsIgnoreCase(this.getLanguage())) {
             this.setDateFormat("dd.MM.yyyy");
             this.setDatetimeFormat("dd.MM.yyyy HH:mm");
@@ -452,18 +464,18 @@ public class SOSMail {
             content = content.replaceAll("\n", "<br/>");
         }
         if (replacements != null) {
-            Iterator keys = replacements.keySet().iterator();
+            Iterator<String> keys = replacements.keySet().iterator();
             while (keys.hasNext()) {
                 key = keys.next();
                 if (key != null) {
-                    value = replacements.get(key.toString());
+                    value = replacements.get(key);
                     if (value != null) {
                         try {
                             content =
-                                    content.replaceAll("&\\#\\(" + key.toString() + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()),
+                                    content.replaceAll("&\\#\\(" + key + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()),
                                             this.getDateFormat()));
                             content =
-                                    content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", SOSDate.getDateTimeAsString(
+                                    content.replaceAll("&\\#\\#\\(" + key + "\\)", SOSDate.getDateTimeAsString(
                                             SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
                         } catch (Exception ex) {
                             // ignore this error: replacement is not convertible
@@ -471,14 +483,14 @@ public class SOSMail {
                         }
                         Locale defaultLocale = Locale.getDefault();
                         try {
-                            double doubleValue = Double.parseDouble(value.toString());
+                            double doubleValue = Double.parseDouble(value);
                             if ("de".equalsIgnoreCase(this.getLanguage())) {
                                 Locale.setDefault(Locale.GERMAN);
                             } else if ("en".equalsIgnoreCase(this.getLanguage())) {
                                 Locale.setDefault(Locale.US);
                             }
                             DecimalFormat formatter = new DecimalFormat("#,###.00");
-                            content = content.replaceAll("&\\$\\(" + key.toString() + "\\)", formatter.format(doubleValue).toString());
+                            content = content.replaceAll("&\\$\\(" + key + "\\)", formatter.format(doubleValue).toString());
                         } catch (Exception ex) {
                         } finally {
                             Locale.setDefault(defaultLocale);
@@ -827,23 +839,23 @@ public class SOSMail {
             if (!toList.isEmpty()) {
                 InternetAddress toAddrs[] = new InternetAddress[toList.size()];
                 int i = 0;
-                for (ListIterator e = toList.listIterator(); e.hasNext();) {
-                    t = e.next().toString();
+                for (ListIterator<String> e = toList.listIterator(); e.hasNext();) {
+                    t = e.next();
                     toAddrs[i++] = new InternetAddress(t);
                 }
                 message.setRecipients(MimeMessage.RecipientType.TO, toAddrs);
             }
             InternetAddress toAddrs[] = new InternetAddress[ccList.size()];
             int i = 0;
-            for (ListIterator e = ccList.listIterator(); e.hasNext();) {
-                t = e.next().toString();
+            for (ListIterator<String> e = ccList.listIterator(); e.hasNext();) {
+                t = e.next();
                 toAddrs[i++] = new InternetAddress(t);
             }
             message.setRecipients(MimeMessage.RecipientType.CC, toAddrs);
             toAddrs = new InternetAddress[bccList.size()];
             i = 0;
-            for (ListIterator e = bccList.listIterator(); e.hasNext();) {
-                t = e.next().toString();
+            for (ListIterator<String> e = bccList.listIterator(); e.hasNext();) {
+                t = e.next();
                 toAddrs[i++] = new InternetAddress(t);
             }
             message.setRecipients(MimeMessage.RecipientType.BCC, toAddrs);
@@ -880,8 +892,8 @@ public class SOSMail {
                 if (alternativeBodypart != null) {
                     alternativeBodypart.setHeader("Content-Transfer-Encoding", alternativeEncoding);
                 }
-                for (Iterator iter = attachmentList.values().iterator(); iter.hasNext();) {
-                    SOSMailAttachment attachment = (SOSMailAttachment) iter.next();
+                for (Iterator<SOSMailAttachment> iter = attachmentList.values().iterator(); iter.hasNext();) {
+                    SOSMailAttachment attachment = iter.next();
                     String content_type = attachment.getContentType();
                     if (content_type == null) {
                         throw new Exception("content_type ist null");
@@ -1014,7 +1026,7 @@ public class SOSMail {
         return bytes;
     }
 
-    public LinkedList getRecipients() {
+    public LinkedList<String> getRecipients() {
         return toList;
     }
 
@@ -1028,14 +1040,14 @@ public class SOSMail {
                 }
             }
         } else {
-            for (Iterator i = toList.listIterator(); i.hasNext();) {
+            for (Iterator<String> i = toList.listIterator(); i.hasNext();) {
                 s += i.next() + ",";
             }
         }
         return s.substring(0, s.length() - 1).trim();
     }
 
-    public LinkedList getCCs() {
+    public LinkedList<String> getCCs() {
         return ccList;
     }
 
@@ -1049,14 +1061,14 @@ public class SOSMail {
                 }
             }
         } else {
-            for (Iterator i = ccList.listIterator(); i.hasNext();) {
+            for (Iterator<String> i = ccList.listIterator(); i.hasNext();) {
                 s += i.next() + ",";
             }
         }
         return s.substring(0, s.length() - 1).trim();
     }
 
-    public LinkedList getBCCs() {
+    public LinkedList<String> getBCCs() {
         return bccList;
     }
 
@@ -1070,7 +1082,7 @@ public class SOSMail {
                 }
             }
         } else {
-            for (Iterator i = bccList.listIterator(); i.hasNext();) {
+            for (Iterator<String> i = bccList.listIterator(); i.hasNext();) {
                 s += i.next() + ",";
             }
         }
@@ -1508,7 +1520,7 @@ public class SOSMail {
             }
             if (!toList.isEmpty()) {
                 sb = new StringBuilder();
-                for (ListIterator e = toList.listIterator(); e.hasNext();) {
+                for (ListIterator<String> e = toList.listIterator(); e.hasNext();) {
                     sb.append(getQuotedName(e.next().toString()));
                     if (e.hasNext()) {
                         sb.append(",");
@@ -1518,7 +1530,7 @@ public class SOSMail {
             }
             if (!ccList.isEmpty()) {
                 sb = new StringBuilder();
-                for (ListIterator e = ccList.listIterator(); e.hasNext();) {
+                for (ListIterator<String> e = ccList.listIterator(); e.hasNext();) {
                     sb.append(getQuotedName(e.next().toString()));
                     if (e.hasNext()) {
                         sb.append(",");
@@ -1549,14 +1561,13 @@ public class SOSMail {
             }
             sendLine(out, "\r\n" + body + "\r\n\r\n");
             if (!attachmentList.isEmpty()) {
-                for (Iterator i = attachmentList.values().iterator(); i.hasNext();) {
-                    String[] attachment = new String[2];
-                    attachment = (String[]) i.next();
+                for (Iterator<SOSMailAttachment> i = attachmentList.values().iterator(); i.hasNext();) {
+                    SOSMailAttachment sosMailAttachment = i.next();
                     sendLine(out, "\r\n--" + boundary);
-                    sendLine(out, "Content-Type: " + attachment[1] + "; name=\"" + new File(attachment[0]).getName() + "\"");
-                    sendLine(out, "Content-Disposition: attachment; filename=\"" + attachment[0] + "\"");
+                    sendLine(out, "Content-Type: " + sosMailAttachment.getContentType() + "; name=\"" + new File(sosMailAttachment.getFilename()) + "\"");                    
+                    sendLine(out, "Content-Disposition: attachment; filename=\"" + sosMailAttachment.getFilename() + "\"");
                     sendLine(out, "Content-Transfer-Encoding: " + attachmentEncoding + "\r\n");
-                    SOSMimeBase64.encode(attachment[0], out);
+                    SOSMimeBase64.encode(sosMailAttachment.getFilename(), out);
                 }
             }
             sendLine(out, "\r\n\r\n--" + boundary + "--\r\n");
