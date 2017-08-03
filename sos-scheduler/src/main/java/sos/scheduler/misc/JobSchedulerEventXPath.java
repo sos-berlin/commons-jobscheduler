@@ -57,12 +57,11 @@ public class JobSchedulerEventXPath {
                 if (!xmlFile.canRead()) {
                     throw new Exception("input file not found: " + xmlFile.getAbsolutePath());
                 }
-                in = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile)));
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile),"ISO-8859-1"));
                 String eventContent = "";
                 String line = "";
-                while (line != null) {
+                while ((line = in.readLine()) != null) {
                     eventContent += line;
-                    line = in.readLine();
                 }
                 eventXml = eventContent;
             }
