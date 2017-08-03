@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.w3c.dom.DOMException;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -15,19 +14,17 @@ import sos.scheduler.job.JobSchedulerConstants;
 import sos.xml.SOSXMLXPath;
 
 public class JobSchedulerEventXPath {
-
+    
     public JobSchedulerEventXPath() throws Exception {
     }
 
     public static String getEventXMLAsString(final String eventXml) throws DOMException, Exception {
         try {
             SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(eventXml.replaceFirst("^[^<]*", "").replaceFirst("[^>]*$", "")));
-            NodeList params = sosxml.selectNodeList("/spooler/answer//param[@name='" + JobSchedulerConstants.eventVariableName + "']");
-            if (params.item(0) == null) {
+            String eventString = sosxml.selectSingleNodeValue("//param[@name='" + JobSchedulerConstants.eventVariableName + "']/@value");
+            if (eventString == null) {
                 throw new Exception("no event parameters found in Job Scheduler answer");
             }
-            NamedNodeMap attrParam = params.item(0).getAttributes();
-            String eventString = getText(attrParam.getNamedItem("value"));
             eventString = eventString.replaceAll(String.valueOf((char) 254), "<").replaceAll(String.valueOf((char) 255), ">");
             eventString = eventString.replaceAll("(\\uC3BE|þ|Ã¾)", "<").replaceAll("(\\uC3BF|ÿ|Ã¿)", ">");
             return eventString;
@@ -43,6 +40,28 @@ public class JobSchedulerEventXPath {
             return "";
         }
     }
+    
+    public static String buildXPath(String attr, String value, String xPath) {
+        String[] values = value.trim().split("\\s+");
+        String xPathOr = "";
+        for (int i = 0; i < values.length; i++) {
+           if (i == 0) {
+               xPathOr += "@"+attr+"='"+values[i]+"'";
+           } else {
+               xPathOr += "or @"+attr+"='"+values[i]+"'";
+           }
+        }
+        if (values.length > 1) {
+            xPathOr = "(" + xPathOr + ")";
+        }
+        if (values.length > 0) {
+            if (!xPath.isEmpty()) {
+                xPathOr = " and " + xPathOr;
+            }
+            xPath += xPathOr;
+        }
+        return xPath;
+    }
 
     public static void main(final String[] args) {
         BufferedReader in = null;
@@ -52,6 +71,37 @@ public class JobSchedulerEventXPath {
             }
             String eventXml = args[0];
             String eventXPath = args[1];
+            String eventClass = null;
+            String eventId = null;
+            String eventExitCode = null;
+            String eventXPath2 = "";
+            if (args.length > 2 && eventXPath.isEmpty()) {
+                eventClass = args[2];
+                if (eventClass != null && !eventClass.isEmpty()) {
+                    eventXPath2 = JobSchedulerEventXPath.buildXPath("event_class", eventClass, eventXPath2);
+                }
+            }
+            if (args.length > 3 && eventXPath.isEmpty()) {
+                eventId = args[3];
+                if (eventId != null && !eventId.isEmpty()) {
+                    eventXPath2 = JobSchedulerEventXPath.buildXPath("event_id", eventId, eventXPath2);
+                }
+            }
+            if (args.length > 4 && eventXPath.isEmpty()) {
+                eventExitCode = args[4];
+                if (eventExitCode != null && !eventExitCode.isEmpty()) {
+                    eventXPath2 = JobSchedulerEventXPath.buildXPath("exit_code", eventExitCode, eventXPath2);
+                }
+            }
+            if (!eventXPath2.isEmpty()) {
+                eventXPath2 = "//events/event[" + eventXPath2 + "]";
+            } else {
+                eventXPath2 = "//events/event";
+            }
+            if (eventXPath.isEmpty()) {
+                eventXPath = eventXPath2; 
+            }
+            
             if (!eventXml.startsWith("<?xml ")) {
                 File xmlFile = new File(eventXml);
                 if (!xmlFile.canRead()) {
