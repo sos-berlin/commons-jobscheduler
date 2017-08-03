@@ -3,6 +3,7 @@ package sos.scheduler.misc;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.w3c.dom.DOMException;
@@ -20,8 +21,8 @@ public class JobSchedulerEventXPath {
 
     public static String getEventXMLAsString(final String eventXml) throws DOMException, Exception {
         try {
-            SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(eventXml));
-            NodeList params = sosxml.selectNodeList("/spooler/answer/params/param[@name='" + JobSchedulerConstants.eventVariableName + "']");
+            SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(eventXml.replaceFirst("^[^<]*", "").replaceFirst("[^>]*$", "")));
+            NodeList params = sosxml.selectNodeList("/spooler/answer//param[@name='" + JobSchedulerConstants.eventVariableName + "']");
             if (params.item(0) == null) {
                 throw new Exception("no event parameters found in Job Scheduler answer");
             }
@@ -44,6 +45,7 @@ public class JobSchedulerEventXPath {
     }
 
     public static void main(final String[] args) {
+        BufferedReader in = null;
         try {
             if (args.length < 2) {
                 throw new Exception("Usage: JobSchedulerEventXPath xmlString  xPathString");
@@ -55,7 +57,7 @@ public class JobSchedulerEventXPath {
                 if (!xmlFile.canRead()) {
                     throw new Exception("input file not found: " + xmlFile.getAbsolutePath());
                 }
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile)));
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile)));
                 String eventContent = "";
                 String line = "";
                 while (line != null) {
@@ -76,6 +78,13 @@ public class JobSchedulerEventXPath {
             System.out.println(0);
             System.err.println("JobSchedulerEventXPath: " + e.getMessage());
             System.exit(1);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 
