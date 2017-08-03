@@ -59,6 +59,8 @@ public class SOSlogin {
     }
 
     public void login(String user, String pwd) {
+        user = user.replaceAll(" +", " ");
+        user = user.replaceAll(" ", "%20");
         if (user == null) {
             currentUser = null;
         } else {
