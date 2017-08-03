@@ -33,11 +33,33 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authzInfo = null;
         if (authorizing != null) {
+            
 
             authorizing.setAuthcToken(authcToken);
             authorizing.setSosLdapAuthorizingRealm(this);
-
+            
+            
             authzInfo = authorizing.setRoles(authzInfo, principalCollection);
+
+            if (this.getCacheManager() == null && this.isCachingEnabled() )               {
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting 'cacheManager'");
+            }
+            if (this.getSearchBase() == null ){
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting 'ldapRealm.searchBase'");
+            }
+            if (this.getUserDnTemplate() == null ){
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting 'ldapRealm.userDnTemplate'");
+            }
+            if (this.getContextFactory() == null ){
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting 'ldapRealm.contextFactory.url'");
+            }
+            if (this.getRolePermissionResolver() == null ){
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting 'ldapRealm.rolePermissionResolver'");
+            }
+            if (this.getPermissionResolver() == null ){
+                throw new RuntimeException ("LDAP configuration is not valid: Missing setting rolePermissionResolver'");
+            }
+         
         }
         return authzInfo;
     }
