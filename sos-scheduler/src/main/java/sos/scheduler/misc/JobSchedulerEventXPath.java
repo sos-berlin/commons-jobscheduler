@@ -21,7 +21,7 @@ public class JobSchedulerEventXPath {
 
     public static String getEventXMLAsString(final String eventXml) throws DOMException, Exception {
         try {
-            SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(eventXml));
+            SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(eventXml.replaceFirst("^[^<]*", "").replaceFirst("[^>]*$", "")));
             NodeList params = sosxml.selectNodeList("/spooler/answer//param[@name='" + JobSchedulerConstants.eventVariableName + "']");
             if (params.item(0) == null) {
                 throw new Exception("no event parameters found in Job Scheduler answer");
