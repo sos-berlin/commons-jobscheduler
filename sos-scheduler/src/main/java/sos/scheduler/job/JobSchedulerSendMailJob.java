@@ -70,9 +70,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
         try {
             mailOrderId = Integer.parseInt(this.mailOrderIterator.next().toString());
             SOSMailOrder mailOrder = new SOSMailOrder(this.sosMailSettings, this.getConnection());
-            if (this.getLogger() != null) {
-                mailOrder.setSOSLogger(this.getLogger());
-            }
+          
             if (mailOrder.getHost() == null || mailOrder.getHost().isEmpty()) {
                 if (!"-queue".equalsIgnoreCase(spooler_log.mail().smtp())) {
                     mailOrder.setHost(spooler_log.mail().smtp());
