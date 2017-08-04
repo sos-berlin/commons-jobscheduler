@@ -43,19 +43,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.Logger;
-
 import sos.settings.SOSSettings;
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
 
 import com.sos.JSHelper.Exceptions.JSNotImplementedException;
 import com.sos.JSHelper.interfaces.ISOSSmtpMailOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSMail {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSMail.class);
     protected String host = "";
     protected String port = "25";
     protected String user = "";
@@ -97,8 +96,6 @@ public class SOSMail {
     protected String sectionMailScripts = "mail_start_scripts_factory";
     protected String applicationMailTemplatesFactory = "email_templates_factory";
     protected String sectionMailTemplatesFactory = "mail_templates";
-    protected SOSLogger sosLogger = null;
-    private static final Logger LOGGER = Logger.getLogger(SOSMail.class);
     private boolean sendToOutputStream = false;
     private byte[] messageBytes;
     private MimeMessage message = null;
@@ -307,50 +304,6 @@ public class SOSMail {
         }
     }
 
-    public void log(String s, final int level) throws Exception {
-        s = "SOSMail." + s;
-        if (sosLogger != null) {
-            switch (level) {
-            case SOSLogger.DEBUG1:
-                sosLogger.debug1(s);
-                break;
-            case SOSLogger.DEBUG2:
-                sosLogger.debug2(s);
-                break;
-            case SOSLogger.DEBUG3:
-                sosLogger.debug3(s);
-                break;
-            case SOSLogger.DEBUG4:
-                sosLogger.debug4(s);
-                break;
-            case SOSLogger.DEBUG5:
-                sosLogger.debug5(s);
-                break;
-            case SOSLogger.DEBUG6:
-                sosLogger.debug6(s);
-                break;
-            case SOSLogger.DEBUG7:
-                sosLogger.debug7(s);
-                break;
-            case SOSLogger.DEBUG8:
-                sosLogger.debug8(s);
-                break;
-            case SOSLogger.DEBUG9:
-                sosLogger.debug9(s);
-                break;
-            case SOSLogger.INFO:
-                sosLogger.info(s);
-                break;
-            case SOSLogger.WARN:
-                sosLogger.warn(s);
-                break;
-            case SOSLogger.ERROR:
-                sosLogger.error(s);
-                break;
-            }
-        }
-    }
-
     private void getSettings(final SOSSettings sosSettings, final String language) throws Exception {
         if (language != null) {
             this.setLanguage(language);
@@ -520,7 +473,7 @@ public class SOSMail {
             if (!toList.contains(token)) {
                 toList.add(token);
             }
-            log(SOSClassUtil.getMethodName() + "-->" + token, SOSLogger.DEBUG9);
+            LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + token);
         }
         changed = true;
     }
@@ -537,9 +490,9 @@ public class SOSMail {
             token = t.nextToken();
             if (!toList.contains(token) && !ccList.contains(token)) {
                 ccList.add(token);
-                log(SOSClassUtil.getMethodName() + "-->" + token, SOSLogger.DEBUG9);
+                LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + token);
             } else {
-                log(SOSClassUtil.getMethodName() + "--> Ignored:" + token, SOSLogger.DEBUG9);
+                LOGGER.debug(SOSClassUtil.getMethodName() + "--> Ignored:" + token);
             }
         }
         changed = true;
@@ -557,9 +510,9 @@ public class SOSMail {
             token = t.nextToken();
             if (!ccList.contains(token) && !toList.contains(token) && !bccList.contains(token)) {
                 bccList.add(token);
-                log(SOSClassUtil.getMethodName() + "-->" + token, SOSLogger.DEBUG9);
+                LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + token);
             } else {
-                log(SOSClassUtil.getMethodName() + "--> Ignored:" + token, SOSLogger.DEBUG9);
+                LOGGER.debug(SOSClassUtil.getMethodName() + "--> Ignored:" + token);
             }
         }
         changed = true;
@@ -721,10 +674,10 @@ public class SOSMail {
             if (!"".equals(sBCC)) {
                 logMessage += "   sBCC=" + sBCC;
             }
-            log(logMessage, SOSLogger.INFO);
-            log(SOSClassUtil.getMethodName() + "-->" + "Subject=" + subject, SOSLogger.DEBUG6);
-            log(SOSClassUtil.getMethodName() + "-->" + dumpHeaders(), SOSLogger.DEBUG6);
-            log(SOSClassUtil.getMethodName() + "-->" + dumpMessageAsString(false), SOSLogger.DEBUG9);
+            LOGGER.info(logMessage);
+            LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + "Subject=" + subject);
+            LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + dumpHeaders());
+            LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + dumpMessageAsString(false));
             if (!sendToOutputStream) {
                 Transport t;
                 if ("ssl".equalsIgnoreCase(securityProtocol) || "starttls".equalsIgnoreCase(securityProtocol)) {
@@ -754,7 +707,7 @@ public class SOSMail {
                 try {
                     dumpMessageToFile(true);
                 } catch (Exception e) {
-                    log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                    LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                 }
                 return false;
             } else {
@@ -769,7 +722,7 @@ public class SOSMail {
                     try {
                         dumpMessageToFile(true);
                     } catch (Exception ee) {
-                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                        LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
                     return false;
 
@@ -786,7 +739,7 @@ public class SOSMail {
                     try {
                         dumpMessageToFile(true);
                     } catch (Exception ee) {
-                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                        LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
                     return false;
                 } else {
@@ -899,7 +852,7 @@ public class SOSMail {
                     if (content_type == null) {
                         throw new Exception("content_type ist null");
                     }
-                    log(SOSClassUtil.getMethodName() + "-->" + "Attachment=" + attachment.getFile(), SOSLogger.DEBUG6);
+                    LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + "Attachment=" + attachment.getFile());
                     addFile(attachment);
                 }
             } else {
@@ -958,11 +911,11 @@ public class SOSMail {
         SimpleDateFormat s = new SimpleDateFormat(queuePattern);
         FieldPosition fp = new FieldPosition(0);
         StringBuffer b = s.format(d, bb, fp);
-        lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email";
+        lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
         File f = new File(lastGeneratedFileName);
         while (f.exists()) {
             b = s.format(d, bb, fp);
-            lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email";
+            lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
             f = new File(lastGeneratedFileName);
         }
         dumpMessageToFile(f, withAttachment);
@@ -1090,7 +1043,7 @@ public class SOSMail {
     }
 
     public void clearRecipients() throws Exception {
-        log(SOSClassUtil.getMethodName(), SOSLogger.DEBUG9);
+        LOGGER.debug(SOSClassUtil.getMethodName());
         toList.clear();
         ccList.clear();
         bccList.clear();
@@ -1467,14 +1420,10 @@ public class SOSMail {
         return loadedMessageId;
     }
 
-    public void setSOSLogger(final SOSLogger sosLogger) {
-        this.sosLogger = sosLogger;
-    }
-
     private void warn(final String n, final String v) {
         if (messageReady) {
             try {
-                log("...setting of " + n + "=" + v + " will not be used. Loaded Message will be sent unchanged.", SOSStandardLogger.WARN);
+                LOGGER.warn("...setting of " + n + "=" + v + " will not be used. Loaded Message will be sent unchanged.");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -1600,11 +1549,9 @@ public class SOSMail {
         String s = "Hello\\nWorld";
         sosMail.setBody(s);
         sosMail.addRecipient("xyz@sos-berlin.com");
-        SOSStandardLogger sosLogger = new SOSStandardLogger(SOSStandardLogger.DEBUG9);
-        sosMail.setSOSLogger(sosLogger);
         sosMail.setPriorityLowest();
         if (!sosMail.send()) {
-            sosMail.log(SOSClassUtil.getMethodName() + "-->" + sosMail.getLastError(), SOSLogger.WARN);
+            LOGGER.warn(SOSClassUtil.getMethodName() + "-->" + sosMail.getLastError());
         }
         sosMail.clearRecipients();
     }
@@ -1649,11 +1596,10 @@ public class SOSMail {
             }
             sosMail.setSubject(options.getSubject().getValue());
             sosMail.setBody(options.getBody().getValue());
-            if (sosLogger != null) {
-                sosLogger.debug("sending mail: \n" + sosMail.dumpMessageAsString());
-            }
-            if (!sosMail.send() && sosLogger != null) {
-                sosLogger.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
+            LOGGER.debug("sending mail: \n" + sosMail.dumpMessageAsString());
+            
+            if (!sosMail.send() ) {
+                LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
                         + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
             }
         } catch (Exception e) {

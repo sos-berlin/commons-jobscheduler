@@ -14,13 +14,16 @@ import sos.settings.SOSSettings;
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
 import sos.textprocessor.SOSDocumentFactoryTextProcessor;
-import sos.util.SOSLogger;
 import sos.textprocessor.SOSPlainTextProcessor;
-import sos.util.SOSStandardLogger;
 import sos.textprocessor.SOSTextProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSMailOrder extends SOSMail {
 
+
+        
+     private static final Logger LOGGER = LoggerFactory.getLogger(SOSMailOrder.class);
     protected SOSConnection sosConnection;
     protected boolean hasLocalizedTemplates = true;
     protected SOSPlainTextProcessor mailPlainTextProcessor = null;
@@ -226,7 +229,7 @@ public class SOSMailOrder extends SOSMail {
             data = sosConnection.getArray("SELECT " + "\"FILENAME\", \"CHARSET\",  \"ENCODING\", \"CONTENT_TYPE\" " + "FROM " + SOSMail.tableMailAttachments
                     + " " + "WHERE \"ID\"=" + this.id);
             if (data != null) {
-                log("Found " + data.size() + " attachments.", SOSLogger.DEBUG3);
+                LOGGER.debug("Found " + data.size() + " attachments.");
                 Iterator iter = data.iterator();
                 while (iter.hasNext()) {
                     HashMap att = (HashMap) iter.next();
@@ -665,22 +668,6 @@ public class SOSMailOrder extends SOSMail {
         this.hasLocalizedTemplates = hasLocalizedTemplates;
     }
 
-    public static void main(String[] args) throws Exception {
-        String mailto = "mo@sos-berlin.com";
-        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                        "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk");
-        conn.connect();
-        SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS");
-        SOSMailOrder order = new SOSMailOrder(settings, conn);
-        order.addRecipient(mailto);
-        order.setLanguage("en");
-        order.setSubjectTemplate("default_subject");
-        order.setSubjectTemplateType(TEMPLATE_TYPE_PLAIN);
-        order.setBodyTemplate("default_body");
-        order.setBodyTemplateType(TEMPLATE_TYPE_PLAIN);
-        order.send();
-        conn.disconnect();
-    }
 
     public String getModifiedBy() {
         return modifiedBy;
