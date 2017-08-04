@@ -172,7 +172,6 @@ public class SchedulerMailer {
                 && ("yes".equalsIgnoreCase(readSettings) || "1".equalsIgnoreCase(readSettings) || "true".equalsIgnoreCase(readSettings))) {
             if (job.getConnectionSettings() != null && !job.getConnectionSettings().getSection("email", "mail_server").isEmpty()) {
                 sosMail = new SOSMail(job.getConnectionSettings());
-                sosMail.setSOSLogger(logger);
             } else {
                 throw new Exception("Mail Settings could not be found.");
             }
@@ -188,7 +187,6 @@ public class SchedulerMailer {
             if (logger == null) {
                 logger = new SOSSchedulerLogger(spooler_log);
             }
-            sosMail.setSOSLogger(logger);
             sosMail.setQueueDir(spooler_log.mail().queue_dir());
             sosMail.setFrom(spooler_log.mail().from());
             sosMail.addRecipient(spooler_log.mail().to());

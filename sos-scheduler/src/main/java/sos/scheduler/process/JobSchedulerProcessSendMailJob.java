@@ -153,7 +153,6 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                         attachment.setContentType(attachmentContentType);
                         sosMail.addAttachment(attachment);
                     }
-                    sosMail.setSOSLogger(this.getLogger());
                     this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
                     if (!sosMail.send()) {
                         this.getLogger().warn(

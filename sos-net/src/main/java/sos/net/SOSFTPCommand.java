@@ -615,7 +615,6 @@ abstract public class SOSFTPCommand {
             }
             sosMail.setSubject(subject);
             sosMail.setBody(body);
-            sosMail.setSOSLogger(this.getLogger());
             this.getLogger().debug1("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
                 this.getLogger().warn(

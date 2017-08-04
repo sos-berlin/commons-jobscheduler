@@ -319,7 +319,6 @@ public class ProcessBaseMonitor extends Monitor_impl {
             }
             sosMail.setSubject(subject);
             sosMail.setBody(body);
-            sosMail.setSOSLogger(this.getLogger());
             this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
                 this.getLogger().warn(
