@@ -668,23 +668,7 @@ public class SOSMailOrder extends SOSMail {
         this.hasLocalizedTemplates = hasLocalizedTemplates;
     }
 
-    public static void main(String[] args) throws Exception {
-        String mailto = "mo@sos-berlin.com";
-        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                        "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk");
-        conn.connect();
-        SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS");
-        SOSMailOrder order = new SOSMailOrder(settings, conn);
-        order.addRecipient(mailto);
-        order.setLanguage("en");
-        order.setSubjectTemplate("default_subject");
-        order.setSubjectTemplateType(TEMPLATE_TYPE_PLAIN);
-        order.setBodyTemplate("default_body");
-        order.setBodyTemplateType(TEMPLATE_TYPE_PLAIN);
-        order.send();
-        conn.disconnect();
-    }
-
+  
     public String getModifiedBy() {
         return modifiedBy;
     }
