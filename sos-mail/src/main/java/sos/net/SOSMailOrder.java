@@ -14,13 +14,16 @@ import sos.settings.SOSSettings;
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
 import sos.textprocessor.SOSDocumentFactoryTextProcessor;
-import sos.util.SOSLogger;
 import sos.textprocessor.SOSPlainTextProcessor;
-import sos.util.SOSStandardLogger;
 import sos.textprocessor.SOSTextProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSMailOrder extends SOSMail {
 
+
+        
+     private static final Logger LOGGER = LoggerFactory.getLogger(SOSMailOrder.class);
     protected SOSConnection sosConnection;
     protected boolean hasLocalizedTemplates = true;
     protected SOSPlainTextProcessor mailPlainTextProcessor = null;
@@ -96,14 +99,13 @@ public class SOSMailOrder extends SOSMail {
     public void load(int id) throws Exception {
         HashMap data = new HashMap();
         try {
-            data =
-                    sosConnection.getSingle("SELECT " + "\"MAILING_ID\", \"JOB_ID\", \"MESSAGE_ID\", \"TOPIC\", "
-                            + "\"TOPIC_IDENTIFIER\", \"CLIENT_IDENTIFIER\", \"REFERENCE\", \"MAIL_FROM\", "
-                            + "\"FROM_NAME\", \"MAIL_TO\", \"CC_TO\", \"BCC_TO\", \"REPLY_TO\", "
-                            + "\"PRIORITY\", \"SUBJECT\", \"SUBJECT_TEMPLATE\", \"SUBJECT_TEMPLATE_TYPE\", "
-                            + "\"BODY_TEMPLATE\", \"BODY_TEMPLATE_TYPE\", \"REPLACEMENTS\", \"LANGUAGE\", "
-                            + "\"CHARSET\", \"ENCODING\", \"CONTENT_TYPE\", \"STATUS\", \"STATUS_TEXT\", " + "\"TARGETED\", \"DELIVERED\" " + "FROM "
-                            + SOSMail.tableMails + " " + "WHERE \"ID\"=" + id);
+            data = sosConnection.getSingle("SELECT " + "\"MAILING_ID\", \"JOB_ID\", \"MESSAGE_ID\", \"TOPIC\", "
+                + "\"TOPIC_IDENTIFIER\", \"CLIENT_IDENTIFIER\", \"REFERENCE\", \"MAIL_FROM\", "
+                + "\"FROM_NAME\", \"MAIL_TO\", \"CC_TO\", \"BCC_TO\", \"REPLY_TO\", "
+                + "\"PRIORITY\", \"SUBJECT\", \"SUBJECT_TEMPLATE\", \"SUBJECT_TEMPLATE_TYPE\", "
+                + "\"BODY_TEMPLATE\", \"BODY_TEMPLATE_TYPE\", \"REPLACEMENTS\", \"LANGUAGE\", "
+                + "\"CHARSET\", \"ENCODING\", \"CONTENT_TYPE\", \"STATUS\", \"STATUS_TEXT\", " + "\"TARGETED\", \"DELIVERED\" " + "FROM "
+                + SOSMail.tableMails + " " + "WHERE \"ID\"=" + id);
             if (data.isEmpty()) {
                 throw new Exception("Mail not found.");
             }
@@ -224,11 +226,10 @@ public class SOSMailOrder extends SOSMail {
     private void loadAttachments() throws Exception {
         ArrayList data = new ArrayList();
         try {
-            data =
-                    sosConnection.getArray("SELECT " + "\"FILENAME\", \"CHARSET\",  \"ENCODING\", \"CONTENT_TYPE\" " + "FROM "
-                            + SOSMail.tableMailAttachments + " " + "WHERE \"ID\"=" + this.id);
+            data = sosConnection.getArray("SELECT " + "\"FILENAME\", \"CHARSET\",  \"ENCODING\", \"CONTENT_TYPE\" " + "FROM " + SOSMail.tableMailAttachments
+                    + " " + "WHERE \"ID\"=" + this.id);
             if (data != null) {
-                log("Found " + data.size() + " attachments.", SOSLogger.DEBUG3);
+                LOGGER.debug("Found " + data.size() + " attachments.");
                 Iterator iter = data.iterator();
                 while (iter.hasNext()) {
                     HashMap att = (HashMap) iter.next();
@@ -276,6 +277,7 @@ public class SOSMailOrder extends SOSMail {
                 int iPrio = Integer.parseInt(prio.substring(0, 1));
                 statement += updateField("PRIORITY", iPrio);
             } catch (Exception e) {
+                //
             }
         }
         statement += updateField("SUBJECT", getSubject());
@@ -304,9 +306,7 @@ public class SOSMailOrder extends SOSMail {
         } catch (Exception e) {
             try {
                 sosConnection.rollback();
-            } catch (Exception ex) {
-                // do not handle errors while error handling
-            }
+            } catch (Exception ex) {}
             throw new Exception("Error occured storing mail: " + e.getMessage(), e);
         }
     }
@@ -348,8 +348,7 @@ public class SOSMailOrder extends SOSMail {
         try {
             while (iter.hasNext()) {
                 SOSMailAttachment attachment = (SOSMailAttachment) iter.next();
-                String statement =
-                        "INSERT INTO " + tableMailAttachments + " (\"ID\", \"FILENAME\", \"CHARSET\", \"ENCODING\","
+                String statement = "INSERT INTO " + tableMailAttachments + " (\"ID\", \"FILENAME\", \"CHARSET\", \"ENCODING\","
                                 + " \"CONTENT_TYPE\", \"CREATED\", \"CREATED_BY\", " + " \"MODIFIED\", \"MODIFIED_BY\") VALUES " + " (" + this.id
                                 + ", '" + attachment.getFile().getAbsolutePath() + "', " + "'" + attachment.getCharset() + "', " + "'"
                                 + attachment.getEncoding() + "', " + "'" + attachment.getContentType() + "', " + "%now, '" + getClass().getName()
@@ -362,8 +361,7 @@ public class SOSMailOrder extends SOSMail {
     }
 
     protected void create() throws Exception {
-        String statement =
-                "INSERT INTO " + SOSMail.tableMails + " " + " (\"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\")" + " VALUES (%now, '"
+        String statement = "INSERT INTO " + SOSMail.tableMails + " " + " (\"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\")" + " VALUES (%now, '"
                         + getClass().getName() + "', %now, '" + getClass().getName() + "')";
         try {
             sosConnection.execute(statement);
@@ -672,13 +670,11 @@ public class SOSMailOrder extends SOSMail {
 
     public static void main(String[] args) throws Exception {
         String mailto = "mo@sos-berlin.com";
-        SOSLogger logger = new SOSStandardLogger(9);
         SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk", logger);
+                        "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk");
         conn.connect();
-        SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS", logger);
+        SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS");
         SOSMailOrder order = new SOSMailOrder(settings, conn);
-        order.setSOSLogger(logger);
         order.addRecipient(mailto);
         order.setLanguage("en");
         order.setSubjectTemplate("default_subject");
