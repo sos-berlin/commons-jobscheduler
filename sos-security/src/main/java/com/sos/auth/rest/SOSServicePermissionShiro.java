@@ -538,6 +538,14 @@ public class SOSServicePermissionShiro {
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:remove");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:edit_content");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:change:hot_folder");
+            
+            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:status");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:log");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:transfers");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:files");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_start");
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_store");
 
             sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
@@ -583,6 +591,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setHolidayCalendar(o.createSOSPermissionJocCockpitHolidayCalendar());
             sosPermissionJocCockpit.setAuditLog(o.createSOSPermissionJocCockpitAuditLog());
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
+            sosPermissionJocCockpit.setYADE(o.createSOSPermissionJocCockpitYADE());
 
             sosPermissionJocCockpit.setJOCConfigurations(o.createSOSPermissionJocCockpitJOCConfigurations());
             sosPermissionJocCockpit.getJOCConfigurations().setShare(o.createSOSPermissionJocCockpitJOCConfigurationsShare());
@@ -633,6 +642,10 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getAuditLog().setView(o.createSOSPermissionJocCockpitAuditLogView());
             sosPermissionJocCockpit.getMaintenanceWindow().setView(o.createSOSPermissionJocCockpitMaintenanceWindowView());
 
+            sosPermissionJocCockpit.getYADE().setView(o.createSOSPermissionJocCockpitYADEView());
+            sosPermissionJocCockpit.getYADE().setExecute(o.createSOSPermissionJocCockpitYADEExecute());
+
+            
             sosPermissionJocCockpit.getJobschedulerMaster().getView().setStatus(haveRight(
                     "sos:products:joc_cockpit:jobscheduler_master:view:status"));
             sosPermissionJocCockpit.getJobschedulerMaster().getView().setMainlog(haveRight(
@@ -764,6 +777,14 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getMaintenanceWindow().setEnableDisableMaintenanceWindow(haveRight(
                     "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window"));
 
+
+            sosPermissionJocCockpit.getYADE().getView().setStatus(haveRight("sos:products:joc_cockpit:yade:view:status"));
+            sosPermissionJocCockpit.getYADE().getView().setLog(haveRight("sos:products:joc_cockpit:yade:view:log"));
+            sosPermissionJocCockpit.getYADE().getView().setTransfers(haveRight("sos:products:joc_cockpit:yade:view:transfers"));
+            sosPermissionJocCockpit.getYADE().getView().setFiles(haveRight("sos:products:joc_cockpit:yade:view:files"));
+            sosPermissionJocCockpit.getYADE().getExecute().setTransferStart(haveRight("sos:products:joc_cockpit:yade:execute:transfer_start"));
+            sosPermissionJocCockpit.getYADE().getExecute().setTransferStore(haveRight("sos:products:joc_cockpit:yade:execute:transfer_store"));
+            
         }
         return sosPermissionJocCockpit;
     }
