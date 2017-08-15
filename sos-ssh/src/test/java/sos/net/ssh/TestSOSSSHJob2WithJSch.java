@@ -101,7 +101,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
     public void testExecuteWithErrors() throws Exception {
         logger.info("****testExecuteWithErrors started****");
         String strArgs[] =
-                new String[] { "-command", "ls unknownPath", "-auth_method", "password", "-host", "homer.sos", "-user", "test", "-password", "12345",
+                new String[] { "-command", "exit 3", "-auth_method", "password", "-host", "boromir.sos", "-user", "root", "-password", "123456",
                         "-command_delimiter", ";" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
