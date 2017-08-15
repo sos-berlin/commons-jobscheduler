@@ -209,10 +209,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         return false;
     }
 
+    // TODO remove if process is reviewed and fixed! Original in JobSchedulerJobAdapter puts duplicated key/Value pair
     @Override
-    // TO DO remove if process is reviewed and fixed! Original in JobSchedulerJobAdapter puts duplicated key/Value pair
-        protected
-        HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
+    protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
         HashMap<String, String> result = new HashMap<String, String>();
         try {
             if (isNotNull(variableSet)) {
