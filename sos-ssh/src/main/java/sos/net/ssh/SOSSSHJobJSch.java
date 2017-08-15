@@ -129,6 +129,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     checkExitCode();
                     changeExitSignal();
                 } catch (Exception e) {
+                    checkStdOut();
+                    checkStdErr();
+                    checkExitCode();
+                    changeExitSignal();
                     if (objOptions.raise_exception_on_error.value()) {
                         if (objOptions.ignore_error.value()) {
                             if (objOptions.ignore_stderr.value()) {

@@ -96,6 +96,10 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                     checkExitCode();
                     changeExitSignal();
                 } catch (Exception e) {
+                    checkStdOut();
+                    checkStdErr();
+                    checkExitCode();
+                    changeExitSignal();
                     // logger.error(this.StackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 } finally {
