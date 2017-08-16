@@ -62,7 +62,6 @@ public class SOSlogin {
         if (user == null) {
             currentUser = null;
         } else {
-            user = user.replaceAll(" +", " ").replaceAll(" ", "%20");
             if (currentUser != null && currentUser.isAuthenticated()) {
                 logout();
             }
