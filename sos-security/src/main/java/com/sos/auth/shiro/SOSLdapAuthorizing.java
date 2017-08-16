@@ -57,6 +57,8 @@ public class SOSLdapAuthorizing {
         Section s = ini.getSection("users");
         if (s != null) {
         	LOGGER.debug("reading roles from section [users]");
+        	username = username.replaceAll(" +", " ").replaceAll(" ", "%20");
+
             String roles = s.get(username);
 
             if (roles != null) {
