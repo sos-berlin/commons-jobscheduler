@@ -165,10 +165,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     checkStdErr();
                     checkExitCode();
                     changeExitSignal();
-                    if (objOptions.raise_exception_on_error.value()) {
-                        if (objOptions.ignore_error.value()) {
-                            if (objOptions.ignore_stderr.value()) {
-                                logger.debug(this.StackTrace2String(e));
+                    if (objOptions.raiseExceptionOnError.value()) {
+                        if (objOptions.ignoreError.value()) {
+                            if (objOptions.ignoreStderr.value()) {
+                                LOGGER.debug(this.stackTrace2String(e));
                             } else {
                                 LOGGER.error(this.stackTrace2String(e));
                                 throw new SSHExecutionError("Exception raised: " + e, e);
