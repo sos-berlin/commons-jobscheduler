@@ -46,18 +46,18 @@ public class SOSlogin {
                 setMsg("There is no user with username/password combination of " + token.getPrincipal());
                 currentUser = null;
             } catch (IncorrectCredentialsException ice) {
-                setMsg("Password for account " + token.getPrincipal() + " was incorrect!");
+                setMsg("There is no user with username / password combination of " + token.getPrincipal());
                 currentUser = null;
             } catch (LockedAccountException lae) {
                 setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
                 currentUser = null;
             } catch (Exception ee) {
-                setMsg("Exception while logging in " + token.getPrincipal() + " " + ee.getMessage());
+                setMsg("Exception while logging in " + token.getPrincipal() + " " + ee.getMessage().toString());
                 currentUser = null;
             }
         }
     }
-
+    
     public void login(String user, String pwd) {
         if (user == null) {
             currentUser = null;
