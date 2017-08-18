@@ -479,6 +479,31 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Calendar">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view"/>
+							<xs:element name="edit">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="create" type="xs:boolean"/>
+										<xs:element name="change" type="xs:boolean"/>
+										<xs:element name="delete" type="xs:boolean"/>
+										<xs:element name="assign">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="runtime" type="xs:boolean"/>
+													<xs:element name="nonworking" type="xs:boolean"/>
+													<xs:element name="change" type="xs:boolean"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
