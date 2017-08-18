@@ -785,6 +785,16 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getYADE().getExecute().setTransferStart(haveRight("sos:products:joc_cockpit:yade:execute:transfer_start"));
             sosPermissionJocCockpit.getYADE().getExecute().setTransferStore(haveRight("sos:products:joc_cockpit:yade:execute:transfer_store"));
             
+            sosPermissionJocCockpit.getCalendar().setView(haveRight("sos:products:joc_cockpit:calendar:view"));
+            
+            sosPermissionJocCockpit.getCalendar().getEdit().setChange(haveRight("sos:products:joc_cockpit:calendar:edit:change"));
+            sosPermissionJocCockpit.getCalendar().getEdit().setDelete(haveRight("sos:products:joc_cockpit:calendar:edit:delete"));
+            sosPermissionJocCockpit.getCalendar().getEdit().setCreate(haveRight("sos:products:joc_cockpit:calendar:edit:create"));
+            
+            sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setChange(haveRight("sos:products:joc_cockpit:calendar:assign:change"));
+            sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setNonworking(haveRight("sos:products:joc_cockpit:calendar:assign:nonworking"));
+            sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setRuntime(haveRight("sos:products:joc_cockpit:calendar:assign:runtime"));
+            
         }
         return sosPermissionJocCockpit;
     }
