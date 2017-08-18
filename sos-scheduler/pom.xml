@@ -174,7 +174,8 @@
 
 		<dependency>
 			<groupId>com.sos-berlin.jobscheduler.engine</groupId>
-			<artifactId>base_${scala.base.version}</artifactId>
+			<artifactId>engine-base</artifactId>
+            <scope>provided</scope>
 		</dependency>
 		
 	</dependencies>
