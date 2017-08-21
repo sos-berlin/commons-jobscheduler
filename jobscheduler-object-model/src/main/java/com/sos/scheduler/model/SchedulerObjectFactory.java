@@ -124,6 +124,8 @@ import com.sos.xml.SOSXmlCommand;
 
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
+    private static final int READ_TIME_OUT = 60;
+    private static final int WRITE_TIME_OUT = 60;
     private static final Class<Spooler> DEFAULT_MARSHALLER = Spooler.class;
     private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
     private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
@@ -191,6 +193,14 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         initMarshaller(DEFAULT_MARSHALLER);
     }
 
+    public SchedulerObjectFactory(String commandUrl, String basicAuthorization) {
+        this();
+        this.getOptions().setTransferMethod("https");
+        this.getOptions().commandUrl.setValue(commandUrl);
+        this.getOptions().basicAuthorization.setValue(basicAuthorization);
+        initMarshaller(DEFAULT_MARSHALLER);
+    }
+
     public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
         this(pstrServerName, pintPort);
         this.liveConnector = liveConnector;
@@ -227,6 +237,15 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
                 } else if (objOptions.TransferMethod.isHttp()) {
                     SOSXmlCommand sosXmlCommand= new SOSXmlCommand(objOptions.getCommandUrl().getValue()); 
                     LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
+                    String answer = sosXmlCommand.executeXMLPost(xmlCommand);
+                    LOGGER.trace("Answer from JobScheduler:\n" + answer);
+                    objAnswer = getAnswer(answer);
+                } else if (objOptions.TransferMethod.isHttps()) {
+                    SOSXmlCommand sosXmlCommand= new SOSXmlCommand(objOptions.getCommandUrl().getValue()); 
+                    LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
+                    sosXmlCommand.setBasicAuthorization(objOptions.basicAuthorization.getValue());
+                    sosXmlCommand.setConnectTimeout(WRITE_TIME_OUT);
+                    sosXmlCommand.setReadTimeout(READ_TIME_OUT);
                     String answer = sosXmlCommand.executeXMLPost(xmlCommand);
                     LOGGER.trace("Answer from JobScheduler:\n" + answer);
                     objAnswer = getAnswer(answer);
