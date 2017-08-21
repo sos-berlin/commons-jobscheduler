@@ -6,7 +6,7 @@ public class SOSOptionJSTransferMethod extends SOSOptionStringValueList {
     private static final long serialVersionUID = 559611781725991697L;
 
     public enum enuJSTransferModes {
-        tcp("tcp"), udp("udp"), jms("jms"), http("http"), telnet("telnet"), api("api");
+        tcp("tcp"), udp("udp"), jms("jms"), http("http"), https("https"), telnet("telnet"), api("api");
 
         public final String description;
 
@@ -41,6 +41,10 @@ public class SOSOptionJSTransferMethod extends SOSOptionStringValueList {
 
     public boolean isHttp() {
         return this.getValue().equalsIgnoreCase(enuJSTransferModes.http.description);
+    }
+
+    public boolean isHttps() {
+        return this.getValue().equalsIgnoreCase(enuJSTransferModes.https.description);
     }
 
     public boolean isTcp() {

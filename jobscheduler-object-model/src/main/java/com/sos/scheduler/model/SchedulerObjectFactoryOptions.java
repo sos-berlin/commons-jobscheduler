@@ -46,6 +46,17 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
     }
 
     
+    @JSOptionDefinition(name = "basic_authorization", description = "", key = "basic_authorization", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString basicAuthorization = new SOSOptionString(this, conClassName + ".basic_authorization", "", " ", " ", false);
+
+    public SOSOptionString getBasicAuthorization() {
+        return basicAuthorization;
+    }
+
+    public void setBasicAuthorization(SOSOptionString basicAuthorization) {
+        this.basicAuthorization = basicAuthorization;
+    }
+
     @JSOptionDefinition(name = "command_url", description = "", key = "command_url", type = "SOSOptionString", mandatory = false)
     public SOSOptionString commandUrl = new SOSOptionString(this, conClassName + ".command_url", "", " ", " ", false);
 
