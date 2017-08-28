@@ -482,7 +482,7 @@
 				<xs:element name="Calendar">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="view"/>
+							<xs:element name="view" type="xs:boolean"/>
 							<xs:element name="edit">
 								<xs:complexType>
 									<xs:sequence>
