@@ -73,6 +73,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     public SOSVfsSFtpJCraft() {
         super();
+        JSch.setLogger(new SOSVfsSFtpJCraftLogger());
         secureChannel = new JSch();
     }
 
