@@ -106,10 +106,7 @@ public class JobChain implements Serializable {
     protected List<JobChainNode> jobChainNode;
     @XmlElement(name = "order_history")
     protected JobChain.OrderHistory orderHistory;
-
     @XmlAttribute(name = "name", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T04:00:28+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String name;
     @XmlAttribute(name = "orders", required = true)

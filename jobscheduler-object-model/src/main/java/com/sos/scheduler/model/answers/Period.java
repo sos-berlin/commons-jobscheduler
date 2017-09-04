@@ -79,8 +79,6 @@ public class Period implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-09-26T11:23:43+02:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String jobChain;
     @XmlAttribute(name = "order")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-09-26T11:23:43+02:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String order;
 

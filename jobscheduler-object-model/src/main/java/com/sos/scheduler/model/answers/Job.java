@@ -119,8 +119,6 @@ public class Job implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String inPeriod;
     @XmlAttribute(name = "job", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NMTOKEN")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String job;
     @XmlAttribute(name = "job_chain_priority")
@@ -131,8 +129,6 @@ public class Job implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String logFile;
     @XmlAttribute(name = "name", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NMTOKEN")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String name;
     @XmlAttribute(name = "next_start_time")
@@ -146,8 +142,6 @@ public class Job implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected BigInteger noOfTasks;
     @XmlAttribute(name = "order", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-11-22T05:41:11+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String order;
     @XmlAttribute(name = "path", required = true)
