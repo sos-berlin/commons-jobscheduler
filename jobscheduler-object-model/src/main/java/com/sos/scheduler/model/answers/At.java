@@ -64,8 +64,6 @@ public class At implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T02:59:52+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String jobChain;
     @XmlAttribute(name = "order")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T02:59:52+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String order;
 
