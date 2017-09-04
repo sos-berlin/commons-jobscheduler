@@ -91,8 +91,6 @@ public class Order implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-03-10T05:26:40+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected BigInteger historyId;
     @XmlAttribute(name = "id", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-03-10T05:26:40+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String id;
     @XmlAttribute(name = "in_process_since")
@@ -125,8 +123,6 @@ public class Order implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-03-10T05:26:40+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String nextStartTime;
     @XmlAttribute(name = "order", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "NCName")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-03-10T05:26:40+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected String order;
     @XmlAttribute(name = "path", required = true)
