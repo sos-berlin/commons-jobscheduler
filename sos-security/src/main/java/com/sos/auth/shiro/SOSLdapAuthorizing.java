@@ -53,7 +53,7 @@ public class SOSLdapAuthorizing {
 
     private void getRoleNamesForUser(String username) throws Exception {
         LOGGER.debug(String.format("Getting roles for user %s", username));
-        Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+        Ini ini = Globals.getIniFromSecurityManagerFactory();
         Section s = ini.getSection("users");
         if (s != null) {
             LOGGER.debug("reading roles from section [users]");

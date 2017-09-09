@@ -989,9 +989,7 @@ public class SOSServicePermissionShiro {
             Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
         }
 
-        String iniFile = Globals.getShiroIniInClassPath();
-        sosLogin = new SOSlogin();
-        sosLogin.setInifile(iniFile);
+        sosLogin = new SOSlogin(Globals.getShiroIniSecurityManagerFactory());
         sosLogin.login(currentUser.getUsername(), currentUser.getPassword());
 
         currentUser.setCurrentSubject(sosLogin.getCurrentUser());
@@ -1122,13 +1120,7 @@ public class SOSServicePermissionShiro {
     public Ini getIni() {
 
         if (ini == null) {
-            String iniFile;
-            if (sosLogin == null) {
-                iniFile = Globals.getShiroIniInClassPath();
-            } else {
-                iniFile = sosLogin.getInifile();
-            }
-            ini = Ini.fromResourcePath(iniFile);
+            return Globals.getIniFromSecurityManagerFactory();
         }
         return ini;
     }

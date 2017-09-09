@@ -10,31 +10,17 @@ import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.Factory;
 
 public class SOSlogin {
 
     private static final Logger LOGGER = Logger.getLogger(SOSlogin.class);
 
-    private static final String DEFAULT_INI_FILE = "classpath:shiro.ini";
-    private String inifile;
     private Subject currentUser;
     private String msg;
+    private IniSecurityManagerFactory factory = null;
 
-    public SOSlogin() {
-        this.inifile = DEFAULT_INI_FILE;
-    }
-
-    public SOSlogin(String inifile) {
-        this.inifile = inifile;
-    }
-
-    public void setInifile(String inifile) {
-        this.inifile = inifile;
-    }
-
-    public String getInifile() {
-        return inifile;
+    public SOSlogin(IniSecurityManagerFactory factory) {
+        this.factory = factory;
     }
 
     public void createSubject(String user, String pwd) {
@@ -82,9 +68,12 @@ public class SOSlogin {
     }
 
     private void init() {
-        Factory<SecurityManager> factory = new IniSecurityManagerFactory(inifile);
-        SecurityManager securityManager = factory.getInstance();
-        SecurityUtils.setSecurityManager(securityManager);
+        if (factory != null) {
+            SecurityManager securityManager = factory.getInstance();
+            SecurityUtils.setSecurityManager(securityManager);  
+        } else {
+            LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
+        }
         
         currentUser = new Subject.Builder().buildSubject();
         
