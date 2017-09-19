@@ -168,7 +168,6 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public SchedulerObjectFactory() {
         super("com_sos_scheduler_model");
         initMarshaller(DEFAULT_MARSHALLER);
-        this.spooler = spooler;
         useDefaultPeriod = false;
     }
 
@@ -293,7 +292,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objAnswer;
     }
 
-    public Answer getAnswerFromSpooler(JSCmdBase pobjJSCmd) {
+    public Answer getAnswerFromSpooler(JSCmdBase pobjJSCmd) {   
         String command = pobjJSCmd.toXMLString();
         strLastAnswer = spooler.execute_xml(command);
         LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
@@ -1299,6 +1298,10 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public ISOSVirtualFile getFileHandleOrNull(final String pstrFilename) {
         return liveConnector != null ? liveConnector.getFileSystemHandler().getFileHandle(pstrFilename) : null;
+    }
+
+    public void setSpooler(sos.spooler.Spooler spooler) {
+       this.spooler = spooler;
     }
 
 }
