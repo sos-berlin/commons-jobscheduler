@@ -16,9 +16,9 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testGetPermissions() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSPermissionShiro sosPermissionShiroAll = sosServicePermissionShiro.getPermissions("","",false, LDAP_USER, LDAP_PASSWORD);
+        SOSPermissionShiro sosPermissionShiroAll = sosServicePermissionShiro.getPermissions("","","",false, LDAP_USER, LDAP_PASSWORD);
         Globals.sosShiroProperties = null;
-        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","",true, LDAP_USER, LDAP_PASSWORD);
+        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","","",true, LDAP_USER, LDAP_PASSWORD);
         for (int i=0;i< sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().size();i++){
             System.out.println(sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(i));
         }
@@ -32,7 +32,7 @@ public class TestSOSServicePermissionShiro {
     public void testIsAuthenticated() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
-        sosServicePermissionShiro.logoutPost(sosShiroCurrentUserAnswer.getAccessToken());
+        sosServicePermissionShiro.logoutPost(sosShiroCurrentUserAnswer.getAccessToken(),"");
         assertEquals("testCurrentUserAnswer is authenticated", true, sosShiroCurrentUserAnswer.getIsAuthenticated());
     }
 
@@ -40,7 +40,7 @@ public class TestSOSServicePermissionShiro {
     public void testHasRole() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
-        sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, SHIRO_MAPPED_ROLE);
+        sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole("","", sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, SHIRO_MAPPED_ROLE);
         assertEquals("testCurrentUserAnswer is authenticated", true, sosShiroCurrentUserAnswer.getIsAuthenticated());
         assertEquals("testCurrentUserAnswer is has role " + SHIRO_MAPPED_ROLE, true, sosShiroCurrentUserAnswer.hasRole());
     }
@@ -50,23 +50,23 @@ public class TestSOSServicePermissionShiro {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:pause");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:pause");
 //        assertEquals("testCurrentUserAnswer is permitted  " + SHIRO_PERMISSION, true, sosShiroCurrentUserAnswer.isPermitted());
         assertEquals("testCurrentUserAnswer is authenticated", true, sosShiroCurrentUserAnswer.getIsAuthenticated());
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:pause");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:pause");
         assertEquals("testCurrentUserAnswer is permitted  sos:products:joc_cockpit:jobscheduler_master:pause", false, sosShiroCurrentUserAnswer.isPermitted());
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:restart");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:restart");
         assertEquals("testCurrentUserAnswer is permitted  sos:products:joc_cockpit:jobscheduler_master:restart", true, sosShiroCurrentUserAnswer.isPermitted());
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:continue");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:continue");
         assertEquals("testCurrentUserAnswer is permitted  sos:products:joc_cockpit:jobscheduler_master:continue", false, sosShiroCurrentUserAnswer.isPermitted());
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:job_chain:view:status");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:job_chain:view:status");
         assertEquals("testCurrentUserAnswer is permitted  sos:products:joc_cockpit:job_chain:view:status", true, sosShiroCurrentUserAnswer.isPermitted());
         sosShiroCurrentUserAnswer =
-                sosServicePermissionShiro.isPermitted("",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:job_chain:view:history");
+                sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:job_chain:view:history");
         assertEquals("testCurrentUserAnswer is permitted  sos:products:joc_cockpit:job_chain:view:history", false, sosShiroCurrentUserAnswer.isPermitted());
     }
 
