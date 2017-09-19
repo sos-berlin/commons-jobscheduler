@@ -53,6 +53,7 @@ public class JSCmdBase extends JSObjBase {
     }
 
     public void getAnswerFromSpooler(sos.spooler.Spooler spooler) {
+        objFactory.setSpooler(spooler);
         objAnswer = objFactory.getAnswerFromSpooler(this);
     }
 
