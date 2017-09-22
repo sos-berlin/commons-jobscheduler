@@ -175,8 +175,34 @@ public class SOSServicePermissionShiro {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getAccessToken(String user) {
-        SOSShiroCurrentUserAnswer s = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByName(user);
-        return JOCDefaultResponse.responseStatus200(s);
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            SOSShiroCurrentUserAnswer s = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByName(user);
+            return JOCDefaultResponse.responseStatus200(s);
+        } else {
+            SOSShiroCurrentUserAnswer s = new SOSShiroCurrentUserAnswer();
+            s.setAccessToken("not-valid");
+            s.setUser(user);
+            return JOCDefaultResponse.responseStatus200(s);
+        }
+
+    }
+
+    @POST
+    @Path("/userbytoken")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse getAccessToken(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
+            @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader) {
+        String token = this.getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, "");
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+
+            SOSShiroCurrentUserAnswer s = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUserByToken(token);
+            return JOCDefaultResponse.responseStatus200(s);
+        } else {
+            SOSShiroCurrentUserAnswer s = new SOSShiroCurrentUserAnswer();
+            s.setAccessToken("not-valid");
+            return JOCDefaultResponse.responseStatus200(s);
+        }
     }
 
     @POST
@@ -256,8 +282,9 @@ public class SOSServicePermissionShiro {
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader) {
-        String accessToken = getAccessToken(accessTokenFromHeader,xAccessTokenFromHeader,EMPTY_STRING);
+    public JOCDefaultResponse logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
+            @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader) {
+        String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, EMPTY_STRING);
         return logout(accessToken);
     }
 
@@ -288,9 +315,9 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/role")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer hasRole(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
-            @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user, @QueryParam("pwd") String pwd,
-            @QueryParam("role") String role) {
+    public SOSShiroCurrentUserAnswer hasRole(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
+            @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
+            @QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("role") String role) {
 
         String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
 
@@ -309,9 +336,9 @@ public class SOSServicePermissionShiro {
     @POST
     @Path("/permission")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
-            @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user, @QueryParam("pwd") String pwd,
-            @QueryParam("permission") String permission) {
+    public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
+            @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
+            @QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
 
         String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
         setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -348,9 +375,9 @@ public class SOSServicePermissionShiro {
     @POST
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
-            @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("forUser") Boolean forUser, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd) {
+    public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
+            @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
+            @QueryParam("forUser") Boolean forUser, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -1133,7 +1160,7 @@ public class SOSServicePermissionShiro {
             LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
 
             Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
-           
+
             JocAuditLog jocAuditLog = new JocAuditLog(currentUser.getUsername(), "./login");
             SecurityAudit s = new SecurityAudit(getRolesAsString(true));
             jocAuditLog.logAuditMessage(s);

@@ -34,7 +34,6 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
-import com.sos.scheduler.JobSchedulerLog4JAppender;
 
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl {

@@ -20,7 +20,6 @@ import sos.spooler.Job_impl;
 import sos.spooler.Spooler;
 import sos.spooler.Variable_set;
 import sos.util.SOSArguments;
-import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 
