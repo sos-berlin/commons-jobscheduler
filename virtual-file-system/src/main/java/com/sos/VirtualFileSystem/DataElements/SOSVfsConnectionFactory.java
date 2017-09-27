@@ -8,6 +8,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.exception.SOSYadeSourceConnectionException;
+import com.sos.exception.SOSYadeTargetConnectionException;
 
 /** @author KB */
 public class SOSVfsConnectionFactory {
@@ -18,9 +20,7 @@ public class SOSVfsConnectionFactory {
     private SOSVfsConnectionPool objConnPoolTarget = null;
 
     public SOSVfsConnectionFactory(final SOSFTPOptions pobjOptions) {
-        super();
-        objOptions = pobjOptions;
-        createConnectionPool();
+        this.objOptions = pobjOptions;
     }
 
     public SOSVfsConnectionPool getSourcePool() {
@@ -31,7 +31,7 @@ public class SOSVfsConnectionFactory {
         return objConnPoolTarget;
     }
 
-    public void createConnectionPool() {
+    public void createConnectionPool() throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
         if (objConnPoolSource != null && objOptions.pollingServer.isTrue()) {
             LOGGER.debug("use existing connection pool");
         } else {
@@ -55,7 +55,8 @@ public class SOSVfsConnectionFactory {
         }
     }
 
-    private ISOSVFSHandler getVfsHandler(final boolean isSource) {
+    private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException,
+        SOSYadeTargetConnectionException {
         ISOSVFSHandler handler = null;
         try {
             SOSConnection2OptionsAlternate options;
@@ -100,9 +101,17 @@ public class SOSVfsConnectionFactory {
                 }
             }
         } catch (JobSchedulerException ex) {
-            throw ex;
+            if (isSource) {
+                throw new SOSYadeSourceConnectionException(ex.getCause());
+            } else {
+                throw new SOSYadeTargetConnectionException(ex.getCause());
+            }
         } catch (Exception ex) {
-            throw new JobSchedulerException(ex);
+            if (isSource) {
+                throw new SOSYadeSourceConnectionException(ex);
+            } else {
+                throw new SOSYadeTargetConnectionException(ex);
+            }
         }
         return handler;
     }

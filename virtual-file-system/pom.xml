@@ -54,6 +54,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>sos-exceptions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- These are the dependencies for third party libraries -->
         <dependency>

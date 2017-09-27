@@ -9,11 +9,12 @@ import com.sos.localization.SOSMsg;
 @I18NResourceBundle(baseName = "com.sos.JSHelper.messages", defaultLocale = "en")
 public class JobSchedulerException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
     protected String strMessage = null;
     protected SOSMsg objSOSMsg = null;
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerException.class);
     private int intStatus = SUCCESS;
-    private Exception nestedException;
+    private Throwable nestedException;
     private int intErrorNumber = 0;
     private String strCategory = "???";
     private String strType = "???";
@@ -64,21 +65,21 @@ public class JobSchedulerException extends RuntimeException {
         this.setStatus(JobSchedulerException.ERROR);
     }
 
-    public JobSchedulerException(final String pstrMessage, final Exception e) {
-        super(pstrMessage);
+    public JobSchedulerException(final String pstrMessage, final Throwable e) {
+        super(pstrMessage, e);
         setMessage(pstrMessage + " (" + e.getMessage() + ")");
         saveException(e);
     }
 
-    public JobSchedulerException(final SOSMsg pobjMsg, final Exception e) {
-        super(pobjMsg.get());
+    public JobSchedulerException(final SOSMsg pobjMsg, final Throwable e) {
+        super(pobjMsg.get(), e);
         strMessage = pobjMsg.get();
         objSOSMsg = pobjMsg;
         setMessage(strMessage + " (" + e.getMessage() + ")");
         saveException(e);
     }
-    public JobSchedulerException(final Exception e) {
-        super(e.getMessage());
+    public JobSchedulerException(final Throwable e) {
+        super(e);
         setMessage(e.getMessage());
         saveException(e);
     }
@@ -90,7 +91,7 @@ public class JobSchedulerException extends RuntimeException {
     public int getErrorNumber() {
         return intErrorNumber;
     }
-    private void saveException(final Exception e) {
+    private void saveException(final Throwable e) {
         nestedException = e;
         if (e instanceof JobSchedulerException) {
             JobSchedulerException objXE = (JobSchedulerException) e;
@@ -111,11 +112,11 @@ public class JobSchedulerException extends RuntimeException {
         LastErrorMessage += pstrMsg + "\n";
     }
 
-    public Exception getNestedException() {
+    public Throwable getNestedException() {
         return nestedException;
     }
 
-    public JobSchedulerException setNestedException(final Exception e) {
+    public JobSchedulerException setNestedException(final Throwable e) {
         nestedException = e;
         return this;
     }
@@ -257,7 +258,7 @@ public class JobSchedulerException extends RuntimeException {
         }
     }
 
-    public String stackTrace2String(final Exception e) {
+    public String stackTrace2String(final Throwable e) {
         String strT = "";
         final StackTraceElement arrStack[] = e.getStackTrace();
         for (final StackTraceElement objS : arrStack) {

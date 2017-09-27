@@ -51,6 +51,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private SOSConnection2Options objConnectionOptions;
     @JSOptionClass(description = "objMailOptions", name = "objMailOptions")
     private SOSSmtpMailOptions objMailOptions;
+    private String jobSchedulerId;
+    private String jobChain;
+    private String jobChainNodeName;
+    private String job;
+    private String orderId;
     public static final String conURIPrefixFILE = "file://";
     public static final String conSchedulerEnvVarPrefix = "scheduler_param_";
     public static final String conSOSFtpEnvVarPrefix = "sosftp_";
@@ -1039,4 +1044,45 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public boolean getDeleteSettingsFileOnExit() {
         return this.deleteSettingsFileOnExit;
     }
+
+    public String getJobSchedulerId() {
+        return jobSchedulerId;
+    }
+    
+    public void setJobSchedulerId(String jobSchedulerId) {
+        this.jobSchedulerId = jobSchedulerId;
+    }
+    
+    public String getJobChain() {
+        return jobChain;
+    }
+    
+    public void setJobChain(String jobChain) {
+        this.jobChain = jobChain;
+    }
+    
+    public String getJobChainNodeName() {
+        return jobChainNodeName;
+    }
+    
+    public void setJobChainNodeName(String jobChainNodeName) {
+        this.jobChainNodeName = jobChainNodeName;
+    }
+    
+    public String getJob() {
+        return job;
+    }
+    
+    public void setJob(String job) {
+        this.job = job;
+    }
+    
+    public String getOrderId() {
+        return orderId;
+    }
+    
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
 }
