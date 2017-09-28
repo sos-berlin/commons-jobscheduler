@@ -56,6 +56,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private String jobChainNodeName;
     private String job;
     private String orderId;
+    private Long parentTransferId;
     public static final String conURIPrefixFILE = "file://";
     public static final String conSchedulerEnvVarPrefix = "scheduler_param_";
     public static final String conSOSFtpEnvVarPrefix = "sosftp_";
@@ -1083,6 +1084,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public Long getParentTransferId() {
+        return parentTransferId;
+    }
+
+    public void setParentTransferId(Long parentTransferId) {
+        this.parentTransferId = parentTransferId;
     }
 
 }
