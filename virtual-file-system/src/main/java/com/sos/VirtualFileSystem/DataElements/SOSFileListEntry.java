@@ -104,6 +104,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private SOSVfsConnectionPool objConnPoolTarget = null;
     private String errorMessage = null;
     private Map<String, String> jumpHistoryRecord = null;
+    private Date modificationDate = null;
     public long zeroByteCount = 0;
 
     public enum enuTransferStatus {
@@ -962,8 +963,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
             if (!skipTransfer()) {
                 this.doTransfer(objSourceTransferFile, objTargetTransferFile);
+                long pdteDateTime = objSourceFile.getModificationDateTime();
+                if (pdteDateTime != -1) {
+                    modificationDate = new Date(pdteDateTime);
+                }
                 if (objOptions.keepModificationDate.isTrue()) {
-                    long pdteDateTime = objSourceFile.getModificationDateTime();
                     if (pdteDateTime != -1) {
                         objTargetFile.setModificationDateTime(pdteDateTime);
                     }
@@ -1505,6 +1509,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             buf.setLength(length);
             return buf;
         }
+    }
+
+    
+    public Date getModificationDate() {
+        return modificationDate;
     }
 
 }
