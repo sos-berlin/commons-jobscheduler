@@ -97,7 +97,11 @@ public class JobSchedulerRotateLog extends Job_impl {
             spooler_log.warn("an error occurred cleaning up log files: " + e.getMessage());
         }
         try {
-            spooler.log().start_new_file();
+            if (spooler_job.process_class() == null || spooler_job.process_class().remote_scheduler() == null) {
+                spooler.log().start_new_file();
+            } else {
+                spooler_log.info("scheduler.log is not rotated because the job is running on an Agent");
+            }
         } catch (Exception e) {
             spooler_log.warn("an error occurred rotating log file: " + e.getMessage());
             return false;
