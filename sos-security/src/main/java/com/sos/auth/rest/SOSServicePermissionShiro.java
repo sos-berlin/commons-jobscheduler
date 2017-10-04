@@ -171,6 +171,18 @@ public class SOSServicePermissionShiro {
     }
 
     @POST
+    @Path("/size")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse getSize() {
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            return JOCDefaultResponse.responseStatus200(-1);
+        } else {
+            return JOCDefaultResponse.responseStatus200(Globals.jocWebserviceDataContainer.getCurrentUsersList().size());
+        }
+    }
+
+    @POST
     @Path("/userbyname")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
