@@ -605,7 +605,15 @@ public class SOSServicePermissionShiro {
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:files");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_start");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_store");
-
+            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:view:status");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:edit:change");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:edit:delete");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:edit:create");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:assign:change");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:assign:nonworking");            
+            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:assign:runtime");            
+            
             sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
             sosPermissionShiro.setSOSPermissionRoles(roles);
