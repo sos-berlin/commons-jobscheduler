@@ -361,27 +361,26 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
-        executeCommands(pobjDataClient, pstrCommandString, null);
+    private void executeCommands(final String commandOptionName,final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
+        executeCommands(commandOptionName,fileTransfer, optionCommands, null);
     }
         
-    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString, final SOSOptionString commandDelimiter) {
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands, final SOSOptionString optionCommandDelimiter) {
         final String conMethodName = "SOSFileListEntry::executeCommands";
-        if (pstrCommandString.isNotEmpty()) {
-            String strT = pstrCommandString.getValue();
-            strT = replaceVariables(strT);
-            String strM = SOSVfs_D_0151.params(strT);
-            LOGGER.debug(strM);
+        if (optionCommands.isNotEmpty()) {
+            String commands = optionCommands.getValue();
+            commands = replaceVariables(commands);
+            LOGGER.debug(String.format("[%s] %s",commandOptionName,SOSVfs_D_0151.params(commands)));
             String delimiter = null;
-            if (commandDelimiter != null) {
-                delimiter = commandDelimiter.getValue();
+            if (optionCommandDelimiter != null) {
+                delimiter = optionCommandDelimiter.getValue();
             }
             if (delimiter == null) {
                 delimiter = ";";
             }
             if (delimiter.isEmpty()) {
                 try {
-                    pobjDataClient.getHandler().executeCommand(strT);
+                    fileTransfer.getHandler().executeCommand(commands);
                 } catch (JobSchedulerException e) {
                     LOGGER.error(e.toString());
                     throw e;
@@ -390,10 +389,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     throw new JobSchedulerException(conMethodName, e);
                 }
             } else {
-                String[] strA = strT.split(delimiter);
-                for (String strCmd : strA) {
+                String[] values = commands.split(delimiter);
+                for (String command : values) {
                     try {
-                        pobjDataClient.getHandler().executeCommand(strCmd);
+                        fileTransfer.getHandler().executeCommand(command);
                     } catch (JobSchedulerException e) {
                         LOGGER.error(e.toString());
                         throw e;
@@ -409,48 +408,48 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void executeTFNPostCommnands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().tfnPostCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_tfn_post_command",objDataTargetClient, target.getAlternatives().tfnPostCommand, target.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataTargetClient, objOptions.tfnPostCommand);
-            executeCommands(objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
+            executeCommands("tfn_post_command",objDataTargetClient, objOptions.tfnPostCommand);
+            executeCommands("target_tfn_post_command",objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().tfnPostCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_tfn_post_command",objDataSourceClient, source.getAlternatives().tfnPostCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
+            executeCommands("source_tfn_post_command",objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
         }
     }
 
     public void executePostCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().postCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_post_command",objDataTargetClient, target.getAlternatives().postCommand, target.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataTargetClient, objOptions.postCommand);
-            executeCommands(objDataTargetClient, target.postCommand, target.commandDelimiter);
+            executeCommands("post_command",objDataTargetClient, objOptions.postCommand);
+            executeCommands("target_post_command",objDataTargetClient, target.postCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().postCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_post_command",objDataSourceClient, source.getAlternatives().postCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.postCommand, source.commandDelimiter);
+            executeCommands("source_post_command",objDataSourceClient, source.postCommand, source.commandDelimiter);
         }
     }
 
     private void executePreCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
+            executeCommands("alternative_target_pre_command",objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
         } else {
-            executeCommands(objDataTargetClient, objOptions.preCommand);
-            executeCommands(objDataTargetClient, target.preCommand, target.commandDelimiter);
+            executeCommands("pre_command",objDataTargetClient, objOptions.preCommand);
+            executeCommands("target_pre_command",objDataTargetClient, target.preCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_pre_command",objDataSourceClient, source.getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.preCommand, source.commandDelimiter);
+            executeCommands("source_pre_command",objDataSourceClient, source.preCommand, source.commandDelimiter);
         }
     }
 
@@ -903,6 +902,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             case getlist:
                 return;
             case delete:
+                executePreCommands();
                 objSourceFile.delete();
                 LOGGER.debug(SOSVfs_I_0113.params(strSourceFileName));
                 this.setStatus(enuTransferStatus.deleted);
