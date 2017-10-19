@@ -9,6 +9,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -32,11 +33,16 @@ import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.jade.db.DBItemYadeFiles;
 import com.sos.localization.Messages;
+import com.sos.scheduler.engine.data.event.KeyedEvent;
+import com.sos.scheduler.engine.data.events.custom.VariablesCustomEvent;
+import com.sos.scheduler.engine.eventbus.EventBus;
 
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
-public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl {
+public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl, IJobSchedulerEventHandler {
 
     protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
     protected Messages Messages = null;
@@ -55,7 +61,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private String jobNameForTest = "job_name_for_test";
     private String orderStateForTest = "order_state_for_test";
     private boolean loggerConfigured = false;
+    private IJobSchedulerEventHandler eventHandler = null;
 
+    
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
         if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
@@ -582,6 +590,31 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public void spooler_on_success() {
         setStateText("*** ended without Errors ***");
+    }
+
+    @Override
+    public void sendEvent(Map<String, Map<String, String>> eventParameters) {
+        // TODO Eventbus should return from JObScheduer API spooler.getEventBus()
+        EventBus e = null;
+        for(String key : eventParameters.keySet()) {
+            KeyedEvent<VariablesCustomEvent> event = VariablesCustomEvent.keyed(key, eventParameters.get(key));
+            e.publishJava(event);
+        }
+//        logger.info(String.format("sendEvent() was called! Type of Option Class: %1$s", this.getClass().getSimpleName()));
+    }
+    
+    public IJobSchedulerEventHandler getEventHandler() {
+        return eventHandler;
+    }
+
+    public void setEventHandler(IJobSchedulerEventHandler eventHandler) {
+        this.eventHandler = eventHandler;
+    }
+
+    @Override
+    public void updateDb(Long id, String type, Map<String, String> values) {
+        // TODO Auto-generated method stub
+        // nothing to do, should be implemented in Job classes extending this one
     }
 
 }

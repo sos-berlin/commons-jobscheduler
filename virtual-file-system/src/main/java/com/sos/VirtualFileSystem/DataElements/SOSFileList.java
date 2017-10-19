@@ -44,16 +44,18 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private ISOSVFSHandler objVFS = null;
     private boolean flgHistoryFileAlreadyWritten = false;
     private boolean flgResultSetFileAlreadyCreated = false;
+    private long sumOfFileSizes = 0L;
     public ISOSVfsFileTransfer objDataTargetClient = null;
     public ISOSVfsFileTransfer objDataSourceClient = null;
     public int lngNoOfZeroByteSizeFiles = 0;
-    long lngSuccessfulTransfers = 0;
-    long lngFailedTransfers = 0;
-    long lngSkippedTransfers = 0;
-    long lngNoOfTransferHistoryRecordsSent = 0;
-    long lngNoOfHistoryFileRecordsWritten = 0;
-    long lngNoOfRecordsInResultSetFile = 0;
-    long lngNoOfBytesTransferred = 0;
+    public long lngSuccessfulTransfers = 0;
+    public long lngFailedTransfers = 0;
+    public long lngSkippedTransfers = 0;
+    public long lngNoOfTransferHistoryRecordsSent = 0;
+    public long lngNoOfHistoryFileRecordsWritten = 0;
+    public long lngNoOfRecordsInResultSetFile = 0;
+    public long lngNoOfBytesTransferred = 0;
+    public static Long sendEventTimeoutInMillis = 15000L;
 
     public SOSFileList() {
         super(SOSVfsConstants.strBundleBaseName);
@@ -744,6 +746,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
 
     public boolean isEmpty() {
         return this.getList().isEmpty();
+    }
+
+    public long getSumOfFileSizes() {
+        return sumOfFileSizes;
+    }
+
+    public void setSumOfFileSizes(long sumOfFileSizes) {
+        this.sumOfFileSizes = sumOfFileSizes;
     }
 
 }

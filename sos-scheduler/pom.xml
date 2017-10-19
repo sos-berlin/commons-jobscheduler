@@ -81,6 +81,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>com.sos-berlin.jade</groupId>
+            <artifactId>jade-db-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>jobscheduler-object-model</artifactId>

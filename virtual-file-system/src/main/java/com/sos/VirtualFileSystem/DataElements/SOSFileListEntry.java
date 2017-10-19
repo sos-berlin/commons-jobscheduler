@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
@@ -106,6 +107,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private Map<String, String> jumpHistoryRecord = null;
     private Date modificationDate = null;
     public long zeroByteCount = 0;
+    private IJobSchedulerEventHandler eventHandler = null;
+    public static Long sendEventTimeoutInMillis = 15000L;
 
     public enum enuTransferStatus {
         transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted,
@@ -257,6 +260,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     }
                 }
             }
+            //TODO
+            sendEvent(null);
             source.closeInput();
             target.closeOutput();
             closed = true;
@@ -289,6 +294,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 target.closeOutput();
                 closed = true;
             }
+        }
+    }
+
+    private void sendEvent(Map<String, Map<String, String>> eventParams) {
+        if (eventHandler != null) {
+            eventHandler.sendEvent(eventParams);
+        }
+    }
+    
+    private void updateDb(Long id, String type, Map<String, String> values) {
+        if (eventHandler != null) {
+            // id of the DBItem
+            // type of the Item, here always YADE_FILE
+            // map of values of the Item, with key = propertyName and value = propertyValue
+            eventHandler.updateDb(id, type, values);
         }
     }
 
@@ -1511,9 +1531,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    
     public Date getModificationDate() {
         return modificationDate;
+    }
+
+    public void setEventHandler(IJobSchedulerEventHandler eventHandler) {
+        this.eventHandler  = eventHandler;
     }
 
 }
