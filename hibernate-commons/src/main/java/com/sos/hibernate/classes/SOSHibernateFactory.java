@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -84,6 +85,17 @@ public class SOSHibernateFactory implements Serializable {
         default:
             throw new SOSHibernateConfigurationException(String.format("Invalid transaction isolation level = %s.", isolationLevel));
         }
+    }
+
+    public static String toString(Object o) {
+        if (o == null) {
+            return null;
+        }
+        try {
+            return ReflectionToStringBuilder.toString(o);
+        } catch (Throwable t) {
+        }
+        return o.toString();
     }
 
     public void addClassMapping(Class<?> c) {
