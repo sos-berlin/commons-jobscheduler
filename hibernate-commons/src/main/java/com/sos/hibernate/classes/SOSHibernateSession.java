@@ -289,13 +289,13 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateObjectOperationException */
     public void delete(Object item) throws SOSHibernateException {
         if (item == null) {
-            throw new SOSHibernateObjectOperationException("item is NULL");
+            throw new SOSHibernateObjectOperationException("item is NULL", item);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("delete");
-        LOGGER.debug(String.format("%s: item=%s", method, item));
+        LOGGER.debug(String.format("%s: item=%s", method, SOSHibernateFactory.toString(item)));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -306,9 +306,9 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         }
     }
 
@@ -358,29 +358,31 @@ public class SOSHibernateSession implements Serializable {
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> entityClass, Serializable id) throws SOSHibernateException {
         if (entityClass == null) {
-            throw new SOSHibernateObjectOperationException("entityClass is NULL");
+            throw new SOSHibernateObjectOperationException("entityClass is NULL", null);
         }
         if (id == null) {
-            throw new SOSHibernateObjectOperationException("id is NULL");
+            throw new SOSHibernateObjectOperationException("id is NULL", null);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("get");
-        LOGGER.debug(String.format("%s: entityClass=%s", method, entityClass.getName()));
+        LOGGER.debug(String.format("%s: entityClass=%s, id=%s", method, entityClass.getName(), id));
+        T item = null;
         try {
             if (isStatelessSession) {
-                return (T) ((StatelessSession) currentSession).get(entityClass, id);
+                item = (T) ((StatelessSession) currentSession).get(entityClass, id);
             } else {
-                return ((Session) currentSession).get(entityClass, id);
+                item = ((Session) currentSession).get(entityClass, id);
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
             return null;
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
             return null;
         }
+        return item;
     }
 
     public CacheMode getCacheMode() {
@@ -860,13 +862,13 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateObjectOperationException */
     public void refresh(String entityName, Object item) throws SOSHibernateException {
         if (item == null) {
-            throw new SOSHibernateObjectOperationException("item is NULL");
+            throw new SOSHibernateObjectOperationException("item is NULL", item);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("refresh");
-        LOGGER.debug(String.format("%s: entityName=%s", method, entityName));
+        LOGGER.debug(String.format("%s: entityName=%s, item=%s", method, entityName, SOSHibernateFactory.toString(item)));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -884,9 +886,9 @@ public class SOSHibernateSession implements Serializable {
                 }
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         }
     }
 
@@ -922,13 +924,13 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateObjectOperationException */
     public void save(Object item) throws SOSHibernateException {
         if (item == null) {
-            throw new SOSHibernateObjectOperationException("item is NULL");
+            throw new SOSHibernateObjectOperationException("item is NULL", item);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("save");
-        LOGGER.debug(String.format("%s: item=%s", method, item));
+        LOGGER.debug(String.format("%s: item=%s", method, SOSHibernateFactory.toString(item)));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -939,22 +941,21 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         }
     }
 
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateObjectOperationException */
     public Object saveOrUpdate(Object item) throws SOSHibernateException {
         if (item == null) {
-            throw new SOSHibernateObjectOperationException("item is NULL");
+            throw new SOSHibernateObjectOperationException("item is NULL", item);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("saveOrUpdate");
-        LOGGER.debug(String.format("%s: item=%s", method, item));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -970,19 +971,23 @@ public class SOSHibernateSession implements Serializable {
                 }
                 Object dbItem = get(item.getClass(), (Serializable) id);
                 if (dbItem == null) {
+                    LOGGER.debug(String.format("%s: insert item=%s", method, SOSHibernateFactory.toString(item)));
                     session.insert(item);
                 } else {
+                    LOGGER.debug(String.format("%s: update item=%s", method, SOSHibernateFactory.toString(item)));
                     session.update(item);
                 }
             } else {
+                LOGGER.debug(String.format("%s: item=%s", method, SOSHibernateFactory.toString(item)));
+
                 Session session = ((Session) currentSession);
                 session.saveOrUpdate(item);
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         }
         return item;
     }
@@ -1064,13 +1069,13 @@ public class SOSHibernateSession implements Serializable {
     /** @throws SOSHibernateException : SOSHibernateInvalidSessionException, SOSHibernateLockAcquisitionException, SOSHibernateObjectOperationException */
     public void update(Object item) throws SOSHibernateException {
         if (item == null) {
-            throw new SOSHibernateObjectOperationException("item is NULL");
+            throw new SOSHibernateObjectOperationException("item is NULL", item);
         }
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
         String method = getMethodName("update");
-        LOGGER.debug(String.format("%s: item=%s", method, item));
+        LOGGER.debug(String.format("%s: item=%s", method, SOSHibernateFactory.toString(item)));
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -1081,9 +1086,9 @@ public class SOSHibernateSession implements Serializable {
                 session.flush();
             }
         } catch (IllegalStateException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         } catch (PersistenceException e) {
-            throwException(e, new SOSHibernateObjectOperationException(e));
+            throwException(e, new SOSHibernateObjectOperationException(e, item));
         }
     }
 

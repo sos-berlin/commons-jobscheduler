@@ -9,6 +9,7 @@ import org.hibernate.hql.internal.ast.QuerySyntaxException;
 import org.hibernate.query.Query;
 
 import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 
 public class SOSHibernateException extends SOSException {
 
@@ -17,6 +18,7 @@ public class SOSHibernateException extends SOSException {
     private String message = null;
     private SQLException sqlException = null;
     private String statement = null;
+    private Object dbItem = null;
 
     public SOSHibernateException(IllegalArgumentException cause, String stmt) {
         Throwable e = cause;
@@ -149,12 +151,20 @@ public class SOSHibernateException extends SOSException {
         initCause(cause);
     }
 
+    protected void setDbItem(Object val) {
+        dbItem = val;
+    }
+
     protected void setMessage(String val) {
         message = val;
     }
 
     protected void setStatement(String val) {
         statement = val;
+    }
+
+    public Object getDbItem() {
+        return dbItem;
     }
 
     @Override
@@ -172,10 +182,14 @@ public class SOSHibernateException extends SOSException {
 
     @Override
     public String toString() {
+        String result = super.toString();
         if (statement != null) {
-            return String.format("%s [%s]", super.toString(), statement);
+            result = String.format("%s [%s]", result, statement);
         }
-        return super.toString();
+        if (dbItem != null) {
+            result = String.format("%s [%s]", result, SOSHibernateFactory.toString(dbItem));
+        }
+        return result;
     }
 
     @SuppressWarnings("deprecation")
