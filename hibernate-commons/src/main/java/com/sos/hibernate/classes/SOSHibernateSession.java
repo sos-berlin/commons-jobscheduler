@@ -18,6 +18,7 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.StaleStateException;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.exception.JDBCConnectionException;
@@ -37,6 +38,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateLockAcquisitionException;
 import com.sos.hibernate.exceptions.SOSHibernateObjectOperationException;
+import com.sos.hibernate.exceptions.SOSHibernateObjectOperationStaleStateException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryNonUniqueResultException;
@@ -1208,6 +1210,8 @@ public class SOSHibernateSession implements Serializable {
                 throw new SOSHibernateInvalidSessionException((SQLNonTransientConnectionException) e, ex.getStatement());
             } else if (e instanceof LockAcquisitionException) {
                 throw new SOSHibernateLockAcquisitionException((LockAcquisitionException) e, ex.getStatement());
+            } else if (e instanceof StaleStateException) {
+                throw new SOSHibernateObjectOperationStaleStateException((StaleStateException) e, ex.getDbItem());
             } else if (e instanceof SQLException) {
                 if (getFactory().getDbms().equals(SOSHibernateFactory.Dbms.MYSQL)) {
                     // MySQL with the mariadb driver not throws a specific exception - check error code
