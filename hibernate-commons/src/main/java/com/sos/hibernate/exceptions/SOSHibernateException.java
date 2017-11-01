@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import javax.persistence.PersistenceException;
 
 import org.hibernate.JDBCException;
+import org.hibernate.StaleStateException;
 import org.hibernate.hql.internal.ast.QuerySyntaxException;
 import org.hibernate.query.Query;
 
@@ -92,6 +93,10 @@ public class SOSHibernateException extends SOSException {
                 if (sqlException != null && sqlException.getMessage() != null) {
                     message = String.format("%s: %d %s", message, sqlException.getErrorCode(), sqlException.getMessage());
                 }
+                return;
+            } else if (e instanceof StaleStateException) {
+                initCause(e);
+                message = e.getMessage();
                 return;
             }
             e = e.getCause();
