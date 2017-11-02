@@ -15,6 +15,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPHTTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
@@ -315,11 +316,27 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
     }
 
     @Override
-    public void ExecuteCommand(final String strCmd) throws Exception {
-        String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
-        objFTPClient.sendCommand(command);
-        LOGGER.info(SOSVfs_D_151.params(strCmd, getReplyString()));
-        objFTPClient.completePendingCommand();
+    public void ExecuteCommand(final String cmd) throws Exception {
+        String command = cmd.endsWith("\n") ? cmd : cmd + "\n";
+        try {
+            objFTPClient.sendCommand(command);
+            String replyString = objFTPClient.getReplyString().trim();
+            int replyCode = objFTPClient.getReplyCode();
+            if (FTPReply.isNegativePermanent(replyCode) || FTPReply.isNegativeTransient(replyCode) || replyCode >= 10_000) {
+                throw new JobSchedulerException(SOSVfs_E_164.params(replyString + "[" + command.trim()+"]"));
+            }
+            LOGGER.info(SOSVfs_D_151.params(command.trim(), replyString));
+        } catch (JobSchedulerException ex) {
+            if (objConnection2Options.raise_exception_on_error.value()) {
+                throw ex;
+            }
+            LOGGER.info(SOSVfs_D_151.params(command.trim(), ex.toString()));
+        } catch (Exception ex) {
+            if (objConnection2Options.raise_exception_on_error.value()) {
+                throw new JobSchedulerException(SOSVfs_E_134.params("ExecuteCommand"),ex);
+            }
+            LOGGER.info(SOSVfs_D_151.params(command.trim(), ex.toString()));
+        }
     }
 
     @Override
