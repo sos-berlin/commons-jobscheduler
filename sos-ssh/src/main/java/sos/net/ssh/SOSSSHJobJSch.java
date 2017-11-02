@@ -34,11 +34,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     protected ISOSVFSHandler vfsHandler;
     private static final Logger LOGGER = Logger.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
-    private static final String COMMAND_DELIMITER = ";";
     private static final String DEFAULT_LINUX_DELIMITER = ";";
     private static final String DEFAULT_WINDOWS_DELIMITER = "&";
     private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
     private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
+    private static final String DEFAULT_WINDOWS_PRE_COMMAND = "set %s = %s";
+    private static final String DEFAULT_LINUX_PRE_COMMAND = "export %s = %s";
+    private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "type %s";
+    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "cat %s";
+    private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "rm %s";
+    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "del %s";
     private String tempFileName;
     private String pidFileName;
     private String ssh_job_get_pid_command = "echo $$";
@@ -306,8 +311,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
                     }
                     if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
-                        sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
-                        sb.append(delimiter);
+                        if (flgIsWindowsShell) {
+                            sb.append(String.format(DEFAULT_WINDOWS_PRE_COMMAND, keyVal.toUpperCase(), envVarValue));
+                            sb.append(delimiter);
+                        } else if (objOptions.getPreCommand().isNotDirty()){
+                            sb.append(String.format(DEFAULT_LINUX_PRE_COMMAND, keyVal.toUpperCase(), envVarValue));
+                            sb.append(delimiter);
+                        } else {
+                            sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
+                            sb.append(delimiter);
+                        }
                     }
                 }
             }
@@ -329,7 +342,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public void processPostCommands(String tmpFileName) {
         openPrePostCommandsSession();
-        String postCommandRead = String.format(objOptions.getPostCommandRead().getValue(), tmpFileName);
+        String postCommandRead = null;
+        if (flgIsWindowsShell) {
+            postCommandRead = String.format(DEFAULT_WINDOWS_POST_COMMAND_READ, tmpFileName);
+        } else if (objOptions.getPostCommandRead().isNotDirty()) {
+            postCommandRead = String.format(DEFAULT_LINUX_POST_COMMAND_READ, tmpFileName);
+        } else {
+            postCommandRead = String.format(objOptions.getPostCommandRead().getValue(), tmpFileName);
+        }
         String stdErr = "";
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
@@ -353,7 +373,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             returnValues.put(key, value);
                         }
                     }
-                    String postCommandDelete = String.format(objOptions.getPostCommandDelete().getValue(), tmpFileName);
+                    String postCommandDelete = null;
+                    if (flgIsWindowsShell) {
+                        postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tmpFileName);
+                    } else if (objOptions.getPostCommandDelete().isNotDirty()) {
+                        postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tmpFileName);
+                    } else {
+                        postCommandDelete = String.format(objOptions.getPostCommandDelete().getValue(), tmpFileName);
+                    }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
                     LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 } else {
