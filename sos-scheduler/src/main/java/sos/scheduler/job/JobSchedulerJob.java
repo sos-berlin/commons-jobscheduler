@@ -264,7 +264,7 @@ public class JobSchedulerJob extends Job_impl {
 				return Paths.get(var);
 			}
 		}
-		return Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
+		return Paths.get(spooler.directory() + "/config").resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
     }
     
     public Path getHibernateConfigurationReporting(){
@@ -279,7 +279,7 @@ public class JobSchedulerJob extends Job_impl {
 				return Paths.get(var);
 			}
 		}
-		Path configFile = Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
+		Path configFile = Paths.get(spooler.directory() + "/config").resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
 		if(Files.exists(configFile)){
 			return configFile;
 		}
