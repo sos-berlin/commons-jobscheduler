@@ -1,17 +1,28 @@
 package com.sos.auth.shiro;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
+
+import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -51,13 +62,102 @@ public class SOSLdapAuthorizing {
         }
     }
 
+    private Collection<String> getGroupNamesByGroup(String username) throws NamingException {
+        SearchControls searchCtls = new SearchControls();
+        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+        String searchFilter = String.format(sosLdapAuthorizingRealm.getGroupSearchFilter(), username);
+        LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+                searchFilter));
+
+        NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getGroupSearchBase(), searchFilter, searchCtls);
+        ArrayList<String> rolesForGroups = new ArrayList<String>();
+
+        while (answer.hasMoreElements()) {
+            SearchResult result = answer.next();
+            String groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
+            Attribute g = result.getAttributes().get(groupNameAttribute);
+            String group = g.get().toString();
+            rolesForGroups.add(group);
+            LOGGER.debug(String.format("Groupname %s found in attribute", group, groupNameAttribute));
+        }
+        return rolesForGroups;
+    }
+
+    private Attributes getUserAttributes(String username) throws NamingException {
+        SearchControls searchCtls = new SearchControls();
+        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        Attributes user = null;
+
+        String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+
+        LOGGER.debug(String.format("getting user from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+                searchFilter));
+
+        NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
+
+        if (!answer.hasMore()) {
+            LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", username, searchFilter,
+                    sosLdapAuthorizingRealm.getSearchBase()));
+        } else {
+            SearchResult result = answer.nextElement();
+            user = result.getAttributes();
+            LOGGER.debug("user found: " + user.toString());
+        }
+        return user;
+    }
+
+    private Collection<String> getGroupNamesByUser(String username) throws NamingException {
+        SearchControls searchCtls = new SearchControls();
+        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        Collection<String> groupNames = null;
+
+        String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+        LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+                searchFilter));
+
+        NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
+
+        if (!answer.hasMore()) {
+            LOGGER.warn(String.format("Cannot find roles for user: %s with search filter %s and  search base: %s ", username, searchFilter,
+                    sosLdapAuthorizingRealm.getSearchBase()));
+        } else {
+            SearchResult result = answer.nextElement();
+            String groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
+            Attribute memberOf = result.getAttributes().get(groupNameAttribute);
+
+            if (memberOf != null) { 
+                LOGGER.debug("getting all attribute values using attribute " + memberOf);
+                groupNames = LdapUtils.getAllAttributeValues(memberOf);
+            } else {
+                LOGGER.info(String.format("User: %s is not member of any group", username));
+            }
+        }
+        return groupNames;
+    }
+
+    private static String normalizeUser(String username) {
+        String[] s = username.split("@");
+        if (s.length > 1) {
+            username = s[0];
+        } else {
+
+            s = username.split("\\\\");
+            if (s.length > 1) {
+                username = s[1];
+            }
+        }
+        return username;
+
+    }
+
     private void getRoleNamesForUser(String username) throws Exception {
         LOGGER.debug(String.format("Getting roles for user %s", username));
         Ini ini = Globals.getIniFromSecurityManagerFactory();
         Section s = ini.getSection("users");
         if (s != null) {
             LOGGER.debug("reading roles from section [users]");
-            String searchUsername = username.replaceAll(" +", " ").replaceAll(" ", "%20");
+            String searchUsername = username.replaceAll(" ", "%20");
 
             String roles = s.get(searchUsername);
 
@@ -71,6 +171,50 @@ public class SOSLdapAuthorizing {
                 }
             }
         }
+
+        String userPrincipalName = normalizeUser(username);
+        if (sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution() != null && !sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution()
+                .isEmpty()) {
+            LOGGER.debug("get userPrincipalName for substitution from user record.");
+            Attributes user = getUserAttributes(username);
+            userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution()).get().toString();
+        }
+        LOGGER.debug("userPrincipalName: " + userPrincipalName);
+
+        if (sosLdapAuthorizingRealm.isGetRolesFromLdap()) {
+            if ((sosLdapAuthorizingRealm.getSearchBase() != null || sosLdapAuthorizingRealm.getGroupSearchBase() != null) && (sosLdapAuthorizingRealm.getGroupSearchFilter() != null || sosLdapAuthorizingRealm.getUserSearchFilter() != null)) {
+                LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm
+                        .getSearchBase(), sosLdapAuthorizingRealm.getUserSearchFilter()));
+
+                Collection<String> groupNames;
+
+                if (sosLdapAuthorizingRealm.getGroupSearchFilter() != null && !sosLdapAuthorizingRealm.getGroupSearchFilter().isEmpty()) {
+                    groupNames = getGroupNamesByGroup(userPrincipalName);
+                } else {
+                    groupNames = getGroupNamesByUser(userPrincipalName);
+                }
+
+               if (groupNames != null) {
+                   getRoleNamesForGroups(groupNames);
+               }
+            }
+        }
+        LdapUtils.closeContext(ldapContext);
+    }
+
+    public void getRoleNamesForUserTest(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm, String username) throws Exception {
+
+        // String ldapAdServer = "ldap://ldap.andrew.cmu.edu:389";
+        String ldapAdServer = "ldap://ldap.itd.umich.edu:389";
+        Hashtable<String, Object> env = new Hashtable<String, Object>();
+        env.put(Context.PROVIDER_URL, ldapAdServer);
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, ldapAdServer);
+        env.put("java.naming.ldap.attributes.binary", "objectSID");
+
+        InitialDirContext ldapContext = new InitialDirContext(env);
 
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -86,25 +230,17 @@ public class SOSLdapAuthorizing {
                     searchFilter));
 
             NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
+            ArrayList<String> rolesForGroups = new ArrayList<String>();
+            LOGGER.debug("Retrieving group names for user [" + userPrincipalName + "]");
 
-            if (!answer.hasMore()) {
-                LOGGER.warn(String.format("Cannot find roles for user: %s with search filter %s and  search base: %s ", username, searchFilter, sosLdapAuthorizingRealm.getSearchBase()));
-            } else {
-                SearchResult result = answer.nextElement();
-
+            while (answer.hasMoreElements()) {
+                SearchResult result = answer.next();
                 String groupNameAttribute;
-
                 groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
-
-                Attribute memberOf = result.getAttributes().get(groupNameAttribute);
-                if (memberOf != null) {
-                    LOGGER.debug("getting all attribute values using attribute" + memberOf);
-                    Collection<String> groupNames = LdapUtils.getAllAttributeValues(memberOf);
-                    getRoleNamesForGroups(groupNames);
-                }
+                Attribute g = result.getAttributes().get(groupNameAttribute);
+                rolesForGroups.add(g.get().toString());
             }
         }
-        LdapUtils.closeContext(ldapContext);
     }
 
     protected void getRoleNamesForGroups(Collection<String> groupNames) {
@@ -128,11 +264,28 @@ public class SOSLdapAuthorizing {
 
         Object principal = sosLdapAuthorizingRealm.getLdapPrincipal(authcToken);
         Object credentials = authcToken.getCredentials();
-
         try {
             ldapContext = ldapContextFactory.getLdapContext(principal, credentials);
+            JndiLdapContextFactory jndiLdapContextFactory = (JndiLdapContextFactory) ldapContextFactory;
+            if (sosLdapAuthorizingRealm.isUseStartTls()) {
+                LOGGER.debug("using StartTls for authentication");
+                StartTlsRequest startTlsRequest = new StartTlsRequest();
+                StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
+                tls.negotiate();
+                ldapContext.addToEnvironment(Context.SECURITY_AUTHENTICATION, jndiLdapContextFactory.getAuthenticationMechanism());
+                ldapContext.addToEnvironment(Context.SECURITY_PRINCIPAL, principal);
+                ldapContext.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+                ldapContext.reconnect(ldapContext.getConnectControls());
+            }
+        } catch (IOException e) {
+            LdapUtils.closeContext(ldapContext);
+            LOGGER.error("Failed to negotiate TLS connection': ", e);
         } catch (NamingException e) {
             LOGGER.error(e);
+        } catch (Throwable t) {
+            LdapUtils.closeContext(ldapContext);
+            LOGGER.error("Unexpected failure to negotiate TLS connection", t);
+            throw t;
         }
     }
 

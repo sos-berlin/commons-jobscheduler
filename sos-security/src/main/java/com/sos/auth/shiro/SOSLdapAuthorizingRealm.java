@@ -7,6 +7,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -18,9 +19,12 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     private String searchBase;
     private Map<String, String> groupRolesMap;
     private Map<String, String> permissions;
+    private String userNameAttributeForSubstitution;
     private String groupNameAttribute;
     private String userNameAttribute;
-
+    private boolean getRolesFromLdap=true;
+    private boolean useStartTls=false;  
+    private String groupSearchFilter;
     private String userSearchFilter;
     private AuthenticationToken authcToken;
 
@@ -134,5 +138,44 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     public void setUserSearchFilter(String userSearchFilter) {
         this.userSearchFilter = userSearchFilter;
     }
+
+    public void setGetRolesFromLdap(String getRolesFromLdap) {
+        this.getRolesFromLdap = "true".equalsIgnoreCase(getRolesFromLdap);
+    }
+
+    public boolean isGetRolesFromLdap() {
+        return getRolesFromLdap;
+    }
+
+    
+    public boolean isUseStartTls() {
+        return useStartTls;
+    }
+
+    
+    public void setUseStartTls(String useStartTls) {
+        this.useStartTls = "true".equalsIgnoreCase(useStartTls);
+    }
+
+    
+    public String getUserNameAttributeForSubstitution() {
+        return userNameAttributeForSubstitution;
+    }
+
+    
+    public void setUserNameAttributeForSubstitution(String userNameAttributeForSubstitution) {
+        this.userNameAttributeForSubstitution = userNameAttributeForSubstitution;
+    }
+
+    
+    public String getGroupSearchFilter() {
+        return groupSearchFilter;
+    }
+
+    
+    public void setGroupSearchFilter(String groupSearchFilter) {
+        this.groupSearchFilter = groupSearchFilter;
+    }
+ 
 
 }
