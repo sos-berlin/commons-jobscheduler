@@ -669,10 +669,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 String sourceParent = strSourceFileName.substring(0, strSourceFileName.length() - sourceFileName.length());
                 String newSourceFileName = sourceOptions.replacing.doReplace(sourceFileName, replaceWith).replace('\\', '/');
                 if (!newSourceFileName.equals(sourceFileName)) {
-                    String sourceDir = addFileSeparator(sourceOptions.directory.getValue());
+                    String sourceDir = addFileSeparator(sourceOptions.directory.getValue()).replace('\\', '/');
                     if (objOptions.recursive.value()) {
                         String subDirs = sourceParent.substring(sourceDir.length());
-                        newSourceFileName = newSourceFileName.replaceFirst("([^/]*)$", subDirs + "$1");
+                        newSourceFileName = subDirs + newSourceFileName;
                     }
                     if (!newSourceFileName.startsWith("/") && !newSourceFileName.matches("^[a-zA-Z]:[\\\\/].*$")) {
                         newSourceFileName = sourceDir + newSourceFileName;
