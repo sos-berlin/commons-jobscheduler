@@ -7,7 +7,6 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -17,6 +16,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
     private SOSLdapAuthorizing authorizing;
     private String searchBase;
+    private String groupSearchBase;
     private Map<String, String> groupRolesMap;
     private Map<String, String> permissions;
     private String userNameAttributeForSubstitution;
@@ -175,6 +175,16 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     
     public void setGroupSearchFilter(String groupSearchFilter) {
         this.groupSearchFilter = groupSearchFilter;
+    }
+
+    
+    public String getGroupSearchBase() {
+        return groupSearchBase;
+    }
+
+    
+    public void setGroupSearchBase(String groupSearchBase) {
+        this.groupSearchBase = groupSearchBase;
     }
  
 
