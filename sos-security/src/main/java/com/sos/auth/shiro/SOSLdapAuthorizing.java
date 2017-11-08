@@ -89,22 +89,38 @@ public class SOSLdapAuthorizing {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         Attributes user = null;
 
-        String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+        String searchFilter = "(" + sosLdapAuthorizingRealm.getUserNameAttribute() + "=%s";
+        if (sosLdapAuthorizingRealm.getUserSearchFilter() == null) {
+            LOGGER.warn(String.format(
+                    "You have specified a value for userNameAttribute but you have not defined the userSearchFilter. The default filter %s will be used",
+                    searchFilter));
+        } else {
+            searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+        }
 
         LOGGER.debug(String.format("getting user from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
 
-        NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
+        String searchBase = "";
+        if (sosLdapAuthorizingRealm.getSearchBase() == null) {
+            LOGGER.warn(String.format(
+                    "You have specified a value for userNameAttribute but you have not defined the searchBase. The default empty search base will be used"));
+        } else {
+            searchBase = sosLdapAuthorizingRealm.getSearchBase();
+        }
+
+        NamingEnumeration<SearchResult> answer = ldapContext.search(searchBase, searchFilter, searchCtls);
 
         if (!answer.hasMore()) {
             LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", username, searchFilter,
-                    sosLdapAuthorizingRealm.getSearchBase()));
+                    searchBase));
         } else {
             SearchResult result = answer.nextElement();
             user = result.getAttributes();
             LOGGER.debug("user found: " + user.toString());
         }
         return user;
+
     }
 
     private Collection<String> getGroupNamesByUser(String username) throws NamingException {
@@ -176,10 +192,16 @@ public class SOSLdapAuthorizing {
         if (sosLdapAuthorizingRealm.getUserNameAttribute() != null && !sosLdapAuthorizingRealm.getUserNameAttribute().isEmpty()) {
             LOGGER.debug("get userPrincipalName for substitution from user record. Using username from login.");
             Attributes user = getUserAttributes(username);
-            if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
-                LOGGER.error(String.format("can not find the attribute %s in the user record. Please check the setting .userNameAttribute in the shiro.ini configuration file",sosLdapAuthorizingRealm.getUserNameAttribute()));
-            } else {
-                userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString();
+            if (user != null) {
+                if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
+                    LOGGER.error(String.format(
+                            "can not find the attribute %s in the user record. Please check the setting .userNameAttribute in the shiro.ini configuration file",
+                            sosLdapAuthorizingRealm.getUserNameAttribute()));
+                } else {
+                    userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString();
+                }
+            }else {
+                LOGGER.info("using the username from login: " + userPrincipalName);
             }
         }
         LOGGER.debug("userPrincipalName: " + userPrincipalName);
