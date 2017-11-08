@@ -126,7 +126,7 @@ public class SOSLdapAuthorizing {
             String groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
             Attribute memberOf = result.getAttributes().get(groupNameAttribute);
 
-            if (memberOf != null) { 
+            if (memberOf != null) {
                 LOGGER.debug("getting all attribute values using attribute " + memberOf);
                 groupNames = LdapUtils.getAllAttributeValues(memberOf);
             } else {
@@ -173,16 +173,20 @@ public class SOSLdapAuthorizing {
         }
 
         String userPrincipalName = normalizeUser(username);
-        if (sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution() != null && !sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution()
-                .isEmpty()) {
-            LOGGER.debug("get userPrincipalName for substitution from user record.");
+        if (sosLdapAuthorizingRealm.getUserNameAttribute() != null && !sosLdapAuthorizingRealm.getUserNameAttribute().isEmpty()) {
+            LOGGER.debug("get userPrincipalName for substitution from user record. Using username from login.");
             Attributes user = getUserAttributes(username);
-            userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttributeForSubstitution()).get().toString();
+            if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
+                LOGGER.error(String.format("can not find the attribute %s in the user record. Please check the setting .userNameAttribute in the shiro.ini configuration file",sosLdapAuthorizingRealm.getUserNameAttribute()));
+            } else {
+                userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString();
+            }
         }
         LOGGER.debug("userPrincipalName: " + userPrincipalName);
 
-        if (sosLdapAuthorizingRealm.isGetRolesFromLdap()) {
-            if ((sosLdapAuthorizingRealm.getSearchBase() != null || sosLdapAuthorizingRealm.getGroupSearchBase() != null) && (sosLdapAuthorizingRealm.getGroupSearchFilter() != null || sosLdapAuthorizingRealm.getUserSearchFilter() != null)) {
+        if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getGetRolesFromLdap())) {
+            if ((sosLdapAuthorizingRealm.getSearchBase() != null || sosLdapAuthorizingRealm.getGroupSearchBase() != null) && (sosLdapAuthorizingRealm
+                    .getGroupSearchFilter() != null || sosLdapAuthorizingRealm.getUserSearchFilter() != null)) {
                 LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm
                         .getSearchBase(), sosLdapAuthorizingRealm.getUserSearchFilter()));
 
@@ -194,9 +198,9 @@ public class SOSLdapAuthorizing {
                     groupNames = getGroupNamesByUser(userPrincipalName);
                 }
 
-               if (groupNames != null) {
-                   getRoleNamesForGroups(groupNames);
-               }
+                if (groupNames != null) {
+                    getRoleNamesForGroups(groupNames);
+                }
             }
         }
         LdapUtils.closeContext(ldapContext);
@@ -257,7 +261,7 @@ public class SOSLdapAuthorizing {
         }
     }
 
-    public void setSosLdapAuthorizingRealm(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm) {
+    public void setSosLdapAuthorizingRealm(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm) throws IOException, NamingException {
         this.sosLdapAuthorizingRealm = sosLdapAuthorizingRealm;
 
         ldapContextFactory = sosLdapAuthorizingRealm.getContextFactory();
@@ -267,7 +271,7 @@ public class SOSLdapAuthorizing {
         try {
             ldapContext = ldapContextFactory.getLdapContext(principal, credentials);
             JndiLdapContextFactory jndiLdapContextFactory = (JndiLdapContextFactory) ldapContextFactory;
-            if (sosLdapAuthorizingRealm.isUseStartTls()) {
+            if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getUseStartTls())) {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
@@ -280,8 +284,10 @@ public class SOSLdapAuthorizing {
         } catch (IOException e) {
             LdapUtils.closeContext(ldapContext);
             LOGGER.error("Failed to negotiate TLS connection': ", e);
+            throw e;
         } catch (NamingException e) {
             LOGGER.error(e);
+            throw e;
         } catch (Throwable t) {
             LdapUtils.closeContext(ldapContext);
             LOGGER.error("Unexpected failure to negotiate TLS connection", t);
