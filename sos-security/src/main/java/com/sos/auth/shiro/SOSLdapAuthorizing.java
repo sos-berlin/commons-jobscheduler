@@ -13,9 +13,13 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -27,6 +31,8 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import com.sos.joc.Globals;
+
+import java.security.cert.Certificate;
 
 public class SOSLdapAuthorizing {
 
@@ -112,8 +118,7 @@ public class SOSLdapAuthorizing {
         NamingEnumeration<SearchResult> answer = ldapContext.search(searchBase, searchFilter, searchCtls);
 
         if (!answer.hasMore()) {
-            LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", username, searchFilter,
-                    searchBase));
+            LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", username, searchFilter, searchBase));
         } else {
             SearchResult result = answer.nextElement();
             user = result.getAttributes();
@@ -200,7 +205,7 @@ public class SOSLdapAuthorizing {
                 } else {
                     userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString();
                 }
-            }else {
+            } else {
                 LOGGER.info("using the username from login: " + userPrincipalName);
             }
         }
@@ -297,11 +302,16 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
+                tls.setHostnameVerifier(new DummyVerifier());
                 tls.negotiate();
-                ldapContext.addToEnvironment(Context.SECURITY_AUTHENTICATION, jndiLdapContextFactory.getAuthenticationMechanism());
+                LOGGER.debug("negotiation succeeded");
+                if (jndiLdapContextFactory.getAuthenticationMechanism() != null) {
+                    ldapContext.addToEnvironment(Context.SECURITY_AUTHENTICATION, jndiLdapContextFactory.getAuthenticationMechanism());
+                }
                 ldapContext.addToEnvironment(Context.SECURITY_PRINCIPAL, principal);
                 ldapContext.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
                 ldapContext.reconnect(ldapContext.getConnectControls());
+                LOGGER.debug("reconnection succeeded");
             }
         } catch (IOException e) {
             LdapUtils.closeContext(ldapContext);
@@ -319,6 +329,14 @@ public class SOSLdapAuthorizing {
 
     public void setAuthcToken(AuthenticationToken authcToken) {
         this.authcToken = authcToken;
+    }
+
+    /** The hostname verifier always return true */
+    final static class DummyVerifier implements HostnameVerifier {
+
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
     }
 
 }
