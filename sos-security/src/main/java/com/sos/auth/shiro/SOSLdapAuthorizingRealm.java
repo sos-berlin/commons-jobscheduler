@@ -12,8 +12,11 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.log4j.Logger;
 
 public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
+
+    private static final Logger LOGGER = Logger.getLogger(SOSLdapAuthorizingRealm.class);
 
     private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
     private SOSLdapAuthorizing authorizing;
@@ -43,14 +46,14 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
             authorizing.setAuthcToken(authcToken);
             try {
                 authorizing.setSosLdapAuthorizingRealm(this);
+                authzInfo = authorizing.setRoles(authzInfo, principalCollection);
+                
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (NamingException e) {
                 throw new RuntimeException(e);
             }
-
-            authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-
+            
             if (this.getCacheManager() == null && this.isCachingEnabled()) {
                 throw new RuntimeException("LDAP configuration is not valid: Missing setting 'cacheManager'");
             }
@@ -117,7 +120,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     }
 
     public String getUserNameAttribute() {
-            return userNameAttribute;
+        return userNameAttribute;
     }
 
     public void setUserNameAttribute(String userNameAttribute) {
@@ -179,12 +182,10 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
         this.groupSearchBase = groupSearchBase;
     }
 
-    
     public String getHostNameVerification() {
         return hostNameVerification;
     }
 
-    
     public void setHostNameVerification(String hostNameVerification) {
         this.hostNameVerification = hostNameVerification;
     }

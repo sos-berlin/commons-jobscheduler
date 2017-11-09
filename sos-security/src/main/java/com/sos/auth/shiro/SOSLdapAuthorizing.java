@@ -13,12 +13,10 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.log4j.Logger;
@@ -31,8 +29,6 @@ import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import com.sos.joc.Globals;
-
-import java.security.cert.Certificate;
 
 public class SOSLdapAuthorizing {
 
@@ -60,11 +56,14 @@ public class SOSLdapAuthorizing {
     }
 
     protected void queryForAuthorizationInfo(PrincipalCollection principals) throws Exception {
-        String userName = (String) principals.getPrimaryPrincipal();
-        try {
-            getRoleNamesForUser(userName);
-        } finally {
-            LdapUtils.closeContext(ldapContext);
+        if (ldapContext != null) {
+
+            String userName = (String) principals.getPrimaryPrincipal();
+            try {
+                getRoleNamesForUser(userName);
+            } finally {
+                LdapUtils.closeContext(ldapContext);
+            }
         }
     }
 
@@ -302,17 +301,18 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
-                
-                boolean globalHostNameVerification = "true".equalsIgnoreCase(Globals.jocConfigurationProperties.getProperties().getProperty("https_with_hostname_verification"));
+
+                boolean globalHostNameVerification = "true".equalsIgnoreCase(Globals.jocConfigurationProperties.getProperties().getProperty(
+                        "https_with_hostname_verification"));
                 if (globalHostNameVerification) {
                     if ("false".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "off".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {
                         tls.setHostnameVerifier(new DummyVerifier());
                     }
-                }else {
+                } else {
                     if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "on".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {
-                    }else {
+                    } else {
                         tls.setHostnameVerifier(new DummyVerifier());
                     }
                 }
@@ -331,8 +331,7 @@ public class SOSLdapAuthorizing {
             LOGGER.error("Failed to negotiate TLS connection': ", e);
             throw e;
         } catch (NamingException e) {
-            LOGGER.error(e);
-            throw e;
+            LOGGER.warn(e);
         } catch (Throwable t) {
             LdapUtils.closeContext(ldapContext);
             LOGGER.error("Unexpected failure to negotiate TLS connection", t);
