@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -763,27 +764,65 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private String replaceVariables(final String pstrReplaceIn) {
-        String strT = pstrReplaceIn;
-        String renamedSourceFileName = (strRenamedSourceFileName != null) ? strRenamedSourceFileName : "";
-        strT = strT.replace("$TargetFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
-        strT = strT.replace("$TargetTransferFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName)));
-        strT = strT.replace("$SourceFileName", resolveDotsInPath(strSourceFileName));
-        strT = strT.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
-        strT = strT.replace("$RenamedSourceFileName", renamedSourceFileName);
-        Properties objProp = objOptions.getTextProperties();
-        objProp.put("TargetFileName", strTargetFileName);
-        objProp.put("TargetTransferFileName", strTargetTransferName);
-        objProp.put("SourceFileName", strSourceFileName);
-        objProp.put("SourceTransferFileName", strSourceTransferName);
-        objProp.put("$TargetDirName", objOptions.TargetDir.Value());
-        objProp.put("TargetDirName", objOptions.TargetDir.Value());
-        objProp.put("$SourceDirName", objOptions.SourceDir.Value());
-        objProp.put("SourceDirName", objOptions.SourceDir.Value());
-        objProp.put("$RenamedSourceFileName", renamedSourceFileName);
-        objProp.put("RenamedSourceFileName", renamedSourceFileName);
-        strT = objOptions.replaceVars(strT);
-        return strT;
+    private String replaceVariables(final String value) {
+        String replaced = value;
+
+        Path targetDir = Paths.get(objOptions.TargetDir.Value());
+        Path sourceDir = Paths.get(objOptions.SourceDir.Value());
+
+        EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
+        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(),
+                strTargetTransferName)));
+
+        EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
+        EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
+
+        // deprecated vars
+        replaced = replaced.replace("$TargetFileName", targetFile.getFullName());
+        replaced = replaced.replace("$TargetTransferFileName", targetTransferFile.getFullName());
+        replaced = replaced.replace("$SourceFileName", sourceFile.getFullName());
+        replaced = replaced.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
+        replaced = replaced.replace("$RenamedSourceFileName", sourceFileRenamed.getFullName());
+
+        Properties vars = objOptions.getTextProperties();
+        // deprecated vars
+        vars.put("TargetFileName", targetFile.getRelativeName());
+        vars.put("TargetTransferFileName", targetTransferFile.getFullName());
+        vars.put("SourceFileName", sourceFile.getFullName());
+        vars.put("SourceTransferFileName", strSourceTransferName);
+        vars.put("RenamedSourceFileName", sourceFileRenamed.getFullName());
+        vars.put("TargetDirName", objOptions.TargetDir.Value());
+        vars.put("SourceDirName", objOptions.SourceDir.Value());
+
+        // new vars
+        vars.put("TargetDirFullName", targetDir.normalize().toString().replace('\\', '/'));
+        vars.put("SourceDirFullName", sourceDir.normalize().toString().replace('\\', '/'));
+
+        vars.put("TargetFileFullName", targetFile.getFullName());
+        vars.put("TargetFileRelativeName", targetFile.getRelativeName());
+        vars.put("TargetFileBaseName", targetFile.getBaseName());
+        vars.put("TargetFileParentFullName", targetFile.getParentFullName());
+        vars.put("TargetFileParentBaseName", targetFile.getParentBaseName());
+
+        vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
+        vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
+        vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
+        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentFullName());
+        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentBaseName());
+
+        vars.put("SourceFileFullName", sourceFile.getFullName());
+        vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
+        vars.put("SourceFileBaseName", sourceFile.getBaseName());
+        vars.put("SourceFileParentFullName", sourceFile.getParentFullName());
+        vars.put("SourceFileParentBaseName", sourceFile.getParentBaseName());
+
+        vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
+        vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
+        vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
+        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentFullName());
+        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentBaseName());
+
+        return objOptions.replaceVars(replaced);
     }
 
     @Override
@@ -1373,6 +1412,54 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             buf.setLength(length);
             return buf;
         }
+    }
+
+    private class EntryPaths {
+
+        private String fullName = "";
+        private String relativeName = "";
+        private String baseName = "";
+        private String parentFullName = "";
+        private String parentBaseName = "";
+
+        private EntryPaths(final Path baseDir, final String filePath) {
+            if (filePath != null) {
+                try {
+                    Path path = Paths.get(filePath);
+
+                    fullName = path.toString().replace('\\', '/');
+                    relativeName = baseDir.relativize(path).normalize().toString().replace('\\', '/');
+                    baseName = path.getFileName().toString();
+
+                    Path parent = path.getParent();
+                    parentFullName = parent.toString().replace('\\', '/');
+                    parentBaseName = parent.getFileName().toString();
+                } catch (Exception e) {
+                    logger.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
+                }
+            }
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public String getRelativeName() {
+            return relativeName;
+        }
+
+        public String getBaseName() {
+            return baseName;
+        }
+
+        public String getParentFullName() {
+            return parentFullName;
+        }
+
+        public String getParentBaseName() {
+            return parentBaseName;
+        }
+
     }
 
 }
