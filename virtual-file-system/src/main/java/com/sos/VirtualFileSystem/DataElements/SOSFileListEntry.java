@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -107,8 +108,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public long zeroByteCount = 0;
 
     public enum enuTransferStatus {
-        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted,
-        compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
+        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
     }
 
     public enum HistoryRecordType {
@@ -330,9 +330,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         } catch (Exception ex) {
                             LOGGER.debug(ex.toString(), ex);
                         }
-                        String strT =
-                                String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'",
-                                        sourceChecksumFileName, origChecksum, checksum4check);
+                        String strT = String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'",
+                                sourceChecksumFileName, origChecksum, checksum4check);
                         setStatus(enuTransferStatus.transfer_aborted);
                         throw new JobSchedulerException(strT);
                     } else {
@@ -836,27 +835,65 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private String replaceVariables(final String pstrReplaceIn) {
-        String strT = pstrReplaceIn;
-        String renamedSourceFileName = (strRenamedSourceFileName != null) ? strRenamedSourceFileName : "";
-        strT = strT.replace("$TargetFileName", resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName)));
-        strT = strT.replace("$TargetTransferFileName", resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(), strTargetTransferName)));
-        strT = strT.replace("$SourceFileName", resolveDotsInPath(strSourceFileName));
-        strT = strT.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
-        strT = strT.replace("$RenamedSourceFileName", renamedSourceFileName);
-        Properties objProp = objOptions.getTextProperties();
-        objProp.put("TargetFileName", strTargetFileName);
-        objProp.put("TargetTransferFileName", strTargetTransferName);
-        objProp.put("SourceFileName", strSourceFileName);
-        objProp.put("SourceTransferFileName", strSourceTransferName);
-        objProp.put("$TargetDirName", objOptions.targetDir.getValue());
-        objProp.put("TargetDirName", objOptions.targetDir.getValue());
-        objProp.put("$SourceDirName", objOptions.sourceDir.getValue());
-        objProp.put("SourceDirName", objOptions.sourceDir.getValue());
-        objProp.put("$RenamedSourceFileName", renamedSourceFileName);
-        objProp.put("RenamedSourceFileName", renamedSourceFileName);
-        strT = objOptions.replaceVars(strT);
-        return strT;
+    private String replaceVariables(final String value) {
+        String replaced = value;
+
+        Path targetDir = Paths.get(objOptions.targetDir.getValue());
+        Path sourceDir = Paths.get(objOptions.sourceDir.getValue());
+
+        EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName)));
+        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
+                strTargetTransferName)));
+
+        EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
+        EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
+
+        // deprecated vars
+        replaced = replaced.replace("$TargetFileName", targetFile.getFullName());
+        replaced = replaced.replace("$TargetTransferFileName", targetTransferFile.getFullName());
+        replaced = replaced.replace("$SourceFileName", sourceFile.getFullName());
+        replaced = replaced.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
+        replaced = replaced.replace("$RenamedSourceFileName", sourceFileRenamed.getFullName());
+
+        Properties vars = objOptions.getTextProperties();
+        // deprecated vars
+        vars.put("TargetFileName", targetFile.getRelativeName());
+        vars.put("TargetTransferFileName", targetTransferFile.getFullName());
+        vars.put("SourceFileName", sourceFile.getFullName());
+        vars.put("SourceTransferFileName", strSourceTransferName);
+        vars.put("RenamedSourceFileName", sourceFileRenamed.getFullName());
+        vars.put("TargetDirName", objOptions.targetDir.getValue());
+        vars.put("SourceDirName", objOptions.sourceDir.getValue());
+
+        // new vars
+        vars.put("TargetDirFullName", targetDir.normalize().toString().replace('\\', '/'));
+        vars.put("SourceDirFullName", sourceDir.normalize().toString().replace('\\', '/'));
+
+        vars.put("TargetFileFullName", targetFile.getFullName());
+        vars.put("TargetFileRelativeName", targetFile.getRelativeName());
+        vars.put("TargetFileBaseName", targetFile.getBaseName());
+        vars.put("TargetFileParentFullName", targetFile.getParentFullName());
+        vars.put("TargetFileParentBaseName", targetFile.getParentBaseName());
+
+        vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
+        vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
+        vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
+        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentFullName());
+        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentBaseName());
+
+        vars.put("SourceFileFullName", sourceFile.getFullName());
+        vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
+        vars.put("SourceFileBaseName", sourceFile.getBaseName());
+        vars.put("SourceFileParentFullName", sourceFile.getParentFullName());
+        vars.put("SourceFileParentBaseName", sourceFile.getParentBaseName());
+
+        vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
+        vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
+        vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
+        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentFullName());
+        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentBaseName());
+
+        return objOptions.replaceVars(replaced);
     }
 
     @Override
@@ -943,8 +980,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 objTargetTransferFile.setModeRestart(objOptions.resumeTransfer.value());
             }
             strSourceTransferName = getFileNameWithoutPath(strSourceTransferName);
-            objSourceTransferFile =
-                    objDataSourceClient.getFileHandle(makeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
+            objSourceTransferFile = objDataSourceClient.getFileHandle(makeFullPathName(getPathWithoutFileName(strSourceFileName),
+                    strSourceTransferName));
             if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
                 String strM = SOSVfs_D_0110.params(strSourceFileName);
                 LOGGER.debug(strM);
@@ -1043,8 +1080,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void setNoOfBytesTransferred(final long plngNoOfBytesTransferred) {
         lngNoOfBytesTransferred = plngNoOfBytesTransferred;
         SOSConnection2Options objConnectOptions = objOptions.getConnectionOptions();
-        if (!(objOptions.checkSize.isFalse() || objOptions.compressFiles.isTrue() || objOptions.transferMode.isAscii()
-                || objConnectOptions.getSource().transferMode.isAscii() || objConnectOptions.getTarget().transferMode.isAscii())) {
+        if (!(objOptions.checkSize.isFalse() || objOptions.compressFiles.isTrue() || objOptions.transferMode.isAscii() || objConnectOptions
+                .getSource().transferMode.isAscii() || objConnectOptions.getTarget().transferMode.isAscii())) {
             if (lngFileSize <= 0) {
                 lngFileSize = objDataSourceClient.getFileHandle(strSourceFileName).getFileSize();
             }
@@ -1350,8 +1387,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 fileAttributes.put(FIELD_TRANSFER_END, jumpHistoryRecord.getOrDefault(FIELD_TRANSFER_END, ""));
                 fileAttributes.put(FIELD_STATUS, jumpHistoryRecord.getOrDefault(FIELD_STATUS, ""));
                 if (recordType.equals(HistoryRecordType.XML)) {
-                    last_error_message =
-                            normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "")));
+                    last_error_message = normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(
+                            FIELD_LAST_ERROR_MESSAGE, "")));
                 } else {
                     last_error_message = jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "");
                 }
@@ -1423,8 +1460,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public String toString() {
         String strT;
         try {
-            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.getSourceFileName(), this.getNoOfBytesTransferred(),
-                            objOptions.operation.getValue());
+            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.getSourceFileName(), this.getNoOfBytesTransferred(), objOptions.operation
+                    .getValue());
         } catch (RuntimeException e) {
             LOGGER.error(e.toString());
             strT = "???";
@@ -1507,4 +1544,51 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
+    private class EntryPaths {
+
+        private String fullName = "";
+        private String relativeName = "";
+        private String baseName = "";
+        private String parentFullName = "";
+        private String parentBaseName = "";
+
+        private EntryPaths(final Path baseDir, final String filePath) {
+            if (filePath != null) {
+                try {
+                    Path path = Paths.get(filePath);
+
+                    fullName = path.toString().replace('\\', '/');
+                    relativeName = baseDir.relativize(path).normalize().toString().replace('\\', '/');
+                    baseName = path.getFileName().toString();
+
+                    Path parent = path.getParent();
+                    parentFullName = parent.toString().replace('\\', '/');
+                    parentBaseName = parent.getFileName().toString();
+                } catch (Exception e) {
+                    LOGGER.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
+                }
+            }
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public String getRelativeName() {
+            return relativeName;
+        }
+
+        public String getBaseName() {
+            return baseName;
+        }
+
+        public String getParentFullName() {
+            return parentFullName;
+        }
+
+        public String getParentBaseName() {
+            return parentBaseName;
+        }
+
+    }
 }
