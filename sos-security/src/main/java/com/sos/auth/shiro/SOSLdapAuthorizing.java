@@ -301,10 +301,8 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
-
-                boolean globalHostNameVerification = "true".equalsIgnoreCase(Globals.jocConfigurationProperties.getProperties().getProperty(
-                        "https_with_hostname_verification"));
-                if (globalHostNameVerification) {
+                
+                if (Globals.withHostnameVerification) {
                     if ("false".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "off".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {
                         tls.setHostnameVerifier(new DummyVerifier());
