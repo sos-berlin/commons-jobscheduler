@@ -1143,7 +1143,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                         if ("uuid".equalsIgnoreCase(strKey)) {
                             continue;
                         }
-                        String strPP = "(\\$|%)\\{" + strKey + "\\}";
+                        String strPP = "(\\$|%)\\{" + Matcher.quoteReplacement(strKey) + "\\}";
                         strVal = this.OptionByName(strKey);
                         if (isNotNull(strVal)) {
                             strVal = strVal.replace('\\', '/');
