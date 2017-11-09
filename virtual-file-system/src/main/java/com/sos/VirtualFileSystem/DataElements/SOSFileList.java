@@ -568,7 +568,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
         for (SOSFileListEntry entry : objFileListEntries) {
             if (!entry.getTargetFileName().isEmpty()) {
                 msg = entry.toString();
-                LOGGER.trace(msg);
+                LOGGER.info(msg);
                 JADE_REPORT_LOGGER.info(msg);
             }
         }
