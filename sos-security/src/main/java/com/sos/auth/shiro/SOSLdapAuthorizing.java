@@ -302,7 +302,20 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
-                tls.setHostnameVerifier(new DummyVerifier());
+                
+                boolean globalHostNameVerification = "true".equalsIgnoreCase(Globals.jocConfigurationProperties.getProperties().getProperty("https_with_hostname_verification"));
+                if (globalHostNameVerification) {
+                    if ("false".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "off".equalsIgnoreCase(sosLdapAuthorizingRealm
+                            .getHostNameVerification())) {
+                        tls.setHostnameVerifier(new DummyVerifier());
+                    }
+                }else {
+                    if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "on".equalsIgnoreCase(sosLdapAuthorizingRealm
+                            .getHostNameVerification())) {
+                    }else {
+                        tls.setHostnameVerifier(new DummyVerifier());
+                    }
+                }
                 tls.negotiate();
                 LOGGER.debug("negotiation succeeded");
                 if (jndiLdapContextFactory.getAuthenticationMechanism() != null) {
