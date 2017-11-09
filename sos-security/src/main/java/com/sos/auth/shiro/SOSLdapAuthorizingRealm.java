@@ -149,6 +149,9 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     }
 
     public String getGetRolesFromLdap() {
+        if (getRolesFromLdap == null) {
+            getRolesFromLdap = "true";
+        }
         return getRolesFromLdap;
     }
 
