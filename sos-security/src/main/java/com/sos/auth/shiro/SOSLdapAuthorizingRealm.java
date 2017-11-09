@@ -27,6 +27,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     private String useStartTls;
     private String groupSearchFilter;
     private String userSearchFilter;
+    private String hostNameVerification;
     private AuthenticationToken authcToken;
 
     public boolean supports(AuthenticationToken token) {
@@ -173,6 +174,16 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
     public void setGroupSearchBase(String groupSearchBase) {
         this.groupSearchBase = groupSearchBase;
+    }
+
+    
+    public String getHostNameVerification() {
+        return hostNameVerification;
+    }
+
+    
+    public void setHostNameVerification(String hostNameVerification) {
+        this.hostNameVerification = hostNameVerification;
     }
 
 }
