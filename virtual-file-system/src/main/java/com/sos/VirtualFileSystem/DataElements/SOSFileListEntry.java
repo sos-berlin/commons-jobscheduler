@@ -857,8 +857,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private String replaceVariables(final String value) {
-        String replaced = value;
-
         Path targetDir = Paths.get(objOptions.targetDir.getValue());
         Path sourceDir = Paths.get(objOptions.sourceDir.getValue());
 
@@ -868,25 +866,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
         EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
         EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
-
-        // deprecated vars
-        replaced = replaced.replace("$TargetFileName", targetFile.getFullName());
-        replaced = replaced.replace("$TargetTransferFileName", targetTransferFile.getFullName());
-        replaced = replaced.replace("$SourceFileName", sourceFile.getFullName());
-        replaced = replaced.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
-        replaced = replaced.replace("$RenamedSourceFileName", sourceFileRenamed.getFullName());
-
+        
         Properties vars = objOptions.getTextProperties();
-        // deprecated vars
-        vars.put("TargetFileName", targetFile.getRelativeName());
-        vars.put("TargetTransferFileName", targetTransferFile.getFullName());
-        vars.put("SourceFileName", sourceFile.getFullName());
-        vars.put("SourceTransferFileName", strSourceTransferName);
-        vars.put("RenamedSourceFileName", sourceFileRenamed.getFullName());
-        vars.put("TargetDirName", objOptions.targetDir.getValue());
-        vars.put("SourceDirName", objOptions.sourceDir.getValue());
-
-        // new vars
         vars.put("TargetDirFullName", targetDir.normalize().toString().replace('\\', '/'));
         vars.put("SourceDirFullName", sourceDir.normalize().toString().replace('\\', '/'));
 
@@ -914,7 +895,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentFullName());
         vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentBaseName());
 
-        return objOptions.replaceVars(replaced);
+        return objOptions.replaceVars(value);
     }
 
     @Override
