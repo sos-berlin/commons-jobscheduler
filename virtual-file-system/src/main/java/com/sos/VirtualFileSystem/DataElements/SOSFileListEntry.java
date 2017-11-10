@@ -1562,8 +1562,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     baseName = path.getFileName().toString();
 
                     Path parent = path.getParent();
-                    parentFullName = parent.toString().replace('\\', '/');
-                    parentBaseName = parent.getFileName().toString();
+                    if (parent != null) {
+                        parentFullName = parent.toString().replace('\\', '/');
+                        parentBaseName = parent.getFileName().toString();
+                    }
                 } catch (Exception e) {
                     LOGGER.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
                 }
