@@ -771,8 +771,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         Path sourceDir = Paths.get(objOptions.SourceDir.Value());
 
         EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(),
-                strTargetTransferName)));
+        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName)));
 
         EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
         EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
@@ -1432,8 +1431,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     baseName = path.getFileName().toString();
 
                     Path parent = path.getParent();
-                    parentFullName = parent.toString().replace('\\', '/');
-                    parentBaseName = parent.getFileName().toString();
+                    if (parent != null) {
+                        parentFullName = parent.toString().replace('\\', '/');
+                        parentBaseName = parent.getFileName().toString();
+                    }
                 } catch (Exception e) {
                     logger.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
                 }
