@@ -34,6 +34,8 @@ import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.util.SOSString;
+
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
 
@@ -846,15 +848,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private String replaceVariables(final String value) {
         String replaced = value;
 
-        Path targetDir = Paths.get(objOptions.targetDir.getValue());
-        Path sourceDir = Paths.get(objOptions.sourceDir.getValue());
+        EntryPaths targetFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
+                strTargetFileName)));
+        EntryPaths targetTransferFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir
+                .getValue(), strTargetTransferName)));
 
-        EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
-                strTargetTransferName)));
-
-        EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
-        EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
+        EntryPaths sourceFile = new EntryPaths(objOptions.sourceDir.getValue(), resolveDotsInPath(strSourceFileName));
+        EntryPaths sourceFileRenamed = new EntryPaths(objOptions.sourceDir.getValue(), strRenamedSourceFileName);
 
         // deprecated vars
         replaced = replaced.replace("$TargetFileName", targetFile.getFullName());
@@ -874,32 +874,32 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         vars.put("SourceDirName", objOptions.sourceDir.getValue());
 
         // new vars
-        vars.put("TargetDirFullName", targetDir.normalize().toString().replace('\\', '/'));
-        vars.put("SourceDirFullName", sourceDir.normalize().toString().replace('\\', '/'));
+        vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
+        vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
 
         vars.put("TargetFileFullName", targetFile.getFullName());
         vars.put("TargetFileRelativeName", targetFile.getRelativeName());
         vars.put("TargetFileBaseName", targetFile.getBaseName());
-        vars.put("TargetFileParentFullName", targetFile.getParentFullName());
-        vars.put("TargetFileParentBaseName", targetFile.getParentBaseName());
+        vars.put("TargetFileParentFullName", targetFile.getParentDirFullName());
+        vars.put("TargetFileParentBaseName", targetFile.getParentDirBaseName());
 
         vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
         vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
         vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
-        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentFullName());
-        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentBaseName());
+        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentDirFullName());
+        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentDirBaseName());
 
         vars.put("SourceFileFullName", sourceFile.getFullName());
         vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
         vars.put("SourceFileBaseName", sourceFile.getBaseName());
-        vars.put("SourceFileParentFullName", sourceFile.getParentFullName());
-        vars.put("SourceFileParentBaseName", sourceFile.getParentBaseName());
+        vars.put("SourceFileParentFullName", sourceFile.getParentDirFullName());
+        vars.put("SourceFileParentBaseName", sourceFile.getParentDirBaseName());
 
         vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
         vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
         vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
-        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentFullName());
-        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentBaseName());
+        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentDirFullName());
+        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentDirBaseName());
 
         return objOptions.replaceVars(replaced);
     }
@@ -1557,25 +1557,37 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         private String fullName = "";
         private String relativeName = "";
         private String baseName = "";
-        private String parentFullName = "";
-        private String parentBaseName = "";
+        private String baseDirFullName = "";
+        private String parentDirFullName = "";
+        private String parentDirBaseName = "";
 
-        private EntryPaths(final Path baseDir, final String filePath) {
+        private EntryPaths(final String baseDirPath, final String filePath) {
             if (filePath != null) {
                 try {
-                    Path path = Paths.get(filePath);
+                    Path baseDir = SOSString.isEmpty(baseDirPath) ? null : Paths.get(baseDirPath);
+                    Path file = Paths.get(filePath);
+                    Path parentDir = file.getParent();
 
-                    fullName = path.toString().replace('\\', '/');
-                    relativeName = baseDir.relativize(path).normalize().toString().replace('\\', '/');
-                    baseName = path.getFileName().toString();
-
-                    Path parent = path.getParent();
-                    if (parent != null) {
-                        parentFullName = parent.toString().replace('\\', '/');
-                        parentBaseName = parent.getFileName().toString();
+                    if (parentDir != null) {
+                        parentDirFullName = parentDir.toString().replace('\\', '/');
+                        parentDirBaseName = parentDir.getFileName().toString();
+                        if (baseDir == null) {
+                            baseDir = parentDir;
+                        }
                     }
+
+                    fullName = file.toString().replace('\\', '/');
+                    baseName = file.getFileName().toString();
+
+                    if (baseDir == null) {
+                        relativeName = baseName;
+                    } else {
+                        baseDirFullName = baseDir.normalize().toString().replace('\\', '/');
+                        relativeName = baseDir.relativize(file).normalize().toString().replace('\\', '/');
+                    }
+
                 } catch (Exception e) {
-                    LOGGER.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
+                    LOGGER.warn(String.format("error on resolve path for baseDirPath=%s, filePath=%s", baseDirPath, filePath), e);
                 }
             }
         }
@@ -1592,13 +1604,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             return baseName;
         }
 
-        public String getParentFullName() {
-            return parentFullName;
+        public String getBaseDirFullName() {
+            return baseDirFullName;
         }
 
-        public String getParentBaseName() {
-            return parentBaseName;
+        public String getParentDirFullName() {
+            return parentDirFullName;
+        }
+
+        public String getParentDirBaseName() {
+            return parentDirBaseName;
         }
 
     }
+
 }
