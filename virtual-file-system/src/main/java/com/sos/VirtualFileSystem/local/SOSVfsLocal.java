@@ -195,25 +195,25 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void executeCommand(final String strCmd) throws Exception {
+    public void executeCommand(final String cmd) throws Exception {
         if (objCmdShell == null) {
             objCmdShell = new CmdShell();
         }
-        String strT = strCmd;
+        String command = cmd.trim();
         if (objCmdShell.isWindows()) {
-            strT = replaceCommand4Windows(strT);
+            command = replaceCommand4Windows(command);
         }
-        int exitCode = objCmdShell.executeCommand(strT);
+        int exitCode = objCmdShell.executeCommand(command);
         if (exitCode != 0) {
             throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
         }
     }
 
-    public String replaceCommand4Windows(final String strCmd) {
-        String strT = strCmd;
-        strT = strT.replaceAll("/(?=[^ ]*/)", "\\\\");
-        strT = strT.replaceAll("(?<! )/", "\\\\");
-        return strT;
+    public String replaceCommand4Windows(final String cmd) {
+        String command = cmd;
+        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
+        command = command.replaceAll("(?<! )/", "\\\\");
+        return command;
     }
 
     @Override
