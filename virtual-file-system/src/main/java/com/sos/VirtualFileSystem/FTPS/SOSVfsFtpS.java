@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.ProxySelector;
 import java.security.KeyStore;
 
+import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.util.TrustManagerUtils;
 import org.apache.log4j.Logger;
@@ -90,6 +91,30 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
         } catch (Exception e) {
             String msg = getHostID("connect returns an exception");
             LOGGER.error(msg, e);
+        }
+    }
+
+    @Override
+    public void executeCommand(final String cmd) throws Exception {
+        String command = cmd.trim();
+        try {
+            client.sendCommand(command);
+            String replyString = client.getReplyString().trim();
+            int replyCode = client.getReplyCode();
+            if (FTPReply.isNegativePermanent(replyCode) || FTPReply.isNegativeTransient(replyCode) || replyCode >= 10_000) {
+                throw new JobSchedulerException(SOSVfs_E_164.params(replyString + "[" + command + "]"));
+            }
+            LOGGER.info(SOSVfs_D_151.params(command, replyString));
+        } catch (JobSchedulerException ex) {
+            if (objConnection2Options.raiseExceptionOnError.value()) {
+                throw ex;
+            }
+            LOGGER.info(SOSVfs_D_151.params(command, ex.toString()));
+        } catch (Exception ex) {
+            if (objConnection2Options.raiseExceptionOnError.value()) {
+                raiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+            }
+            LOGGER.info(SOSVfs_D_151.params(command, ex.toString()));
         }
     }
 
