@@ -395,6 +395,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void executeCommand(String cmd) {
+        cmd = cmd.trim();
         final String endOfLine = System.getProperty("line.separator");
         channelExec = null;
         exitCode = null;
