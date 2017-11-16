@@ -364,7 +364,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
         
     private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands, final SOSOptionString optionCommandDelimiter) {
-        final String conMethodName = "SOSFileListEntry::executeCommands";
+            LOGGER.debug(SOSVfs_D_0151.params(commands));
         if (optionCommands.isNotEmpty()) {
             String commands = optionCommands.getValue();
             commands = replaceVariables(commands);
@@ -377,7 +377,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 delimiter = ";";
             }
             if (delimiter.isEmpty()) {
-                try {
+                    try {
                     fileTransfer.getHandler().executeCommand(commands);
                 } catch (JobSchedulerException e) {
                     LOGGER.error(e.toString());
@@ -397,6 +397,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     } catch (Exception e) {
                         LOGGER.error(e.toString());
                         throw new JobSchedulerException(conMethodName, e);
+                    }
                     }
                 }
             }
