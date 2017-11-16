@@ -305,20 +305,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
-        final String conMethodName = conClassName + "::executeCommands";
-        if (pstrCommandString.IsNotEmpty()) {
-            String strT = pstrCommandString.Value();
-            strT = replaceVariables(strT);
-            String strM = SOSVfs_D_0151.params(strT);
-            logger.debug(strM);
-            String[] strA = strT.split(";");
-            for (String strCmd : strA) {
-                try {
-                    pobjDataClient.getHandler().ExecuteCommand(strCmd);
-                } catch (Exception e) {
-                    logger.error(e.getLocalizedMessage());
-                    throw new JobSchedulerException(conMethodName, e);
+    private void executeCommands(final ISOSVfsFileTransfer fileTransfer, final SOSOptionString commandOption) {
+        final String methodName = conClassName + "::executeCommands";
+        String commands = commandOption.Value().trim();
+        if (commands.length() > 0) {
+            commands = replaceVariables(commands);
+            logger.debug(SOSVfs_D_0151.params(commands));
+            String[] arr = commands.split(";");
+            for (String command : arr) {
+                if (command.trim().length() > 0) {
+                    try {
+                        fileTransfer.getHandler().ExecuteCommand(command);
+                    } catch (Exception e) {
+                        logger.error(e.getLocalizedMessage());
+                        throw new JobSchedulerException(methodName, e);
+                    }
                 }
             }
         }
@@ -771,7 +772,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         Path sourceDir = Paths.get(objOptions.SourceDir.Value());
 
         EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName)));
+        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(),
+                strTargetTransferName)));
 
         EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
         EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
@@ -908,7 +910,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 objTargetTransferFile.setModeRestart(objOptions.ResumeTransfer.value());
             }
             strSourceTransferName = getFileNameWithoutPath(strSourceTransferName);
-            objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
+            objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName),
+                    strSourceTransferName));
             if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
                 String strM = SOSVfs_D_0110.params(strSourceFileName);
                 logger.debug(strM);
@@ -1004,8 +1007,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void setNoOfBytesTransferred(final long plngNoOfBytesTransferred) {
         lngNoOfBytesTransferred = plngNoOfBytesTransferred;
         SOSConnection2Options objConnectOptions = objOptions.getConnectionOptions();
-        if (!(objOptions.check_size.isFalse() || objOptions.compress_files.isTrue() || objOptions.transfer_mode.isAscii()
-                || objConnectOptions.Source().transfer_mode.isAscii() || objConnectOptions.Target().transfer_mode.isAscii())) {
+        if (!(objOptions.check_size.isFalse() || objOptions.compress_files.isTrue() || objOptions.transfer_mode.isAscii() || objConnectOptions
+                .Source().transfer_mode.isAscii() || objConnectOptions.Target().transfer_mode.isAscii())) {
             if (lngFileSize <= 0) {
                 lngFileSize = objDataSourceClient.getFileHandle(strSourceFileName).getFileSize();
             }
@@ -1352,7 +1355,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public String toString() {
         String strT;
         try {
-            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(), objOptions.operation.Value());
+            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(), objOptions.operation
+                    .Value());
         } catch (RuntimeException e) {
             logger.error(e.getLocalizedMessage());
             strT = "???";
