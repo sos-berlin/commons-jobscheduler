@@ -360,23 +360,24 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
-        final String conMethodName = "SOSFileListEntry::executeCommands";
-        if (pstrCommandString.isNotEmpty()) {
-            String strT = pstrCommandString.getValue();
-            strT = replaceVariables(strT);
-            String strM = SOSVfs_D_0151.params(strT);
-            LOGGER.debug(strM);
-            String[] strA = strT.split(";");
-            for (String strCmd : strA) {
-                try {
-                    pobjDataClient.getHandler().executeCommand(strCmd);
-                } catch (JobSchedulerException e) {
-                    LOGGER.error(e.toString());
-                    throw e;
-                } catch (Exception e) {
-                    LOGGER.error(e.toString());
-                    throw new JobSchedulerException(conMethodName, e);
+    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString optionCommands) {
+        final String methodName = "SOSFileListEntry::executeCommands";
+        String commands = optionCommands.getValue().trim();
+        if (commands.length() > 0) {
+            commands = replaceVariables(commands);
+            LOGGER.debug(SOSVfs_D_0151.params(commands));
+            String[] arr = commands.split(";");
+            for (String command : arr) {
+                if (command.trim().length() > 0) {
+                    try {
+                        pobjDataClient.getHandler().executeCommand(command);
+                    } catch (JobSchedulerException e) {
+                        LOGGER.error(e.toString());
+                        throw e;
+                    } catch (Exception e) {
+                        LOGGER.error(e.toString());
+                        throw new JobSchedulerException(methodName, e);
+                    }
                 }
             }
         }
