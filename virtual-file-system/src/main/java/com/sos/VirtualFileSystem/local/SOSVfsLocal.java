@@ -202,38 +202,38 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void ExecuteCommand(final String strCmd) throws Exception {
+    public void ExecuteCommand(final String cmd) throws Exception {
         if (objCmdShell == null) {
             objCmdShell = new cmdShell();
         }
-        String strT = strCmd;
+        String command = cmd.trim();
         if (objCmdShell.isWindows() == true) {
-            // strT = strT.replaceAll("/", "\\\\");
-            // Kommandos auf Windows koennen Optionen haben wie /F /Y, die nicht
-            // in \F \Y umbenannt werden duerfen
-            strT = replaceCommand4Windows(strT);
+            command = replaceCommand4Windows(command);
         }
-        int exitCode = objCmdShell.executeCommand(strT);
+        int exitCode = objCmdShell.executeCommand(command);
         if (exitCode != 0) {
             throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
         }
     }
 
-    public String replaceCommand4Windows(final String strCmd) {
-        String strT = strCmd;
+    public String replaceCommand4Windows(final String cmd) {
+        // Kommandos auf Windows koennen Optionen haben wie /F /Y, die nicht
+        // in \F \Y umbenannt werden duerfen
+   
+        String command = cmd;
         // http://www.sos-berlin.com/jira/browse/SOSFTP-204
         // Die folgenden beiden "replace" Aufrufe aendern nur Slashes, denen
         // kein Leerzeichen vorangeht und kein Slash folgt.
         // 1.Schritt: alle slashs, denen ein slash folgt, bevor ein Leerzeichen
         // folgt ( " /F //host/c/foo/bar c:/foo/bar" -> " /F \\host\c\foo/bar
         // c:\foo/bar")
-        strT = strT.replaceAll("/(?=[^ ]*/)", "\\\\");
+        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
         // 2.Schritt: alle slashs, die nicht auf ein Leerzeichen folgen (
         // " /F //host/c/foo/bar c:/foo/bar" -> " /F \\host\c\foo\bar
         // c:\foo\bar")
-        strT = strT.replaceAll("(?<! )/", "\\\\");
+        command = command.replaceAll("(?<! )/", "\\\\");
 
-        return strT;
+        return command;
     }
 
     @Override
