@@ -380,16 +380,17 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executeCommands(final String commandOptionName,final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
-        executeCommands(commandOptionName,fileTransfer, optionCommands, null);
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
+        executeCommands(commandOptionName, fileTransfer, optionCommands, null);
     }
-        
-    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands, final SOSOptionString optionCommandDelimiter) {
-        final String conMethodName = "SOSFileListEntry::executeCommands";
-        if (optionCommands.isNotEmpty()) {
-            String commands = optionCommands.getValue();
+
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
+            final SOSOptionString optionCommandDelimiter) {
+        final String methodName = "SOSFileListEntry::executeCommands";
+        String commands = optionCommands.getValue().trim();
+        if (commands.length() > 0) {
             commands = replaceVariables(commands);
-            LOGGER.debug(String.format("[%s] %s",commandOptionName,SOSVfs_D_0151.params(commands)));
+            LOGGER.debug(String.format("[%s] %s", commandOptionName, SOSVfs_D_0151.params(commands)));
             String delimiter = null;
             if (optionCommandDelimiter != null) {
                 delimiter = optionCommandDelimiter.getValue();
@@ -405,19 +406,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     throw e;
                 } catch (Exception e) {
                     LOGGER.error(e.toString());
-                    throw new JobSchedulerException(conMethodName, e);
+                    throw new JobSchedulerException(methodName, e);
                 }
             } else {
                 String[] values = commands.split(delimiter);
                 for (String command : values) {
-                    try {
-                        fileTransfer.getHandler().executeCommand(command);
-                    } catch (JobSchedulerException e) {
-                        LOGGER.error(e.toString());
-                        throw e;
-                    } catch (Exception e) {
-                        LOGGER.error(e.toString());
-                        throw new JobSchedulerException(conMethodName, e);
+                    if (command.trim().length() > 0) {
+                        try {
+                            fileTransfer.getHandler().executeCommand(command);
+                        } catch (JobSchedulerException e) {
+                            LOGGER.error(e.toString());
+                            throw e;
+                        } catch (Exception e) {
+                            LOGGER.error(e.toString());
+                            throw new JobSchedulerException(methodName, e);
+                        }
                     }
                 }
             }
@@ -427,48 +430,53 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void executeTFNPostCommnands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_tfn_post_command",objDataTargetClient, target.getAlternatives().tfnPostCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_tfn_post_command", objDataTargetClient, target.getAlternatives().tfnPostCommand, target
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("tfn_post_command",objDataTargetClient, objOptions.tfnPostCommand);
-            executeCommands("target_tfn_post_command",objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
+            executeCommands("tfn_post_command", objDataTargetClient, objOptions.tfnPostCommand);
+            executeCommands("target_tfn_post_command", objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_tfn_post_command",objDataSourceClient, source.getAlternatives().tfnPostCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_tfn_post_command", objDataSourceClient, source.getAlternatives().tfnPostCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_tfn_post_command",objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
+            executeCommands("source_tfn_post_command", objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
         }
     }
 
     public void executePostCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_post_command",objDataTargetClient, target.getAlternatives().postCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("post_command",objDataTargetClient, objOptions.postCommand);
-            executeCommands("target_post_command",objDataTargetClient, target.postCommand, target.commandDelimiter);
+            executeCommands("post_command", objDataTargetClient, objOptions.postCommand);
+            executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_post_command",objDataSourceClient, source.getAlternatives().postCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_post_command",objDataSourceClient, source.postCommand, source.commandDelimiter);
+            executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter);
         }
     }
 
     private void executePreCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_pre_command",objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
+            executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
         } else {
-            executeCommands("pre_command",objDataTargetClient, objOptions.preCommand);
-            executeCommands("target_pre_command",objDataTargetClient, target.preCommand, target.commandDelimiter);
+            executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
+            executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_pre_command",objDataSourceClient, source.getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_pre_command",objDataSourceClient, source.preCommand, source.commandDelimiter);
+            executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
         }
     }
 
