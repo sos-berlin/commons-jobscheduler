@@ -41,6 +41,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     private static final Logger LOGGER = Logger.getLogger(SOSVfsLocal.class);
     private final InputStream objInputStream = null;
     private final OutputStream objOutputStream = null;
+    private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
     private String strReplyString = "";
     private File objWorkingDirectory = null;
     private CmdShell objCmdShell = null;
@@ -136,7 +137,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
+        connection2OptionsAlternate = options;
         return null;
     }
 
@@ -202,7 +204,15 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         }
         int exitCode = objCmdShell.executeCommand(command);
         if (exitCode != 0) {
-            throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
+            boolean raiseException = true;
+            if (connection2OptionsAlternate != null) {
+                raiseException = connection2OptionsAlternate.raiseExceptionOnError.value();
+            }
+            if (raiseException) {
+                throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
+            } else {
+                LOGGER.info(SOSVfs_D_151.params(command, SOSVfs_E_191.params(exitCode + "")));
+            }
         }
     }
 
