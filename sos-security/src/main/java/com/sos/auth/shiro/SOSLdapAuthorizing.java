@@ -71,7 +71,7 @@ public class SOSLdapAuthorizing {
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-        String searchFilter = String.format(sosLdapAuthorizingRealm.getGroupSearchFilter(), username);
+        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getGroupSearchFilter(), username);
         LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
 
@@ -89,6 +89,13 @@ public class SOSLdapAuthorizing {
         return rolesForGroups;
     }
 
+    private String substituteUserName(String source,String username) {
+        String s = String.format(source, username);
+        s = s.replaceAll("\\^s","%s");
+        s = String.format(s, normalizeUser(username));
+        return s;
+    }
+    
     private Attributes getUserAttributes(String username) throws NamingException {
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -100,8 +107,10 @@ public class SOSLdapAuthorizing {
                     "You have specified a value for userNameAttribute but you have not defined the userSearchFilter. The default filter %s will be used",
                     searchFilter));
         } else {
-            searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+            searchFilter = sosLdapAuthorizingRealm.getUserSearchFilter();
         }
+        
+        searchFilter = substituteUserName(searchFilter, username);
 
         LOGGER.debug(String.format("getting user from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
@@ -132,7 +141,8 @@ public class SOSLdapAuthorizing {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         Collection<String> groupNames = null;
 
-        String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+
         LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
 
@@ -156,7 +166,7 @@ public class SOSLdapAuthorizing {
         return groupNames;
     }
 
-    private static String normalizeUser(String username) {
+    private String normalizeUser(String username) {
         String[] s = username.split("@");
         if (s.length > 1) {
             username = s[0];
@@ -168,7 +178,6 @@ public class SOSLdapAuthorizing {
             }
         }
         return username;
-
     }
 
     private void getRoleNamesForUser(String username) throws Exception {
@@ -192,10 +201,12 @@ public class SOSLdapAuthorizing {
             }
         }
 
-        String userPrincipalName = normalizeUser(username);
+
+        String userPrincipalName = username;
+        
         if (sosLdapAuthorizingRealm.getUserNameAttribute() != null && !sosLdapAuthorizingRealm.getUserNameAttribute().isEmpty()) {
             LOGGER.debug("get userPrincipalName for substitution from user record. Using username from login.");
-            Attributes user = getUserAttributes(username);
+            Attributes user = getUserAttributes(userPrincipalName);
             if (user != null) {
                 if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
                     LOGGER.error(String.format(
@@ -235,10 +246,13 @@ public class SOSLdapAuthorizing {
     public void getRoleNamesForUserTest(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm, String username) throws Exception {
 
         // String ldapAdServer = "ldap://ldap.andrew.cmu.edu:389";
-        String ldapAdServer = "ldap://ldap.itd.umich.edu:389";
+        String ldapAdServer = "ldap://localhost:389";
         Hashtable<String, Object> env = new Hashtable<String, Object>();
         env.put(Context.PROVIDER_URL, ldapAdServer);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        
+        env.put(Context.SECURITY_PRINCIPAL, "CN=ur,CN=sos,DC=berlin,DC=com");
+        env.put(Context.SECURITY_CREDENTIALS, "aplsos");
 
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, ldapAdServer);
@@ -255,7 +269,7 @@ public class SOSLdapAuthorizing {
             LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                     sosLdapAuthorizingRealm.getUserSearchFilter()));
 
-            String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), userPrincipalName);
+            String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter(), userPrincipalName);
             LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                     searchFilter));
 
