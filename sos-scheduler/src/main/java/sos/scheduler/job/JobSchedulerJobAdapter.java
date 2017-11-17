@@ -140,6 +140,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 }
             }
             schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
+            parameterSubstitutor = null;
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
