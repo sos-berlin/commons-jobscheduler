@@ -90,9 +90,9 @@ public class SOSLdapAuthorizing {
     }
 
     private String substituteUserName(String source,String username) {
-        String s = String.format(source, username);
+        String s = String.format(source, normalizeUser(username));
         s = s.replaceAll("\\^s","%s");
-        s = String.format(s, normalizeUser(username));
+        s = String.format(s, username);
         return s;
     }
     
