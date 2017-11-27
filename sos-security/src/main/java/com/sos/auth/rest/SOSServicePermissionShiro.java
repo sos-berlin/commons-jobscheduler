@@ -445,7 +445,7 @@ public class SOSServicePermissionShiro {
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:terminate");
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:daily_plan:view:status");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:history:view");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:history:view:status");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:status");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:configuration");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:order_log");
@@ -518,7 +518,7 @@ public class SOSServicePermissionShiro {
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
 
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:view");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:view:status");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:delete");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:customization:share:change:edit_content");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(),
@@ -664,11 +664,13 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
             sosPermissionJocCockpit.setYADE(o.createSOSPermissionJocCockpitYADE());
             sosPermissionJocCockpit.setCalendar(o.createSOSPermissionJocCockpitCalendar());
+            sosPermissionJocCockpit.getCalendar().setView(o.createSOSPermissionJocCockpitCalendarView());
             sosPermissionJocCockpit.getCalendar().setEdit(o.createSOSPermissionJocCockpitCalendarEdit());
             sosPermissionJocCockpit.getCalendar().getEdit().setAssign(o.createSOSPermissionJocCockpitCalendarEditAssign());
 
             sosPermissionJocCockpit.setJOCConfigurations(o.createSOSPermissionJocCockpitJOCConfigurations());
             sosPermissionJocCockpit.getJOCConfigurations().setShare(o.createSOSPermissionJocCockpitJOCConfigurationsShare());
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setView(o.createSOSPermissionJocCockpitJOCConfigurationsShareView());
             sosPermissionJocCockpit.getJOCConfigurations().getShare().setChange(o.createSOSPermissionJocCockpitJOCConfigurationsShareChange());
             sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setSharedStatus(o
                     .createSOSPermissionJocCockpitJOCConfigurationsShareChangeSharedStatus());
@@ -715,7 +717,8 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getHolidayCalendar().setView(o.createSOSPermissionJocCockpitHolidayCalendarView());
             sosPermissionJocCockpit.getAuditLog().setView(o.createSOSPermissionJocCockpitAuditLogView());
             sosPermissionJocCockpit.getMaintenanceWindow().setView(o.createSOSPermissionJocCockpitMaintenanceWindowView());
-
+            sosPermissionJocCockpit.getHistory().setView(o.createSOSPermissionJocCockpitHistoryView());
+             
             sosPermissionJocCockpit.getYADE().setView(o.createSOSPermissionJocCockpitYADEView());
             sosPermissionJocCockpit.getYADE().setExecute(o.createSOSPermissionJocCockpitYADEExecute());
 
@@ -767,14 +770,13 @@ public class SOSServicePermissionShiro {
 
             sosPermissionJocCockpit.getDailyPlan().getView().setStatus(haveRight("sos:products:joc_cockpit:daily_plan:view:status"));
 
-            sosPermissionJocCockpit.getHistory().setView(haveRight("sos:products:joc_cockpit:history:view"));
+            sosPermissionJocCockpit.getHistory().getView().setStatus(haveRight("sos:products:joc_cockpit:history:view:status"));
 
             sosPermissionJocCockpit.getOrder().getView().setStatus(haveRight("sos:products:joc_cockpit:order:view:status"));
             sosPermissionJocCockpit.getOrder().getView().setConfiguration(haveRight("sos:products:joc_cockpit:order:view:configuration"));
             sosPermissionJocCockpit.getOrder().getView().setOrderLog(haveRight("sos:products:joc_cockpit:order:view:order_log"));
             sosPermissionJocCockpit.getOrder().getChange().setStartAndEndNode(haveRight("sos:products:joc_cockpit:order:change:start_and_end_node"));
-            sosPermissionJocCockpit.getOrder().getChange().setTimeForAdhocOrder(haveRight(
-                    "sos:products:joc_cockpit:order:change:time_for_adhoc_orders"));
+            sosPermissionJocCockpit.getOrder().getChange().setTimeForAdhocOrder(haveRight("sos:products:joc_cockpit:order:change:time_for_adhoc_orders"));
             sosPermissionJocCockpit.getOrder().getChange().setParameter(haveRight("sos:products:joc_cockpit:order:change:parameter"));
             sosPermissionJocCockpit.getOrder().getChange().setRunTime(haveRight("sos:products:joc_cockpit:order:change:run_time"));
             sosPermissionJocCockpit.getOrder().getChange().setState(haveRight("sos:products:joc_cockpit:order:change:state"));
@@ -837,7 +839,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getHolidayCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:holiday_calendar:view:status"));
             sosPermissionJocCockpit.getAuditLog().getView().setStatus(haveRight("sos:products:joc_cockpit:audit_log:view:status"));
 
-            sosPermissionJocCockpit.getJOCConfigurations().getShare().setView(haveRight("sos:products:joc_cockpit:customization:share:view"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getView().setStatus(haveRight("sos:products:joc_cockpit:customization:share:view:status"));
             sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setDelete(haveRight(
                     "sos:products:joc_cockpit:customization:share:change:delete"));
             sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setEditContent(haveRight(
@@ -859,7 +861,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getYADE().getExecute().setTransferStart(haveRight("sos:products:joc_cockpit:yade:execute:transfer_start"));
             sosPermissionJocCockpit.getYADE().getExecute().setTransferStore(haveRight("sos:products:joc_cockpit:yade:execute:transfer_store"));
             
-            sosPermissionJocCockpit.getCalendar().setView(haveRight("sos:products:joc_cockpit:calendar:view"));
+            sosPermissionJocCockpit.getCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:calendar:view:status"));
             
             sosPermissionJocCockpit.getCalendar().getEdit().setChange(haveRight("sos:products:joc_cockpit:calendar:edit:change"));
             sosPermissionJocCockpit.getCalendar().getEdit().setDelete(haveRight("sos:products:joc_cockpit:calendar:edit:delete"));

@@ -41,6 +41,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     private static final Logger LOGGER = Logger.getLogger(SOSVfsLocal.class);
     private final InputStream objInputStream = null;
     private final OutputStream objOutputStream = null;
+    private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
     private String strReplyString = "";
     private File objWorkingDirectory = null;
     private CmdShell objCmdShell = null;
@@ -136,7 +137,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
+        connection2OptionsAlternate = options;
         return null;
     }
 
@@ -192,25 +194,33 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void executeCommand(final String strCmd) throws Exception {
+    public void executeCommand(final String cmd) throws Exception {
         if (objCmdShell == null) {
             objCmdShell = new CmdShell();
         }
-        String strT = strCmd;
+        String command = cmd.trim();
         if (objCmdShell.isWindows()) {
-            strT = replaceCommand4Windows(strT);
+            command = replaceCommand4Windows(command);
         }
-        int exitCode = objCmdShell.executeCommand(strT);
+        int exitCode = objCmdShell.executeCommand(command);
         if (exitCode != 0) {
-            throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
+            boolean raiseException = true;
+            if (connection2OptionsAlternate != null) {
+                raiseException = connection2OptionsAlternate.raiseExceptionOnError.value();
+            }
+            if (raiseException) {
+                throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
+            } else {
+                LOGGER.info(SOSVfs_D_151.params(command, SOSVfs_E_191.params(exitCode + "")));
+            }
         }
     }
 
-    public String replaceCommand4Windows(final String strCmd) {
-        String strT = strCmd;
-        strT = strT.replaceAll("/(?=[^ ]*/)", "\\\\");
-        strT = strT.replaceAll("(?<! )/", "\\\\");
-        return strT;
+    public String replaceCommand4Windows(final String cmd) {
+        String command = cmd;
+        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
+        command = command.replaceAll("(?<! )/", "\\\\");
+        return command;
     }
 
     @Override

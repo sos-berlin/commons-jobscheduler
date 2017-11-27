@@ -35,6 +35,8 @@ import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.util.SOSString;
+
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
 
@@ -396,16 +398,17 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executeCommands(final String commandOptionName,final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
-        executeCommands(commandOptionName,fileTransfer, optionCommands, null);
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
+        executeCommands(commandOptionName, fileTransfer, optionCommands, null);
     }
-        
-    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands, final SOSOptionString optionCommandDelimiter) {
-        final String conMethodName = "SOSFileListEntry::executeCommands";
-        if (optionCommands.isNotEmpty()) {
-            String commands = optionCommands.getValue();
+
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
+            final SOSOptionString optionCommandDelimiter) {
+        final String methodName = "SOSFileListEntry::executeCommands";
+        String commands = optionCommands.getValue().trim();
+        if (commands.length() > 0) {
             commands = replaceVariables(commands);
-            LOGGER.debug(String.format("[%s] %s",commandOptionName,SOSVfs_D_0151.params(commands)));
+            LOGGER.debug(String.format("[%s] %s", commandOptionName, SOSVfs_D_0151.params(commands)));
             String delimiter = null;
             if (optionCommandDelimiter != null) {
                 delimiter = optionCommandDelimiter.getValue();
@@ -421,19 +424,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     throw e;
                 } catch (Exception e) {
                     LOGGER.error(e.toString());
-                    throw new JobSchedulerException(conMethodName, e);
+                    throw new JobSchedulerException(methodName, e);
                 }
             } else {
                 String[] values = commands.split(delimiter);
                 for (String command : values) {
-                    try {
-                        fileTransfer.getHandler().executeCommand(command);
-                    } catch (JobSchedulerException e) {
-                        LOGGER.error(e.toString());
-                        throw e;
-                    } catch (Exception e) {
-                        LOGGER.error(e.toString());
-                        throw new JobSchedulerException(conMethodName, e);
+                    if (command.trim().length() > 0) {
+                        try {
+                            fileTransfer.getHandler().executeCommand(command);
+                        } catch (JobSchedulerException e) {
+                            LOGGER.error(e.toString());
+                            throw e;
+                        } catch (Exception e) {
+                            LOGGER.error(e.toString());
+                            throw new JobSchedulerException(methodName, e);
+                        }
                     }
                 }
             }
@@ -443,48 +448,53 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void executeTFNPostCommnands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_tfn_post_command",objDataTargetClient, target.getAlternatives().tfnPostCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_tfn_post_command", objDataTargetClient, target.getAlternatives().tfnPostCommand, target
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("tfn_post_command",objDataTargetClient, objOptions.tfnPostCommand);
-            executeCommands("target_tfn_post_command",objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
+            executeCommands("tfn_post_command", objDataTargetClient, objOptions.tfnPostCommand);
+            executeCommands("target_tfn_post_command", objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_tfn_post_command",objDataSourceClient, source.getAlternatives().tfnPostCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_tfn_post_command", objDataSourceClient, source.getAlternatives().tfnPostCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_tfn_post_command",objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
+            executeCommands("source_tfn_post_command", objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
         }
     }
 
     public void executePostCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_post_command",objDataTargetClient, target.getAlternatives().postCommand, target.getAlternatives().commandDelimiter);
+            executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("post_command",objDataTargetClient, objOptions.postCommand);
-            executeCommands("target_post_command",objDataTargetClient, target.postCommand, target.commandDelimiter);
+            executeCommands("post_command", objDataTargetClient, objOptions.postCommand);
+            executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_post_command",objDataSourceClient, source.getAlternatives().postCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_post_command",objDataSourceClient, source.postCommand, source.commandDelimiter);
+            executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter);
         }
     }
 
     private void executePreCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_pre_command",objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
+            executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
         } else {
-            executeCommands("pre_command",objDataTargetClient, objOptions.preCommand);
-            executeCommands("target_pre_command",objDataTargetClient, target.preCommand, target.commandDelimiter);
+            executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
+            executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_pre_command",objDataSourceClient, source.getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
+            executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
+                    .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_pre_command",objDataSourceClient, source.preCommand, source.commandDelimiter);
+            executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
         }
     }
 
@@ -873,43 +883,41 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private String replaceVariables(final String value) {
-        Path targetDir = Paths.get(objOptions.targetDir.getValue());
-        Path sourceDir = Paths.get(objOptions.sourceDir.getValue());
+        EntryPaths targetFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
+                strTargetFileName)));
+        EntryPaths targetTransferFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir
+                .getValue(), strTargetTransferName)));
 
-        EntryPaths targetFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(targetDir, resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
-                strTargetTransferName)));
-
-        EntryPaths sourceFile = new EntryPaths(sourceDir, resolveDotsInPath(strSourceFileName));
-        EntryPaths sourceFileRenamed = new EntryPaths(sourceDir, strRenamedSourceFileName);
+        EntryPaths sourceFile = new EntryPaths(objOptions.sourceDir.getValue(), resolveDotsInPath(strSourceFileName));
+        EntryPaths sourceFileRenamed = new EntryPaths(objOptions.sourceDir.getValue(), strRenamedSourceFileName);
         
         Properties vars = objOptions.getTextProperties();
-        vars.put("TargetDirFullName", targetDir.normalize().toString().replace('\\', '/'));
-        vars.put("SourceDirFullName", sourceDir.normalize().toString().replace('\\', '/'));
+        vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
+        vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
 
         vars.put("TargetFileFullName", targetFile.getFullName());
         vars.put("TargetFileRelativeName", targetFile.getRelativeName());
         vars.put("TargetFileBaseName", targetFile.getBaseName());
-        vars.put("TargetFileParentFullName", targetFile.getParentFullName());
-        vars.put("TargetFileParentBaseName", targetFile.getParentBaseName());
+        vars.put("TargetFileParentFullName", targetFile.getParentDirFullName());
+        vars.put("TargetFileParentBaseName", targetFile.getParentDirBaseName());
 
         vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
         vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
         vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
-        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentFullName());
-        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentBaseName());
+        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentDirFullName());
+        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentDirBaseName());
 
         vars.put("SourceFileFullName", sourceFile.getFullName());
         vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
         vars.put("SourceFileBaseName", sourceFile.getBaseName());
-        vars.put("SourceFileParentFullName", sourceFile.getParentFullName());
-        vars.put("SourceFileParentBaseName", sourceFile.getParentBaseName());
+        vars.put("SourceFileParentFullName", sourceFile.getParentDirFullName());
+        vars.put("SourceFileParentBaseName", sourceFile.getParentDirBaseName());
 
         vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
         vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
         vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
-        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentFullName());
-        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentBaseName());
+        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentDirFullName());
+        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentDirBaseName());
 
         return objOptions.replaceVars(value);
     }
@@ -1578,25 +1586,37 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         private String fullName = "";
         private String relativeName = "";
         private String baseName = "";
-        private String parentFullName = "";
-        private String parentBaseName = "";
+        private String baseDirFullName = "";
+        private String parentDirFullName = "";
+        private String parentDirBaseName = "";
 
-        private EntryPaths(final Path baseDir, final String filePath) {
+        private EntryPaths(final String baseDirPath, final String filePath) {
             if (filePath != null) {
                 try {
-                    Path path = Paths.get(filePath);
+                    Path baseDir = SOSString.isEmpty(baseDirPath) ? null : Paths.get(baseDirPath);
+                    Path file = Paths.get(filePath);
+                    Path parentDir = file.getParent();
 
-                    fullName = path.toString().replace('\\', '/');
-                    relativeName = baseDir.relativize(path).normalize().toString().replace('\\', '/');
-                    baseName = path.getFileName().toString();
-
-                    Path parent = path.getParent();
-                    if (parent != null) {
-                        parentFullName = parent.toString().replace('\\', '/');
-                        parentBaseName = parent.getFileName().toString();
+                    if (parentDir != null) {
+                        parentDirFullName = parentDir.toString().replace('\\', '/');
+                        parentDirBaseName = parentDir.getFileName().toString();
+                        if (baseDir == null) {
+                            baseDir = parentDir;
+                        }
                     }
+
+                    fullName = file.toString().replace('\\', '/');
+                    baseName = file.getFileName().toString();
+
+                    if (baseDir == null) {
+                        relativeName = baseName;
+                    } else {
+                        baseDirFullName = baseDir.normalize().toString().replace('\\', '/');
+                        relativeName = baseDir.relativize(file).normalize().toString().replace('\\', '/');
+                    }
+
                 } catch (Exception e) {
-                    LOGGER.warn(String.format("error on resolve path for baseDir=%s, filePath=%s", baseDir.toString(), filePath), e);
+                    LOGGER.warn(String.format("error on resolve path for baseDirPath=%s, filePath=%s", baseDirPath, filePath), e);
                 }
             }
         }
@@ -1613,13 +1633,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             return baseName;
         }
 
-        public String getParentFullName() {
-            return parentFullName;
+        public String getBaseDirFullName() {
+            return baseDirFullName;
         }
 
-        public String getParentBaseName() {
-            return parentBaseName;
+        public String getParentDirFullName() {
+            return parentDirFullName;
+        }
+
+        public String getParentDirBaseName() {
+            return parentDirBaseName;
         }
 
     }
+
 }
