@@ -244,6 +244,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         try {
                             Buffer compressedBytes = compress(buffer, bytesTransferred);
                             target.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+                            Map<String, String> values = new HashMap<String, String>();
+                            values.put("bytesTransferred", "" + bytesTransferred);
+                            values.put("targetSize", "" + target.getFileSize());
+                            Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                            eventParams.put("transferring:" + source.getName(), values);
+                            sendEvent(eventParams);
                             if (calculateIntegrityHash4Check) {
                                 md4check.update(buffer, 0, bytesTransferred);
                             }
@@ -257,10 +263,20 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         }
                         totalBytesTransferred += bytesTransferred;
                         setTransferProgress(totalBytesTransferred);
+
+                        // event processing
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put("totalBytesTransferred", "" + totalBytesTransferred);
+                        values.put("targetSize", "" + target.getFileSize());
+                        Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                        eventParams.put("transferred:" + source.getName(), values);
+                        sendEvent(eventParams);
+                        // end of event processing
                     }
                 }
             }
-            //TODO
+            // TODO: define the structure of the event answer
+            
             sendEvent(null);
             source.closeInput();
             target.closeOutput();
@@ -298,7 +314,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void sendEvent(Map<String, Map<String, String>> eventParams) {
-        if (eventHandler != null) {
+        if (eventHandler != null && eventParams != null) {
             eventHandler.sendEvent(eventParams);
         }
     }
