@@ -1,4 +1,4 @@
-package com.sos.scheduler.converter.graphviz;
+package com.sos.graphviz.main;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import org.apache.log4j.Logger;
@@ -12,10 +12,10 @@ public class JSObjects2GraphvizMain extends JSToolBox {
         final String conMethodName = "JSObjects2GraphvizMain::Main";
         LOGGER.info("JSObjects2Graphviz - Main");
         try {
-            JSObjects2Graphviz objM = new JSObjects2Graphviz();
-            JSObjects2GraphvizOptions objO = objM.getOptions();
-            objO.commandLineArgs(pstrArgs);
-            objM.execute();
+            JSObjects2Graphviz jsObjects2Graphviz = new JSObjects2Graphviz();
+            JSObjects2GraphvizOptions jsObjects2GraphvizOptions = jsObjects2Graphviz.getOptions();
+            jsObjects2GraphvizOptions.commandLineArgs(pstrArgs);
+            jsObjects2Graphviz.execute();
         } catch (Exception e) {
             LOGGER.error(conMethodName + ": " + "Error occured ..." + e.getMessage(), e);
             int intExitCode = 99;

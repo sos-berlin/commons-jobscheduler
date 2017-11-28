@@ -1,4 +1,4 @@
-package com.sos.scheduler.converter.graphviz;
+package com.sos.graphviz.main;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -7,24 +7,25 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.graphviz.enums.FileType;
+import com.sos.graphviz.jobchain.diagram.JobChainDiagramCreator;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.*;
-import org.apache.log4j.Logger;
 import java.io.File;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static com.sos.scheduler.model.messages.JSMessages.*;
 
 public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOptions> {
 
     private static final String CLASSNAME = "JSObjects2Graphviz";
-    private static final Logger LOGGER = Logger.getLogger(JSObjects2Graphviz.class);
-    private ISOSVFSHandler objVFS = null;
-    private ISOSVfsFileTransfer objFileSystemHandler = null;
-    private SchedulerObjectFactory objFactory = null;
-    private SchedulerHotFolderFileList objSchedulerHotFolderFileList = null;
-    private String strOutputFolderName = "";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjects2Graphviz.class);
+    private ISOSVFSHandler vfs = null;
+    private ISOSVfsFileTransfer fileSystemHandler = null;
+    private SchedulerObjectFactory schedulerObjectFactory = null;
+    private SchedulerHotFolderFileList schedulerHotFolderFileList = null;
+    private String outputFolderName = "";
 
     public JSObjects2Graphviz() {
         super(new JSObjects2GraphvizOptions());
@@ -34,15 +35,15 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
-        objVFS = VFSFactory.getHandler("local");
-        objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
-        objFactory = new SchedulerObjectFactory();
-        objFactory.initMarshaller(Spooler.class);
-        ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(liveFolderName);
-        SchedulerHotFolder objSchedulerHotFolder = objFactory.createSchedulerHotFolder(objHotFolder);
+        vfs = VFSFactory.getHandler("local");
+        fileSystemHandler = (ISOSVfsFileTransfer) vfs;
+        schedulerObjectFactory = new SchedulerObjectFactory();
+        schedulerObjectFactory.initMarshaller(Spooler.class);
+        ISOSVirtualFile hotFolder = fileSystemHandler.getFileHandle(liveFolderName);
+        SchedulerHotFolder schedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(hotFolder);
         LOGGER.info(String.format("... load %1$s", liveFolderName));
-        objSchedulerHotFolderFileList = objSchedulerHotFolder.loadRecursive();
-        strOutputFolderName = objOptions.outputFolderName.getValue();
+        schedulerHotFolderFileList = schedulerHotFolder.loadRecursive();
+        outputFolderName = objOptions.outputFolderName.getValue();
         return this;
     }
 
@@ -51,14 +52,15 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         JOM_I_110.toLog(methodName);
         try {
             initialize();
-            LOGGER.debug(String.format("%s job chains found", objSchedulerHotFolderFileList.getSortedFileList().size()));
-            for (JSObjBase obj : objSchedulerHotFolderFileList.getSortedFileList()) {
+            LOGGER.debug(String.format("%s job chains found", schedulerHotFolderFileList.getSortedFileList().size()));
+            for (JSObjBase obj : schedulerHotFolderFileList.getSortedFileList()) {
                 if (obj instanceof JSObjJobChain) {
                     JSObjJobChain jsObjJobChain = (JSObjJobChain) obj;
-                    jsObjJobChain.setGraphVizImageType(FileType.pdf);
-                    jsObjJobChain.setDotOutputPath(strOutputFolderName);
-                    LOGGER.info(String.format("... call generator %1$s", strOutputFolderName));
-                    jsObjJobChain.createGraphVizImageFile(new File(objOptions.liveFolderName.getValue()), true);
+                    JobChainDiagramCreator jobChainDiagramCreator = new JobChainDiagramCreator(jsObjJobChain, new File(objOptions.liveFolderName.getValue()));
+                    jobChainDiagramCreator.setGraphVizImageType(FileType.pdf);
+                    jobChainDiagramCreator.setDotOutputPath(outputFolderName);
+                    LOGGER.info(String.format("... call generator %1$s", outputFolderName));
+                    jobChainDiagramCreator.createGraphVizFile(true);
                 }
             }
         } catch (Exception e) {

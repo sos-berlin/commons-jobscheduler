@@ -1,4 +1,4 @@
-package com.sos.scheduler.converter.graphviz;
+package com.sos.graphviz.main;
 
 import java.util.HashMap;
 

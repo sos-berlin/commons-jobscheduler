@@ -169,7 +169,13 @@
 				<xs:element name="History">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="view" type="xs:boolean"/>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -447,7 +453,13 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
-										<xs:element name="view" type="xs:boolean"/>
+										<xs:element name="view">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="status" type="xs:boolean"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -482,7 +494,13 @@
 				<xs:element name="Calendar">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="view" type="xs:boolean"/>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="edit">
 								<xs:complexType>
 									<xs:sequence>

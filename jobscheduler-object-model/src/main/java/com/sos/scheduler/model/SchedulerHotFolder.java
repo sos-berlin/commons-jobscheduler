@@ -89,7 +89,7 @@ public class SchedulerHotFolder extends JSObjBase {
     }
 
     private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) {
-        return load(pobjVirtualDir);
+        return load(pobjVirtualDir,".*");
     }
     
     private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir,String regex) {
