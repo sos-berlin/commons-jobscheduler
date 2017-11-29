@@ -647,11 +647,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public void controlEncoding(final String pstrControlEncoding) {
-
-    }
-
-    @Override
     public void mkdir(final String pathname) throws IOException {
         logINFO("not implemented yet");
     }

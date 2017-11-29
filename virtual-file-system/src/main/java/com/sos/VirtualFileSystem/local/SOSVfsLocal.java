@@ -153,11 +153,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void controlEncoding(final String pstrControlEncoding) {
-        //
-    }
-
-    @Override
     public String createScriptFile(final String pstrContent) throws Exception {
         return EMPTY_STRING;
     }

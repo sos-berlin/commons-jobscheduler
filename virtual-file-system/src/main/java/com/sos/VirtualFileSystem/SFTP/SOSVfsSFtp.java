@@ -1311,11 +1311,6 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         }
     }
 
-    @Override
-    public void controlEncoding(final String pstrControlEncoding) {
-        //
-    }
-
     public SFTPv3FileHandle getOutputFileHandle(final String pstrFileName) {
         openOutputFile(pstrFileName);
         return objOutputFile;

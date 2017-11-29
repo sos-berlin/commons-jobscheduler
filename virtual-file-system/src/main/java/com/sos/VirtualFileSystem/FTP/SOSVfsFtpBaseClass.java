@@ -24,8 +24,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.Util;
 import org.apache.log4j.Logger;
 
-import sos.util.SOSString;
-
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -53,6 +51,8 @@ import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.util.SOSString;
+
 /** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
@@ -68,10 +68,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     protected String gstrUser = EMPTY_STRING;
     protected SOSOptionHostName objHost = null;
     protected SOSOptionPortNumber objPort = null;
-    protected boolean utf8Supported = false;
-    protected boolean restSupported = false;
-    protected boolean mlsdSupported = false;
-    protected boolean modezSupported = false;
     protected boolean dataChannelEncrypted = false;
     protected SOSFtpServerReply objFTPReply = null;
     protected SOSOptionTransferMode objTransferMode = null;
@@ -359,14 +355,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public void controlEncoding(final String pstrControlEncoding) {
-        if (!pstrControlEncoding.isEmpty()) {
-            Client().setControlEncoding(pstrControlEncoding);
-            logReply();
-        }
-    }
-
-    @Override
     public String createScriptFile(final String pstrContent) throws Exception {
         notImplemented();
         return null;
@@ -477,35 +465,20 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (IOException e) {
             LOGGER.info(e.getMessage());
         }
-        if (objOptions.checkServerFeatures().isTrue()) {
-            sendCommand("FEAT");
-            if (objFTPReply.getCode() == FTPReply.SYSTEM_STATUS) {
-                String[] lines = objFTPReply.getMessages();
-                for (int i = 1; i < lines.length - 1; i++) {
-                    String feat = lines[i].trim().toUpperCase();
-                    if ("REST STREAM".equalsIgnoreCase(feat)) {
-                        restSupported = true;
-                        continue;
-                    }
-                    if ("UTF8".equalsIgnoreCase(feat)) {
-                        utf8Supported = true;
-                        Client().setControlEncoding("UTF-8");
-                        continue;
-                    }
-                    if ("MLSD".equalsIgnoreCase(feat)) {
-                        mlsdSupported = true;
-                        continue;
-                    }
-                    if ("MODE Z".equalsIgnoreCase(feat) || feat.startsWith("MODE Z ")) {
-                        modezSupported = true;
-                        continue;
-                    }
+        sendCommand("FEAT");
+        if (objFTPReply.getCode() == FTPReply.SYSTEM_STATUS) {
+            String[] lines = objFTPReply.getMessages();
+            for (int i = 1; i < lines.length - 1; i++) {
+                String feat = lines[i].trim().toUpperCase();
+                if ("UTF8".equals(feat)) {
+                    Client().setControlEncoding("UTF-8");
+                    break;
                 }
-            } else {
-                LOGGER.info("no valid response for FEAT command received: " + objFTPReply.toString());
             }
-            sendCommand("NOOP");
+        } else {
+            LOGGER.info("no valid response for FEAT command received: " + objFTPReply.toString());
         }
+        sendCommand("NOOP");
     }
 
     @Override

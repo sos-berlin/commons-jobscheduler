@@ -145,7 +145,6 @@ public class SOSVfsConnectionFactory {
         } else {
             client.transferMode(objOptions.transferMode);
         }
-        client.controlEncoding(objOptions.controlEncoding.getValue());
     }
 
     public void clear() {

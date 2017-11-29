@@ -29,8 +29,6 @@ import com.sos.JSHelper.Options.SOSOptionUserName;
 /** @author KB */
 public interface ISOSFtpOptions {
 
-    public abstract SOSOptionBoolean checkServerFeatures();
-
     public abstract SOSOptionString getAccount();
 
     public abstract void setAccount(SOSOptionString pAccount);

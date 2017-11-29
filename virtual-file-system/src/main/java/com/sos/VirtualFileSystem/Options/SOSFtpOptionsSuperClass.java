@@ -391,25 +391,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return this;
     }
 
-    @JSOptionDefinition(name = "CheckServerFeatures", description = "The available features of a ftp-server", key = "Check_Server_Features", 
-            type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean checkServerFeatures = new SOSOptionBoolean(this, CLASSNAME + ".Check_Server_Features", 
-            "The available features of a ftp-server", "false", "false", false);
-
-    @Override
-    public SOSOptionBoolean checkServerFeatures() {
-        return checkServerFeatures;
-    }
-
-    public String getCheckServerFeatures() {
-        return checkServerFeatures.getValue();
-    }
-
-    public SOSFtpOptionsSuperClass setCheckServerFeatures(final String pstrValue) {
-        checkServerFeatures.setValue(pstrValue);
-        return this;
-    }
-
     @JSOptionDefinition(name = "PollKeepConnection", description = "Keep connection while polling", key = "PollKeepConnection", 
             type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean pollKeepConnection = new SOSOptionBoolean(this, CLASSNAME + ".PollKeepConnection", "Keep connection while polling", 
@@ -435,20 +416,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     public SOSFtpOptionsSuperClass setFileNameEncoding(final String pstrValue) {
         fileNameEncoding.setValue(pstrValue);
-        return this;
-    }
-
-    @JSOptionDefinition(name = "ControlEncoding", description = "Specify the encoding-type, e.g. utf-8, used by the server", 
-            key = "ControlEncoding", type = "SOSOptionString", mandatory = false)
-    public SOSOptionEncoding controlEncoding = new SOSOptionEncoding(this, CLASSNAME + ".ControlEncoding", 
-            "Specify the encoding-type, e.g. utf-8, used by the server", "", "", false);
-
-    public String getControlEncoding() {
-        return controlEncoding.getValue();
-    }
-
-    public SOSFtpOptionsSuperClass setControlEncoding(final String pstrValue) {
-        controlEncoding.setValue(pstrValue);
         return this;
     }
 

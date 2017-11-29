@@ -38,7 +38,6 @@ public interface ISOSVfsFileTransfer {
     public long getFile(String remoteFile, String localFile, boolean append) throws Exception;
     public long getFile(String remoteFile, String localFile) throws Exception;
     public ISOSVirtualFile transferMode(SOSOptionTransferMode pobjFileTransferMode);
-    public void controlEncoding(final String pstrControlEncoding);
     public int passive();
     public void login(String strUserName, String strPassword);
     public Vector<String> nList() throws Exception;

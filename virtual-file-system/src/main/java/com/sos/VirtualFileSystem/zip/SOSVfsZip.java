@@ -632,11 +632,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void controlEncoding(final String pstrControlEncoding) {
-        //
-    }
-
-    @Override
     public void rmdir(final String pstrFolderName) throws IOException {
         notImplemented();
     }
