@@ -51,8 +51,7 @@ public class JobChainDiagramCreator {
         this.jsObjJobChain = jsObjJobChain;
         this.liveFolder = liveFolder;
     }
-    
-   
+
     private void newErrorNode(String state) {
         if (jobChainDiagrammData.getListOfJobChainNodes().get(state) == null) {
             Node nNotExist = jobChainDiagrammData.getGraph().getNodeOrNull(state);
@@ -159,10 +158,12 @@ public class JobChainDiagramCreator {
         }
 
         jobChainDiagrammData.getListOfFileOrderSinks().getList();
-        jobChainDiagrammData.getListOfJobChainNodes().setFirstNode(jobChainDiagrammData.getListOfFileOrderSinks().getFirstNode());
         jobChainDiagrammData.getListOfJobChainNodes().getList();
 
         String firstState = jobChainDiagrammData.getListOfJobChainNodes().getFirstNode();
+        if (firstState == null || firstState.isEmpty()) {
+            firstState = jobChainDiagrammData.getListOfJobChainNodes().getFirstNode();
+        }
 
         creatingOrders(firstState);
         String state = null;
@@ -254,11 +255,11 @@ public class JobChainDiagramCreator {
         }
         if (dotOutputPath == null || dotOutputPath.isEmpty()) {
             dotOutputPath = "./";
-                
+
         }
-        
+
         String name = jobChainDiagrammData.getListOfOrders().getName();
-    
+
         LOGGER.debug("createGraphVizImageFile.jobchain.getObjectName()" + name);
         File output = new File(imageOutputFolder.getAbsolutePath(), name + "." + graphVizImageType);
         io.writeGraphToFile(graphVizImageType, output);
