@@ -35,8 +35,11 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSc
 
     @Override
     protected void subAppend(final LoggingEvent event) {
-        String strMsg = getLayout().format(event);
-        try {
+        if (!hasLogger()) {
+            super.subAppend(event);
+        } else {
+            String strMsg = getLayout().format(event);
+
             Level lL = event.getLevel();
             int intL = lL.toInt();
             int intSOSLevel = 0;
@@ -68,8 +71,6 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSc
                     System.out.print(CLASSNAME + " (system.out): " + strMsg);
                 }
             }
-        } catch (Exception ex) {
-            System.out.print(CLASSNAME + " (system.out): " + strMsg);
         }
     }
 
@@ -82,7 +83,7 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSc
 
     @Override
     public boolean hasLogger() {
-        return sosLogger != null ? true : false;
+        return sosLogger != null;
     }
 
 }
