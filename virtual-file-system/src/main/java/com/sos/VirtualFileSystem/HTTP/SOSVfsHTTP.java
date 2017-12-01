@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.HTTP;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 
 import org.apache.commons.httpclient.Credentials;
@@ -16,21 +14,21 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.HttpsURL;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
-
-import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -41,7 +39,8 @@ import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author Robert Ehrlich */
+import sos.util.SOSString;
+
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
@@ -50,20 +49,25 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     private HttpClient httpClient;
     private HttpURL rootUrl = null;
     private HashMap<String, Long> fileSizes = null;
+    private HashMap<String, PutMethod> putMethods = null;
     private String proxyHost = null;
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
     private boolean simulateShell = false;
+    private int lastStatusCode = -1;
+    private boolean raiseJobSchedulerException = true;
+    private GetMethod lastInputStreamGetMethod = null;
 
     public SOSVfsHTTP() {
         super();
-        this.fileSizes = new HashMap<String, Long>();
+        fileSizes = new HashMap<String, Long>();
+        putMethods = new HashMap<String, PutMethod>();
     }
 
     @Override
     public ISOSConnection connect() throws Exception {
-        this.connect(this.connection2OptionsAlternate);
+        connect(connection2OptionsAlternate);
         return this;
     }
 
@@ -77,7 +81,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         proxyPort = connection2OptionsAlternate.proxyPort.value();
         proxyUser = connection2OptionsAlternate.proxyUser.getValue();
         proxyPassword = connection2OptionsAlternate.proxyPassword.getValue();
-        this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
+        doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
         return this;
     }
 
@@ -85,7 +89,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            this.doAuthenticate(authenticationOptions);
+            doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -97,10 +101,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     @Override
     public void login(final String user, final String password) {
         try {
-            this.doLogin(user, password);
+            doLogin(user, password);
             reply = "OK";
             LOGGER.info(SOSVfs_D_133.params(userName));
-            this.logReply();
+            logReply();
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_134.params("authentication"));
         }
@@ -109,15 +113,17 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     @Override
     public void disconnect() {
         reply = "disconnect OK";
-        this.fileSizes = new HashMap<String, Long>();
-        if (this.connectionManager != null) {
+        fileSizes = new HashMap<String, Long>();
+        putMethods = new HashMap<String, PutMethod>();
+        lastStatusCode = -1;
+        if (connectionManager != null) {
             try {
-                this.connectionManager.shutdown();
+                connectionManager.shutdown();
             } catch (Exception ex) {
                 reply = "disconnect: " + ex;
             }
-            this.connectionManager = null;
-            this.httpClient = null;
+            connectionManager = null;
+            httpClient = null;
         }
         LOGGER.info(reply);
     }
@@ -129,10 +135,15 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     private String normalizeHttpPath(String path) {
         if (!path.toLowerCase().startsWith("http://") && !path.toLowerCase().startsWith("https://")) {
+            if (path.startsWith("http:/")) {
+                return path.replace("http:/", "http://");
+            } else if (path.startsWith("https:/")) {
+                return path.replace("https:/", "https://");
+            }
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
-            path = this.httpClient.getHostConfiguration().getHostURL() + path;
+            path = httpClient.getHostConfiguration().getHostURL() + path;
         }
         return path;
     }
@@ -165,6 +176,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             } catch (Exception e) {
                 //
             }
+            resetLastInputStreamGetMethod();
         }
         return fileSize;
     }
@@ -181,7 +193,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     protected boolean fileExists(final String path) {
         GetMethod method = new GetMethod(normalizeHttpPath(path));
         try {
-            this.httpClient.executeMethod(method);
+            httpClient.executeMethod(method);
             return isSuccessStatusCode(method.getStatusCode());
         } catch (Exception ex) {
         } finally {
@@ -198,18 +210,18 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         this.userName = user;
         LOGGER.debug(SOSVfs_D_132.params(userName));
         if (!SOSString.isEmpty(userName)) {
-            Credentials credentials = new UsernamePasswordCredentials(this.userName, password);
-            this.httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+            Credentials credentials = new UsernamePasswordCredentials(userName, password);
+            httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         }
-        this.checkConnection();
+        checkConnection();
     }
 
     private void checkConnection() throws Exception {
-        String uri = this.rootUrl.getURI();
+        String uri = rootUrl.getURI();
         GetMethod method = new GetMethod(uri);
         try {
-            if (isServerErrorStatusCode(this.httpClient.executeMethod(method))) {
-                throw new Exception(this.getHttpMethodExceptionText(method, uri));
+            if (isErrorStatusCode(httpClient.executeMethod(method))) {
+                throw new Exception(getHttpMethodExceptionText(method, uri));
             }
         } catch (Exception ex) {
             throw ex;
@@ -224,56 +236,59 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
-        this.doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
+        doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
         return this;
     }
 
     private void doConnect(final String phost, final int pport) {
         if (!this.isConnected()) {
             try {
-                this.port = pport;
-                this.host = phost;
+                port = pport;
+                host = phost;
                 HostConfiguration hc = new HostConfiguration();
                 if (phost.toLowerCase().startsWith("https://") || phost.toLowerCase().startsWith("http://")) {
                     URL url = new URL(phost);
-                    this.port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
-                    this.host = url.getHost();
-                    String _rootUrl = url.getProtocol() + "://" + this.host + ":" + this.port + url.getPath();
+                    port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+                    host = url.getHost();
+                    String _rootUrl = url.getProtocol() + "://" + host + ":" + port + url.getPath();
                     if (!url.getPath().endsWith("/")) {
                         _rootUrl += "/";
                     }
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
-                        this.rootUrl = new HttpsURL(_rootUrl);
+                        rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
                         psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
-                            LOGGER.info("*********************** Security warning *********************************************************************");
+                            LOGGER.info(
+                                    "*********************** Security warning *********************************************************************");
                             LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
-                            LOGGER.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
+                            LOGGER.info(
+                                    "The certificate verification process will not verify the DNS name of the certificate presented by the server,");
                             LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
-                            LOGGER.info("**************************************************************************************************************");
+                            LOGGER.info(
+                                    "**************************************************************************************************************");
                         }
                         if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }
-                        Protocol p = new Protocol("https", (ProtocolSocketFactory) psf, this.port);
+                        Protocol p = new Protocol("https", (ProtocolSocketFactory) psf, port);
                         Protocol.registerProtocol("https", p);
-                        hc.setHost(this.host, this.port, p);
+                        hc.setHost(host, port, p);
                     } else {
-                        this.rootUrl = new HttpURL(_rootUrl);
+                        rootUrl = new HttpURL(_rootUrl);
                         hc.setHost(new HttpHost(host, port));
                     }
                 } else {
-                    this.rootUrl = new HttpURL(phost, pport, "/");
+                    rootUrl = new HttpURL(phost, pport, "/");
                     hc.setHost(new HttpHost(host, port));
                 }
                 LOGGER.info(SOSVfs_D_0101.params(host, port));
                 connectionManager = new MultiThreadedHttpConnectionManager();
                 httpClient = new HttpClient(connectionManager);
                 httpClient.setHostConfiguration(hc);
-                this.setProxyCredentionals();
-                this.logReply();
+                setProxyCredentionals();
+                logReply();
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
@@ -283,51 +298,225 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     private void setProxyCredentionals() throws Exception {
-        if (!SOSString.isEmpty(this.proxyHost)) {
-            LOGGER.info(String.format("using proxy: host = %s, port = %s, user = %s, pass = ?", this.proxyHost, this.proxyPort, this.proxyUser));
-            httpClient.getHostConfiguration().setProxy(this.proxyHost, this.proxyPort);
-            Credentials credentials = new UsernamePasswordCredentials(this.proxyUser, this.proxyPassword);
-            AuthScope authScope = new AuthScope(this.proxyHost, this.proxyPort);
-            this.httpClient.getState().setProxyCredentials(authScope, credentials);
+        if (!SOSString.isEmpty(proxyHost)) {
+            LOGGER.info(String.format("using proxy: host = %s, port = %s, user = %s, pass = ?", proxyHost, proxyPort, proxyUser));
+            httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort);
+            Credentials credentials = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            AuthScope authScope = new AuthScope(proxyHost, proxyPort);
+            httpClient.getState().setProxyCredentials(authScope, credentials);
         }
     }
 
     private boolean isSuccessStatusCode(int statusCode) {
-        if (statusCode == HttpStatus.SC_OK) {
+        lastStatusCode = statusCode;
+        if (statusCode >= 200 && statusCode < 300) {
             return true;
         }
         return false;
     }
 
-    private boolean isServerErrorStatusCode(int statusCode) {
-        if (statusCode >= 500) {
+    private boolean isErrorStatusCode(int statusCode) {
+        lastStatusCode = statusCode;
+        if (statusCode >= 400) {
             return true;
         }
         return false;
     }
 
     @Override
+    public void rename(String from, String to) {
+        from = normalizeHttpPath(from);
+        to = normalizeHttpPath(to);
+
+        PutMethod m = null;
+        InputStream is = null;
+        try {
+            m = new PutMethod(to);
+            is = getInputStream(from);
+            m.setRequestEntity(new InputStreamRequestEntity(is));
+            httpClient.executeMethod(m);
+            try {
+                is.close();
+                is = null;
+            } catch (Exception ex) {
+            }
+            if (!isSuccessStatusCode(m.getStatusCode())) {
+                throw new Exception(getHttpMethodExceptionText(m, to));
+            }
+            delete(from);
+        } catch (Exception e) {
+            reply = e.toString();
+            raiseException(e, SOSVfs_E_188.params("rename", from, to));
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
+            }
+            resetLastInputStreamGetMethod();
+            if (m != null) {
+                try {
+                    m.releaseConnection();
+                } catch (Exception e) {
+                }
+            }
+        }
+        reply = "mv OK";
+        logINFO(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
+    }
+
+    @Override
+    public void delete(String path) {
+        String uri = normalizeHttpPath(path);
+        DeleteMethod m = null;
+
+        try {
+            if (this.isDirectory(uri)) {
+                throw new JobSchedulerException(SOSVfs_E_186.params(uri));
+            }
+            m = new DeleteMethod(uri);
+            httpClient.executeMethod(m);
+            if (!isSuccessStatusCode(m.getStatusCode())) {
+                throw new Exception(getHttpMethodExceptionText(m, uri));
+            }
+        } catch (Exception ex) {
+            reply = ex.toString();
+            raiseException(ex, SOSVfs_E_187.params("delete", uri));
+        } finally {
+            if (m != null) {
+                try {
+                    m.releaseConnection();
+                } catch (Exception e) {
+                }
+            }
+        }
+        reply = "rm OK";
+        logINFO(getHostID(SOSVfs_D_181.params("delete", uri, getReplyString())));
+    }
+
+    @Override
+    public boolean isDirectory(final String path) {
+        String uri = normalizeHttpPath(path);
+        TraceMethod m = null;
+        try {
+            uri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
+            m = new TraceMethod(uri);
+            httpClient.executeMethod(m);
+            if (m.getStatusCode() <= 400) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        } finally {
+            if (m != null) {
+                try {
+                    m.releaseConnection();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
+    @Override
     public OutputStream getOutputStream() {
+        // TODO Auto-generated method stub
         return null;
     }
 
-    public static byte[] getBytesX(InputStream is) throws IOException {
-        int len;
-        int size = 1024;
-        byte[] buf;
-        if (is instanceof ByteArrayInputStream) {
-            size = is.available();
-            buf = new byte[size];
-            len = is.read(buf, 0, size);
-        } else {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            buf = new byte[size];
-            while ((len = is.read(buf, 0, size)) != -1) {
-                bos.write(buf, 0, len);
+    private ByteArrayOutputStream getOutputStream4Append(String path) throws Exception {
+        // @TODO original Name
+        path = path.replace(objOptions.atomicPrefix.getValue(), "");
+        path = path.replace(objOptions.atomicSuffix.getValue(), "");
+
+        InputStream source = null;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            raiseJobSchedulerException = false;
+            source = getInputStream(path);
+        } catch (RuntimeException ex) {
+            raiseJobSchedulerException = true;
+            if (lastStatusCode == 404) {
+                return out;
+            } else {
+                raiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
+                return null;
             }
-            buf = bos.toByteArray();
+        } finally {
+            raiseJobSchedulerException = true;
         }
-        return buf;
+
+        try {
+            if (source != null) {
+                byte[] buffer = new byte[objOptions.bufferSize.value()];
+                int bytesTransferred;
+                while ((bytesTransferred = source.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesTransferred);
+                }
+                source.close();
+                source = null;
+
+                out.flush();
+            }
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            resetLastInputStreamGetMethod();
+        }
+
+        return out;
+    }
+
+    @Override
+    public OutputStream getOutputStream(final String path) {
+        String uri = normalizeHttpPath(path);
+        try {
+            PutMethod m = new PutMethod(uri);
+            SOSVfsHTTPRequestEntity re = null;
+            if (objOptions.appendFiles.value()) {
+                re = new SOSVfsHTTPRequestEntity(getOutputStream4Append(path));
+            } else {
+                re = new SOSVfsHTTPRequestEntity();
+            }
+            m.setRequestEntity(re);
+
+            putMethods.put(uri, m);
+            return re.getOutputStream();
+        } catch (Exception ex) {
+            raiseException(ex, SOSVfs_E_193.params("getOutputStream()", uri));
+            return null;
+        }
+    }
+
+    protected void put(String path) throws Exception {
+        String uri = normalizeHttpPath(path);
+
+        PutMethod m = putMethods.get(uri);
+        if (m == null) {
+            throw new Exception(String.format("[%s]PutMethod is null", uri));
+        }
+
+        try {
+            httpClient.executeMethod(m);
+            if (!isSuccessStatusCode(m.getStatusCode())) {
+                throw new Exception(getHttpMethodExceptionText(m, uri));
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            putMethods.remove(uri);
+
+            try {
+                m.releaseConnection();
+            } catch (Exception e) {
+            }
+        }
+
     }
 
     public static Long getInputStreamLen(InputStream is) throws IOException {
@@ -352,14 +541,14 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public long size(final String path) throws Exception {
-        if (this.fileSizes.containsKey(path)) {
-            return this.fileSizes.get(path);
+        if (fileSizes.containsKey(path)) {
+            return fileSizes.get(path);
         }
         Long size = new Long(-1);
         String uri = normalizeHttpPath(path);
         GetMethod method = new GetMethod(uri);
         try {
-            this.httpClient.executeMethod(method);
+            httpClient.executeMethod(method);
             if (!isSuccessStatusCode(method.getStatusCode())) {
                 throw new Exception(this.getHttpMethodExceptionText(method, uri));
             }
@@ -367,10 +556,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             if (size < 0) {
                 size = getInputStreamLen(method.getResponseBodyAsStream());
             }
-            this.fileSizes.put(path, size);
         } catch (Exception ex) {
             throw ex;
         } finally {
+            fileSizes.put(path, size);
             try {
                 method.releaseConnection();
             } catch (Exception ex) {
@@ -398,21 +587,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     public InputStream getInputStream(final String fileName) {
         try {
             String uri = normalizeHttpPath(fileName);
-            GetMethod method = new GetMethod(uri);
-            this.httpClient.executeMethod(method);
-            if (!isSuccessStatusCode(method.getStatusCode())) {
-                throw new Exception(this.getHttpMethodExceptionText(method, uri));
+            lastInputStreamGetMethod = new GetMethod(uri);
+            httpClient.executeMethod(lastInputStreamGetMethod);
+            if (!isSuccessStatusCode(lastInputStreamGetMethod.getStatusCode())) {
+                throw new Exception(getHttpMethodExceptionText(lastInputStreamGetMethod, uri));
             }
-            return method.getResponseBodyAsStream();
+            return lastInputStreamGetMethod.getResponseBodyAsStream();
         } catch (Exception ex) {
-            raiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
+            if (raiseJobSchedulerException) {
+                raiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
+            } else {
+                throw new RuntimeException(ex);
+            }
             return null;
         }
-    }
-
-    @Override
-    public OutputStream getOutputStream(final String fileName) {
-        return null;
     }
 
     @Override
@@ -421,16 +609,16 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     private String getHttpMethodExceptionText(HttpMethod method, String uri) throws Exception {
-        return this.getHttpMethodExceptionText(method, uri, null);
+        return getHttpMethodExceptionText(method, uri, null);
     }
 
     private String getHttpMethodExceptionText(HttpMethod method, String uri, Exception ex) throws Exception {
-        int code = this.getMethodStatusCode(method);
-        String text = this.getMethodStatusText(method);
+        int code = getMethodStatusCode(method);
+        String text = getMethodStatusText(method);
         if (ex == null) {
-            return String.format("HTTP [%s][%s] = %s", uri, code, text);
+            return String.format("HTTP %s[%s][%s] = %s", method.getName(), uri, code, text);
         } else {
-            return String.format("HTTP [%s][%s][%s] = %s", uri, code, text, ex);
+            return String.format("HTTP %s[%s][%s][%s] = %s", method.getName(), uri, code, text, ex);
         }
     }
 
@@ -452,6 +640,16 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             //
         }
         return val;
+    }
+
+    public void resetLastInputStreamGetMethod() {
+        if (lastInputStreamGetMethod != null) {
+            try {
+                lastInputStreamGetMethod.releaseConnection();
+            } catch (Exception ex) {
+            }
+            lastInputStreamGetMethod = null;
+        }
     }
 
     @Override
