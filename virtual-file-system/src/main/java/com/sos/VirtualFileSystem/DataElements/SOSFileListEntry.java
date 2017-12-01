@@ -212,6 +212,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         executePreCommands();
         long totalBytesTransferred = 0;
         this.setStatus(enuTransferStatus.transferring);
+        // send event to inform that transfer starts?
         try {
             int cumulativeFileSeperatorLength = 0;
             byte[] buffer = new byte[objOptions.bufferSize.value()];
@@ -242,16 +243,23 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         md4create.update(compressedBytes.getBytes());
                     }
                 } else {
+//                    int actualBytesTransferred = 0;
                     while ((bytesTransferred = source.read(buffer)) != -1) {
                         try {
+//                            actualBytesTransferred += bytesTransferred;
                             Buffer compressedBytes = compress(buffer, bytesTransferred);
                             target.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+//                            Map<String, String> values = new HashMap<String, String>();
+//                            values.put("bytesTransferred", "" + actualBytesTransferred);
+//                            values.put("targetSize", "" + target.getFileSize());
+//                            Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+//                            eventParams.put("transferring:" + source.getName(), values);
+//                            sendEvent(eventParams);
                             Map<String, String> values = new HashMap<String, String>();
-                            values.put("bytesTransferred", "" + bytesTransferred);
-                            values.put("targetSize", "" + target.getFileSize());
-                            Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-                            eventParams.put("transferring:" + source.getName(), values);
-                            sendEvent(eventParams);
+                            values.put("sourcePath", this.getSourceFilename());
+                            values.put("targetPath", this.getTargetFilename());
+                            values.put("state", "5");
+                            updateDb(null, "YADE_FILE", values);
                             if (calculateIntegrityHash4Check) {
                                 md4check.update(buffer, 0, bytesTransferred);
                             }
@@ -259,6 +267,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                                 md4create.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
                             }
                         } catch (JobSchedulerException e) {
+                            Map<String, String> values = new HashMap<String, String>();
+                            values.put("sourcePath", this.getSourceFilename());
+                            values.put("state", "7");
+                            values.put("errorMessage", e.getMessage());
+                            updateDb(null, "YADE_FILE", values);
                             setEntryErrorMessage(e);
                             LOGGER.error(errorMessage);
                             break;
@@ -267,19 +280,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         setTransferProgress(totalBytesTransferred);
 
                         // event processing
-                        Map<String, String> values = new HashMap<String, String>();
-                        values.put("totalBytesTransferred", "" + totalBytesTransferred);
-                        values.put("targetSize", "" + target.getFileSize());
-                        Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-                        eventParams.put("transferred:" + source.getName(), values);
-                        sendEvent(eventParams);
+//                        Map<String, String> values = new HashMap<String, String>();
+//                        values.put("totalBytesTransferred", "" + totalBytesTransferred);
+//                        values.put("targetSize", "" + target.getFileSize());
+//                        Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+//                        eventParams.put("transferred:" + source.getName(), values);
+//                        sendEvent(eventParams);
                         // end of event processing
                     }
                 }
             }
             // TODO: define the structure of the event answer
-            
-            sendEvent(null);
+//            sendEvent(null);
             source.closeInput();
             target.closeOutput();
             closed = true;
@@ -315,11 +327,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void sendEvent(Map<String, Map<String, String>> eventParams) {
-        if (eventHandler != null && eventParams != null) {
-            eventHandler.sendEvent(eventParams);
-        }
-    }
+//    private void sendEvent(Map<String, Map<String, String>> eventParams) {
+//        if (eventHandler != null && eventParams != null) {
+//            eventHandler.sendEvent(eventParams);
+//        }
+//    }
     
     private void updateDb(Long id, String type, Map<String, String> values) {
         if (eventHandler != null) {
@@ -1026,6 +1038,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (!skipTransfer()) {
                 this.doTransfer(objSourceTransferFile, objTargetTransferFile);
                 long pdteDateTime = objSourceFile.getModificationDateTime();
+                LOGGER.debug("sourceFile.getModificationDateTime() = " + pdteDateTime);
                 if (pdteDateTime != -1) {
                     modificationDate = new Date(pdteDateTime);
                 }

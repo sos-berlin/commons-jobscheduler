@@ -37,6 +37,7 @@ import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.jade.db.DBItemYadeFiles;
 import com.sos.localization.Messages;
+import com.sos.scheduler.engine.base.sprayjson.typed.TypedJsonFormat;
 import com.sos.scheduler.engine.data.event.KeyedEvent;
 import com.sos.scheduler.engine.data.events.custom.VariablesCustomEvent;
 import com.sos.scheduler.engine.eventbus.EventBus;
@@ -593,16 +594,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         setStateText("*** ended without Errors ***");
     }
 
-    @Override
-    public void sendEvent(Map<String, Map<String, String>> eventParameters) {
-        // TODO Eventbus should return from JObScheduer API spooler.getEventBus()
-        EventBus e = null;
-        for(String key : eventParameters.keySet()) {
-            KeyedEvent<VariablesCustomEvent> event = VariablesCustomEvent.keyed(key, eventParameters.get(key));
-            e.publishJava(event);
-        }
-//        logger.info(String.format("sendEvent() was called! Type of Option Class: %1$s", this.getClass().getSimpleName()));
-    }
+//    @Override
+//    public void sendEvent(String key, Map<String, String> values) {
+//        KeyedEvent<VariablesCustomEvent> event = VariablesCustomEvent.keyed(key, values);
+//        spooler.execute_xml(String.format("<publish_event>%1$s</publish_event>", 
+//                event.event().jsonFormat().write(event.event()).toString()));
+//    }
     
     public IJobSchedulerEventHandler getEventHandler() {
         return eventHandler;
