@@ -6,35 +6,23 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
 
-    /** @param pstrFileName */
     public SOSVfsHTTPFile(final String path) {
         super(path);
     }
 
     @Override
     public boolean fileExists() {
-
         Long fs = objVFSHandler.getFileSize(fileName);
-
         return fs >= 0;
     }
 
-    /** \brief read
-     * 
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @return */
     @Override
     public int read(byte[] buffer) {
         try {
-            InputStream is = this.getFileInputStream();
+            InputStream is = getFileInputStream();
 
             if (is == null) {
                 throw new JobSchedulerException(SOSVfs_E_177.get());
@@ -46,20 +34,10 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief read
-     * 
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength
-     * @return */
     @Override
     public int read(byte[] buffer, int offset, int len) {
         try {
-            InputStream is = this.getFileInputStream();
+            InputStream is = getFileInputStream();
             if (is == null) {
                 throw new Exception(SOSVfs_E_177.get());
             }
@@ -70,4 +48,57 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
+    @Override
+    public void write(final byte[] buffer, final int offset, final int length) {
+        try {
+            if (objOutputStream == null) {
+                objOutputStream = objVFSHandler.getOutputStream(fileName);
+            }
+            if (objOutputStream == null) {
+                throw new Exception(SOSVfs_E_147.get());
+            }
+            objOutputStream.write(buffer, offset, length);
+        } catch (Exception e) {
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
+        }
+    }
+
+    @Override
+    public void write(final byte[] buffer) {
+        try {
+            if (objOutputStream == null) {
+                objOutputStream = objVFSHandler.getOutputStream(fileName);
+            }
+            if (objOutputStream == null) {
+                throw new Exception(SOSVfs_E_147.get());
+            }
+            objOutputStream.write(buffer);
+        } catch (Exception e) {
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
+        }
+    }
+
+    @Override
+    public void closeInput() {
+        super.closeInput();
+        ((SOSVfsHTTP) objVFSHandler).resetLastInputStreamGetMethod();
+    }
+
+    @Override
+    public void closeOutput() {
+        try {
+            if (objOutputStream != null) {
+                objOutputStream.flush();
+                objOutputStream.close();
+
+                ((SOSVfsHTTP) objVFSHandler).put(fileName);
+            }
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerException(e);
+        } finally {
+            objOutputStream = null;
+        }
+    }
 }
