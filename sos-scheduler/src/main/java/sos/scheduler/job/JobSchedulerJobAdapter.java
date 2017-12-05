@@ -311,6 +311,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (isJobchain()) {
             specialParams.put("SCHEDULER_JOB_CHAIN_NAME", spooler_task.order().job_chain().name());
             specialParams.put("SCHEDULER_JOB_CHAIN_TITLE", spooler_task.order().job_chain().title());
+            specialParams.put("SCHEDULER_JOB_CHAIN_PATH", spooler_task.order().job_chain().path());
             specialParams.put("SCHEDULER_ORDER_ID", spooler_task.order().id());
             specialParams.put("SCHEDULER_NODE_NAME", getCurrentNodeName(false));
             specialParams.put("SCHEDULER_NEXT_NODE_NAME", spooler_task.order().job_chain_node().next_state());
