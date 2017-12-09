@@ -3,7 +3,9 @@ package com.sos.auth.shiro;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -39,6 +41,7 @@ public class SOSLdapAuthorizing {
     private LdapContext ldapContext;
     private SOSLdapAuthorizingRealm sosLdapAuthorizingRealm;
     private AuthenticationToken authcToken;
+    private SOSLdapLoginUserName sosLdapLoginUserName;
 
     public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
         if (authorizationInfo_ == null) {
@@ -59,19 +62,20 @@ public class SOSLdapAuthorizing {
         if (ldapContext != null) {
 
             String userName = (String) principals.getPrimaryPrincipal();
+            sosLdapLoginUserName = new SOSLdapLoginUserName(userName);
             try {
-                getRoleNamesForUser(userName);
+                getRoleNamesForUser();
             } finally {
                 LdapUtils.closeContext(ldapContext);
             }
         }
     }
 
-    private Collection<String> getGroupNamesByGroup(String username) throws NamingException {
+    private Collection<String> getGroupNamesByGroup() throws NamingException {
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getGroupSearchFilter(), username);
+        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getGroupSearchFilter());
         LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
 
@@ -89,19 +93,19 @@ public class SOSLdapAuthorizing {
         return rolesForGroups;
     }
 
-    private String substituteUserName(String source,String username) {
-        String s = String.format(source, normalizeUser(username));
-        s = s.replaceAll("\\^s","%s");
-        s = String.format(s, username);
+    private String substituteUserName(String source) {
+        String s = String.format(source, sosLdapLoginUserName.getUserName());
+        s = s.replaceAll("\\^s", "%s");
+        s = String.format(s, sosLdapLoginUserName.getLogin());
         return s;
     }
-    
-    private Attributes getUserAttributes(String username) throws NamingException {
+
+    private Attributes getUserAttributes() throws NamingException {
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         Attributes user = null;
 
-        String searchFilter = "(" + sosLdapAuthorizingRealm.getUserNameAttribute() + "=%s";
+        String searchFilter = "(" + sosLdapAuthorizingRealm.getUserNameAttribute() + "=%s)";
         if (sosLdapAuthorizingRealm.getUserSearchFilter() == null) {
             LOGGER.warn(String.format(
                     "You have specified a value for userNameAttribute but you have not defined the userSearchFilter. The default filter %s will be used",
@@ -109,8 +113,8 @@ public class SOSLdapAuthorizing {
         } else {
             searchFilter = sosLdapAuthorizingRealm.getUserSearchFilter();
         }
-        
-        searchFilter = substituteUserName(searchFilter, username);
+
+        searchFilter = substituteUserName(searchFilter);
 
         LOGGER.debug(String.format("getting user from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
@@ -126,7 +130,8 @@ public class SOSLdapAuthorizing {
         NamingEnumeration<SearchResult> answer = ldapContext.search(searchBase, searchFilter, searchCtls);
 
         if (!answer.hasMore()) {
-            LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", username, searchFilter, searchBase));
+            LOGGER.warn(String.format("Cannot find user: %s with search filter %s and search base: %s ", sosLdapLoginUserName.getLogin(),
+                    searchFilter, searchBase));
         } else {
             SearchResult result = answer.nextElement();
             user = result.getAttributes();
@@ -136,12 +141,12 @@ public class SOSLdapAuthorizing {
 
     }
 
-    private Collection<String> getGroupNamesByUser(String username) throws NamingException {
+    private Collection<String> getGroupNamesByUser() throws NamingException {
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         Collection<String> groupNames = null;
 
-        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter(), username);
+        String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
 
         LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
@@ -149,8 +154,8 @@ public class SOSLdapAuthorizing {
         NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
 
         if (!answer.hasMore()) {
-            LOGGER.warn(String.format("Cannot find roles for user: %s with search filter %s and  search base: %s ", username, searchFilter,
-                    sosLdapAuthorizingRealm.getSearchBase()));
+            LOGGER.warn(String.format("Cannot find roles for user: %s with search filter %s and  search base: %s ", sosLdapLoginUserName
+                    .getUserName(), searchFilter, sosLdapAuthorizingRealm.getSearchBase()));
         } else {
             SearchResult result = answer.nextElement();
             String groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
@@ -160,37 +165,20 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("getting all attribute values using attribute " + memberOf);
                 groupNames = LdapUtils.getAllAttributeValues(memberOf);
             } else {
-                LOGGER.info(String.format("User: %s is not member of any group", username));
+                LOGGER.info(String.format("User: %s is not member of any group", sosLdapLoginUserName.getUserName()));
             }
         }
         return groupNames;
     }
 
-    private String normalizeUser(String username) {
-        String[] s = username.split("@");
-        if (s.length > 1) {
-            username = s[0];
-        } else {
-
-            s = username.split("\\\\");
-            if (s.length > 1) {
-                username = s[1];
-            }
-        }
-        return username;
-    }
-
-    private void getRoleNamesForUser(String username) throws Exception {
-        LOGGER.debug(String.format("Getting roles for user %s", username));
-        Ini ini = Globals.getIniFromSecurityManagerFactory();
-        Section s = ini.getSection("users");
-        if (s != null) {
-            LOGGER.debug("reading roles from section [users]");
-            String searchUsername = username.replaceAll(" ", "%20");
-
+    private boolean addRolesFromUserSection(Map<String, String> s, String searchUsername) {
+        boolean found = false;
+        if (searchUsername != null) {
+            searchUsername = searchUsername.replaceAll(" ", "%20").toLowerCase();
             String roles = s.get(searchUsername);
 
             if (roles != null) {
+                found = true;
                 String[] listOfRoles = roles.split(",");
                 if (listOfRoles.length > 1) {
                     for (int i = 1; i < listOfRoles.length; i++) {
@@ -200,26 +188,43 @@ public class SOSLdapAuthorizing {
                 }
             }
         }
+        return found;
 
+    }
 
-        String userPrincipalName = username;
-        
+    private void getRoleNamesForUser() throws Exception {
+        LOGGER.debug(String.format("Getting roles for user %s", sosLdapLoginUserName.getLogin()));
+        Ini ini = Globals.getIniFromSecurityManagerFactory();
+        Section s = ini.getSection("users");
+        HashMap<String, String> caseInsensitivUser = new HashMap<String, String>();
+
+        for (Map.Entry<String, String> entry : s.entrySet()) {
+            caseInsensitivUser.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+        if (s != null) {
+            LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
+            if (!addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getLogin())) {
+                LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getAlternateLogin() + " from section [users]");
+                addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getAlternateLogin());
+            }
+        }
+
         if (sosLdapAuthorizingRealm.getUserNameAttribute() != null && !sosLdapAuthorizingRealm.getUserNameAttribute().isEmpty()) {
             LOGGER.debug("get userPrincipalName for substitution from user record. Using username from login.");
-            Attributes user = getUserAttributes(userPrincipalName);
+            Attributes user = getUserAttributes();
             if (user != null) {
                 if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
                     LOGGER.error(String.format(
                             "can not find the attribute %s in the user record. Please check the setting .userNameAttribute in the shiro.ini configuration file",
                             sosLdapAuthorizingRealm.getUserNameAttribute()));
                 } else {
-                    userPrincipalName = user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString();
+                    sosLdapLoginUserName.setUserName(user.get(sosLdapAuthorizingRealm.getUserNameAttribute()).get().toString());
                 }
             } else {
-                LOGGER.info("using the username from login: " + userPrincipalName);
+                LOGGER.info("using the username from login: " + sosLdapLoginUserName.getLogin());
             }
         }
-        LOGGER.debug("userPrincipalName: " + userPrincipalName);
+        LOGGER.debug("userPrincipalName: " + sosLdapLoginUserName.getUserName());
 
         if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getGetRolesFromLdap())) {
             if ((sosLdapAuthorizingRealm.getSearchBase() != null || sosLdapAuthorizingRealm.getGroupSearchBase() != null) && (sosLdapAuthorizingRealm
@@ -230,9 +235,9 @@ public class SOSLdapAuthorizing {
                 Collection<String> groupNames;
 
                 if (sosLdapAuthorizingRealm.getGroupSearchFilter() != null && !sosLdapAuthorizingRealm.getGroupSearchFilter().isEmpty()) {
-                    groupNames = getGroupNamesByGroup(userPrincipalName);
+                    groupNames = getGroupNamesByGroup();
                 } else {
-                    groupNames = getGroupNamesByUser(userPrincipalName);
+                    groupNames = getGroupNamesByUser();
                 }
 
                 if (groupNames != null) {
@@ -250,7 +255,7 @@ public class SOSLdapAuthorizing {
         Hashtable<String, Object> env = new Hashtable<String, Object>();
         env.put(Context.PROVIDER_URL, ldapAdServer);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        
+
         env.put(Context.SECURITY_PRINCIPAL, "CN=ur,CN=sos,DC=berlin,DC=com");
         env.put(Context.SECURITY_CREDENTIALS, "aplsos");
 
@@ -269,7 +274,7 @@ public class SOSLdapAuthorizing {
             LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                     sosLdapAuthorizingRealm.getUserSearchFilter()));
 
-            String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter(), userPrincipalName);
+            String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
             LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                     searchFilter));
 
@@ -289,13 +294,17 @@ public class SOSLdapAuthorizing {
 
     protected void getRoleNamesForGroups(Collection<String> groupNames) {
         if (sosLdapAuthorizingRealm.getGroupRolesMap() != null) {
+            LOGGER.debug(String.format("Analysing groupRolesMapping: %s", sosLdapAuthorizingRealm.getGroupRolesMap()));
             for (String groupName : groupNames) {
+                LOGGER.debug(String.format("Looking for group: %s", groupName));
                 String strRoleNames = sosLdapAuthorizingRealm.getGroupRolesMap().get(groupName);
                 if (strRoleNames != null) {
                     LOGGER.debug(String.format("roles for group %s: %s", groupName, strRoleNames));
                     for (String roleName : strRoleNames.split(ROLE_NAMES_DELIMETER)) {
                         authorizationInfo.addRole(roleName);
                     }
+                }else {
+                    LOGGER.debug(String.format("Group %s not found in groupRolesMapping", groupName));
                 }
             }
         }
@@ -315,7 +324,7 @@ public class SOSLdapAuthorizing {
                 LOGGER.debug("using StartTls for authentication");
                 StartTlsRequest startTlsRequest = new StartTlsRequest();
                 StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
-                
+
                 if (Globals.withHostnameVerification) {
                     if ("false".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "off".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {

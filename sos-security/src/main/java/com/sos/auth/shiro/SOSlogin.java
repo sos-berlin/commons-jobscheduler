@@ -1,5 +1,7 @@
 package com.sos.auth.shiro;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -7,8 +9,12 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 public class SOSlogin {
@@ -23,7 +29,29 @@ public class SOSlogin {
         this.factory = factory;
     }
 
+    private void clearCache(String user) {
+        RealmSecurityManager mgr = (RealmSecurityManager) SecurityUtils.getSecurityManager();
+
+        Collection<Realm> realmCollection = mgr.getRealms();
+        for (Realm realm : realmCollection) {
+            if (realm instanceof AuthorizingRealm) {
+                SimplePrincipalCollection spc = new SimplePrincipalCollection();
+                spc.add(user, realm.getName());
+
+                AuthorizingRealm authRealm = (AuthorizingRealm) realm;
+                if (authRealm.getAuthenticationCache() != null) {
+                    authRealm.getAuthenticationCache().remove(spc);
+                }
+                if (authRealm.getAuthorizationCache() != null) {
+                    authRealm.getAuthorizationCache().remove(spc);
+                }
+            }
+        }
+
+    }
+
     public void createSubject(String user, String pwd) {
+        clearCache(user);
         UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
         if (currentUser != null) {
             try {
@@ -38,7 +66,7 @@ public class SOSlogin {
                 setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
                 currentUser = null;
             } catch (Exception ee) {
-                String cause = ""; 
+                String cause = "";
                 if (ee.getCause() != null) {
                     cause = ee.getCause().toString();
                 }
@@ -47,7 +75,7 @@ public class SOSlogin {
             }
         }
     }
-    
+
     public void login(String user, String pwd) {
         if (user == null) {
             currentUser = null;
@@ -68,15 +96,16 @@ public class SOSlogin {
     }
 
     private void init() {
+
         if (factory != null) {
             SecurityManager securityManager = factory.getInstance();
-            SecurityUtils.setSecurityManager(securityManager);  
+            SecurityUtils.setSecurityManager(securityManager);
         } else {
             LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
         }
-        
+
         currentUser = new Subject.Builder().buildSubject();
-        
+
         try {
             logout();
         } catch (InvalidSessionException e) {
