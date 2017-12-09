@@ -88,7 +88,7 @@ public class SOSEvaluateEvents {
         String response = "";
         Document doc = null;
         if (activeEvents == null) {
-            response = sendCommand("<param.get name=\"" + JobSchedulerConstants.eventVariableName + "\"/>");
+            response = sendCommand("<param.get name=\"" + JobSchedulerConstants.EVENTS_VARIABLE_NAME + "\"/>");
         }
         if (!"".equals(response) || activeEvents != null) {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -100,7 +100,7 @@ public class SOSEvaluateEvents {
                     doc = docBuilder.parse(new InputSource(new StringReader(response)));
                     NodeList params = doc.getElementsByTagName("param");
                     if (params.item(0) == null) {
-                        errmsg = "No events param found in Job Scheduler answer for " + JobSchedulerConstants.eventVariableName;
+                        errmsg = "No events param found in Job Scheduler answer for " + JobSchedulerConstants.EVENTS_VARIABLE_NAME;
                     } else {
                         NamedNodeMap attrParam = params.item(0).getAttributes();
                         String eventString = getText(attrParam.getNamedItem("value"));
