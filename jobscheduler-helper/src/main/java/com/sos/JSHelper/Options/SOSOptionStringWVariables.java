@@ -78,6 +78,7 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
             } else {
                 strT = substituteAllDate();
             }
+            super.setValue(strT);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
