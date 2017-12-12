@@ -505,10 +505,8 @@ public class SOSServicePermissionShiro {
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:change:hot_folder");
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:view:status");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:delete");
-
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:view:status");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event_action:create_event_manually");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:execute:delete");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:execute:add");
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:holiday_calendar:view:status");
 
@@ -658,7 +656,6 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setSchedule(o.createSOSPermissionJocCockpitSchedule());
             sosPermissionJocCockpit.setLock(o.createSOSPermissionJocCockpitLock());
             sosPermissionJocCockpit.setEvent(o.createSOSPermissionJocCockpitEvent());
-            sosPermissionJocCockpit.setEventAction(o.createSOSPermissionJocCockpitEventAction());
             sosPermissionJocCockpit.setHolidayCalendar(o.createSOSPermissionJocCockpitHolidayCalendar());
             sosPermissionJocCockpit.setAuditLog(o.createSOSPermissionJocCockpitAuditLog());
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
@@ -713,7 +710,8 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getLock().setChange(o.createSOSPermissionJocCockpitLockChange());
 
             sosPermissionJocCockpit.getEvent().setView(o.createSOSPermissionJocCockpitEventView());
-            sosPermissionJocCockpit.getEventAction().setView(o.createSOSPermissionJocCockpitEventActionView());
+            sosPermissionJocCockpit.getEvent().setExecute(o.createSOSPermissionJocCockpitEventExecute());
+
             sosPermissionJocCockpit.getHolidayCalendar().setView(o.createSOSPermissionJocCockpitHolidayCalendarView());
             sosPermissionJocCockpit.getAuditLog().setView(o.createSOSPermissionJocCockpitAuditLogView());
             sosPermissionJocCockpit.getMaintenanceWindow().setView(o.createSOSPermissionJocCockpitMaintenanceWindowView());
@@ -830,11 +828,8 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getLock().getView().setStatus(haveRight("sos:products:joc_cockpit:lock:view:status"));
 
             sosPermissionJocCockpit.getEvent().getView().setStatus(haveRight("sos:products:joc_cockpit:event:view:status"));
-            sosPermissionJocCockpit.getEvent().setDelete(haveRight("sos:products:joc_cockpit:event:delete"));
-
-            sosPermissionJocCockpit.getEventAction().getView().setStatus(haveRight("sos:products:joc_cockpit:event_action:view:status"));
-            sosPermissionJocCockpit.getEventAction().setCreateEventsManually(haveRight(
-                    "sos:products:joc_cockpit:event_action:create_event_manually"));
+            sosPermissionJocCockpit.getEvent().getExecute().setDelete(haveRight("sos:products:joc_cockpit:event:execute:delete"));
+            sosPermissionJocCockpit.getEvent().getExecute().setAdd(haveRight("sos:products:joc_cockpit:event:execute:add"));
 
             sosPermissionJocCockpit.getHolidayCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:holiday_calendar:view:status"));
             sosPermissionJocCockpit.getAuditLog().getView().setStatus(haveRight("sos:products:joc_cockpit:audit_log:view:status"));
