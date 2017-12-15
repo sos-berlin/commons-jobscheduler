@@ -612,6 +612,9 @@ public class SOSServicePermissionShiro {
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:assign:nonworking");            
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:assign:runtime");            
             
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:runtime:execute:edit_xml");
+
+            
             sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
             sosPermissionShiro.setSOSPermissionRoles(roles);
@@ -660,6 +663,9 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setAuditLog(o.createSOSPermissionJocCockpitAuditLog());
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
             sosPermissionJocCockpit.setYADE(o.createSOSPermissionJocCockpitYADE());
+            sosPermissionJocCockpit.setRuntime(o.createSOSPermissionJocCockpitRuntime());
+            sosPermissionJocCockpit.getRuntime().setExecute(o.createSOSPermissionJocCockpitRuntimeExecute());
+
             sosPermissionJocCockpit.setCalendar(o.createSOSPermissionJocCockpitCalendar());
             sosPermissionJocCockpit.getCalendar().setView(o.createSOSPermissionJocCockpitCalendarView());
             sosPermissionJocCockpit.getCalendar().setEdit(o.createSOSPermissionJocCockpitCalendarEdit());
@@ -865,6 +871,8 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setChange(haveRight("sos:products:joc_cockpit:calendar:assign:change"));
             sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setNonworking(haveRight("sos:products:joc_cockpit:calendar:assign:nonworking"));
             sosPermissionJocCockpit.getCalendar().getEdit().getAssign().setRuntime(haveRight("sos:products:joc_cockpit:calendar:assign:runtime"));
+
+            sosPermissionJocCockpit.getRuntime().getExecute().setEditXml(haveRight("sos:products:joc_cockpit:runtime:execute:edit_xml"));
             
         }
         return sosPermissionJocCockpit;
