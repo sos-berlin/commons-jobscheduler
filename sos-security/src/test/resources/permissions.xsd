@@ -373,21 +373,14 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="delete" type="xs:boolean"/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="EventAction">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="view">
+							<xs:element name="execute">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="add" type="xs:boolean"/>
+										<xs:element name="delete" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="createEventsManually" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -516,6 +509,19 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Runtime">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="editXml" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
