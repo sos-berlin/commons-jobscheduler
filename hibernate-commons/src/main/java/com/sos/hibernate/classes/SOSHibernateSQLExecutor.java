@@ -20,8 +20,6 @@ import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +36,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final SOSHibernateSession session;
+    private boolean execReturnsResultSet;
 
     protected SOSHibernateSQLExecutor(SOSHibernateSession sess) {
         session = sess;
@@ -168,7 +167,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             List<String> commands = getStatements(content);
             for (int i = 0; i < commands.size(); i++) {
                 command = commands.get(i);
-                if (isResultListQuery(command)) {
+                if (isResultListQuery(command, execReturnsResultSet)) {
                     LOGGER.debug(String.format("%s: executeQuery: %s", method, command));
                     ResultSet rs = null;
                     try {
@@ -809,15 +808,21 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
+    public boolean isExecReturnsResultSet() {
+        return execReturnsResultSet;
+    }
+
+    public void setExecReturnsResultSet(final boolean val) {
+        execReturnsResultSet = val;
+    }
+
     private String getMethodName(String name) {
         String prefix = session.getIdentifier() == null ? "" : String.format("[%s] ", session.getIdentifier());
         return String.format("%s%s", prefix, name);
     }
 
-    private boolean isResultListQuery(String sql) {
-        String patterns = "^select|^exec";
-        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = p.matcher(sql);
-        return matcher.find();
+    public static boolean isResultListQuery(final String sql, final boolean execReturnsResultSet) {
+        String stmt = sql.toLowerCase();
+        return stmt.startsWith("select") || (stmt.startsWith("exec") && execReturnsResultSet);
     }
 }
