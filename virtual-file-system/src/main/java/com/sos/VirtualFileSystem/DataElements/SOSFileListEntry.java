@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 
+import sos.util.SOSString;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
@@ -34,8 +36,6 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
-
-import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
@@ -255,11 +255,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 //                            Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
 //                            eventParams.put("transferring:" + source.getName(), values);
 //                            sendEvent(eventParams);
-                            Map<String, String> values = new HashMap<String, String>();
-                            values.put("sourcePath", this.getSourceFilename());
-                            values.put("targetPath", this.getTargetFilename());
-                            values.put("state", "5");
-                            updateDb(null, "YADE_FILE", values);
+                            if (eventHandler != null) {
+                                Map<String, String> values = new HashMap<String, String>();
+                                values.put("sourcePath", this.getSourceFilename());
+                                values.put("targetPath", this.getTargetFilename());
+                                values.put("state", "5");
+                                eventHandler.updateDb(null, "YADE_FILE", values);
+                            }
                             if (calculateIntegrityHash4Check) {
                                 md4check.update(buffer, 0, bytesTransferred);
                             }
@@ -267,11 +269,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                                 md4create.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
                             }
                         } catch (JobSchedulerException e) {
-                            Map<String, String> values = new HashMap<String, String>();
-                            values.put("sourcePath", this.getSourceFilename());
-                            values.put("state", "7");
-                            values.put("errorMessage", e.getMessage());
-                            updateDb(null, "YADE_FILE", values);
+                            if (eventHandler != null) {
+                                Map<String, String> values = new HashMap<String, String>();
+                                values.put("sourcePath", this.getSourceFilename());
+                                values.put("state", "7");
+                                values.put("errorMessage", e.getMessage());
+                                updateDb(null, "YADE_FILE", values);
+                            }
                             setEntryErrorMessage(e);
                             LOGGER.error(errorMessage);
                             break;

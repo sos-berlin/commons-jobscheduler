@@ -386,6 +386,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             objConn.authMethod.setValue(enuAuthenticationMethods.url);
             objConn.sshAuthMethod.setValue(enuAuthenticationMethods.url);
         }
+        if (transferType == enuTransferTypes.local) {
+            objConn.user.setValue(System.getProperty("user.name"));
+            this.user.setValue(System.getProperty("user.name"));
+        }
     }
 
     private void setDefaultHostPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort,

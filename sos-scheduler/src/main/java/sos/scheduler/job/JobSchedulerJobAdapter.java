@@ -595,12 +595,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         setStateText("*** ended without Errors ***");
     }
 
-//    @Override
-//    public void sendEvent(String key, Map<String, String> values) {
-//        KeyedEvent<VariablesCustomEvent> event = VariablesCustomEvent.keyed(key, values);
-//        spooler.execute_xml(String.format("<publish_event>%1$s</publish_event>", 
-//                event.event().jsonFormat().write(event.event()).toString()));
-//    }
+    @Override
+    public void sendEvent(String key, Map<String, String> values) {
+        // TODO Auto-generated method stub
+        // nothing to do, should be implemented in Job classes extending this one
+    }
     
     public IJobSchedulerEventHandler getEventHandler() {
         return eventHandler;
