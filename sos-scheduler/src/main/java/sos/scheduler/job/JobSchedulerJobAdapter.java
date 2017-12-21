@@ -20,6 +20,8 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import sos.spooler.Job_chain;
+import sos.spooler.Job_chain_node;
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
