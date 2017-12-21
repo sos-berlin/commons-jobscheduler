@@ -9,7 +9,6 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -21,13 +20,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
-import sos.scheduler.misc.ParameterSubstitutor;
-import sos.spooler.Job;
-import sos.spooler.Order;
-import sos.spooler.Supervisor_client;
-import sos.spooler.Variable_set;
-
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
@@ -35,12 +27,16 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.i18n.annotation.I18NResourceBundle;
-import com.sos.jade.db.DBItemYadeFiles;
 import com.sos.localization.Messages;
-import com.sos.scheduler.engine.base.sprayjson.typed.TypedJsonFormat;
-import com.sos.scheduler.engine.data.event.KeyedEvent;
-import com.sos.scheduler.engine.data.events.custom.VariablesCustomEvent;
-import com.sos.scheduler.engine.eventbus.EventBus;
+
+import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
+import sos.scheduler.misc.ParameterSubstitutor;
+import sos.spooler.Job;
+import sos.spooler.Job_chain;
+import sos.spooler.Job_chain_node;
+import sos.spooler.Order;
+import sos.spooler.Supervisor_client;
+import sos.spooler.Variable_set;
 
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl, IJobSchedulerEventHandler {
@@ -98,15 +94,16 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         logger = Logger.getRootLogger();
             if (!loggerConfigured) {
                 LOG_D_0020.toLog();
-                if (spooler_log.level() > 1) {
+                int schedulerLogLevel = spooler_log.level(); 
+                if (schedulerLogLevel > 1) {
                     logger.setLevel(Level.ERROR);
-                } else if (spooler_log.level() == 1) {
+                } else if (schedulerLogLevel == 1) {
                     logger.setLevel(Level.WARN);
-                } else if (spooler_log.level() == 0) {
+                } else if (schedulerLogLevel == 0) {
                     logger.setLevel(Level.INFO);
-                } else if (spooler_log.level() == -9) {
+                } else if (schedulerLogLevel == -9) {
                     logger.setLevel(Level.TRACE);
-                } else if (spooler_log.level() < 0) {
+                } else if (schedulerLogLevel < 0) {
                     logger.setLevel(Level.DEBUG);
                 }
                 loggerConfigured = true;
@@ -309,13 +306,16 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         specialParams.put("SCHEDULER_DIRECTORY", spooler.directory());
         specialParams.put("SCHEDULER_CONFIGURATION_DIRECTORY", spooler.configuration_directory());
         if (isJobchain()) {
-            specialParams.put("SCHEDULER_JOB_CHAIN_NAME", spooler_task.order().job_chain().name());
-            specialParams.put("SCHEDULER_JOB_CHAIN_TITLE", spooler_task.order().job_chain().title());
-            specialParams.put("SCHEDULER_JOB_CHAIN_PATH", spooler_task.order().job_chain().path());
-            specialParams.put("SCHEDULER_ORDER_ID", spooler_task.order().id());
+            Order order = spooler_task.order();
+            Job_chain jobChain = order.job_chain();
+            Job_chain_node jobChainNode = order.job_chain_node();
+            specialParams.put("SCHEDULER_JOB_CHAIN_NAME", jobChain.name());
+            specialParams.put("SCHEDULER_JOB_CHAIN_TITLE", jobChain.title());
+            specialParams.put("SCHEDULER_JOB_CHAIN_PATH", jobChain.path());
+            specialParams.put("SCHEDULER_ORDER_ID", order.id());
             specialParams.put("SCHEDULER_NODE_NAME", getCurrentNodeName(false));
-            specialParams.put("SCHEDULER_NEXT_NODE_NAME", spooler_task.order().job_chain_node().next_state());
-            specialParams.put("SCHEDULER_NEXT_ERROR_NODE_NAME", spooler_task.order().job_chain_node().error_state());
+            specialParams.put("SCHEDULER_NEXT_NODE_NAME", jobChainNode.next_state());
+            specialParams.put("SCHEDULER_NEXT_ERROR_NODE_NAME", jobChainNode.error_state());
         }
         specialParams.put("SCHEDULER_JOB_NAME", this.getJobName());
         specialParams.put("SCHEDULER_JOB_FOLDER", this.getJobFolder());
