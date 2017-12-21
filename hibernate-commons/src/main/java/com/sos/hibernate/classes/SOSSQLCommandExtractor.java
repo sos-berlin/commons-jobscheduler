@@ -253,7 +253,7 @@ public class SOSSQLCommandExtractor {
                 throw new SOSHibernateSQLCommandExtractorException(String.format("unsupported dbms=%s", this.dbms));
             }
 
-            LOGGER.debug(String.format("%s: commandSpltter=%s, commandCloser=%s", method, commandSpltter, commandCloser));
+            LOGGER.debug(String.format("%s: commandCloser=%s, commandSpltter=; or %s", method, commandCloser, commandSpltter));
 
             return sb.toString();
         }
