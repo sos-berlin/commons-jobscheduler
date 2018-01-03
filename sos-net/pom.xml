@@ -76,11 +76,6 @@
         </dependency>
 
 		<dependency>
-			<groupId>com.trilead</groupId>
-			<artifactId>sos-trilead-ssh2</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-net</groupId>
 			<artifactId>commons-net</artifactId>
 		</dependency>

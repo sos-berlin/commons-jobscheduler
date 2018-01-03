@@ -130,21 +130,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.trilead</groupId>
-            <artifactId>sos-trilead-ssh2</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.ethz.ganymed</groupId>
-            <artifactId>ganymed-ssh2</artifactId>
-        </dependency>
-
-        <!--dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency-->
-
-        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
