@@ -10,8 +10,6 @@ import org.apache.log4j.Logger;
 import org.linguafranca.pwdb.Entry;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
-import com.sos.CredentialStore.exceptions.CredentialStoreEntryExpired;
-import com.sos.CredentialStore.exceptions.CredentialStoreKeyNotFound;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -195,17 +193,18 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 kpd = new SOSKeePassDatabase(keePassFile);
                 kpd.load(keePassPassword, Paths.get(keePassKeyFile));
                 entry = kpd.getEntryByPath(objCredentialStoreOptions.credentialStoreKeyPath.getValue());
+                if (entry == null) {
+                    throw new Exception(String.format("[%s][%s]entry not found", objCredentialStoreOptions.credentialStoreFileName.getValue(),
+                            objCredentialStoreOptions.credentialStoreKeyPath.getValue()));
+                }
+                if (entry.getExpires()) {
+                    throw new Exception(String.format("[%s][%s]entry is expired (%s)", objCredentialStoreOptions.credentialStoreFileName.getValue(),
+                            objCredentialStoreOptions.credentialStoreKeyPath.getValue(), entry.getExpiryTime()));
+                }
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(e);
             }
-            if (entry == null) {
-                throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
-            }
-            if (entry.getExpires()) {
-                throw new CredentialStoreEntryExpired(entry.getExpiryTime());
-            }
-            boolean hideValuesFromCredentialStore = false;
             if (!entry.getUrl().isEmpty()) {
                 try {
                     // Possible Elements of an URL are:
@@ -238,17 +237,18 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                     //
                 }
             }
+            boolean hideValue = false;
             if (isNotEmpty(entry.getUsername())) {
                 user.setValue(entry.getUsername());
-                user.setHideValue(hideValuesFromCredentialStore);
+                user.setHideValue(hideValue);
             }
             if (isNotEmpty(entry.getPassword())) {
                 password.setValue(entry.getPassword());
-                password.setHideValue(hideValuesFromCredentialStore);
+                password.setHideValue(hideValue);
             }
             if (isNotEmpty(entry.getUrl())) {
                 setIfNotDirty(host, entry.getUrl());
-                host.setHideValue(hideValuesFromCredentialStore);
+                host.setHideValue(hideValue);
             }
             if (hostName.isNotDirty()) {
                 hostName.setValue(entry.getUrl().toString());
