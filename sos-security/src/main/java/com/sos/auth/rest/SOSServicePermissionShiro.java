@@ -598,11 +598,9 @@ public class SOSServicePermissionShiro {
             
             
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:status");
-            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:log");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:transfers");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:view:files");
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_start");
-            addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:yade:execute:transfer_store");
             
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:view:status");            
             addPermission(forUser,sosPermissionCommands.getSOSPermission(), "sos:products:joc_cockpit:calendar:edit:change");            
@@ -856,11 +854,9 @@ public class SOSServicePermissionShiro {
 
 
             sosPermissionJocCockpit.getYADE().getView().setStatus(haveRight("sos:products:joc_cockpit:yade:view:status"));
-            sosPermissionJocCockpit.getYADE().getView().setLog(haveRight("sos:products:joc_cockpit:yade:view:log"));
             sosPermissionJocCockpit.getYADE().getView().setTransfers(haveRight("sos:products:joc_cockpit:yade:view:transfers"));
             sosPermissionJocCockpit.getYADE().getView().setFiles(haveRight("sos:products:joc_cockpit:yade:view:files"));
             sosPermissionJocCockpit.getYADE().getExecute().setTransferStart(haveRight("sos:products:joc_cockpit:yade:execute:transfer_start"));
-            sosPermissionJocCockpit.getYADE().getExecute().setTransferStore(haveRight("sos:products:joc_cockpit:yade:execute:transfer_store"));
             
             sosPermissionJocCockpit.getCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:calendar:view:status"));
             
