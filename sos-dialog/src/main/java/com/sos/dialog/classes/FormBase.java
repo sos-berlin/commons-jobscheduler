@@ -16,8 +16,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.dialog.comparators.SortBaseComparator;
-// import com.sos.dialog.swtdesigner.SWTResourceManager;
+ 
 import com.sos.hibernate.classes.SosSortTableItem;
 
 /** @author KB */
@@ -103,32 +102,6 @@ public class FormBase extends JSToolBox {
         return shell;
     }
 
-    protected final void sortTable(Table table, SortBaseComparator[][] comparables) {
-        if (comparables != null) {
-            for (int i = 0; i < comparables[colPosForSort].length; i++) {
-                comparables[colPosForSort][i]._sortFlag = colSortFlag;
-            }
-            Arrays.sort(comparables[colPosForSort]);
-            SosSortTableItem tmpSortTableItem = new SosSortTableItem();
-            for (int i = 0; i < table.getItemCount(); i++) {
-                tmpSortTableItem.setTextBuffer(comparables[colPosForSort][i].sosSortTableItem.getTextBuffer());
-                tmpSortTableItem.setBackground(comparables[colPosForSort][i].sosSortTableItem.getBackground());
-                tmpSortTableItem.setForeground(comparables[colPosForSort][i].sosSortTableItem.getForeground());
-                tmpSortTableItem.setBackgroundColumn(comparables[colPosForSort][i].sosSortTableItem.getBackgroundColumn());
-                tmpSortTableItem.setForegroundColumn(comparables[colPosForSort][i].sosSortTableItem.getForegroundColumn());
-                tmpSortTableItem.setData(comparables[colPosForSort][i].sosSortTableItem.getData());
-                table.getItems()[i].setText(tmpSortTableItem.getTextBuffer());
-                table.getItems()[i].setBackground(tmpSortTableItem.getBackground());
-                table.getItems()[i].setForeground(tmpSortTableItem.getForeground());
-                if (tmpSortTableItem.getBackgroundColumn() != null) {
-                    for (int ii = 0; ii < tmpSortTableItem.getBackgroundColumn().length; ii++) {
-                        table.getItems()[i].setBackground(ii, tmpSortTableItem.getBackgroundColumn()[ii]);
-                        table.getItems()[i].setForeground(ii, tmpSortTableItem.getForegroundColumn()[ii]);
-                    }
-                }
-                table.getItems()[i].setData(tmpSortTableItem.getData());
-            }
-        }
-    }
+    
 
 }
