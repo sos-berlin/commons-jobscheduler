@@ -435,8 +435,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
     public void endTransaction() {
         dteTransactionEnd.setParsePattern(JSDateFormat.dfTIMESTAMPS);
         dteTransactionEnd.Value(now());
-        getJumpHistoryFile();
-        writeTransferHistory();
+//        getJumpHistoryFile();
+//        writeTransferHistory();
     }
 
     public void startTransaction() {
@@ -527,173 +527,173 @@ public class SOSFileList extends SOSVfsMessageCodes {
         this.endTransaction();
     }
 
-    public void writeTransferHistory() {
-        if (flgHistoryFileAlreadyWritten) {
-            return;
-        }
-        flgHistoryFileAlreadyWritten = true;
-        dteTransactionEnd.setFormatString(JSDateFormat.dfTIMESTAMPS);
-        dteTransactionStart.setFormatString(JSDateFormat.dfTIMESTAMPS);
-        long duration = dteTransactionEnd.getDateObject().getTime() - dteTransactionStart.getDateObject().getTime();
-        String operation = objOptions.operation.getValue();
-        String msg = SOSVfs_D_213.params(dteTransactionStart.getFormattedValue(), dteTransactionEnd.getFormattedValue(), duration, operation);
-        LOGGER.debug(msg);
-        JADE_REPORT_LOGGER.info(msg);
-        String historyFileName = objOptions.historyFileName.getValue();
-        JSFile historyFile = null;
-        try {
-            if (objOptions.historyFileName.isDirty()) {
-                historyFile = objOptions.historyFileName.getJSFile();
-                if (objOptions.historyFileAppendMode.isTrue()) {
-                    historyFile.setAppendMode(true);
-                    if (!historyFile.exists()) {
-                        historyFile.writeLine(historyFields + ";" + newHistoryFields);
-                    }
-                } else {
-                    historyFile.writeLine(historyFields + ";" + newHistoryFields);
-                }
-                for (SOSFileListEntry entry : objFileListEntries) {
-                    historyFile.writeLine(entry.toCsv());
-                    lngNoOfHistoryFileRecordsWritten++;
-                }
-                LOGGER.info(String.format("%s records written to history file '%s', HistoryFileAppendMode = %s", lngNoOfHistoryFileRecordsWritten,
-                        historyFileName, objOptions.historyFileAppendMode.getValue()));
-            }
-        } catch (Exception e) {
-            LOGGER.warn(String.format("Error occured during writing of the history file: %s", e.toString()));
-        } finally {
-            if (historyFile != null) {
-                try {
-                    historyFile.close();
-                } catch (Exception ex) {
-                    //
-                }
-            }
-        }
-        for (SOSFileListEntry entry : objFileListEntries) {
-            if (!entry.getTargetFileName().isEmpty()) {
-                msg = entry.toString();
-                LOGGER.info(msg);
-                JADE_REPORT_LOGGER.info(msg);
-            }
-        }
-    }
+//    public void writeTransferHistory() {
+//        if (flgHistoryFileAlreadyWritten) {
+//            return;
+//        }
+//        flgHistoryFileAlreadyWritten = true;
+//        dteTransactionEnd.setFormatString(JSDateFormat.dfTIMESTAMPS);
+//        dteTransactionStart.setFormatString(JSDateFormat.dfTIMESTAMPS);
+//        long duration = dteTransactionEnd.getDateObject().getTime() - dteTransactionStart.getDateObject().getTime();
+//        String operation = objOptions.operation.getValue();
+//        String msg = SOSVfs_D_213.params(dteTransactionStart.getFormattedValue(), dteTransactionEnd.getFormattedValue(), duration, operation);
+//        LOGGER.debug(msg);
+//        JADE_REPORT_LOGGER.info(msg);
+//        String historyFileName = objOptions.historyFileName.getValue();
+//        JSFile historyFile = null;
+//        try {
+//            if (objOptions.historyFileName.isDirty()) {
+//                historyFile = objOptions.historyFileName.getJSFile();
+//                if (objOptions.historyFileAppendMode.isTrue()) {
+//                    historyFile.setAppendMode(true);
+//                    if (!historyFile.exists()) {
+//                        historyFile.writeLine(historyFields + ";" + newHistoryFields);
+//                    }
+//                } else {
+//                    historyFile.writeLine(historyFields + ";" + newHistoryFields);
+//                }
+//                for (SOSFileListEntry entry : objFileListEntries) {
+//                    historyFile.writeLine(entry.toCsv());
+//                    lngNoOfHistoryFileRecordsWritten++;
+//                }
+//                LOGGER.info(String.format("%s records written to history file '%s', HistoryFileAppendMode = %s", lngNoOfHistoryFileRecordsWritten,
+//                        historyFileName, objOptions.historyFileAppendMode.getValue()));
+//            }
+//        } catch (Exception e) {
+//            LOGGER.warn(String.format("Error occured during writing of the history file: %s", e.toString()));
+//        } finally {
+//            if (historyFile != null) {
+//                try {
+//                    historyFile.close();
+//                } catch (Exception ex) {
+//                    //
+//                }
+//            }
+//        }
+//        for (SOSFileListEntry entry : objFileListEntries) {
+//            if (!entry.getTargetFileName().isEmpty()) {
+//                msg = entry.toString();
+//                LOGGER.info(msg);
+//                JADE_REPORT_LOGGER.info(msg);
+//            }
+//        }
+//    }
 
-    public void getJumpHistoryFile() {
-        String operation = this.objOptions.getDmzOption("operation");
-        String historyFilename = this.objOptions.getDmzOption("history");
-        if (!operation.isEmpty() && !historyFilename.isEmpty()) {
-            File localTempHistory = null;
-            Map<String, Map<String, String>> jumpHistoryRecords = null;
-            try {
-                if ("copyFromInternet".equals(operation)) {
-                    ISOSVirtualFile historyFile = this.objDataSourceClient.getFileHandle(historyFilename);
-                    if (historyFile.fileExists()) {
-                        localTempHistory = transferJumpHistoryFile(historyFile);
-                        jumpHistoryRecords = readJumpHistory(localTempHistory, "remote_filename");
-                        for (SOSFileListEntry entry : objFileListEntries) {
-                            if (!entry.getTargetFileName().isEmpty()) {
-                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileName())));
-                            }
-                        }
-                    }
-                } else if ("copyToInternet".equals(operation)) {
-                    ISOSVirtualFile historyFile = this.objDataTargetClient.getFileHandle(historyFilename);
-                    if (historyFile.fileExists()) {
-                        localTempHistory = transferJumpHistoryFile(historyFile);
-                        jumpHistoryRecords = readJumpHistory(localTempHistory, "local_filename");
-                        for (SOSFileListEntry entry : objFileListEntries) {
-                            if (!entry.getTargetFileName().isEmpty()) {
-                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileNameAndPath())));
-                            }
-                        }
-                    }
-                }
-            } catch (JobSchedulerException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new JobSchedulerException(e);
-            }
-
-        }
-
-    }
-
-    private Map<String, Map<String, String>> readJumpHistory(File localTempHistory, String primaryKey) {
-        Map<String, Map<String, String>> records = new HashMap<String, Map<String, String>>();
-        Map<String, String> recordFields = null;
-        String primaryKeyValue = "";
-        JSCsvFile hwFile = null;
-        try {
-            hwFile = new JSCsvFile(localTempHistory.getAbsolutePath());
-            hwFile.setCheckColumnCount(false);
-            String[] strValues = null;
-            hwFile.loadHeaders();
-            String[] strHeader = hwFile.getHeaders();
-            while ((strValues = hwFile.readCSVLine()) != null) {
-                primaryKeyValue = "";
-                recordFields = new HashMap<String, String>();
-                int j = 0;
-                for (String val : strValues) {
-                    String strFieldName = strHeader[j++];
-                    if (val == null) {
-                        val = "";
-                    }
-                    recordFields.put(strFieldName, val);
-                    if (strFieldName.endsWith(primaryKey)) {
-                        primaryKeyValue = adjustFileSeparator(val);
-                    }
-                }
-                if (!primaryKeyValue.isEmpty()) {
-                    records.put(primaryKeyValue, recordFields);
-                }
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(e);
-        } finally {
-            try {
-                if (hwFile != null) {
-                    hwFile.close();
-                }
-            } catch (IOException e) {
-                //
-            }
-        }
-        return records;
-    }
-
-    private File transferJumpHistoryFile(ISOSVirtualFile jumpHistoryFile) {
-        File localTempHistory = null;
-        if (jumpHistoryFile != null) {
-            byte[] buffer = new byte[objOptions.bufferSize.value()];
-            int bytesTransferred = 0;
-            FileOutputStream fos = null;
-            try {
-                localTempHistory = File.createTempFile("jade-", null);
-                localTempHistory.deleteOnExit();
-                fos = new FileOutputStream(localTempHistory);
-                while ((bytesTransferred = jumpHistoryFile.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesTransferred);
-                }
-            } catch (Exception e) {
-                throw new JobSchedulerException(e);
-            } finally {
-                try {
-                    if (fos != null) {
-                        fos.close();
-                    }
-                } catch (IOException e) {
-                    //
-                }
-                try {
-                    jumpHistoryFile.closeInput();
-                } catch (Exception e) {
-                    //
-                }
-            }
-        }
-        return localTempHistory;
-    }
+//    public void getJumpHistoryFile() {
+//        String operation = this.objOptions.getDmzOption("operation");
+//        String historyFilename = this.objOptions.getDmzOption("history");
+//        if (!operation.isEmpty() && !historyFilename.isEmpty()) {
+//            File localTempHistory = null;
+//            Map<String, Map<String, String>> jumpHistoryRecords = null;
+//            try {
+//                if ("copyFromInternet".equals(operation)) {
+//                    ISOSVirtualFile historyFile = this.objDataSourceClient.getFileHandle(historyFilename);
+//                    if (historyFile.fileExists()) {
+//                        localTempHistory = transferJumpHistoryFile(historyFile);
+//                        jumpHistoryRecords = readJumpHistory(localTempHistory, "remote_filename");
+//                        for (SOSFileListEntry entry : objFileListEntries) {
+//                            if (!entry.getTargetFileName().isEmpty()) {
+//                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileName())));
+//                            }
+//                        }
+//                    }
+//                } else if ("copyToInternet".equals(operation)) {
+//                    ISOSVirtualFile historyFile = this.objDataTargetClient.getFileHandle(historyFilename);
+//                    if (historyFile.fileExists()) {
+//                        localTempHistory = transferJumpHistoryFile(historyFile);
+//                        jumpHistoryRecords = readJumpHistory(localTempHistory, "local_filename");
+//                        for (SOSFileListEntry entry : objFileListEntries) {
+//                            if (!entry.getTargetFileName().isEmpty()) {
+//                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileNameAndPath())));
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (JobSchedulerException e) {
+//                throw e;
+//            } catch (Exception e) {
+//                throw new JobSchedulerException(e);
+//            }
+//
+//        }
+//
+//    }
+//
+//    private Map<String, Map<String, String>> readJumpHistory(File localTempHistory, String primaryKey) {
+//        Map<String, Map<String, String>> records = new HashMap<String, Map<String, String>>();
+//        Map<String, String> recordFields = null;
+//        String primaryKeyValue = "";
+//        JSCsvFile hwFile = null;
+//        try {
+//            hwFile = new JSCsvFile(localTempHistory.getAbsolutePath());
+//            hwFile.setCheckColumnCount(false);
+//            String[] strValues = null;
+//            hwFile.loadHeaders();
+//            String[] strHeader = hwFile.getHeaders();
+//            while ((strValues = hwFile.readCSVLine()) != null) {
+//                primaryKeyValue = "";
+//                recordFields = new HashMap<String, String>();
+//                int j = 0;
+//                for (String val : strValues) {
+//                    String strFieldName = strHeader[j++];
+//                    if (val == null) {
+//                        val = "";
+//                    }
+//                    recordFields.put(strFieldName, val);
+//                    if (strFieldName.endsWith(primaryKey)) {
+//                        primaryKeyValue = adjustFileSeparator(val);
+//                    }
+//                }
+//                if (!primaryKeyValue.isEmpty()) {
+//                    records.put(primaryKeyValue, recordFields);
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw new JobSchedulerException(e);
+//        } finally {
+//            try {
+//                if (hwFile != null) {
+//                    hwFile.close();
+//                }
+//            } catch (IOException e) {
+//                //
+//            }
+//        }
+//        return records;
+//    }
+//
+//    private File transferJumpHistoryFile(ISOSVirtualFile jumpHistoryFile) {
+//        File localTempHistory = null;
+//        if (jumpHistoryFile != null) {
+//            byte[] buffer = new byte[objOptions.bufferSize.value()];
+//            int bytesTransferred = 0;
+//            FileOutputStream fos = null;
+//            try {
+//                localTempHistory = File.createTempFile("jade-", null);
+//                localTempHistory.deleteOnExit();
+//                fos = new FileOutputStream(localTempHistory);
+//                while ((bytesTransferred = jumpHistoryFile.read(buffer)) != -1) {
+//                    fos.write(buffer, 0, bytesTransferred);
+//                }
+//            } catch (Exception e) {
+//                throw new JobSchedulerException(e);
+//            } finally {
+//                try {
+//                    if (fos != null) {
+//                        fos.close();
+//                    }
+//                } catch (IOException e) {
+//                    //
+//                }
+//                try {
+//                    jumpHistoryFile.closeInput();
+//                } catch (Exception e) {
+//                    //
+//                }
+//            }
+//        }
+//        return localTempHistory;
+//    }
 
     public long size() {
         long intS = 0;

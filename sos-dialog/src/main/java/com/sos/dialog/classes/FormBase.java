@@ -16,7 +16,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import com.sos.JSHelper.Basics.JSToolBox;
-  
+ 
+import com.sos.hibernate.classes.SosSortTableItem;
+
 /** @author KB */
 public class FormBase extends JSToolBox {
 
@@ -101,4 +103,5 @@ public class FormBase extends JSToolBox {
     }
 
     
+
 }

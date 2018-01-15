@@ -204,13 +204,16 @@ public class SOSLdapAuthorizing {
         if (s != null) {
             LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
             if (!addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getLogin())) {
-                LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getAlternateLogin() + " from section [users]");
-                addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getAlternateLogin());
+                LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
+                if (sosLdapLoginUserName.getAlternateLogin() != null) {
+                    if (!addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getAlternateLogin()))
+                        LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getAlternateLogin() + " from section [users]");
+                }
             }
         }
 
         if (sosLdapAuthorizingRealm.getUserNameAttribute() != null && !sosLdapAuthorizingRealm.getUserNameAttribute().isEmpty()) {
-            LOGGER.debug("get userPrincipalName for substitution from user record. Using username from login.");
+            LOGGER.debug("get userPrincipalName for substitution from user record.");
             Attributes user = getUserAttributes();
             if (user != null) {
                 if (user.get(sosLdapAuthorizingRealm.getUserNameAttribute()) == null) {
@@ -303,7 +306,7 @@ public class SOSLdapAuthorizing {
                     for (String roleName : strRoleNames.split(ROLE_NAMES_DELIMETER)) {
                         authorizationInfo.addRole(roleName);
                     }
-                }else {
+                } else {
                     LOGGER.debug(String.format("Group %s not found in groupRolesMapping", groupName));
                 }
             }

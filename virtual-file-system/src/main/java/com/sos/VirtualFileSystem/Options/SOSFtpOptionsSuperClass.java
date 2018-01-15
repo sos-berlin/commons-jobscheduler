@@ -462,6 +462,21 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return this;
     }
 
+    @JSOptionDefinition(name = "writeTransferHistory", 
+            description = "If this option is set to true, the transfer history will be stored in the DB.", 
+            key = "writeTransferHistory", type = "SOSOptionBoolean", mandatory = true)
+    public SOSOptionBoolean writeTransferHistory = new SOSOptionBoolean(this, CLASSNAME + ".writeTransferHistory", 
+            "If this option is set to true, the transfer history will be be stored in the DB.", "true", "true", false);
+
+    public String getWriteTransferHistory() {
+        return writeTransferHistory.getValue();
+    }
+
+    public SOSFtpOptionsSuperClass setWriteTransferHistory(final String value) {
+        writeTransferHistory.setValue(value);
+        return this;
+    }
+
     @JSOptionDefinition(name = "Scheduler_Transfer_Method", description = "The technical method of how to communicate with the JobScheduler", 
             key = "Scheduler_Transfer_Method", type = "SOSOptionJSTransferMethod", mandatory = true)
     public SOSOptionBackgroundServiceTransferMethod schedulerTransferMethod = new SOSOptionBackgroundServiceTransferMethod(this, 
