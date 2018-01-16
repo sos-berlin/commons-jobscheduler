@@ -29,7 +29,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(SOSConnection2OptionsAlternate.class);
-    private final String className = this.getClass().getSimpleName();
+    private static final String CLASSNAME = SOSConnection2OptionsAlternate.class.getSimpleName();
+    private String strAlternativePrefix = "";
     public boolean isSource = false;
 
     public SOSConnection2OptionsAlternate() {
@@ -58,7 +59,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString preTransferCommands = new SOSOptionCommandString(this, className + ".pre_transfer_commands",
+    public SOSOptionCommandString preTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".pre_transfer_commands",
             "FTP commands, which has to be executed before the transfer started.", "", "", false);
 
     public SOSOptionCommandString preFtpCommands = (SOSOptionCommandString) preTransferCommands.setAlias("pre_transfer_commands");
@@ -73,7 +74,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, className + ".post_transfer_Commands",
+    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands",
             "FTP commands, which has to be executed after the transfer ended.", "", "", false);
 
     public SOSOptionCommandString postFtpCommands = (SOSOptionCommandString) postTransferCommands.setAlias("post_Transfer_commands");
@@ -88,16 +89,16 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "post_transfer_commands_on_error", description = "Commands, which has to be executed after the transfer ended with errors.", key = "post_transfer_commands_on_error", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommandsOnError = new SOSOptionCommandString(this, className + ".post_transfer_commands_on_error",
+    public SOSOptionCommandString postTransferCommandsOnError = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_commands_on_error",
             "Commands, which has to be executed after the transfer ended with errors.", "", "", false);
 
     @JSOptionDefinition(name = "post_transfer_commands_final", description = "Commands, which has to be executed always after the transfer ended independent of "
             + "the transfer status.", key = "post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommandsFinal = new SOSOptionCommandString(this, className + ".post_transfer_commands_final",
+    public SOSOptionCommandString postTransferCommandsFinal = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_commands_final",
             "Commands, which has to be executed always after the transfer ended independent of the transfer status.", "", "", false);
 
     @JSOptionDefinition(name = "IgnoreCertificateError", description = "Ignore a SSL Certificate Error", key = "IgnoreCertificateError", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean ignoreCertificateError = new SOSOptionBoolean(this, className + ".IgnoreCertificateError",
+    public SOSOptionBoolean ignoreCertificateError = new SOSOptionBoolean(this, CLASSNAME + ".IgnoreCertificateError",
             "Ignore a SSL Certificate Error", "true", "true", true);
 
     public boolean getIgnoreCertificateError() {
@@ -110,11 +111,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "command_delimiter", description = "Command delimiter for pre and post commands", key = "command_delimiter", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString commandDelimiter = new SOSOptionString(this, className + ".command_delimiter",
+    public SOSOptionString commandDelimiter = new SOSOptionString(this, CLASSNAME + ".command_delimiter",
             "Command delimiter for pre and post commands", ";", ";", true);
 
     @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication", key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean alternateOptionsUsed = new SOSOptionBoolean(this, className + ".AlternateOptionsUsed",
+    public SOSOptionBoolean alternateOptionsUsed = new SOSOptionBoolean(this, CLASSNAME + ".AlternateOptionsUsed",
             "Alternate Options used for connection and/or authentication", "false", "false", false);
 
     public String getAlternateOptionsUsed() {
