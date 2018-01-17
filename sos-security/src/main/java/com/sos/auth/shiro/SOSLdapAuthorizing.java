@@ -198,11 +198,12 @@ public class SOSLdapAuthorizing {
         Section s = ini.getSection("users");
         HashMap<String, String> caseInsensitivUser = new HashMap<String, String>();
 
+
         if (s != null) {
+            LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
             for (Map.Entry<String, String> entry : s.entrySet()) {
                 caseInsensitivUser.put(entry.getKey().toLowerCase(), entry.getValue());
             }
-            LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
             if (!addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getLogin())) {
                 LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
                 if (sosLdapLoginUserName.getAlternateLogin() != null) {
@@ -314,6 +315,9 @@ public class SOSLdapAuthorizing {
     }
 
     public void setSosLdapAuthorizingRealm(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm) throws IOException, NamingException {
+
+        LOGGER.debug("...reading contextFactory. TLS=" + sosLdapAuthorizingRealm.getUseStartTls());
+
         this.sosLdapAuthorizingRealm = sosLdapAuthorizingRealm;
 
         ldapContextFactory = sosLdapAuthorizingRealm.getContextFactory();
@@ -331,24 +335,31 @@ public class SOSLdapAuthorizing {
                 if (Globals.withHostnameVerification) {
                     if ("false".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "off".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {
+                        LOGGER.debug("HostNameVerification=false");
                         tls.setHostnameVerifier(new DummyVerifier());
+                    }else {
+                        LOGGER.debug("HostNameVerification=true");
                     }
                 } else {
                     if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getHostNameVerification()) || "on".equalsIgnoreCase(sosLdapAuthorizingRealm
                             .getHostNameVerification())) {
+                        LOGGER.debug("HostNameVerification=true");
                     } else {
+                        LOGGER.debug("HostNameVerification=false");
                         tls.setHostnameVerifier(new DummyVerifier());
                     }
                 }
+                LOGGER.debug("negotiate ...");
                 tls.negotiate();
-                LOGGER.debug("negotiation succeeded");
+                LOGGER.debug("...negotiation succeeded");
                 if (jndiLdapContextFactory.getAuthenticationMechanism() != null) {
                     ldapContext.addToEnvironment(Context.SECURITY_AUTHENTICATION, jndiLdapContextFactory.getAuthenticationMechanism());
                 }
                 ldapContext.addToEnvironment(Context.SECURITY_PRINCIPAL, principal);
                 ldapContext.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+                LOGGER.debug("reconnect ...");
                 ldapContext.reconnect(ldapContext.getConnectControls());
-                LOGGER.debug("reconnection succeeded");
+                LOGGER.debug("... reconnection succeeded");
             }
         } catch (IOException e) {
             LdapUtils.closeContext(ldapContext);
