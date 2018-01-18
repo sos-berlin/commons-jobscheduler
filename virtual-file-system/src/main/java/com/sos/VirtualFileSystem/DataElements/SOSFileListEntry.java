@@ -946,32 +946,34 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (objDataSourceClient == null) {
                 setDataSourceClient((ISOSVfsFileTransfer) objConnPoolSource.getUnused());
             }
-            if (objDataTargetClient == null & objOptions.isNeedTargetClient()) {
-                setDataTargetClient((ISOSVfsFileTransfer) objConnPoolTarget.getUnused());
-            }
             ISOSVirtualFile objSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
             if (objSourceFile.notExists()) {
                 throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
             }
-            File subParent = null;
-            String subPath = "";
-            String strTargetFolderName = objOptions.targetDir.getValue();
-            String localDir = objOptions.sourceDir.getValue();
-            boolean flgIncludeSubdirectories = objOptions.recursive.value();
-            if (flgIncludeSubdirectories) {
-                if (objSourceFile.getParentVfs() != null && objSourceFile.getParentVfsFile().isDirectory()) {
-                    subPath = strSourceFileName.substring(localDir.length());
-                    subParent = new File(subPath).getParentFile();
-                    if (subParent != null) {
-                        subPath = adjustFileSeparator(subPath);
-                        subPath = subPath.substring(0, subPath.length() - new File(strSourceFileName.toString()).getName().length() - 1);
-                        objDataTargetClient.mkdir(strTargetFolderName + "/" + subPath);
-                    } else {
-                        subPath = "";
+            if (objDataTargetClient == null && objOptions.NeedTargetClient()) {
+                setDataTargetClient((ISOSVfsFileTransfer) objConnPoolTarget.getUnused());
+            }
+            if (objDataTargetClient != null && objOptions.NeedTargetClient()) {
+                File subParent = null;
+                String subPath = "";
+                String strTargetFolderName = objOptions.TargetDir.Value();
+                String localDir = objOptions.SourceDir.Value();
+                boolean flgIncludeSubdirectories = objOptions.recursive.value();
+                if (flgIncludeSubdirectories) {
+                    if (objSourceFile.getParentVfs() != null && objSourceFile.getParentVfsFile().isDirectory()) {
+                        subPath = strSourceFileName.substring(localDir.length());
+                        subParent = new File(subPath).getParentFile();
+                        if (subParent != null) {
+                            subPath = adjustFileSeparator(subPath);
+                            subPath = subPath.substring(0, subPath.length() - new File(strSourceFileName.toString()).getName().length() - 1);
+                            objDataTargetClient.mkdir(strTargetFolderName + "/" + subPath);
+                        } else {
+                            subPath = "";
+                        }
                     }
                 }
+                this.getTargetFile();
             }
-            this.getTargetFile();
             this.setRenamedSourceFilename();
             if (objOptions.transactional.value()) {
                 this.setTransactionalLocalFile();
