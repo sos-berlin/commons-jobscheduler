@@ -950,14 +950,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (objSourceFile.notExists()) {
                 throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
             }
-            if (objDataTargetClient == null && objOptions.NeedTargetClient()) {
+            if (objDataTargetClient == null && objOptions.isNeedTargetClient()) {
                 setDataTargetClient((ISOSVfsFileTransfer) objConnPoolTarget.getUnused());
             }
-            if (objDataTargetClient != null && objOptions.NeedTargetClient()) {
+            if (objDataTargetClient != null && objOptions.isNeedTargetClient()) {
                 File subParent = null;
                 String subPath = "";
-                String strTargetFolderName = objOptions.TargetDir.Value();
-                String localDir = objOptions.SourceDir.Value();
+                String strTargetFolderName = objOptions.targetDir.getValue();
+                String localDir = objOptions.sourceDir.getValue();
                 boolean flgIncludeSubdirectories = objOptions.recursive.value();
                 if (flgIncludeSubdirectories) {
                     if (objSourceFile.getParentVfs() != null && objSourceFile.getParentVfsFile().isDirectory()) {
