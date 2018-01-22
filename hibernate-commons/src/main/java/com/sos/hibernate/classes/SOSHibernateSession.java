@@ -403,10 +403,18 @@ public class SOSHibernateSession implements Serializable {
         try {
             if (isStatelessSession) {
                 StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
-                return sf.connection();
+                try {
+                    return sf.connection();
+                } catch (NullPointerException e) {
+                    throw new SOSHibernateConnectionException("can't get the SQL connection from the StatelessSessionImpl(NullPointerException)");
+                }
             } else {
                 SessionImpl sf = (SessionImpl) currentSession;
-                return sf.connection();
+                try {
+                    return sf.connection();
+                } catch (NullPointerException e) {
+                    throw new SOSHibernateConnectionException("can't get the SQL connection from the SessionImpl(NullPointerException)");
+                }
             }
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateConnectionException(e));
@@ -1180,7 +1188,7 @@ public class SOSHibernateSession implements Serializable {
         };
     }
 
-    private void onOpenSession() {
+    private void onOpenSession() throws SOSHibernateOpenSessionException {
         String method = getMethodName("onOpenSession");
         try {
             if (getFactory().getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
@@ -1189,6 +1197,8 @@ public class SOSHibernateSession implements Serializable {
                     getSQLExecutor().execute("set LOCK_TIMEOUT " + value);
                 }
             }
+        } catch (SOSHibernateConnectionException e) {
+            throw new SOSHibernateOpenSessionException(String.format("%s: %s", method, e.getMessage()), e);
         } catch (Exception e) {
             LOGGER.warn(String.format("%s: %s", method, e.toString()));
         }
