@@ -29,7 +29,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
             strValue = "";
         }
         String strLValue = super.getValue();
-        if (isNotEmpty()) {
+        if (isNotEmpty() && !(strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder())) {
                 strLValue = strLValue + "/";
             }
         return strLValue;
