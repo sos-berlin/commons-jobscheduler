@@ -2,7 +2,6 @@ package com.sos.VirtualFileSystem.Options;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
@@ -24,8 +23,6 @@ import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
-
-import sos.util.SOSString;
 
 @JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -179,6 +176,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public void checkCredentialStoreOptions() {
+        keepass_database.value(null);
+        keepass_database_entry.value(null);
         if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
             LOGGER.trace("entering checkCredentialStoreOptions ");
             objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
