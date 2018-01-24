@@ -13,6 +13,7 @@ import java.net.Proxy;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -498,6 +499,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void executeCommand(final String strCmd) throws Exception {
+        executeCommand(strCmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
         String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
         sendCommand(command);
         LOGGER.info(SOSVfs_D_151.params(strCmd, getReplyString()));
@@ -1362,8 +1368,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(getProxyHost(), getProxyPort()));
     }
 
-    public KeyStore loadKeyStore(String storeType, File storePath, String storePass) throws KeyStoreException, IOException,
-            GeneralSecurityException {
+    public KeyStore loadKeyStore(String storeType, File storePath, String storePass) throws KeyStoreException, IOException, GeneralSecurityException {
         KeyStore ks = KeyStore.getInstance(storeType);
         FileInputStream stream = null;
         try {

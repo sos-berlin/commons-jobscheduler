@@ -32,6 +32,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     private static final String CLASSNAME = SOSConnection2OptionsAlternate.class.getSimpleName();
     private String strAlternativePrefix = "";
     public boolean isSource = false;
+    public static final String KEEPASS_ENTRY_PATH_PREFIX = "cs://";
 
     public SOSConnection2OptionsAlternate() {
         //
@@ -192,7 +193,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             Entry<?, ?, ?, ?> entry = null;
             try {
                 kpd = new SOSKeePassDatabase(keePassFile);
-                kpd.load(keePassPassword, Paths.get(keePassKeyFile));
+                if (keePassKeyFile == null) {
+                    kpd.load(keePassPassword);
+                } else {
+                    kpd.load(keePassPassword, Paths.get(keePassKeyFile));
+                }
                 entry = kpd.getEntryByPath(objCredentialStoreOptions.credentialStoreKeyPath.getValue());
                 if (entry == null) {
                     throw new Exception(String.format("[%s][%s]entry not found", objCredentialStoreOptions.credentialStoreFileName.getValue(),
@@ -266,9 +271,13 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                     attachmentTargetFile.toFile().deleteOnExit();
                 }
             }
-            if (objCredentialStoreOptions.credentialStoreProcessNotesParams.isTrue()) {
-                commandLineArgs(entry.getNotes());
-            }
+        }
+    }
+
+    private void setOptionsFromKeePass(final SOSConnection2OptionsAlternate options, final SOSKeePassDatabase kpd) throws Exception {
+        String keePassUrl = null;
+        if (options.url.getValue().startsWith(KEEPASS_ENTRY_PATH_PREFIX)) {
+            keePassUrl = options.url.getValue();
         }
     }
 

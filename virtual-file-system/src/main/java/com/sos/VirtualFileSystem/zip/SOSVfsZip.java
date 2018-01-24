@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,7 +114,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     public void delete(final String pathname) throws IOException {
         throw new JSNotImplementedException();
     }
-    
+
     @Override
     public void disconnect() throws IOException {
         //
@@ -319,6 +320,11 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 
     @Override
     public void executeCommand(final String strCmd) throws Exception {
+        executeCommand(strCmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
         //
     }
 
