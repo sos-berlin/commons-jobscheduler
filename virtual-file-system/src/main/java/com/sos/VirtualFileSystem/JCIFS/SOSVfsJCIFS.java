@@ -9,19 +9,10 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 import java.util.Map.Entry;
-
-import jcifs.UniAddress;
-import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
-import jcifs.smb.SmbFileOutputStream;
-import jcifs.smb.SmbSession;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
-
-import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -32,6 +23,14 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import jcifs.UniAddress;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
+import jcifs.smb.SmbSession;
+import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
@@ -435,6 +434,21 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             //
         }
         return dateTime;
+    }
+    
+    public long getModificationTimeStamp(final String path) throws Exception {
+        SmbFile f = getSmbFile(this.normalizePath(path));
+        if (f.exists()) {
+            return f.getLastModified();
+        }
+        return -1L;
+    }
+    
+    public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception {
+        SmbFile f = getSmbFile(this.normalizePath(path));
+        if (f.exists()) {
+            f.setLastModified(timeStamp);
+        }
     }
 
     @Override

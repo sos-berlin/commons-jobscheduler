@@ -372,26 +372,26 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 
     @Override
     public long getModificationDateTime() {
-        long lngR = 0;
+        long lngR = 0L;
         try {
             lngR = new File(strFileName).lastModified();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            lngR = -1;
+            lngR = -1L;
         }
         return lngR;
     }
 
     @Override
     public long setModificationDateTime(final long pdteDateTime) {
-        long lngR = 0;
+        long lngR = 0L;
         try {
             File fleF = new File(strFileName);
             fleF.setLastModified(pdteDateTime);
             lngR = pdteDateTime;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            lngR = -1;
+            lngR = -1L;
         }
         return lngR;
     }

@@ -108,7 +108,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private SOSVfsConnectionPool objConnPoolTarget = null;
     private String errorMessage = null;
     private Map<String, String> jumpHistoryRecord = null;
-    private Date modificationDate = null;
     public long zeroByteCount = 0;
     private IJobSchedulerEventHandler eventHandler = null;
     public static Long sendEventTimeoutInMillis = 15000L;
@@ -1054,14 +1053,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
             if (!skipTransfer()) {
                 this.doTransfer(objSourceTransferFile, objTargetTransferFile);
-                long pdteDateTime = objSourceFile.getModificationDateTime();
-                LOGGER.debug("sourceFile.getModificationDateTime() = " + pdteDateTime);
-                if (pdteDateTime != -1) {
-                    modificationDate = new Date(pdteDateTime);
-                }
+                LOGGER.debug("sourceFile.getModificationDateTime() = " + lngFileModDate);
                 if (objOptions.keepModificationDate.isTrue()) {
-                    if (pdteDateTime != -1) {
-                        objTargetFile.setModificationDateTime(pdteDateTime);
+                    if (lngFileModDate != -1) {
+                        objTargetFile.setModificationDateTime(lngFileModDate);
                     }
                 }
                 if ((objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) && objOptions.transactional.isFalse()) {
@@ -1602,9 +1597,19 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             return buf;
         }
     }
+    
+    public long getModificationTimestamp() {
+        return lngFileModDate;
+    }
 
     public Date getModificationDate() {
-        return modificationDate;
+        if (lngFileModDate != -1) {
+            try {
+                return new Date(lngFileModDate);
+            } catch (Exception e) {
+            }
+        }
+        return null;
     }
 
     public void setEventHandler(IJobSchedulerEventHandler eventHandler) {
@@ -1674,7 +1679,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         public String getParentDirBaseName() {
             return parentDirBaseName;
         }
-
     }
 
 }

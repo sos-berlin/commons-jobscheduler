@@ -2,6 +2,8 @@ package com.sos.VirtualFileSystem.WebDAV;
 
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -10,6 +12,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAVFile.class);
     private String strFileName = null;
 
     public SOSVfsWebDAVFile(final String pstrFileName) {
@@ -74,6 +77,23 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             ((SOSVfsWebDAVOutputStream) objOutputStream).put();
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_173.params("write", fileName));
+        }
+    }
+    
+    @Override
+    public long setModificationDateTime(final long timeStamp) {
+        //not supported
+        return -1L;
+    }
+
+    @Override
+    public long getModificationDateTime() {
+        try {
+            SOSVfsWebDAV handler = (SOSVfsWebDAV) objVFSHandler;
+            return handler.getModificationTimeStamp(fileName);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
         }
     }
 

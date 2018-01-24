@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
@@ -342,17 +343,26 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
                 lngT = df.parse(strT.trim()).getTime();
             } catch (Exception e) {
-                lngT = -1;
+                lngT = -1L;
             }
         } else {
-            lngT = -1;
+            lngT = -1L;
         }
         return lngT;
     }
 
     @Override
     public long setModificationDateTime(final long pdteDateTime) {
-        return 0;
+        try {
+            SOSVfsFtp handler = (SOSVfsFtp) objVFSHandler;
+            Date d = new Date(pdteDateTime);
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+            handler.Client().setModificationTime(strFileName, df.format(d));
+            return pdteDateTime;
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
+        }
     }
 
 }
