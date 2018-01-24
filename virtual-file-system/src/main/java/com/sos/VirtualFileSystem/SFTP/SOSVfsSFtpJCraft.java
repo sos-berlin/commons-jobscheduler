@@ -47,6 +47,7 @@ import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.keepass.SOSKeePassDatabase;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
@@ -422,7 +423,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (isUnix) {
                         envs.append(String.format("export %s=%s;", k, v));
                     } else {
-                        //envs.append(String.format("set %s=%s&", k, v));
+                        // envs.append(String.format("set %s=%s&", k, v));
                     }
                 });
                 LOGGER.debug(String.format("setEnv: %s", envs.toString()));
@@ -639,16 +640,28 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.debug(SOSVfs_D_132.params(userName));
         setKnownHostsFile();
         this.createSession(userName, host, port);
+
         if (authenticationOptions.getAuthMethod().isPublicKey()) {
             LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
-            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
-            authenticationFile.checkMandatory(true);
-            if (authenticationFile.isNotEmpty()) {
-                if (authenticationOptions.getPassword().isNotEmpty()) {
-                    secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
-                } else {
-                    secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+
+            Object kd = connection2OptionsAlternate.keepass_database.value();
+            if (kd == null) {
+                SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
+                authenticationFile.checkMandatory(true);
+                if (authenticationFile.isNotEmpty()) {
+                    if (authenticationOptions.getPassword().isNotEmpty()) {
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
+                    } else {
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+                    }
                 }
+            } else {
+                SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
+                org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
+                        (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
+                byte[] pr = kpd.getAttachment(entry);
+                byte[] p = authenticationOptions.getPassword().isNotEmpty() ? authenticationOptions.getPassword().getValue().getBytes() : null;
+                secureChannel.addIdentity("yade", pr, (byte[]) null, p);
             }
         } else {
             if (authenticationOptions.getAuthMethod().isPassword()) {
@@ -816,7 +829,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         outContent2LogLevel = false;
         try {
             executeCommand("echo $PATH");
-            //@TODO parse PATH
+            // @TODO parse PATH
             if (outContent.toString().indexOf("bin:") > -1) {
                 isUnix = true;
             }
