@@ -96,6 +96,7 @@
 										<xs:element name="removeOldInstances" type="xs:boolean"/>
 										<xs:element name="manageCategories" type="xs:boolean"/>
 										<xs:element name="editPermissions" type="xs:boolean"/>
+										<xs:element name="editMainSection"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -467,7 +468,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="log" type="xs:boolean"/>
 										<xs:element name="transfers" type="xs:boolean"/>
 										<xs:element name="files" type="xs:boolean"/>
 									</xs:sequence>
@@ -476,7 +476,6 @@
 							<xs:element name="execute">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="transferStore" type="xs:boolean"/>
 										<xs:element name="transferStart" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>

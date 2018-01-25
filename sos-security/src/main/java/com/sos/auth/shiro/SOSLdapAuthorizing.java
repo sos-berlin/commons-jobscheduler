@@ -21,7 +21,6 @@ import javax.naming.ldap.StartTlsResponse;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-import org.apache.log4j.Logger;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.config.Ini;
@@ -30,11 +29,14 @@ import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.joc.Globals;
 
 public class SOSLdapAuthorizing {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSLdapAuthorizing.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSLdapAuthorizing.class);
     private static final String ROLE_NAMES_DELIMETER = "\\|";
     private SimpleAuthorizationInfo authorizationInfo = null;
     private LdapContextFactory ldapContextFactory;
@@ -51,6 +53,7 @@ public class SOSLdapAuthorizing {
             authorizationInfo = authorizationInfo_;
         }
         try {
+        	LOGGER.debug("setting roles with queryForAuthorizationInfo()");
             queryForAuthorizationInfo(principalCollection);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -76,7 +79,7 @@ public class SOSLdapAuthorizing {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getGroupSearchFilter());
-        LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+        LOGGER.debug(String.format("getting groups from ldap using group search filter %s with group search base %s", sosLdapAuthorizingRealm.getGroupSearchBase(),
                 searchFilter));
 
         NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getGroupSearchBase(), searchFilter, searchCtls);
@@ -148,7 +151,7 @@ public class SOSLdapAuthorizing {
 
         String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
 
-        LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+        LOGGER.debug(String.format("getting groups from ldap using user search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                 searchFilter));
 
         NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
@@ -233,9 +236,7 @@ public class SOSLdapAuthorizing {
         if ("true".equalsIgnoreCase(sosLdapAuthorizingRealm.getGetRolesFromLdap())) {
             if ((sosLdapAuthorizingRealm.getSearchBase() != null || sosLdapAuthorizingRealm.getGroupSearchBase() != null) && (sosLdapAuthorizingRealm
                     .getGroupSearchFilter() != null || sosLdapAuthorizingRealm.getUserSearchFilter() != null)) {
-                LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm
-                        .getSearchBase(), sosLdapAuthorizingRealm.getUserSearchFilter()));
-
+                
                 Collection<String> groupNames;
 
                 if (sosLdapAuthorizingRealm.getGroupSearchFilter() != null && !sosLdapAuthorizingRealm.getGroupSearchFilter().isEmpty()) {
@@ -275,11 +276,10 @@ public class SOSLdapAuthorizing {
         String userPrincipalName = username;
 
         if (sosLdapAuthorizingRealm.getSearchBase() != null && sosLdapAuthorizingRealm.getUserSearchFilter() != null) {
-            LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
-                    sosLdapAuthorizingRealm.getUserSearchFilter()));
+            LOGGER.debug("user_search_filter=" + sosLdapAuthorizingRealm.getUserSearchFilter());
 
             String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
-            LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
+            LOGGER.debug(String.format("getting groups from ldap using user search filter %s with search base %s", sosLdapAuthorizingRealm.getSearchBase(),
                     searchFilter));
 
             NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
@@ -366,7 +366,7 @@ public class SOSLdapAuthorizing {
             LOGGER.error("Failed to negotiate TLS connection': ", e);
             throw e;
         } catch (NamingException e) {
-            LOGGER.warn(e);
+            LOGGER.warn(e.getMessage(),e);
         } catch (Throwable t) {
             LdapUtils.closeContext(ldapContext);
             LOGGER.error("Unexpected failure to negotiate TLS connection", t);

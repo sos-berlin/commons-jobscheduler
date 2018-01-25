@@ -2,7 +2,6 @@ package com.sos.auth.shiro;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -16,10 +15,13 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class SOSlogin {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSlogin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSlogin.class);
 
     private Subject currentUser;
     private String msg;

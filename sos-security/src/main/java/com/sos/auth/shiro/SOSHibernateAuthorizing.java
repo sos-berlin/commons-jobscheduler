@@ -2,7 +2,8 @@ package com.sos.auth.shiro;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -13,7 +14,7 @@ import com.sos.auth.shiro.db.SOSUserPermissionDBItem;
 
 public class SOSHibernateAuthorizing implements ISOSAuthorizing {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateAuthorizing.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizing.class);
     private SimpleAuthorizationInfo authorizationInfo = null;
     private String configurationFileName = null;
 
