@@ -3,6 +3,8 @@ package com.sos.VirtualFileSystem.JCIFS;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -11,6 +13,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFSFile.class);
+    
     public SOSVfsJCIFSFile(final String pstrFileName) {
         super(pstrFileName);
     }
@@ -72,5 +76,27 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
         return objOutputStream;
     }
+    
+    @Override
+    public long setModificationDateTime(final long timeStamp) {
+        try {
+            SOSVfsJCIFS handler = (SOSVfsJCIFS) objVFSHandler;
+            handler.setModificationTimeStamp(fileName, timeStamp);
+            return timeStamp;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
+        }
+    }
 
+    @Override
+    public long getModificationDateTime() {
+        try {
+            SOSVfsJCIFS handler = (SOSVfsJCIFS) objVFSHandler;
+            return handler.getModificationTimeStamp(fileName);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
+        }
+    }
 }

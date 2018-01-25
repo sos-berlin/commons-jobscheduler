@@ -47,6 +47,7 @@ import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.keepass.SOSKeePassDatabase;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
@@ -56,12 +57,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private Session sshSession = null;
     private ChannelSftp sftpClient = null;
     private JSch secureChannel = null;
-    private Map environmentVariables = null;
     private Integer exitCode;
     private String exitSignal;
     private StringBuffer outContent;
     private StringBuffer errContent;
     private boolean isRemoteWindowsShell = false;
+    private boolean isUnix = false;
+    private boolean outContent2LogLevel = true;
     private int connectionTimeout = 0;
     private boolean simulateShell = false;
     private SOSOptionProxyProtocol proxyProtocol = null;
@@ -395,6 +397,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void executeCommand(String cmd) {
+        executeCommand(cmd, null);
+    }
+
+    @Override
+    public void executeCommand(String cmd, Map<String, String> env) {
         cmd = cmd.trim();
         final String endOfLine = System.getProperty("line.separator");
         channelExec = null;
@@ -408,8 +415,21 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
             channelExec.setPty(isSimulateShell());
+
+            StringBuffer envs = new StringBuffer();
+            if (env != null) {
+                env.forEach((k, v) -> {
+                    // envs.append(String.format("set %s=%s", k, v));
+                    if (isUnix) {
+                        envs.append(String.format("export %s=%s;", k, v));
+                    } else {
+                        // envs.append(String.format("set %s=%s&", k, v));
+                    }
+                });
+                LOGGER.debug(String.format("setEnv: %s", envs.toString()));
+            }
             cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
-            channelExec.setCommand(cmd);
+            channelExec.setCommand(envs.toString() + cmd);
             channelExec.setInputStream(null);
             channelExec.setErrStream(null);
             out = channelExec.getInputStream();
@@ -437,7 +457,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             if (outContent.length() > 0) {
-                LOGGER.info(outContent);
+                if (outContent2LogLevel) {
+                    LOGGER.info(outContent);
+                } else {
+                    LOGGER.debug(outContent);
+                }
             }
             LOGGER.debug(SOSVfs_D_163.params("stderr", cmd));
             errReader = new BufferedReader(new InputStreamReader(err));
@@ -500,12 +524,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
+            if (outContent2LogLevel) {
+                logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
+            } else {
+                logDEBUG(getHostID(SOSVfs_I_192.params(getReplyString())));
+            }
         }
-    }
-
-    public void setEnvironmentVariables(Map<String, String> envVariables) {
-        this.environmentVariables = envVariables;
     }
 
     @Override
@@ -616,16 +640,31 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.debug(SOSVfs_D_132.params(userName));
         setKnownHostsFile();
         this.createSession(userName, host, port);
+
         if (authenticationOptions.getAuthMethod().isPublicKey()) {
             LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
-            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
-            authenticationFile.checkMandatory(true);
-            if (authenticationFile.isNotEmpty()) {
-                if (authenticationOptions.getPassword().isNotEmpty()) {
-                    secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
-                } else {
-                    secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+
+            Object kd = connection2OptionsAlternate.keepass_database.value();
+            if (kd == null) {
+                LOGGER.debug(String.format("use authentication file=%s", authenticationOptions.getAuthFile().getValue()));
+                SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
+                authenticationFile.checkMandatory(true);
+                if (authenticationFile.isNotEmpty()) {
+                    if (authenticationOptions.getPassword().isNotEmpty()) {
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
+                    } else {
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+                    }
                 }
+            } else {
+                SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
+                org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
+                        (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
+
+                LOGGER.debug(String.format("use authentication file from KeePass attachment=%s", entry.getPath()));
+                byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
+                byte[] p = authenticationOptions.getPassword().isNotEmpty() ? authenticationOptions.getPassword().getValue().getBytes() : null;
+                secureChannel.addIdentity("yade", pr, (byte[]) null, p);
             }
         } else {
             if (authenticationOptions.getAuthMethod().isPassword()) {
@@ -724,9 +763,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             config.put("compression.s2c", "zlib@openssh.com,zlib,none");
             config.put("compression.c2s", "zlib@openssh.com,zlib,none");
             config.put("compression_level", connection2OptionsAlternate.zlibCompressionLevel.getValue());
-            LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s",
-                    config.getProperty("compression.s2c"), config.getProperty("compression.c2s"),
-                    connection2OptionsAlternate.zlibCompressionLevel.getValue()));
+            LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s", config.getProperty(
+                    "compression.s2c"), config.getProperty("compression.c2s"), connection2OptionsAlternate.zlibCompressionLevel.getValue()));
         }
         sshSession.setConfig(config);
         setCommandsTimeout();
@@ -748,8 +786,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
             int connTimeout = 30000; // 0,5 Minute
-            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(),
-                    proxyHost, proxyPort, proxyUser));
+            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost,
+                    proxyPort, proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
@@ -781,9 +819,28 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
         }
         sshConnection = sshSession.openChannel("sftp");
-            sshSession.setConfig("compression_level", connection2OptionsAlternate.zlibCompressionLevel.getValue());
+        sshSession.setConfig("compression_level", connection2OptionsAlternate.zlibCompressionLevel.getValue());
         sshConnection.connect();
         sftpClient = (ChannelSftp) sshConnection;
+
+        checkIsUnix();
+        LOGGER.debug(String.format("isUnix=%s", isUnix));
+    }
+
+    private void checkIsUnix() {
+        isUnix = false;
+        outContent2LogLevel = false;
+        try {
+            executeCommand("echo $PATH");
+            // @TODO parse PATH
+            if (outContent.toString().indexOf("bin:") > -1) {
+                isUnix = true;
+            }
+        } catch (Throwable e) {
+            isUnix = false;
+        } finally {
+            outContent2LogLevel = true;
+        }
     }
 
     @Override

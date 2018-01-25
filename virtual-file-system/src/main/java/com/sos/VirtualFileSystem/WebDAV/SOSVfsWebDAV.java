@@ -464,6 +464,24 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
         return dateTime;
     }
+    
+    public long getModificationTimeStamp(final String path) throws Exception {
+        WebdavResource res = null;
+        try {
+            res = this.getResource(path);
+            if (res.exists()) {
+                return res.getGetLastModified();
+            }
+            return -1L;
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
 
     @Override
     protected boolean fileExists(final String filename) {

@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -63,7 +64,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         boolean result = false;
         Statement stmt = null;
         try {
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             for (String sql : sqls) {
                 LOGGER.debug(String.format("%s: sql=%s", method, sql));
                 try {
@@ -92,7 +93,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         int[] result = null;
         Statement stmt = null;
         try {
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             for (String sql : sqls) {
                 LOGGER.debug(String.format("%s: addBatch sql=%s", method, sql));
                 try {
@@ -123,7 +124,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             rs = stmt.executeQuery(sql);
         } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e, sql);
@@ -163,7 +164,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         Statement stmt = null;
         String command = null;
         try {
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             List<String> commands = getStatements(content);
             for (int i = 0; i < commands.size(); i++) {
                 command = commands.get(i);
@@ -203,7 +204,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         int result = 0;
         Statement stmt = null;
         try {
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             for (String sql : sqls) {
                 LOGGER.debug(String.format("%s: sql=%s", method, sql));
                 try {
@@ -233,7 +234,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         int result = -1;
         CallableStatement stmt = null;
         try {
-            stmt = session.getConnection().prepareCall(sql);
+            stmt = getConnection().prepareCall(sql);
             result = stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e, sql);
@@ -260,7 +261,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             if (SOSString.isEmpty(sql)) {
                 throw new SOSHibernateSQLExecutorException("missing sql");
             }
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {
                 result = rs.getBytes(1);
@@ -307,7 +308,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             if (path == null) {
                 throw new SOSHibernateSQLExecutorException("path is null");
             }
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             int len = 0;
             if (rs.next()) {
@@ -378,7 +379,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             if (SOSString.isEmpty(sql)) {
                 throw new SOSHibernateSQLExecutorException("missing sql");
             }
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             try {
                 rs = stmt.executeQuery(sql);
             } catch (SQLException e) {
@@ -447,7 +448,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             if (path == null) {
                 throw new SOSHibernateSQLExecutorException("path is null");
             }
-            stmt = session.getConnection().createStatement();
+            stmt = getConnection().createStatement();
             try {
                 rs = stmt.executeQuery(sql);
             } catch (SQLException e) {
@@ -531,7 +532,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
 
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
         try {
-            Statement stmt = session.getConnection().createStatement();
+            Statement stmt = getConnection().createStatement();
             return stmt.executeQuery(sql);
         } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e, sql);
@@ -675,7 +676,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     }
                 }
             }
-            pstmt = session.getConnection().prepareStatement(sql.toString());
+            pstmt = getConnection().prepareStatement(sql.toString());
             pstmt.setBinaryStream(1, inputStream, dataLength);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -776,7 +777,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     }
                 }
             }
-            pstmt = session.getConnection().prepareStatement(sql.toString());
+            pstmt = getConnection().prepareStatement(sql.toString());
             pstmt.setCharacterStream(1, reader, dataLength);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -819,6 +820,14 @@ public class SOSHibernateSQLExecutor implements Serializable {
     private String getMethodName(String name) {
         String prefix = session.getIdentifier() == null ? "" : String.format("[%s] ", session.getIdentifier());
         return String.format("%s%s", prefix, name);
+    }
+
+    private Connection getConnection() throws SOSHibernateException {
+        Connection conn = session.getConnection();
+        if (conn == null) {
+            throw new SOSHibernateSQLExecutorException("SQL connection is null");
+        }
+        return conn;
     }
 
     public static boolean isResultListQuery(final String sql, final boolean execReturnsResultSet) {

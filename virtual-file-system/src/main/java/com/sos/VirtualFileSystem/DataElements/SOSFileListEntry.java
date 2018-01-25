@@ -108,10 +108,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private SOSVfsConnectionPool objConnPoolTarget = null;
     private String errorMessage = null;
     private Map<String, String> jumpHistoryRecord = null;
-    private Date modificationDate = null;
     public long zeroByteCount = 0;
     private IJobSchedulerEventHandler eventHandler = null;
     public static Long sendEventTimeoutInMillis = 15000L;
+    public static String ENV_VAR_FILE_TRANSFER_STATUS = "YADE_FILE_TRANSFER_STATUS";
+    public static String ENV_VAR_FILE_IS_TRANSFERRED = "YADE_FILE_IS_TRANSFERRED";
 
     public enum enuTransferStatus {
         transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
@@ -243,18 +244,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         md4create.update(compressedBytes.getBytes());
                     }
                 } else {
-//                    int actualBytesTransferred = 0;
+                    // int actualBytesTransferred = 0;
                     while ((bytesTransferred = source.read(buffer)) != -1) {
                         try {
-//                            actualBytesTransferred += bytesTransferred;
+                            // actualBytesTransferred += bytesTransferred;
                             Buffer compressedBytes = compress(buffer, bytesTransferred);
                             target.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
-//                            Map<String, String> values = new HashMap<String, String>();
-//                            values.put("bytesTransferred", "" + actualBytesTransferred);
-//                            values.put("targetSize", "" + target.getFileSize());
-//                            Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-//                            eventParams.put("transferring:" + source.getName(), values);
-//                            sendEvent(eventParams);
+                            // Map<String, String> values = new HashMap<String, String>();
+                            // values.put("bytesTransferred", "" + actualBytesTransferred);
+                            // values.put("targetSize", "" + target.getFileSize());
+                            // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                            // eventParams.put("transferring:" + source.getName(), values);
+                            // sendEvent(eventParams);
                             if (eventHandler != null) {
                                 Map<String, String> values = new HashMap<String, String>();
                                 values.put("sourcePath", this.getSourceFilename());
@@ -284,18 +285,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         setTransferProgress(totalBytesTransferred);
 
                         // event processing
-//                        Map<String, String> values = new HashMap<String, String>();
-//                        values.put("totalBytesTransferred", "" + totalBytesTransferred);
-//                        values.put("targetSize", "" + target.getFileSize());
-//                        Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-//                        eventParams.put("transferred:" + source.getName(), values);
-//                        sendEvent(eventParams);
+                        // Map<String, String> values = new HashMap<String, String>();
+                        // values.put("totalBytesTransferred", "" + totalBytesTransferred);
+                        // values.put("targetSize", "" + target.getFileSize());
+                        // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                        // eventParams.put("transferred:" + source.getName(), values);
+                        // sendEvent(eventParams);
                         // end of event processing
                     }
                 }
             }
             // TODO: define the structure of the event answer
-//            sendEvent(null);
+            // sendEvent(null);
             source.closeInput();
             target.closeOutput();
             closed = true;
@@ -331,12 +332,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-//    private void sendEvent(Map<String, Map<String, String>> eventParams) {
-//        if (eventHandler != null && eventParams != null) {
-//            eventHandler.sendEvent(eventParams);
-//        }
-//    }
-    
+    // private void sendEvent(Map<String, Map<String, String>> eventParams) {
+    // if (eventHandler != null && eventParams != null) {
+    // eventHandler.sendEvent(eventParams);
+    // }
+    // }
+
     private void updateDb(Long id, String type, Map<String, String> values) {
         if (eventHandler != null) {
             // id of the DBItem
@@ -415,16 +416,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
-        executeCommands(commandOptionName, fileTransfer, optionCommands, null);
+        executeCommands(commandOptionName, fileTransfer, optionCommands, null, null);
     }
 
     private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
             final SOSOptionString optionCommandDelimiter) {
+        executeCommands(commandOptionName, fileTransfer, optionCommands, optionCommandDelimiter, null);
+    }
+
+    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
+            final SOSOptionString optionCommandDelimiter, Map<String, String> env) {
         final String methodName = "SOSFileListEntry::executeCommands";
         String commands = optionCommands.getValue().trim();
         if (commands.length() > 0) {
             commands = replaceVariables(commands);
-            LOGGER.debug(String.format("[%s] %s", commandOptionName, SOSVfs_D_0151.params(commands)));
+            LOGGER.info(String.format("[%s] %s", commandOptionName, SOSVfs_D_0151.params(commands)));
             String delimiter = null;
             if (optionCommandDelimiter != null) {
                 delimiter = optionCommandDelimiter.getValue();
@@ -434,7 +440,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             }
             if (delimiter.isEmpty()) {
                 try {
-                    fileTransfer.getHandler().executeCommand(commands);
+                    fileTransfer.getHandler().executeCommand(commands, env);
                 } catch (JobSchedulerException e) {
                     LOGGER.error(e.toString());
                     throw e;
@@ -447,7 +453,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 for (String command : values) {
                     if (command.trim().length() > 0) {
                         try {
-                            fileTransfer.getHandler().executeCommand(command);
+                            fileTransfer.getHandler().executeCommand(command, env);
                         } catch (JobSchedulerException e) {
                             LOGGER.error(e.toString());
                             throw e;
@@ -480,20 +486,24 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void executePostCommands() {
+        Map<String, String> env = new HashMap<String, String>();
+        env.put(ENV_VAR_FILE_TRANSFER_STATUS, eTransferStatus.name());
+        env.put(ENV_VAR_FILE_IS_TRANSFERRED, eTransferStatus.equals(enuTransferStatus.transferred) ? "1" : "0");
+
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
-                    .getAlternatives().commandDelimiter);
+                    .getAlternatives().commandDelimiter, env);
         } else {
-            executeCommands("post_command", objDataTargetClient, objOptions.postCommand);
-            executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter);
+            executeCommands("post_command", objDataTargetClient, objOptions.postCommand, null, env);
+            executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter, env);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
-                    .getAlternatives().commandDelimiter);
+                    .getAlternatives().commandDelimiter, env);
         } else {
-            executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter);
+            executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter, env);
         }
     }
 
@@ -906,7 +916,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
         EntryPaths sourceFile = new EntryPaths(objOptions.sourceDir.getValue(), resolveDotsInPath(strSourceFileName));
         EntryPaths sourceFileRenamed = new EntryPaths(objOptions.sourceDir.getValue(), strRenamedSourceFileName);
-        
+
         Properties vars = objOptions.getTextProperties();
         vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
         vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
@@ -1043,14 +1053,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
             if (!skipTransfer()) {
                 this.doTransfer(objSourceTransferFile, objTargetTransferFile);
-                long pdteDateTime = objSourceFile.getModificationDateTime();
-                LOGGER.debug("sourceFile.getModificationDateTime() = " + pdteDateTime);
-                if (pdteDateTime != -1) {
-                    modificationDate = new Date(pdteDateTime);
-                }
+                LOGGER.debug("sourceFile.getModificationDateTime() = " + lngFileModDate);
                 if (objOptions.keepModificationDate.isTrue()) {
-                    if (pdteDateTime != -1) {
-                        objTargetFile.setModificationDateTime(pdteDateTime);
+                    if (lngFileModDate != -1) {
+                        objTargetFile.setModificationDateTime(lngFileModDate);
                     }
                 }
                 if ((objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) && objOptions.transactional.isFalse()) {
@@ -1591,13 +1597,23 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             return buf;
         }
     }
+    
+    public long getModificationTimestamp() {
+        return lngFileModDate;
+    }
 
     public Date getModificationDate() {
-        return modificationDate;
+        if (lngFileModDate != -1) {
+            try {
+                return new Date(lngFileModDate);
+            } catch (Exception e) {
+            }
+        }
+        return null;
     }
 
     public void setEventHandler(IJobSchedulerEventHandler eventHandler) {
-        this.eventHandler  = eventHandler;
+        this.eventHandler = eventHandler;
     }
 
     private class EntryPaths {
@@ -1663,7 +1679,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         public String getParentDirBaseName() {
             return parentDirBaseName;
         }
-
     }
 
 }

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -47,7 +48,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     private CmdShell objCmdShell = null;
     private boolean simulateShell = false;
 
-        //
+    //
     @Override
     public long appendFile(final String strSourceFileName, final String strTargetFileName) {
         JSFile objTargetFile = new JSFile(strTargetFileName);
@@ -190,6 +191,11 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void executeCommand(final String cmd) throws Exception {
+        executeCommand(cmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String cmd, Map<String, String> env) throws Exception {
         if (objCmdShell == null) {
             objCmdShell = new CmdShell();
         }

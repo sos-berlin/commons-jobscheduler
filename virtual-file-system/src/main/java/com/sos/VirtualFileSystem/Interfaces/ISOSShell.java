@@ -1,11 +1,14 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
-/** @author KB */
+import java.util.Map;
+
 public interface ISOSShell {
 
     public boolean remoteIsWindowsShell();
 
-    public void executeCommand(final String strCmd) throws Exception;
+    public void executeCommand(final String cmd) throws Exception;
+
+    public void executeCommand(final String cmd, Map<String, String> env) throws Exception;
 
     public StringBuffer getStdErr() throws Exception;
 
@@ -15,6 +18,6 @@ public interface ISOSShell {
 
     public String getExitSignal();
 
-    public String createScriptFile(final String pstrContent) throws Exception;
+    public String createScriptFile(final String content) throws Exception;
 
 }

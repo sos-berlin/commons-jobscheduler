@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -362,6 +363,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void executeCommand(final String strCmd) throws Exception {
+        executeCommand(strCmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
         logINFO("not implemented yet");
     }
 

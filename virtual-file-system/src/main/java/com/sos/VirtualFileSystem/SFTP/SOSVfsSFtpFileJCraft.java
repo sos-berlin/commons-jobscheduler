@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger;
+
 import com.jcraft.jsch.ChannelSftp;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
+    
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsSFtpFileJCraft.class);
 
     public SOSVfsSFtpFileJCraft(final String fileName) {
         super(fileName);
@@ -113,12 +117,26 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
     @Override
     public long getModificationDateTime() {
-        return 0;
+        try {
+            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+            return handler.getAttributes(adjustRelativePathName(fileName)).getMTime()*1000L;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
+        }
     }
 
     @Override
-    public long setModificationDateTime(final long pdteDateTime) {
-        return 0;
+    public long setModificationDateTime(final long timestamp) {
+        try {
+            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+            int mTime = (int) (timestamp/1000L);
+            handler.getClient().setMtime(adjustRelativePathName(fileName), mTime);
+            return timestamp;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return -1L;
+        }
     }
 
 }

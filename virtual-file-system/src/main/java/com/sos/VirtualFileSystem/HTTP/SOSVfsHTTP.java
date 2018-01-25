@@ -220,7 +220,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         String uri = rootUrl.getURI();
         GetMethod method = new GetMethod(uri);
         try {
-            if (isErrorStatusCode(httpClient.executeMethod(method))) {
+            if (isServerErrorStatusCode(httpClient.executeMethod(method))) {
                 throw new Exception(getHttpMethodExceptionText(method, uri));
             }
         } catch (Exception ex) {
@@ -315,9 +315,9 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         return false;
     }
 
-    private boolean isErrorStatusCode(int statusCode) {
+    private boolean isServerErrorStatusCode(int statusCode) {
         lastStatusCode = statusCode;
-        if (statusCode >= 400) {
+        if (statusCode >= 500) {
             return true;
         }
         return false;

@@ -388,7 +388,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
         if (transferType == enuTransferTypes.local) {
             objConn.user.setValue(System.getProperty("user.name"));
+            objConn.user.setNotDirty();
             this.user.setValue(System.getProperty("user.name"));
+            this.user.setNotDirty();
         }
     }
 
@@ -408,6 +410,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             pobjPort.setDefaultValue("0");
             if (pobjHost.isNotDirty() || "localhost".equalsIgnoreCase(pobjHost.getValue()) || "127.0.0.1".equalsIgnoreCase(pobjHost.getValue())) {
                 pobjHost.setValue(SOSOptionHostName.getLocalHost());
+                pobjHost.setNotDirty();
             }
             break;
         case ftps:
