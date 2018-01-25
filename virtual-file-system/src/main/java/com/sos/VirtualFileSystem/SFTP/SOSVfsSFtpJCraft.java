@@ -48,6 +48,7 @@ import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
+import com.sos.keepass.SOSKeePassPath;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
@@ -661,7 +662,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
                         (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
 
-                LOGGER.debug(String.format("use authentication file from KeePass attachment=%s", entry.getPath()));
+                LOGGER.debug(String.format("use authentication file from KeePass attachment=%s%s%s", entry.getPath(), SOSKeePassPath.PROPERTY_PREFIX,
+                        connection2OptionsAlternate.keepass_attachment_property_name.getValue()));
                 byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
                 byte[] p = authenticationOptions.getPassword().isNotEmpty() ? authenticationOptions.getPassword().getValue().getBytes() : null;
                 secureChannel.addIdentity("yade", pr, (byte[]) null, p);
