@@ -176,8 +176,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public void checkCredentialStoreOptions() {
-        keepass_database.value(null);
-        keepass_database_entry.value(null);
+        setKeePassOptions4Provider(null, null, null);
         if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
             LOGGER.trace("entering checkCredentialStoreOptions ");
             objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
@@ -208,14 +207,10 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     private Entry<?, ?, ?, ?> keePass2OptionsByKeePassSyntax(final SOSKeePassDatabase kpd) throws Exception {
         Entry<?, ?, ?, ?> entry = keePass2OptionByKeePassSyntax(kpd, host, null);
-        entry = keePass2OptionByKeePassSyntax(kpd, port, entry);
-        entry = keePass2OptionByKeePassSyntax(kpd, protocol, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, user, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, password, entry);
 
         entry = keePass2OptionByKeePassSyntax(kpd, proxyHost, entry);
-        entry = keePass2OptionByKeePassSyntax(kpd, proxyPort, entry);
-        entry = keePass2OptionByKeePassSyntax(kpd, proxyProtocol, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyUser, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyPassword, entry);
 
@@ -286,18 +281,36 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     @JSOptionDefinition(name = "keepass_database_entry", description = "Keepass entry", key = "keepass_database_entry", type = "SOSOptionObject", mandatory = false)
     public SOSOptionObject keepass_database_entry = new SOSOptionObject(this, CLASSNAME + ".keepass_database_entry", "Keepass entry", "", "", false);
 
+    @JSOptionDefinition(name = "keepass_attachment_property_name", description = "Keepass attachment property name", key = "keepass_database_entry", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString keepass_attachment_property_name = new SOSOptionString(this, CLASSNAME + ".keepass_attachment_property_name",
+            "Keepass attachment property name", "", "", false);
+
     private void keePass2Options(final SOSKeePassDatabase kpd) throws Exception {
         Entry<?, ?, ?, ?> entry = keePass2OptionsByKeePassSyntax(kpd);
         if (entry == null) {
             entry = keePass2OptionsByKeePassDefault(kpd);
         }
-        if (objCredentialStoreOptions.credentialStoreExportAttachment.isTrue()) {
-            keepass_database.value(kpd);
-            keepass_database_entry.value(entry);
-            /** Path attachmentTargetFile = Paths.get(objCredentialStoreOptions.credentialStoreExportAttachment2FileName.getValue()); try {
-             * kpd.exportAttachment2File(entry, attachmentTargetFile); } catch (Exception e) { LOGGER.error(e.getMessage()); throw new JobSchedulerException(e);
-             * } if (objCredentialStoreOptions.credentialStoreDeleteExportedFileOnExit.isTrue()) { attachmentTargetFile.toFile().deleteOnExit(); } */
+        if (sshAuthMethod.isPublicKey()) {
+            String optionName = sshAuthFile.getShortKey();
+            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), objCredentialStoreOptions.credentialStoreKeyPath
+                    .getValue());
+            if (keePassPath.isValid()) {
+                LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
+                if (!keePassPath.getEntryPath().equals(entry.getPath())) {
+                    entry = getKeePassEntry(kpd, keePassPath.getEntry());
+                }
+                setKeePassOptions4Provider(kpd, entry, keePassPath.getPropertyName());
+
+            } else {
+                LOGGER.debug(String.format("[%s]skip", optionName));
+            }
         }
+    }
+
+    private void setKeePassOptions4Provider(SOSKeePassDatabase kpd, Entry<?, ?, ?, ?> entry, String attachmentPropertyName) {
+        keepass_database.value(kpd);
+        keepass_database_entry.value(entry);
+        keepass_attachment_property_name.setValue(attachmentPropertyName);
     }
 
     private Entry<?, ?, ?, ?> getKeePassEntry(final SOSKeePassDatabase kpd, final String entryPath) throws Exception {
@@ -312,28 +325,51 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return entry;
     }
 
-    private Entry<?, ?, ?, ?> keePass2OptionByKeePassSyntax(final SOSKeePassDatabase kpd, final SOSOptionElement option,
-            Entry<?, ?, ?, ?> previousEntry) throws Exception {
+    private Entry<?, ?, ?, ?> keePass2OptionByKeePassSyntax(final SOSKeePassDatabase kpd, final SOSOptionElement option, Entry<?, ?, ?, ?> lastEntry)
+            throws Exception {
         SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), objCredentialStoreOptions.credentialStoreKeyPath.getValue());
         Entry<?, ?, ?, ?> entry = null;
         String fileName = objCredentialStoreOptions.credentialStoreFileName.getValue();
         String optionName = option.getShortKey();
         if (keePassPath.isValid()) {
-            LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
-            if (previousEntry == null || !keePassPath.getEntryPath().equals(previousEntry.getPath())) {
+            if (lastEntry == null || !keePassPath.getEntryPath().equals(lastEntry.getPath())) {
                 entry = getKeePassEntry(kpd, keePassPath.getEntry());
             } else {
-                entry = previousEntry;
+                entry = lastEntry;
             }
             String value = entry.getProperty(keePassPath.getPropertyName());
             if (value == null) {
                 throw new Exception(String.format("[%s][%s][%s]value is null", fileName, optionName, keePassPath.toString()));
             }
-            option.setValue(value);
+            boolean setMultipleValue = false;
+            if (optionName.equals(host.getShortKey()) || optionName.equals(proxyHost.getShortKey())) {
+                String[] arr = value.split(":");
+                switch (arr.length) {
+                case 1:
+                    break;
+                default:
+                    setMultipleValue = true;
+                    String portOptionName = null;
+                    if (optionName.equals(host.getShortKey())) {
+                        host.setValue(arr[0]);
+                        port.setValue(arr[1]);
+                        portOptionName = port.getShortKey();
+                    } else {
+                        proxyHost.setValue(arr[0]);
+                        proxyPort.setValue(arr[1]);
+                        portOptionName = proxyPort.getShortKey();
+                    }
+                    LOGGER.debug(String.format("[%s,%s]set from %s", optionName, portOptionName, keePassPath.toString()));
+                }
+            }
+            if (!setMultipleValue) {
+                LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
+                option.setValue(value);
+            }
         } else {
             LOGGER.debug(String.format("[%s]skip", optionName));
         }
-        return entry == null ? previousEntry : entry;
+        return entry == null ? lastEntry : entry;
     }
 
     protected void setIfNotDirty(final SOSOptionElement option, final String value) {

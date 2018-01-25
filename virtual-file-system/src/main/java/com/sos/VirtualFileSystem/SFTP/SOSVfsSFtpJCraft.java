@@ -646,6 +646,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
             Object kd = connection2OptionsAlternate.keepass_database.value();
             if (kd == null) {
+                LOGGER.debug(String.format("use authentication file=%s", authenticationOptions.getAuthFile().getValue()));
                 SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
                 authenticationFile.checkMandatory(true);
                 if (authenticationFile.isNotEmpty()) {
@@ -659,7 +660,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
                 org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
                         (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
-                byte[] pr = kpd.getAttachment(entry);
+
+                LOGGER.debug(String.format("use authentication file from KeePass attachment=%s", entry.getPath()));
+                byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
                 byte[] p = authenticationOptions.getPassword().isNotEmpty() ? authenticationOptions.getPassword().getValue().getBytes() : null;
                 secureChannel.addIdentity("yade", pr, (byte[]) null, p);
             }
