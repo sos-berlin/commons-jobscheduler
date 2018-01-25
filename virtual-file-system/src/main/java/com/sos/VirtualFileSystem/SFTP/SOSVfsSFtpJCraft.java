@@ -64,7 +64,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private StringBuffer errContent;
     private boolean isRemoteWindowsShell = false;
     private boolean isUnix = false;
-    private boolean outContent2LogLevel = true;
+    private boolean isOSChecked = false;
     private int connectionTimeout = 0;
     private boolean simulateShell = false;
     private SOSOptionProxyProtocol proxyProtocol = null;
@@ -85,6 +85,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         JSch.setConfig("StrictHostKeyChecking", val);
     }
 
+    @SuppressWarnings("unused")
     private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
         return val.value() ? "yes" : "no";
     }
@@ -278,6 +279,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 reply = "ls OK";
                 return new String[] { path };
             }
+            @SuppressWarnings("unchecked")
             Vector<LsEntry> lsResult = this.getClient().ls(path);
             this.getSOSFileEntries().clear();
             String[] result = new String[lsResult.size()];
@@ -403,6 +405,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void executeCommand(String cmd, Map<String, String> env) {
+        checkOS();
+
         cmd = cmd.trim();
         final String endOfLine = System.getProperty("line.separator");
         channelExec = null;
@@ -458,11 +462,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             if (outContent.length() > 0) {
-                if (outContent2LogLevel) {
-                    LOGGER.info(outContent);
-                } else {
-                    LOGGER.debug(outContent);
-                }
+                LOGGER.info(outContent);
             }
             LOGGER.debug(SOSVfs_D_163.params("stderr", cmd));
             errReader = new BufferedReader(new InputStreamReader(err));
@@ -525,11 +525,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            if (outContent2LogLevel) {
-                logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
-            } else {
-                logDEBUG(getHostID(SOSVfs_I_192.params(getReplyString())));
-            }
+            logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
         }
     }
 
@@ -824,25 +820,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig("compression_level", connection2OptionsAlternate.zlibCompressionLevel.getValue());
         sshConnection.connect();
         sftpClient = (ChannelSftp) sshConnection;
-
-        checkIsUnix();
-        LOGGER.debug(String.format("isUnix=%s", isUnix));
-    }
-
-    private void checkIsUnix() {
-        isUnix = false;
-        outContent2LogLevel = false;
-        try {
-            executeCommand("echo $PATH");
-            // @TODO parse PATH
-            if (outContent.toString().indexOf("bin:") > -1) {
-                isUnix = true;
-            }
-        } catch (Throwable e) {
-            isUnix = false;
-        } finally {
-            outContent2LogLevel = true;
-        }
     }
 
     @Override
@@ -952,4 +929,129 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return channelExec;
     }
 
+    private void checkOS() {
+        if (!isOSChecked) {
+            String cmd = "echo $PATH";
+            try {
+                CommandResult result = executePrivateCommand(cmd);
+                // @TODO parse PATH
+                if (result.getStdOut().toString().indexOf("bin:") > -1) {
+                    isUnix = true;
+                }
+                LOGGER.info(String.format("isUnix=%s", isUnix));
+            } catch (Throwable e) {
+                LOGGER.warn(String.format("[%s]%s", cmd, e.toString()));
+            }
+            isOSChecked = true;
+        }
+    }
+
+    private CommandResult executePrivateCommand(String cmd) throws Exception {
+        ChannelExec channel = null;
+        InputStream in = null;
+        InputStream err = null;
+        BufferedReader errReader = null;
+        CommandResult result = new CommandResult();
+        try {
+            cmd = cmd.trim();
+            LOGGER.debug(String.format("cmd=%s", cmd));
+            channel = (ChannelExec) sshSession.openChannel("exec");
+            channel.setPty(isSimulateShell());
+            channel.setCommand(cmd);
+            channel.setInputStream(null);
+            channel.setErrStream(null);
+            in = channel.getInputStream();
+            err = channel.getErrStream();
+            channel.connect();
+            byte[] tmp = new byte[1024];
+            while (true) {
+                while (in.available() > 0) {
+                    int i = in.read(tmp, 0, 1024);
+                    if (i < 0) {
+                        break;
+                    }
+                    result.getStdOut().append(new String(tmp, 0, i));
+                }
+                if (channel.isClosed()) {
+                    if (in.available() > 0) {
+                        continue;
+                    }
+                    result.setExitCode(channel.getExitStatus());
+                    break;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (Throwable ee) {
+                    //
+                }
+            }
+
+            errReader = new BufferedReader(new InputStreamReader(err));
+            while (true) {
+                String line = errReader.readLine();
+                if (line == null) {
+                    break;
+                }
+                result.getStdErr().append(line + System.getProperty("line.separator"));
+            }
+
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Throwable ex) {
+                }
+            }
+            if (errReader != null) {
+                try {
+                    errReader.close();
+                } catch (Throwable ex) {
+                }
+            }
+            if (err != null) {
+                try {
+                    err.close();
+                } catch (Throwable ex) {
+                }
+            }
+            if (channel != null) {
+                try {
+                    channel.disconnect();
+                } catch (Throwable ex) {
+                }
+            }
+        }
+        return result;
+    }
+
+    private class CommandResult {
+
+        private int _exitCode;
+        private StringBuffer _stdOut;
+        private StringBuffer _stdErr;
+
+        public CommandResult() {
+            _stdOut = new StringBuffer();
+            _stdErr = new StringBuffer();
+        }
+
+        @SuppressWarnings("unused")
+        public int getExitCode() {
+            return _exitCode;
+        }
+
+        public void setExitCode(int val) {
+            _exitCode = val;
+        }
+
+        public StringBuffer getStdOut() {
+            return _stdOut;
+        }
+
+        public StringBuffer getStdErr() {
+            return _stdErr;
+        }
+    }
 }
