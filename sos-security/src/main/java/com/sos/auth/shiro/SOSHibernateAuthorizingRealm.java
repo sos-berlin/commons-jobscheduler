@@ -2,7 +2,8 @@ package com.sos.auth.shiro;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -18,7 +19,7 @@ import com.sos.auth.shiro.db.SOSUserDBLayer;
 
 public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateAuthorizingRealm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizingRealm.class);
     private String hibernateConfigurationFile;
     private ISOSAuthorizing authorizing;
     private UsernamePasswordToken authToken;

@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.joc.Globals;
+import com.sos.joc.exceptions.JocException;
 
 public class TestSOSServicePermissionShiro {
 
@@ -29,7 +30,7 @@ public class TestSOSServicePermissionShiro {
     }
 
     @Test
-    public void testIsAuthenticated() {
+    public void testIsAuthenticated() throws JocException {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosServicePermissionShiro.logoutPost(sosShiroCurrentUserAnswer.getAccessToken(),"");
@@ -37,7 +38,7 @@ public class TestSOSServicePermissionShiro {
     }
 
     @Test
-    public void testHasRole() {
+    public void testHasRole() throws JocException {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole("","", sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, SHIRO_MAPPED_ROLE);
@@ -46,7 +47,7 @@ public class TestSOSServicePermissionShiro {
     }
 
     @Test
-    public void testIsPermitted() {
+    public void testIsPermitted() throws JocException {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosShiroCurrentUserAnswer =

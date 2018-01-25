@@ -12,11 +12,12 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSLdapAuthorizingRealm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSLdapAuthorizingRealm.class);
 
     private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
     private SOSLdapAuthorizing authorizing;
@@ -42,6 +43,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authzInfo = null;
         LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
+        System.out.println("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
         if (authorizing != null) {
 
             authorizing.setAuthcToken(authcToken);

@@ -1,7 +1,5 @@
 package com.sos.auth.shiro.db;
 
- 
-
 import javax.persistence.*;
 
 import com.sos.hibernate.classes.DbItem;
