@@ -245,6 +245,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     }
                 } else {
                     // int actualBytesTransferred = 0;
+                    if (eventHandler != null) {
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put("sourcePath", this.getSourceFilename());
+                        values.put("targetPath", this.getTargetFilename());
+                        values.put("state", "5");
+                        eventHandler.updateDb(null, "YADE_FILE", values);
+                    }
                     while ((bytesTransferred = source.read(buffer)) != -1) {
                         try {
                             // actualBytesTransferred += bytesTransferred;
@@ -256,13 +263,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                             // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
                             // eventParams.put("transferring:" + source.getName(), values);
                             // sendEvent(eventParams);
-                            if (eventHandler != null) {
-                                Map<String, String> values = new HashMap<String, String>();
-                                values.put("sourcePath", this.getSourceFilename());
-                                values.put("targetPath", this.getTargetFilename());
-                                values.put("state", "5");
-                                eventHandler.updateDb(null, "YADE_FILE", values);
-                            }
+                            
+                            // commented due to not having a progress bar and performance
+                            
+//                            if (eventHandler != null) {
+//                                Map<String, String> values = new HashMap<String, String>();
+//                                values.put("sourcePath", this.getSourceFilename());
+//                                values.put("targetPath", this.getTargetFilename());
+//                                values.put("state", "5");
+//                                eventHandler.updateDb(null, "YADE_FILE", values);
+//                            }
                             if (calculateIntegrityHash4Check) {
                                 md4check.update(buffer, 0, bytesTransferred);
                             }
