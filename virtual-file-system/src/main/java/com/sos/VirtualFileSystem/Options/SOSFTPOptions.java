@@ -517,9 +517,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return ((params.get(key) == null) || params.get(key).length() == 0);
     }
 
+    private boolean isEqualIgnoreCase(HashMap<String, String> params, String key, String value) {
+        return ((params.get(key) != null) && params.get(key).equalsIgnoreCase(value));
+    }
+    
     private void handleFileOrderSource(HashMap<String, String> params) {
         boolean b = false;
-        b = (isEmpty(params, "file_path") && isEmpty(params, "source_dir") && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
+        b = ((isEmpty(params, "file_path") || isEqualIgnoreCase(params,"file_path","${scheduler_file_path}")) && isEmpty(params, "source_dir") && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
         if (b && !isEmpty(params, "scheduler_file_path")) {
             LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
                     + "file_spec or source_dir has been specified", params.get("scheduler_file_path")));
