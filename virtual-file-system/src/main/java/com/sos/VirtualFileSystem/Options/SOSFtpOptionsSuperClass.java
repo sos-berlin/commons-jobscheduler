@@ -2041,6 +2041,20 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         password = pPassword;
     }
 
+    @JSOptionDefinition(name = "passphrase", description = "Passphrase", key = "passphrase", type = "SOSOptionPassword", 
+            mandatory = false)
+    public SOSOptionPassword passphrase = new SOSOptionPassword(this, CLASSNAME + ".passphrase", "Passphrase", "", "", false);
+
+    @Override
+    public SOSOptionPassword getPassphrase() {
+        return passphrase;
+    }
+
+    @Override
+    public void setPassphrase(final SOSOptionPassword val) {
+        passphrase = val;
+    }
+    
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", 
             type = "SOSOptionInteger", mandatory = false)
     public SOSOptionTime pollInterval = new SOSOptionTime(this, CLASSNAME + ".poll_interval",

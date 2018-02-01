@@ -394,6 +394,19 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         password = pPassword;
     }
 
+    @JSOptionDefinition(name = "passphrase", description = "Passphrase", key = "passphrase", type = "SOSOptionPassword", mandatory = false)
+    public SOSOptionPassword passphrase = new SOSOptionPassword(this, CLASSNAME + ".passphrase", "Passphrase", "", "", false);
+
+    @Override
+    public SOSOptionPassword getPassphrase() {
+        return passphrase;
+    }
+
+    @Override
+    public void setPassphrase(final SOSOptionPassword val) {
+        passphrase = val;
+    }
+    
     public SOSConnection2OptionsSuperClass() {
         objParentClass = this.getClass();
     }

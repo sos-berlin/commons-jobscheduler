@@ -209,7 +209,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         Entry<?, ?, ?, ?> entry = keePass2OptionByKeePassSyntax(kpd, host, null);
         entry = keePass2OptionByKeePassSyntax(kpd, user, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, password, entry);
-
+        entry = keePass2OptionByKeePassSyntax(kpd, passphrase, entry);
+        
         entry = keePass2OptionByKeePassSyntax(kpd, proxyHost, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyUser, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyPassword, entry);

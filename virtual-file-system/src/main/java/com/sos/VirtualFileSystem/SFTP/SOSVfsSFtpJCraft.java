@@ -640,13 +640,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             authenticationFile.checkMandatory(true);
             if (authenticationFile.isNotEmpty()) {
                 try {
-                    if (authenticationOptions.getPassword().isNotEmpty()) {
+                    if (authenticationOptions.getPassphrase().isNotEmpty()) {
                         LOGGER.debug(String.format("[%s]file=%s, passphrase=?", authMethod, authenticationOptions.getAuthFile().getValue()));
-
-                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassphrase().getValue());
                     } else {
                         LOGGER.debug(String.format("[%s]file=%s", authMethod, authenticationOptions.getAuthFile().getValue()));
-
                         secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
                     }
                 } catch (JSchException e) {
@@ -662,9 +660,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
                 String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + connection2OptionsAlternate.keepass_attachment_property_name
                         .getValue();
-                if (authenticationOptions.getPassword().isNotEmpty()) {
+                if (authenticationOptions.getPassphrase().isNotEmpty()) {
                     LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", authMethod, keePassPath));
-                    secureChannel.addIdentity("yade", pr, (byte[]) null, authenticationOptions.getPassword().getValue().getBytes());
+                    secureChannel.addIdentity("yade", pr, (byte[]) null, authenticationOptions.getPassphrase().getValue().getBytes());
                 } else {
                     LOGGER.debug(String.format("[%s][keepass]attachment=%s", authMethod, keePassPath));
                     secureChannel.addIdentity("yade", pr, (byte[]) null, (byte[]) null);

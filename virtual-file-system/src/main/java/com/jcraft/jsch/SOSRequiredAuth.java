@@ -26,13 +26,14 @@ public class SOSRequiredAuth extends UserAuth {
 
     @Override
     public boolean start(Session session) throws Exception {
+        boolean isPasswordMethod = _jschClass.equals(JSCH_AUTH_CLASS_PASSWORD);
+        String preffered = session.getConfig("PreferredAuthentications");
+        LOGGER.debug(String.format("preffered=%s, isPasswordMethod=%s", preffered, isPasswordMethod));
+
         boolean result = _jschUserAuth.start(session);
         if (!result) {
             throw new JSchException("Auth fail");
         }
-        boolean isPasswordMethod = _jschClass.equals(JSCH_AUTH_CLASS_PASSWORD);
-        String preffered = session.getConfig("PreferredAuthentications");
-        LOGGER.debug(String.format("preffered=%s, isPasswordMethod=%s", preffered, isPasswordMethod));
         if (preffered.startsWith("password") && isPasswordMethod) {
             return false;
         } else if (preffered.startsWith("publickey") && !isPasswordMethod) {
