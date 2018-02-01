@@ -31,6 +31,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.ProxySOCKS4;
 import com.jcraft.jsch.ProxySOCKS5;
+import com.jcraft.jsch.SOSRequiredAuthPassword;
+import com.jcraft.jsch.SOSRequiredAuthPublicKey;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
@@ -73,6 +75,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private String proxyUser = null;
     private String proxyPassword = null;
     private ChannelExec channelExec = null;
+    private final String lineSeparator = System.getProperty("line.separator");
 
     public SOSVfsSFtpJCraft() {
         super();
@@ -408,7 +411,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         checkOS();
 
         cmd = cmd.trim();
-        final String endOfLine = System.getProperty("line.separator");
         channelExec = null;
         exitCode = null;
         InputStream out = null;
@@ -472,7 +474,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 if (line == null) {
                     break;
                 }
-                errContent.append(line + endOfLine);
+                errContent.append(line + lineSeparator);
             }
             LOGGER.debug(errContent);
             if (exitCode != null && !exitCode.equals(new Integer(0))) {
@@ -630,50 +632,104 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return path;
     }
 
+    private void usePublicKeyMethod() throws Exception {
+        String authMethod = "publickey";
+        Object kd = connection2OptionsAlternate.keepass_database.value();
+        if (kd == null) {
+            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
+            authenticationFile.checkMandatory(true);
+            if (authenticationFile.isNotEmpty()) {
+                try {
+                    if (authenticationOptions.getPassword().isNotEmpty()) {
+                        LOGGER.debug(String.format("[%s]file=%s, passphrase=?", authMethod, authenticationOptions.getAuthFile().getValue()));
+
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
+                    } else {
+                        LOGGER.debug(String.format("[%s]file=%s", authMethod, authenticationOptions.getAuthFile().getValue()));
+
+                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+                    }
+                } catch (JSchException e) {
+                    throw new Exception(String.format("[%s][%s]%s", authMethod, authenticationOptions.getAuthFile().getValue(), e.toString()), e);
+                }
+            }
+        } else {
+            SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
+            org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
+                    (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
+
+            try {
+                byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
+                String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + connection2OptionsAlternate.keepass_attachment_property_name
+                        .getValue();
+                if (authenticationOptions.getPassword().isNotEmpty()) {
+                    LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", authMethod, keePassPath));
+                    secureChannel.addIdentity("yade", pr, (byte[]) null, authenticationOptions.getPassword().getValue().getBytes());
+                } else {
+                    LOGGER.debug(String.format("[%s][keepass]attachment=%s", authMethod, keePassPath));
+                    secureChannel.addIdentity("yade", pr, (byte[]) null, (byte[]) null);
+                }
+            } catch (Exception e) {
+                throw new Exception(String.format("[%s][keepass]%s", authMethod, e.toString()), e);
+            }
+        }
+    }
+
+    private void usePasswordMethod() throws Exception {
+        LOGGER.debug(String.format("[password]password=?"));
+        sshSession.setPassword(authenticationOptions.getPassword().getValue());
+    }
+
+    private String usePreferredAuthentications(final String debugKey, final String preferredAuthentications) throws Exception {
+        LOGGER.debug(String.format("[%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
+        try {
+            usePublicKeyMethod();
+        } catch (Exception e) {
+            LOGGER.warn(e.toString());
+        }
+        usePasswordMethod();
+        return preferredAuthentications;
+    }
+
+    private String useRequiredAuthentications(final String requiredAuthentications) throws Exception {
+        String preferredAuthentications = requiredAuthentications;
+        LOGGER.debug(String.format("[required_authentications]preferredAuthentications=%s", preferredAuthentications));
+
+        sshSession.setConfig("userauth.password", SOSRequiredAuthPassword.class.getName());
+        sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
+
+        usePublicKeyMethod();
+        usePasswordMethod();
+        return preferredAuthentications;
+    }
+
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         userName = authenticationOptions.getUser().getValue();
-        String password = authenticationOptions.getPassword().getValue();
-        LOGGER.debug(SOSVfs_D_132.params(userName));
         setKnownHostsFile();
-        this.createSession(userName, host, port);
+        createSession(userName, host, port);
 
-        if (authenticationOptions.getAuthMethod().isPublicKey()) {
-            LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
-
-            Object kd = connection2OptionsAlternate.keepass_database.value();
-            if (kd == null) {
-                LOGGER.debug(String.format("use authentication file=%s", authenticationOptions.getAuthFile().getValue()));
-                SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
-                authenticationFile.checkMandatory(true);
-                if (authenticationFile.isNotEmpty()) {
-                    if (authenticationOptions.getPassword().isNotEmpty()) {
-                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassword().getValue());
-                    } else {
-                        secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
-                    }
-                }
-            } else {
-                SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
-                org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
-                        (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
-
-                LOGGER.debug(String.format("use authentication file from KeePass attachment=%s%s%s", entry.getPath(), SOSKeePassPath.PROPERTY_PREFIX,
-                        connection2OptionsAlternate.keepass_attachment_property_name.getValue()));
-                byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
-                byte[] p = authenticationOptions.getPassword().isNotEmpty() ? authenticationOptions.getPassword().getValue().getBytes() : null;
-                secureChannel.addIdentity("yade", pr, (byte[]) null, p);
-            }
+        String preferredAuthentications = null;
+        if (connection2OptionsAlternate.preferred_authentications.isNotEmpty()) {
+            preferredAuthentications = usePreferredAuthentications("preferred_authentications", connection2OptionsAlternate.preferred_authentications
+                    .getValue());
+        } else if (connection2OptionsAlternate.required_authentications.isNotEmpty()) {
+            preferredAuthentications = useRequiredAuthentications(connection2OptionsAlternate.required_authentications.getValue());
         } else {
-            if (authenticationOptions.getAuthMethod().isPassword()) {
-                LOGGER.debug(SOSVfs_D_165.params("userid", "password"));
-                sshSession.setPassword(password);
+            if (authenticationOptions.getPassword().isNotEmpty() && authenticationOptions.getAuthFile().isNotEmpty()) {
+                preferredAuthentications = usePreferredAuthentications("password,publickey", "password,publickey");
             } else {
-                throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuthMethod().getValue()));
+                preferredAuthentications = authenticationOptions.getAuthMethod().getValue();
+                LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
+                if (authenticationOptions.getAuthMethod().isPublicKey()) {
+                    usePublicKeyMethod();
+                } else {
+                    usePasswordMethod();
+                }
             }
         }
         try {
-            sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuthMethod().getValue());
+            sshSession.setConfig("PreferredAuthentications", preferredAuthentications);
             setConfigFromFiles();
             sshSession.connect();
             this.createSftpClient();
@@ -754,6 +810,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (secureChannel == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("secureChannel"));
         }
+        LOGGER.debug(String.format("user=%s, host=%s, port=%s", puser, phost, pport));
         sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", connection2OptionsAlternate.strictHostKeyChecking.getValue());
@@ -992,7 +1049,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 if (line == null) {
                     break;
                 }
-                result.getStdErr().append(line + System.getProperty("line.separator"));
+                result.getStdErr().append(line + lineSeparator);
             }
 
         } catch (Throwable e) {
