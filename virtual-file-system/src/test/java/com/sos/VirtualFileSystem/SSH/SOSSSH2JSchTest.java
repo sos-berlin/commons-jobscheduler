@@ -86,6 +86,18 @@ public class SOSSSH2JSchTest {
         public void setAuthFile(SOSOptionInFileName authFile) {
             optionAuthFileName = authFile;
         }
+
+        @Override
+        public SOSOptionPassword getPassphrase() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setPassphrase(SOSOptionPassword passphrase) {
+            // TODO Auto-generated method stub
+            
+        }
     };
 
     @Before
