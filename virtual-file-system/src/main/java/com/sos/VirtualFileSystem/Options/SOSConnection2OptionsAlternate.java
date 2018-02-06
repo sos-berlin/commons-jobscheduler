@@ -24,6 +24,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
 
+import sos.util.SOSString;
+
 @JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
@@ -168,6 +170,10 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return objJumpServerOptions;
     }
 
+    public void setCredentialStore(SOSCredentialStoreOptions opt) {
+        objCredentialStoreOptions = opt;
+    }
+
     public SOSCredentialStoreOptions getCredentialStore() {
         if (objCredentialStoreOptions == null) {
             objCredentialStoreOptions = new SOSCredentialStoreOptions();
@@ -192,7 +198,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             SOSKeePassDatabase kpd = null;
             try {
                 kpd = new SOSKeePassDatabase(Paths.get(objCredentialStoreOptions.credentialStoreFileName.getValue()));
-                if (keePassKeyFile == null) {
+                if (SOSString.isEmpty(keePassKeyFile)) {
                     kpd.load(keePassPassword);
                 } else {
                     kpd.load(keePassPassword, Paths.get(keePassKeyFile));
