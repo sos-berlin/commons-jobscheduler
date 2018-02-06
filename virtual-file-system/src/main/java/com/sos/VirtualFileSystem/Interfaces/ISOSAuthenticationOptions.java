@@ -20,6 +20,10 @@ public interface ISOSAuthenticationOptions {
 
     public abstract void setPassword(SOSOptionPassword password);
 
+    public abstract SOSOptionPassword getPassphrase();
+
+    public abstract void setPassphrase(SOSOptionPassword passphrase);
+
     public abstract SOSOptionUserName getUser();
 
     public abstract void setUser(SOSOptionUserName user);

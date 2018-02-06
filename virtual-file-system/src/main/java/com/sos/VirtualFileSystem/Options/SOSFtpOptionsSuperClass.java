@@ -2009,6 +2009,18 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setJumpPostTransferCommandsFinal(SOSOptionCommandString jumpPostTransferCommandsFinal) {
         this.jumpPostTransferCommandsFinal = jumpPostTransferCommandsFinal;
     }
+    
+    @JSOptionDefinition(name = "jump_preferred_authentications", description = "This parameter specifies preferred authentication methods,e.g password,publickey,...", key = "jump_preferred_authentications", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_preferred_authentications = new SOSOptionString(this, CLASSNAME + ".jump_preferred_authentications",
+            "This parameter specifies the preferred authentication methods", "", "", false);
+
+    @JSOptionDefinition(name = "jump_required_authentications", description = "This parameter specifies the required authentication methods,e.g password,publickey,...", key = "jump_required_authentications", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_required_authentications = new SOSOptionString(this, CLASSNAME + ".jump_required_authentications",
+            "This parameter specifies the required authentication methods", "", "", false);
+
+    @JSOptionDefinition(name = "jump_passphrase", description = "This parameter specifies the passphrase", key = "jump_passphrase", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_passphrase = new SOSOptionString(this, CLASSNAME + ".jump_passphrase",
+            "This parameter specifies the passphrase", "", "", false);
 
     @JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode", 
             type = "SOSOptionBoolean", mandatory = false)
@@ -2041,6 +2053,20 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         password = pPassword;
     }
 
+    @JSOptionDefinition(name = "passphrase", description = "Passphrase", key = "passphrase", type = "SOSOptionPassword", 
+            mandatory = false)
+    public SOSOptionPassword passphrase = new SOSOptionPassword(this, CLASSNAME + ".passphrase", "Passphrase", "", "", false);
+
+    @Override
+    public SOSOptionPassword getPassphrase() {
+        return passphrase;
+    }
+
+    @Override
+    public void setPassphrase(final SOSOptionPassword val) {
+        passphrase = val;
+    }
+    
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", 
             type = "SOSOptionInteger", mandatory = false)
     public SOSOptionTime pollInterval = new SOSOptionTime(this, CLASSNAME + ".poll_interval",

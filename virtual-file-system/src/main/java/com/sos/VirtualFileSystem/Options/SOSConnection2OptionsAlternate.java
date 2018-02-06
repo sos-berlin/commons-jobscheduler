@@ -209,6 +209,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         Entry<?, ?, ?, ?> entry = keePass2OptionByKeePassSyntax(kpd, host, null);
         entry = keePass2OptionByKeePassSyntax(kpd, user, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, password, entry);
+        entry = keePass2OptionByKeePassSyntax(kpd, passphrase, entry);
 
         entry = keePass2OptionByKeePassSyntax(kpd, proxyHost, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyUser, entry);
@@ -290,7 +291,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         if (entry == null) {
             entry = keePass2OptionsByKeePassDefault(kpd);
         }
-        if (sshAuthMethod.isPublicKey()) {
+        if (sshAuthFile.isNotEmpty()) {
             String optionName = sshAuthFile.getShortKey();
             SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), objCredentialStoreOptions.credentialStoreKeyPath
                     .getValue());

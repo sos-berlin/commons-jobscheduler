@@ -158,6 +158,11 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public SOSOptionPassword password = new SOSOptionPassword(this, CLASSNAME + ".password", 
             "This parameter specifies the user account password for au", null, null, false);
 
+    @JSOptionDefinition(name = "passphrase", description = "This parameter specifies the user account passphrase for au", key = "passphrase", 
+            type = "SOSOptionPassword", mandatory = false)
+    public SOSOptionPassword passphrase = new SOSOptionPassword(this, CLASSNAME + ".passphrase", 
+            "This parameter specifies the user account passphrase for au", null, null, false);
+
     @JSOptionDefinition(name = "port", description = "This parameter specifies the port number of the SSH serve", key = "port", 
             type = "SOSOptionString", mandatory = true)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, CLASSNAME + ".port", "This parameter specifies the port number of the SSH serve", 
@@ -528,6 +533,16 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
         this.password = password;
     }
 
+    @Override
+    public SOSOptionPassword getPassphrase() {
+        return passphrase;
+    }
+
+    @Override
+    public void setPassphrase(final SOSOptionPassword val) {
+        this.passphrase = val;
+    }
+    
     @Override
     public SOSOptionPortNumber getPort() {
         return port;
