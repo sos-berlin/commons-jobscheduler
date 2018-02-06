@@ -4,8 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.sos.auth.rest.permission.model.SOSPermissionShiro;
-import com.sos.joc.Globals;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.exceptions.JocException;
 
 public class TestSOSServicePermissionShiro {
@@ -14,32 +13,19 @@ public class TestSOSServicePermissionShiro {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
 
-    @Test
-    public void testGetPermissions() {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSPermissionShiro sosPermissionShiroAll = sosServicePermissionShiro.getPermissions("","","",false, LDAP_USER, LDAP_PASSWORD);
-        Globals.sosShiroProperties = null;
-        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","","",true, LDAP_USER, LDAP_PASSWORD);
-        for (int i=0;i< sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().size();i++){
-            System.out.println(sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(i));
-        }
-        sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
-        String permissisonsCommand = sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
-        String permissisonsJoc = sosPermissionShiroAll.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(0);
-
-    }
+   
 
     @Test
-    public void testIsAuthenticated() throws JocException {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+    public void testIsAuthenticated() throws JocException, SOSHibernateException {
+    	SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosServicePermissionShiro.logoutPost(sosShiroCurrentUserAnswer.getAccessToken(),"");
         assertEquals("testCurrentUserAnswer is authenticated", true, sosShiroCurrentUserAnswer.getIsAuthenticated());
     }
 
     @Test
-    public void testHasRole() throws JocException {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+    public void testHasRole() throws JocException, SOSHibernateException {
+    	SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole("","", sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, SHIRO_MAPPED_ROLE);
         assertEquals("testCurrentUserAnswer is authenticated", true, sosShiroCurrentUserAnswer.getIsAuthenticated());
@@ -47,8 +33,8 @@ public class TestSOSServicePermissionShiro {
     }
 
     @Test
-    public void testIsPermitted() throws JocException {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+    public void testIsPermitted() throws JocException, SOSHibernateException {
+    	SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer)sosServicePermissionShiro.loginPost("",LDAP_USER, LDAP_PASSWORD).getEntity();
         sosShiroCurrentUserAnswer =
                 sosServicePermissionShiro.isPermitted("","",sosShiroCurrentUserAnswer.getAccessToken(), LDAP_USER, LDAP_PASSWORD, "sos:products:joc_cockpit:jobscheduler_master:pause");
