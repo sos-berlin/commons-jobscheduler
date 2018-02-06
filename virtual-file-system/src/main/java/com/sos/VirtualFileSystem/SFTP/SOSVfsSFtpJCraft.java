@@ -56,6 +56,7 @@ import com.sos.keepass.SOSKeePassPath;
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private final static Logger LOGGER = Logger.getLogger(SOSVfsSFtpJCraft.class);
+    private final static int DEFAULT_CONNECTION_TIMEOUT = 30_000; // 0,5 minutes
     private Channel sshConnection = null;
     private Session sshSession = null;
     private ChannelSftp sftpClient = null;
@@ -693,6 +694,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         String preferredAuthentications = requiredAuthentications;
         LOGGER.debug(String.format("[required_authentications]preferredAuthentications=%s", preferredAuthentications));
 
+        connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+
         sshSession.setConfig("userauth.password", SOSRequiredAuthPassword.class.getName());
         sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
 
@@ -727,6 +730,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         }
         try {
+            setConnectionTimeout();
             sshSession.setConfig("PreferredAuthentications", preferredAuthentications);
             setConfigFromFiles();
             sshSession.connect();
@@ -822,12 +826,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig(config);
         setCommandsTimeout();
         setProxy();
-        setConnectionTimeout();
     }
 
     private void setConnectionTimeout() throws Exception {
         if (connectionTimeout > 0) {
-            LOGGER.info(String.format("connection timeout = %s ms", connectionTimeout));
+            LOGGER.info(String.format("connectionTimeout=%s ms", connectionTimeout));
             sshSession.setTimeout(connectionTimeout);
         }
     }
@@ -838,7 +841,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
-            int connTimeout = 30000; // 0,5 Minute
             LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost,
                     proxyPort, proxyUser));
             if (proxyProtocol.isHttp()) {
@@ -853,14 +855,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     proxy.setUserPasswd(proxyUser, proxyPassword);
                 }
                 sshSession.setProxy(proxy);
-                connectionTimeout = connTimeout;
+                connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
             } else if (proxyProtocol.isSocks4()) {
                 ProxySOCKS4 proxy = new ProxySOCKS4(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
                     proxy.setUserPasswd(proxyUser, proxyPassword);
                 }
                 sshSession.setProxy(proxy);
-                connectionTimeout = connTimeout;
+                connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
             } else {
                 throw new Exception(String.format("unknown proxy protocol = %s", proxyProtocol.getValue()));
             }
@@ -990,7 +992,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             try {
                 CommandResult result = executePrivateCommand(cmd);
                 // @TODO parse PATH
-                if (result.getStdOut().toString().indexOf("bin:") > -1) {
+                if (result.getStdOut().toString().indexOf("/bin:") > -1) {
                     isUnix = true;
                 }
                 LOGGER.info(String.format("isUnix=%s", isUnix));
