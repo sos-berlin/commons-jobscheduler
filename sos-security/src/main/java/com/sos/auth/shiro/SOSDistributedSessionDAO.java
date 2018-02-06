@@ -19,6 +19,13 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 	private static final String SHIRO_SESSION = "SHIRO_SESSION";
 	private HashMap<String, String> serializedSessions;
 
+	private void putSerializedSession(String sessionId, String sessionString) {
+		if (serializedSessions == null) {
+			serializedSessions = new HashMap<String, String>();
+		}
+		serializedSessions.put(sessionId, sessionString);
+	}
+	
 	private void copySessionToDb(Serializable sessionId, String session) {
 		try {
 			SOSHibernateSession sosHibernateSession = Globals
@@ -93,7 +100,7 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 		Serializable sessionId = generateSessionId(session);
 		assignSessionId(session, sessionId);
 		String sessionString = SOSSerializerUtil.object2toString(session);
-		serializedSessions.put(session.getId().toString(), sessionString);
+		putSerializedSession(session.getId().toString(), sessionString);
 		copySessionToDb(sessionId, sessionString);
 		return session.getId();
 	}
@@ -104,7 +111,7 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 			return;
 		}
 		String sessionString = SOSSerializerUtil.object2toString(session);
-		serializedSessions.put(session.getId().toString(), sessionString);
+		putSerializedSession(session.getId().toString(), sessionString);
 		copySessionToDb(session.getId(), sessionString);
 	}
 
@@ -120,7 +127,7 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 			jocConfigurationDBLayer.getFilter().setName(session.getId().toString());
 			jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
 			jocConfigurationDBLayer.delete();
-			serializedSessions.put(session.getId().toString(), null);
+			putSerializedSession(session.getId().toString(), null);
 			Globals.commit(sosHibernateSession);
 			sosHibernateSession.close();
 		} catch (SOSHibernateException e) {
