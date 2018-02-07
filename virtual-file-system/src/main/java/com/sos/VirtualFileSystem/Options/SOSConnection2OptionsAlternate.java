@@ -182,8 +182,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public void checkCredentialStoreOptions() {
-        setKeePassOptions4Provider(null, null, null);
         if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
+            setKeePassOptions4Provider(null, null, null);
             LOGGER.trace("entering checkCredentialStoreOptions ");
             objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
 
@@ -315,6 +315,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     private void setKeePassOptions4Provider(SOSKeePassDatabase kpd, Entry<?, ?, ?, ?> entry, String attachmentPropertyName) {
+        LOGGER.debug(String.format("attachmentPropertyName=%s",attachmentPropertyName));
         keepass_database.value(kpd);
         keepass_database_entry.value(entry);
         keepass_attachment_property_name.setValue(attachmentPropertyName);
