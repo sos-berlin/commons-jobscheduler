@@ -57,7 +57,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public static final String conSystemPropertyFILE_SEPARATOR = "file.separator";
     public static final String conOperationRECEIVE = "receive";
     public boolean flgCumulativeTargetDeleted = false;
- 
+
     private final Map<String, String> includeDirectives = new HashMap<String, String>() {
 
         private static final long serialVersionUID = 1L;
@@ -121,8 +121,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         switch (penuTransferTypeSource) {
         case webdav:
             authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(),
-                    SOSOptionTransferType.enuTransferTypes.webdav.getText());
+            protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav.getText());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         default:
@@ -149,33 +148,33 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         switch (penuTransferType) {
         case webdav:
             pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(),
-                    SOSOptionTransferType.enuTransferTypes.webdav.getText());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav
+                    .getText());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         case local:
         case file:
             pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.local.getText(),
-                    SOSOptionTransferType.enuTransferTypes.local.getText());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.local.getText(), SOSOptionTransferType.enuTransferTypes.local
+                    .getText());
             pobjOpt.port.changeDefaults(0, 0);
             break;
         case ftp:
             pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftp.getText(),
-                    SOSOptionTransferType.enuTransferTypes.ftp.getText());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftp.getText(), SOSOptionTransferType.enuTransferTypes.ftp
+                    .getText());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4FTP, SOSOptionPortNumber.conPort4FTP);
             break;
         case sftp:
             pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.sftp.getText(),
-                    SOSOptionTransferType.enuTransferTypes.sftp.getText());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.sftp.getText(), SOSOptionTransferType.enuTransferTypes.sftp
+                    .getText());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
             break;
         case ftps:
             pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftps.getText(),
-                    SOSOptionTransferType.enuTransferTypes.ftps.getText());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftps.getText(), SOSOptionTransferType.enuTransferTypes.ftps
+                    .getText());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4FTPS, SOSOptionPortNumber.conPort4FTPS);
             break;
         default:
@@ -203,12 +202,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         try {
             if (objConnectionOptions == null) {
                 objConnectionOptions = new SOSConnection2Options(JSSettings);
-                //objMailOptions = new SOSSmtpMailOptions(JSSettings);
+                // objMailOptions = new SOSSmtpMailOptions(JSSettings);
             } else {
                 objConnectionOptions.setPrefixedValues(JSSettings);
             }
             if (objMailOptions == null) {
-                objMailOptions = new SOSSmtpMailOptions(JSSettings); 
+                objMailOptions = new SOSSmtpMailOptions(JSSettings);
             }
         } catch (Exception e) {
             throw new JobSchedulerException(e);
@@ -242,8 +241,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setDefaultHostPort(protocol, port, host);
         setDefaultHostPort(this.getSource().protocol, this.getSource().port, this.getSource().host);
         setDefaultHostPort(this.getTarget().protocol, this.getTarget().port, this.getTarget().host);
-        setDefaultHostPort(this.getSource().getAlternatives().protocol, this.getSource().getAlternatives().port, this.getSource().getAlternatives().host);
-        setDefaultHostPort(this.getTarget().getAlternatives().protocol, this.getTarget().getAlternatives().port, this.getTarget().getAlternatives().host);
+        setDefaultHostPort(this.getSource().getAlternatives().protocol, this.getSource().getAlternatives().port, this.getSource()
+                .getAlternatives().host);
+        setDefaultHostPort(this.getTarget().getAlternatives().protocol, this.getTarget().getAlternatives().port, this.getTarget()
+                .getAlternatives().host);
         getDataSourceType();
         getDataTargetType();
     }
@@ -320,8 +321,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setDefaultHostPort(protocol, port, host);
         setDefaultHostPort(this.getSource().protocol, this.getSource().port, this.getSource().host);
         setDefaultHostPort(this.getTarget().protocol, this.getTarget().port, this.getTarget().host);
-        setDefaultHostPort(this.getSource().getAlternatives().protocol, this.getSource().getAlternatives().port, this.getSource().getAlternatives().host);
-        setDefaultHostPort(this.getTarget().getAlternatives().protocol, this.getTarget().getAlternatives().port, this.getTarget().getAlternatives().host);
+        setDefaultHostPort(this.getSource().getAlternatives().protocol, this.getSource().getAlternatives().port, this.getSource()
+                .getAlternatives().host);
+        setDefaultHostPort(this.getTarget().getAlternatives().protocol, this.getTarget().getAlternatives().port, this.getTarget()
+                .getAlternatives().host);
         setDefaultAuth(this.getSource().protocol, this.getSource());
         setDefaultAuth(this.getTarget().protocol, this.getTarget());
         setDefaultAuth(this.getSource().getAlternatives().protocol, this.getSource().getAlternatives());
@@ -330,8 +333,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             filePath.setValue("");
         }
         if (filePath.IsEmpty() && sourceDir.IsEmpty() && this.getSource().directory.IsEmpty() && fileListName.IsEmpty()) {
-            throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
-                    filePath.getShortKey(), "source_dir", fileListName.getShortKey()));
+            throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'", filePath
+                    .getShortKey(), "source_dir", fileListName.getShortKey()));
         }
 
         if (protocolCommandListener.isDirty()) {
@@ -520,10 +523,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private boolean isEqualIgnoreCase(HashMap<String, String> params, String key, String value) {
         return ((params.get(key) != null) && params.get(key).equalsIgnoreCase(value));
     }
-    
+
     private void handleFileOrderSource(HashMap<String, String> params) {
         boolean b = false;
-        b = ((isEmpty(params, "file_path") || isEqualIgnoreCase(params,"file_path","${scheduler_file_path}")) && isEmpty(params, "source_dir") && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
+        b = ((isEmpty(params, "file_path") || isEqualIgnoreCase(params, "file_path", "${scheduler_file_path}")) && isEmpty(params, "source_dir")
+                && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
         if (b && !isEmpty(params, "scheduler_file_path")) {
             LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
                     + "file_spec or source_dir has been specified", params.get("scheduler_file_path")));
@@ -561,7 +565,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         SOSConfiguration conf = null;
         Properties properties = new Properties();
         try {
-            LOGGER.debug(String.format("readSettingsFile: settings=%s",settings.getValue()));
+            LOGGER.debug(String.format("readSettingsFile: settings=%s", settings.getValue()));
             sosLogger = new SOSStandardLogger(0);
             getEnvVars();
             conf = new SOSConfiguration(settings.getValue(), profile.getValue());
@@ -600,6 +604,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                     value = beatParams.get(key);
                 }
                 if (hasVariableToSubstitute(value) == true && gflgSubsituteVariables == true) {
+
                     LOGGER.trace("ReadSettingsFile() - key = " + key + ", value = " + value);
                     value = substituteVariables(value, properties);
                     value = substituteVariables(value, props4Substitute);
@@ -607,8 +612,18 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                     value = substituteVariables(value, propAllEnvironmentVariables);
                     value = substituteVariables(value, schedulerParams);
                     if (hasVariableToSubstitute(value)) {
-                        String strM = SOSVfsMessageCodes.SOSVfs_W_0070.params(value, key);
-                        LOGGER.warn(strM);
+                        switch (key) {
+                        case "source_pre_command":
+                        case "source_post_command":
+                        case "source_tfn_post_command":
+
+                        case "target_pre_command":
+                        case "target_post_command":
+                        case "target_tfn_post_command":
+                            break;
+                        default:
+                            LOGGER.warn(SOSVfsMessageCodes.SOSVfs_W_0070.params(value, key));
+                        }
                     }
                     value = unescape(value);
                 }
@@ -669,8 +684,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private boolean hasVariableToSubstitute(String value) {
         boolean flgResult = false;
-        value = " " + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "")
-                .replaceAll("%(source|target)(transfer)?filename%", "");
+        value = " " + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "").replaceAll(
+                "%(source|target)(transfer)?filename%", "");
         if (value.matches("^.*[^\\\\](\\$|%)\\{[^/\\}\\\\]+\\}.*$") || value.matches("^.*[^\\\\]%[^/%\\\\]+%.*$")) {
             flgResult = true;
         }
@@ -1035,7 +1050,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public String getOriginalSettingsFile() {
         return this.originalSettingsFile;
     }
-    
+
     public void setDeleteSettingsFileOnExit(boolean val) {
         this.deleteSettingsFileOnExit = val;
     }
