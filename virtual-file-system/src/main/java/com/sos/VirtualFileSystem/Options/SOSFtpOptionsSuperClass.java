@@ -19,7 +19,6 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandScript;
 import com.sos.JSHelper.Options.SOSOptionCommandScriptFile;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
-import com.sos.JSHelper.Options.SOSOptionEncoding;
 import com.sos.JSHelper.Options.SOSOptionFileName;
 import com.sos.JSHelper.Options.SOSOptionFileSize;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -356,6 +355,10 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return this;
     }
 
+    @JSOptionDefinition(name = "post_command_disable_for_skipped_transfer", description = "Disable Command to be execute after transfer", key = "post_command_disable_for_skipped_transfer", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean post_command_disable_for_skipped_transfer = new SOSOptionBoolean(this, CLASSNAME
+            + ".post_command_disable_for_skipped_transfer", "", "false", "false", false);
+
     @JSOptionDefinition(name = "Pre_Command", description = "FTP-Command to be execute before transfer", key = "Pre_Command", type = "SOSOptionString  ", mandatory = false)
     public SOSOptionCommandString preCommand = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Command", "", "", "", false);
 
@@ -367,6 +370,10 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         preCommand.setValue(pstrValue);
         return this;
     }
+
+    @JSOptionDefinition(name = "pre_command_enable_for_skipped_transfer", description = "Enable Command to be execute before transfer", key = "pre_command_enable_for_skipped_transfer", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean pre_command_enable_for_skipped_transfer = new SOSOptionBoolean(this, CLASSNAME
+            + ".pre_command_enable_for_skipped_transfer", "", "false", "false", false);
 
     @JSOptionDefinition(name = "PollKeepConnection", description = "Keep connection while polling", key = "PollKeepConnection", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean pollKeepConnection = new SOSOptionBoolean(this, CLASSNAME + ".PollKeepConnection", "Keep connection while polling",
@@ -2411,6 +2418,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionZeroByteTransfer transferZeroByteFiles = (SOSOptionZeroByteTransfer) zeroByteTransfer.setAlias("transfer_zero_byte_files");
 
     public void setAllOptions(final Properties pobjProperties) {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         HashMap<String, String> map = new HashMap<String, String>((Map) pobjProperties);
         try {
             super.setAllOptions(map);

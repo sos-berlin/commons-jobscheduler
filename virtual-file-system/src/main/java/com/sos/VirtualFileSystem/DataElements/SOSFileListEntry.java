@@ -210,7 +210,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 calculateIntegrityHash4Check = false;
             }
         }
-        executePreCommands();
+        executePreCommands(false);
         long totalBytesTransferred = 0;
         this.setStatus(enuTransferStatus.transferring);
         // send event to inform that transfer starts?
@@ -263,16 +263,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                             // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
                             // eventParams.put("transferring:" + source.getName(), values);
                             // sendEvent(eventParams);
-                            
+
                             // commented due to not having a progress bar and performance
-                            
-//                            if (eventHandler != null) {
-//                                Map<String, String> values = new HashMap<String, String>();
-//                                values.put("sourcePath", this.getSourceFilename());
-//                                values.put("targetPath", this.getTargetFilename());
-//                                values.put("state", "5");
-//                                eventHandler.updateDb(null, "YADE_FILE", values);
-//                            }
+
+                            // if (eventHandler != null) {
+                            // Map<String, String> values = new HashMap<String, String>();
+                            // values.put("sourcePath", this.getSourceFilename());
+                            // values.put("targetPath", this.getTargetFilename());
+                            // values.put("state", "5");
+                            // eventHandler.updateDb(null, "YADE_FILE", values);
+                            // }
                             if (calculateIntegrityHash4Check) {
                                 md4check.update(buffer, 0, bytesTransferred);
                             }
@@ -496,41 +496,92 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void executePostCommands() {
+        boolean isTransferred = eTransferStatus.equals(enuTransferStatus.transferred);
+        String status = eTransferStatus.name();
         Map<String, String> env = new HashMap<String, String>();
-        env.put(ENV_VAR_FILE_TRANSFER_STATUS, eTransferStatus.name());
-        env.put(ENV_VAR_FILE_IS_TRANSFERRED, eTransferStatus.equals(enuTransferStatus.transferred) ? "1" : "0");
+        env.put(ENV_VAR_FILE_TRANSFER_STATUS, status);
+        env.put(ENV_VAR_FILE_IS_TRANSFERRED, isTransferred ? "1" : "0");
 
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
-                    .getAlternatives().commandDelimiter, env);
+            if (!isTransferred && target.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
+                LOGGER.info(String.format("[alternative_target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
+            } else {
+                executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
+                        .getAlternatives().commandDelimiter, env);
+            }
         } else {
-            executeCommands("post_command", objDataTargetClient, objOptions.postCommand, null, env);
-            executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter, env);
+            if (!isTransferred && objOptions.post_command_disable_for_skipped_transfer.value()) {
+                LOGGER.info(String.format("[post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
+            } else {
+                executeCommands("post_command", objDataTargetClient, objOptions.postCommand, target.commandDelimiter, env);
+            }
+            if (!isTransferred && target.post_command_disable_for_skipped_transfer.value()) {
+                LOGGER.info(String.format("[target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
+            } else {
+                executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter, env);
+            }
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
-                    .getAlternatives().commandDelimiter, env);
+            if (!isTransferred && source.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
+                LOGGER.info(String.format("[alternative_source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
+            } else {
+                executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
+                        .getAlternatives().commandDelimiter, env);
+            }
         } else {
-            executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter, env);
+            if (!isTransferred && source.post_command_disable_for_skipped_transfer.value()) {
+                LOGGER.info(String.format("[source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
+            } else {
+                executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter, env);
+            }
         }
     }
 
-    private void executePreCommands() {
+    private void executePreCommands(boolean isSkipped) {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
+            if (isSkipped) {
+                if (target.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand,
+                            target.commandDelimiter);
+                }
+            } else {
+                executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
+            }
         } else {
-            executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
-            executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
+            if (isSkipped) {
+                if (objOptions.pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
+                }
+                if (target.pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
+                }
+            } else {
+                executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
+                executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
+            }
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
-                    .getAlternatives().commandDelimiter);
+            if (isSkipped) {
+                if (source.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
+                            .getAlternatives().commandDelimiter);
+                }
+            } else {
+                executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
+                        .getAlternatives().commandDelimiter);
+            }
         } else {
-            executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
+            if (isSkipped) {
+                if (source.pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
+                }
+            } else {
+                executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
+            }
         }
     }
 
@@ -1002,7 +1053,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             case getlist:
                 return;
             case delete:
-                executePreCommands();
+                executePreCommands(false);
                 objSourceFile.delete();
                 LOGGER.debug(SOSVfs_I_0113.params(strSourceFileName));
                 this.setStatus(enuTransferStatus.deleted);
@@ -1061,7 +1112,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 }
             }
 
-            if (!skipTransfer()) {
+            if (skipTransfer()) {
+                executePreCommands(true);
+            } else {
                 this.doTransfer(objSourceTransferFile, objTargetTransferFile);
                 LOGGER.debug("sourceFile.getModificationDateTime() = " + lngFileModDate);
                 if (objOptions.keepModificationDate.isTrue()) {
@@ -1607,7 +1660,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             return buf;
         }
     }
-    
+
     public long getModificationTimestamp() {
         return lngFileModDate;
     }
