@@ -199,6 +199,7 @@ public class SOSLdapAuthorizing {
         LOGGER.debug(String.format("Getting roles for user %s", sosLdapLoginUserName.getLogin()));
         Ini ini = Globals.getIniFromSecurityManagerFactory();
         Section s = ini.getSection("users");
+        if (s != null) {
         HashMap<String, String> caseInsensitivUser = new HashMap<String, String>();
 
 
@@ -207,6 +208,7 @@ public class SOSLdapAuthorizing {
             for (Map.Entry<String, String> entry : s.entrySet()) {
                 caseInsensitivUser.put(entry.getKey().toLowerCase(), entry.getValue());
             }
+            LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
             if (!addRolesFromUserSection(caseInsensitivUser, sosLdapLoginUserName.getLogin())) {
                 LOGGER.debug("... not found: reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
                 if (sosLdapLoginUserName.getAlternateLogin() != null) {
