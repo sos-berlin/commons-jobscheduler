@@ -1018,6 +1018,7 @@ public class SOSServicePermissionShiro {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
             Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
         }
+        LOGGER.debug(String.format("Method: %s, User: %s", "createUser", currentUser.getUsername()));
 
         sosLogin = new SOSlogin(Globals.getShiroIniSecurityManagerFactory());
         sosLogin.login(currentUser.getUsername(), currentUser.getPassword());
@@ -1028,6 +1029,8 @@ public class SOSServicePermissionShiro {
             JocError error = new JocError();
             error.setMessage(String.format("%s: Could not login with user: %s password:*******", sosLogin.getMsg(), currentUser.getUsername()));
             throw new JocException(error);
+        }else {
+            LOGGER.debug(String.format("Method: %s, User: %s, login successful", "createUser", currentUser.getUsername()));
         }
         Session session = sosLogin.getCurrentUser().getSession();
         String accessToken = session.getId().toString();
@@ -1157,6 +1160,7 @@ public class SOSServicePermissionShiro {
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
         try {
+            LOGGER.debug("Login: " + user);
             Globals.sosShiroProperties = new JocCockpitProperties();
             Globals.setProperties();
             TimeZone.setDefault(TimeZone.getTimeZone(UTC));
@@ -1168,8 +1172,9 @@ public class SOSServicePermissionShiro {
             }
 
             currentUser.setAuthorization(basicAuthorization);
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
+
             LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
 
             Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
 

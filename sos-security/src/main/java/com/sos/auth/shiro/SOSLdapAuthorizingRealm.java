@@ -41,6 +41,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authzInfo = null;
+        LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
         if (authorizing != null) {
 
             authorizing.setAuthcToken(authcToken);

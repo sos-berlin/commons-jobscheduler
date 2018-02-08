@@ -30,6 +30,8 @@ public class SOSlogin {
     }
 
     private void clearCache(String user) {
+        LOGGER.debug("sosLogin.clearCache(): " + user);
+
         RealmSecurityManager mgr = (RealmSecurityManager) SecurityUtils.getSecurityManager();
 
         Collection<Realm> realmCollection = mgr.getRealms();
@@ -51,10 +53,13 @@ public class SOSlogin {
     }
 
     public void createSubject(String user, String pwd) {
+        LOGGER.debug("sosLogin.createSubject(): " + user);
+
         clearCache(user);
         UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
         if (currentUser != null) {
             try {
+                LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
                 currentUser.login(token);
             } catch (UnknownAccountException uae) {
                 setMsg("There is no user with username/password combination of " + token.getPrincipal());
@@ -97,6 +102,7 @@ public class SOSlogin {
 
     private void init() {
 
+        LOGGER.debug("sosLogin.init()");
         if (factory != null) {
             SecurityManager securityManager = factory.getInstance();
             SecurityUtils.setSecurityManager(securityManager);
@@ -104,6 +110,7 @@ public class SOSlogin {
             LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
         }
 
+        LOGGER.debug("sosLogin.init(): buildSubject");
         currentUser = new Subject.Builder().buildSubject();
 
         try {
@@ -124,6 +131,7 @@ public class SOSlogin {
     }
 
     public void setMsg(String msg) {
+        LOGGER.debug("sosLogin: setMsg=" + msg);
         this.msg = msg;
     }
 
