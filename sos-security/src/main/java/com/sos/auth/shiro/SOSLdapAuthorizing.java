@@ -199,9 +199,7 @@ public class SOSLdapAuthorizing {
         LOGGER.debug(String.format("Getting roles for user %s", sosLdapLoginUserName.getLogin()));
         Ini ini = Globals.getIniFromSecurityManagerFactory();
         Section s = ini.getSection("users");
-        if (s != null) {
         HashMap<String, String> caseInsensitivUser = new HashMap<String, String>();
-
 
         if (s != null) {
             LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
