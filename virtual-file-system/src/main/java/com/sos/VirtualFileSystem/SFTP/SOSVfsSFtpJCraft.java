@@ -431,7 +431,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (isUnix) {
                         envs.append(String.format("export %s=%s;", k, v));
                     } else {
-                        // envs.append(String.format("set %s=%s&", k, v));
+                        envs.append(String.format("set %s=%s&", k, v));
                     }
                 });
                 LOGGER.debug(String.format("setEnv: %s", envs.toString()));
