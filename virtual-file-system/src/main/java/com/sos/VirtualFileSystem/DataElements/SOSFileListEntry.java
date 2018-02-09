@@ -544,7 +544,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         if (target.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (target.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("alternative_target_pre_command", objDataTargetClient, target.getAlternatives().preCommand,
+                    executeCommands("alternative_target_pre_command enable_for_skipped_transfer=true", objDataTargetClient, target.getAlternatives().preCommand,
                             target.commandDelimiter);
                 }
             } else {
@@ -553,10 +553,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         } else {
             if (isSkipped) {
                 if (objOptions.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
+                    executeCommands("pre_command enable_for_skipped_transfer=true", objDataTargetClient, objOptions.preCommand);
                 }
                 if (target.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("target_pre_command", objDataTargetClient, target.preCommand, target.commandDelimiter);
+                    executeCommands("target_pre_command enable_for_skipped_transfer=true", objDataTargetClient, target.preCommand, target.commandDelimiter);
                 }
             } else {
                 executeCommands("pre_command", objDataTargetClient, objOptions.preCommand);
@@ -567,7 +567,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         if (source.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (source.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("alternative_source_pre_command", objDataSourceClient, source.getAlternatives().preCommand, source
+                    executeCommands("alternative_source_pre_command enable_for_skipped_transfer=true", objDataSourceClient, source.getAlternatives().preCommand, source
                             .getAlternatives().commandDelimiter);
                 }
             } else {
@@ -577,7 +577,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         } else {
             if (isSkipped) {
                 if (source.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);
+                    executeCommands("source_pre_command enable_for_skipped_transfer=true", objDataSourceClient, source.preCommand, source.commandDelimiter);
                 }
             } else {
                 executeCommands("source_pre_command", objDataSourceClient, source.preCommand, source.commandDelimiter);

@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
+import sos.util.SOSString;
+
 /** @author KB */
 public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
@@ -91,8 +93,12 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         intCC = objCommand.waitFor();
         strStdOut = bytStdOut.toString(CHARACTER_ENCODING);
         strStdErr = bytStdErr.toString(CHARACTER_ENCODING);
-        LOGGER.info(strStdOut);
-        LOGGER.info(strStdErr);
+        if (!SOSString.isEmpty(strStdOut)) {
+            LOGGER.info(String.format("[stdout]%s", strStdOut.trim()));
+        }
+        if (!SOSString.isEmpty(strStdErr)) {
+            LOGGER.info(String.format("[stderr]%s", strStdErr.trim()));
+        }
         return intCC;
     }
 
@@ -123,13 +129,12 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
                     strStartShellCommandParameter = objShellOptions.getStartShellCommandParameter().getValue();
                     command[intCmdIndex++] = strStartShellCommandParameter;
                 }
-                command[intCmdIndex++] =
-                        objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
-                                + objShellOptions.getShellCommandParameter().getValue();
+                command[intCmdIndex++] = objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
+                        + objShellOptions.getShellCommandParameter().getValue();
             } else {
                 command[intCmdIndex++] = objShellOptions.getShellCommand().getValue();
-                command[intCmdIndex++] =
-                        objShellOptions.getCommandLineOptions().getValue() + " " + objShellOptions.getShellCommandParameter().getValue();
+                command[intCmdIndex++] = objShellOptions.getCommandLineOptions().getValue() + " " + objShellOptions.getShellCommandParameter()
+                        .getValue();
             }
         } else {
             strComSpec = System.getenv(pstrComSpec);
@@ -138,9 +143,8 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
             }
             command[intCmdIndex++] = strComSpec;
             command[intCmdIndex++] = strStartShellCommandParameter;
-            command[intCmdIndex++] =
-                    objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
-                            + objShellOptions.getShellCommandParameter().getValue();
+            command[intCmdIndex++] = objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
+                    + objShellOptions.getShellCommandParameter().getValue();
         }
         LOGGER.debug(SOSVfs_D_230.params(strComSpec));
         return command;

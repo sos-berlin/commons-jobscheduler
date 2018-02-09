@@ -465,9 +465,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             if (outContent.length() > 0) {
-                LOGGER.info(outContent);
+                LOGGER.info(String.format("[stdout]%s", outContent.toString().trim()));
             }
-            LOGGER.debug(SOSVfs_D_163.params("stderr", cmd));
             errReader = new BufferedReader(new InputStreamReader(err));
             errContent = new StringBuffer();
             while (true) {
@@ -477,7 +476,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 errContent.append(line + lineSeparator);
             }
-            LOGGER.debug(errContent);
+            if (errContent.length() > 0) {
+                LOGGER.info(String.format("[stderr]%s", errContent.toString().trim()));
+            }
             if (exitCode != null && !exitCode.equals(new Integer(0))) {
                 StringBuffer errMsg = new StringBuffer();
                 errMsg.append(exitCode.toString());
@@ -991,9 +992,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             String cmd = "echo $PATH";
             try {
                 CommandResult result = executePrivateCommand(cmd);
-                // @TODO parse PATH
-                if (result.getStdOut().toString().indexOf("/bin:") > -1) {
+                String stdout = result.getStdOut().toString();
+                if (stdout.indexOf("/bin:") > -1 && stdout.indexOf("Program Files") == -1) {
                     isUnix = true;
+                }
+                LOGGER.trace(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+                if (result.getStdErr().length() > 0) {
+                    LOGGER.trace(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
                 }
                 LOGGER.info(String.format("isUnix=%s", isUnix));
             } catch (Throwable e) {
