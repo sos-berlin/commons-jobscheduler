@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -13,7 +14,6 @@ import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
 import sos.util.SOSString;
 
-/** @author KB */
 public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     private static final String CHARACTER_ENCODING = "Cp1252";
@@ -75,6 +75,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
     }
 
     private int executeCommand(final String[] pstrCommand, final boolean showCommand) throws Exception {
+        return executeCommand(pstrCommand, showCommand, null);
+    }
+
+    private int executeCommand(final String[] pstrCommand, final boolean showCommand, Map<String, String> env) throws Exception {
         ByteArrayOutputStream bytStdOut = new ByteArrayOutputStream();
         ByteArrayOutputStream bytStdErr = new ByteArrayOutputStream();
         PrintStream psStdOut = new PrintStream(bytStdOut, true, CHARACTER_ENCODING);
@@ -86,6 +90,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
             LOGGER.debug(SOSVfs_D_0151.params(pstrCommand));
         }
         objShell = new ProcessBuilder(pstrCommand);
+        if (env != null) {
+            LOGGER.debug(String.format("set env=%s", env));
+            objShell.environment().putAll(env);
+        }
         final Process objCommand = objShell.start();
         createOutputPipe(objCommand.getInputStream(), psStdOut);
         createOutputPipe(objCommand.getErrorStream(), psStdErr);
@@ -108,6 +116,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     public int executeCommand(final String pstrcommand) throws Exception {
         return executeCommand(createCommand(pstrcommand), true);
+    }
+
+    public int executeCommand(final String pstrcommand, Map<String, String> env) throws Exception {
+        return executeCommand(createCommand(pstrcommand), true, env);
     }
 
     public int executeCommand(final ISOSCmdShellOptions pobjOptions) throws Exception {
