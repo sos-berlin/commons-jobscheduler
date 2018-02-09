@@ -637,7 +637,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void usePublicKeyMethod() throws Exception {
         String authMethod = "publickey";
         Object kd = connection2OptionsAlternate.keepass_database.value();
-        if (kd == null) {
+        Object ke = connection2OptionsAlternate.keepass_database_entry.value();
+        if (kd == null || ke == null) {
             SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
             authenticationFile.checkMandatory(true);
             if (authenticationFile.isNotEmpty()) {
@@ -655,9 +656,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         } else {
             SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
-            org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
-                    (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
-
+            org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry = (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) ke;
             try {
                 byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
                 String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + connection2OptionsAlternate.keepass_attachment_property_name

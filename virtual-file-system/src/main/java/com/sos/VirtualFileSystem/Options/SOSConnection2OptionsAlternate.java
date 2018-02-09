@@ -183,31 +183,43 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     public void checkCredentialStoreOptions() {
         if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
-            setKeePassOptions4Provider(null, null, null);
-            LOGGER.trace("entering checkCredentialStoreOptions ");
-            objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
-
-            String keePassPassword = null;
-            String keePassKeyFile = null;
-            if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
-                keePassPassword = objCredentialStoreOptions.credentialStorePassword.getValue();
-            }
-            if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
-                keePassKeyFile = objCredentialStoreOptions.credentialStoreKeyFileName.getValue();
-            }
             SOSKeePassDatabase kpd = null;
-            try {
-                kpd = new SOSKeePassDatabase(Paths.get(objCredentialStoreOptions.credentialStoreFileName.getValue()));
-                if (SOSString.isEmpty(keePassKeyFile)) {
-                    kpd.load(keePassPassword);
-                } else {
-                    kpd.load(keePassPassword, Paths.get(keePassKeyFile));
+            if (keepass_database.value() == null) {
+                LOGGER.debug(String.format("load KeePass from file %s", objCredentialStoreOptions.credentialStoreFileName.getValue()));
+                objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
+
+                String keePassPassword = null;
+                String keePassKeyFile = null;
+                if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
+                    keePassPassword = objCredentialStoreOptions.credentialStorePassword.getValue();
                 }
+                if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
+                    keePassKeyFile = objCredentialStoreOptions.credentialStoreKeyFileName.getValue();
+                }
+                // SOSKeePassDatabase kpd = null;
+                try {
+                    kpd = new SOSKeePassDatabase(Paths.get(objCredentialStoreOptions.credentialStoreFileName.getValue()));
+                    if (SOSString.isEmpty(keePassKeyFile)) {
+                        kpd.load(keePassPassword);
+                    } else {
+                        kpd.load(keePassPassword, Paths.get(keePassKeyFile));
+                    }
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                    throw new JobSchedulerException(e);
+                }
+            } else {
+                kpd = (SOSKeePassDatabase) keepass_database.value();
+                LOGGER.debug(String.format("use already loaded KeePass from %s", kpd.getFile().toString()));
+            }
+            try {
+                setKeePassOptions4Provider(kpd, null, null);
                 keePass2Options(kpd);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(e);
             }
+
         }
     }
 
@@ -315,7 +327,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     private void setKeePassOptions4Provider(SOSKeePassDatabase kpd, Entry<?, ?, ?, ?> entry, String attachmentPropertyName) {
-        LOGGER.debug(String.format("attachmentPropertyName=%s",attachmentPropertyName));
+        LOGGER.debug(String.format("attachmentPropertyName=%s", attachmentPropertyName));
         keepass_database.value(kpd);
         keepass_database_entry.value(entry);
         keepass_attachment_property_name.setValue(attachmentPropertyName);
