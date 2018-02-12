@@ -69,6 +69,7 @@ public class JSToolBox extends JSListenerClass {
 
     protected String makeFullPathName(final String pstrPathname, final String pstrFileName) {
         String strT = pstrFileName;
+        if(pstrFileName == null) return "";
         String normalizedFilename = pstrFileName.replace('\\', '/');
         String normalizedPathname = pstrPathname.replace('\\', '/');
         if (!normalizedFilename.startsWith(normalizedPathname)) {
