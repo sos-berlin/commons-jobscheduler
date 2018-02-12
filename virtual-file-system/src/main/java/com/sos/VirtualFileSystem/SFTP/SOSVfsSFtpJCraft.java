@@ -988,16 +988,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void checkOS() {
         if (!isOSChecked) {
-            String cmd = "echo $PATH";
+            String cmd = "echo %ComSpec%";
             try {
                 CommandResult result = executePrivateCommand(cmd);
                 String stdout = result.getStdOut().toString();
-                if (stdout.indexOf("/bin:") > -1 && stdout.indexOf("Program Files") == -1) {
+                if (stdout.indexOf("cmd.exe") > -1) {
+                    isUnix = false;
+                } else {
                     isUnix = true;
                 }
-                LOGGER.trace(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+                LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
                 if (result.getStdErr().length() > 0) {
-                    LOGGER.trace(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
+                    LOGGER.debug(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
                 }
                 LOGGER.info(String.format("isUnix=%s", isUnix));
             } catch (Throwable e) {
