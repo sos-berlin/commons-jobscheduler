@@ -1697,7 +1697,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
                     if (parentDir != null) {
                         parentDirFullName = parentDir.toString().replace('\\', '/');
-                        parentDirBaseName = parentDir.getFileName().toString();
+                        Path pdfn = parentDir.getFileName();
+                        if(pdfn != null){
+                            parentDirBaseName = pdfn.toString();
+                        }
                         if (baseDir == null) {
                             baseDir = parentDir;
                         }

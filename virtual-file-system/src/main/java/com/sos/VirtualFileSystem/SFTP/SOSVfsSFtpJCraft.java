@@ -478,13 +478,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             if (isErrorExitCode) {
                 StringBuffer msg = new StringBuffer("[" + cmd + "]");
-                msg.append("remote command terminated with the exit code " + exitCode.toString());
                 if (outContent.length() > 0) {
                     msg.append("[stdout=" + outContent.toString().trim() + "]");
                 }
                 if (errContent.length() > 0) {
                     msg.append("[stderr=" + errContent.toString().trim() + "]");
                 }
+                msg.append("remote command terminated with the exit code " + exitCode.toString());
                 throw new JobSchedulerException(msg.toString());
             } else {
                 if (errContent.length() > 0) {
