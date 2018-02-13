@@ -102,10 +102,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         strStdOut = bytStdOut.toString(CHARACTER_ENCODING);
         strStdErr = bytStdErr.toString(CHARACTER_ENCODING);
         if (!SOSString.isEmpty(strStdOut)) {
-            LOGGER.info(String.format("[stdout]%s", strStdOut.trim()));
+            LOGGER.info(String.format("%s[stdout]%s", objShell.command(), strStdOut.trim()));
         }
         if (!SOSString.isEmpty(strStdErr)) {
-            LOGGER.info(String.format("[stderr]%s", strStdErr.trim()));
+            LOGGER.info(String.format("%s[stderr]%s", objShell.command(), strStdErr.trim()));
         }
         return intCC;
     }

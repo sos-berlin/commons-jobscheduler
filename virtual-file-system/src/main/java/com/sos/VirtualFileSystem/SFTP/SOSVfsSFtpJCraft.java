@@ -492,7 +492,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             reply = "OK";
-            LOGGER.info(String.format("[%s]%s", cmd, reply));
+            //LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
