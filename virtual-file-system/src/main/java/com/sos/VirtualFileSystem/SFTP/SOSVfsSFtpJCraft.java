@@ -443,7 +443,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
             channelExec.connect();
-            LOGGER.debug(SOSVfs_D_163.params("stdout", cmd));
             outContent = new StringBuffer();
             byte[] tmp = new byte[1024];
             while (true) {
@@ -464,8 +463,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            if (outContent.length() > 0) {
-                LOGGER.info(String.format("[stdout]%s", outContent.toString().trim()));
+            boolean isErrorExitCode = exitCode != null && !exitCode.equals(new Integer(0));
+            if (!isErrorExitCode && outContent.length() > 0) {
+                LOGGER.info(String.format("[%s][stdout]%s", cmd, outContent.toString().trim()));
             }
             errReader = new BufferedReader(new InputStreamReader(err));
             errContent = new StringBuffer();
@@ -476,30 +476,35 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 errContent.append(line + lineSeparator);
             }
-            if (errContent.length() > 0) {
-                LOGGER.info(String.format("[stderr]%s", errContent.toString().trim()));
-            }
-            if (exitCode != null && !exitCode.equals(new Integer(0))) {
-                StringBuffer errMsg = new StringBuffer();
-                errMsg.append(exitCode.toString());
-                if (errContent.length() > 0) {
-                    errMsg.append(" (");
-                    errMsg.append(errContent);
-                    errMsg.append(")");
+            if (isErrorExitCode) {
+                StringBuffer msg = new StringBuffer("[" + cmd + "]");
+                msg.append("remote command terminated with the exit code " + exitCode.toString());
+                if (outContent.length() > 0) {
+                    msg.append("[stdout=" + outContent.toString().trim() + "]");
                 }
-                throw new JobSchedulerException(SOSVfs_E_164.params(errMsg));
+                if (errContent.length() > 0) {
+                    msg.append("[stderr=" + errContent.toString().trim() + "]");
+                }
+                throw new JobSchedulerException(msg.toString());
+            } else {
+                if (errContent.length() > 0) {
+                    LOGGER.info(String.format("[%s][stderr]%s", cmd, errContent.toString().trim()));
+                }
             }
             reply = "OK";
+            LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 throw ex;
             }
+            LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (Exception ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 raiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
             }
+            LOGGER.info(String.format("[%s]%s", cmd, reply));
         } finally {
             if (out != null) {
                 try {
@@ -529,7 +534,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
         }
     }
 
