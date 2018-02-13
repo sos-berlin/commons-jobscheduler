@@ -440,7 +440,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         String commands = optionCommands.getValue().trim();
         if (commands.length() > 0) {
             commands = replaceVariables(commands);
-            LOGGER.info(String.format("[%s] %s", commandOptionName, SOSVfs_D_0151.params(commands)));
             String delimiter = null;
             if (optionCommandDelimiter != null) {
                 delimiter = optionCommandDelimiter.getValue();
@@ -450,25 +449,30 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             }
             if (delimiter.isEmpty()) {
                 try {
+                    LOGGER.info(String.format("[%s]%s", commandOptionName, commands));
                     fileTransfer.getHandler().executeCommand(commands, env);
                 } catch (JobSchedulerException e) {
-                    LOGGER.error(e.toString());
+                    //LOGGER.error(e.toString());
                     throw e;
                 } catch (Exception e) {
-                    LOGGER.error(e.toString());
+                    //LOGGER.error(e.toString());
                     throw new JobSchedulerException(methodName, e);
                 }
             } else {
                 String[] values = commands.split(delimiter);
+                if (values.length > 1) {
+                    LOGGER.debug(String.format("[%s]commands=%s", commandOptionName, commands));
+                }
                 for (String command : values) {
                     if (command.trim().length() > 0) {
                         try {
+                            LOGGER.info(String.format("[%s]%s", commandOptionName, command.trim()));
                             fileTransfer.getHandler().executeCommand(command, env);
                         } catch (JobSchedulerException e) {
-                            LOGGER.error(e.toString());
+                            //LOGGER.error(e.toString());
                             throw e;
                         } catch (Exception e) {
-                            LOGGER.error(e.toString());
+                            //LOGGER.error(e.toString());
                             throw new JobSchedulerException(methodName, e);
                         }
                     }
