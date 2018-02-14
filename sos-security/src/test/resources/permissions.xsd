@@ -792,4 +792,34 @@
 			<xs:attribute name="accessToken" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
+	<xs:element name="SOSPermissionJocCockpitMasters">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="SOSPermissionJocCockpitMaster"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SOSPermissionJocCockpitMaster">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="JobSchedulerMaster" type="xs:string"/>
+				<xs:element ref="SOSPermissionJocCockpit"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SOSPermissionCommandsMaster">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="JobSchedulerMaster" type="xs:string"/>
+				<xs:element ref="SOSPermissionCommands"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SOSPermissionCommandsMasters">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="SOSPermissionCommandsMaster"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
