@@ -19,8 +19,8 @@ import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import com.sos.auth.rest.permission.model.ObjectFactory;
-import com.sos.auth.rest.permission.model.SOSPermissionCommands;
-import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.auth.rest.permission.model.SOSPermissionCommandsMasters;
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionListCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionListJoc;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
@@ -58,23 +58,23 @@ public class SOSServicePermissionShiro {
 	private SOSShiroCurrentUser currentUser;
 	private SOSlogin sosLogin;
 
-	public JOCDefaultResponse getJocCockpitPermissions(String accessToken, String user, String pwd) {
+	public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd)
+			throws JocException {
 		this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-		SOSPermissionJocCockpit sosPermissionJocCockpit = createJocCockpitPermissionObject(accessToken, user, pwd);
-		if (currentUser.getSelectedInstance() != null) {
-			sosPermissionJocCockpit.setJobschedulerId(currentUser.getSelectedInstance().getSchedulerId());
-			if (currentUser.getSelectedInstance().getPrecedence() == null) {
-				sosPermissionJocCockpit.setPrecedence(-1);
-			} else {
-				sosPermissionJocCockpit.setPrecedence(currentUser.getSelectedInstance().getPrecedence());
-			}
-		}
-		return JOCDefaultResponse.responseStatus200(sosPermissionJocCockpit);
+		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
+
+		SOSPermissionJocCockpitMasters sosPermissionMasters = sosPermissionsCreator
+				.createJocCockpitPermissionMasterObjectList(accessToken);
+		return JOCDefaultResponse.responseStatus200(sosPermissionMasters);
 	}
 
-	private JOCDefaultResponse getCommandPermissions(String accessToken, String user, String pwd) {
+	private JOCDefaultResponse getCommandPermissions(String accessToken, String user, String pwd) throws JocException {
 		this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-		return JOCDefaultResponse.responseStatus200(createCommandsPermissionObject(accessToken, user, pwd));
+		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
+
+		SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator
+				.createCommandsPermissionMasterObjectList(accessToken);
+		return JOCDefaultResponse.responseStatus200(sosPermissionCommandsMasters);
 	}
 
 	@GET
@@ -83,9 +83,9 @@ public class SOSServicePermissionShiro {
 	public JOCDefaultResponse getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
 			@HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
 			@QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user,
-			@QueryParam("pwd") String pwd) {
+			@QueryParam("pwd") String pwd) throws JocException {
 		String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
-		return getJocCockpitPermissions(accessToken, user, pwd);
+		return getJocCockpitMasterPermissions(accessToken, user, pwd);
 	}
 
 	@POST
@@ -111,7 +111,7 @@ public class SOSServicePermissionShiro {
 						USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
 			}
 
-			return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionJocCockpit());
+			return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionJocCockpitMasters());
 		} catch (org.apache.shiro.session.ExpiredSessionException e) {
 			LOGGER.error(e.getMessage());
 			SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(accessTokenFromHeader,
@@ -131,7 +131,7 @@ public class SOSServicePermissionShiro {
 	public JOCDefaultResponse getCommandPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
 			@HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
 			@QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user,
-			@QueryParam("pwd") String pwd) {
+			@QueryParam("pwd") String pwd) throws JocException {
 		String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
 		return getCommandPermissions(accessToken, user, pwd);
 	}
@@ -159,7 +159,7 @@ public class SOSServicePermissionShiro {
 						USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
 			}
 
-			return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionCommands());
+			return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionCommandsMasters());
 		} catch (org.apache.shiro.session.ExpiredSessionException e) {
 			LOGGER.error(e.getMessage());
 			SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(accessTokenFromHeader,
@@ -246,6 +246,7 @@ public class SOSServicePermissionShiro {
 			user = currentUser.getUsername();
 		}
 		LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "logout", user, accessToken));
+		SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
 		try {
 
 			if (currentUser == null || currentUser.getCurrentSubject() == null) {
@@ -253,7 +254,7 @@ public class SOSServicePermissionShiro {
 				throw new SessionNotExistException("Session doesn't exist");
 			}
 
-			currentUser.getCurrentSubject().getSession().getTimeout();
+			sosShiroSession.getTimeout();
 
 		} catch (ExpiredSessionException ex) {
 			comment = "Session time out: " + ex.getMessage();
@@ -269,9 +270,10 @@ public class SOSServicePermissionShiro {
 			jocAuditLog.logAuditMessage(s);
 			jocAuditLog.storeAuditLogEntry(s);
 			try {
+
 				Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
-				currentUser.getCurrentSubject().getSession().getTimeout();
-				currentUser.getCurrentSubject().getSession().stop();
+				sosShiroSession.getTimeout();
+				sosShiroSession.stop();
 
 			} catch (Exception e) {
 			}
@@ -335,7 +337,7 @@ public class SOSServicePermissionShiro {
 	public SOSShiroCurrentUserAnswer hasRole(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
 			@HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
 			@QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user,
-			@QueryParam("pwd") String pwd, @QueryParam("role") String role) {
+			@QueryParam("pwd") String pwd, @QueryParam("role") String role) throws SessionNotExistException {
 
 		String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
 
@@ -357,7 +359,8 @@ public class SOSServicePermissionShiro {
 	public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
 			@HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
 			@QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("user") String user,
-			@QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
+			@QueryParam("pwd") String pwd, @QueryParam("permission") String permission)
+			throws SessionNotExistException {
 
 		String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
 		setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -373,7 +376,8 @@ public class SOSServicePermissionShiro {
 
 	}
 
-	private void setCurrentUserfromAccessToken(String accessToken, String user, String pwd) {
+	private void setCurrentUserfromAccessToken(String accessToken, String user, String pwd)
+			throws SessionNotExistException {
 		if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null && accessToken != null
 				&& accessToken.length() > 0) {
 			currentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
@@ -399,7 +403,7 @@ public class SOSServicePermissionShiro {
 	public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
 			@HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader,
 			@QueryParam(ACCESS_TOKEN) String accessTokenFromQuery, @QueryParam("forUser") Boolean forUser,
-			@QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+			@QueryParam("user") String user, @QueryParam("pwd") String pwd) throws SessionNotExistException {
 
 		String accessToken = this.getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
 		this.setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -769,31 +773,6 @@ public class SOSServicePermissionShiro {
 		return accessTokenFromQuery;
 	}
 
-	public SOSPermissionJocCockpit createJocCockpitPermissionObject(String accessToken, String user, String pwd) {
-
-		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
-		SOSPermissionJocCockpit sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit();
-		sosPermissionJocCockpit.setSOSPermissionRoles(sosPermissionsCreator.getRoles(true));
-
-		currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
-		Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
-		return sosPermissionJocCockpit;
-	}
-
-	public SOSPermissionCommands createCommandsPermissionObject(String accessToken, String user, String pwd) {
-
-		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
-
-		SOSPermissionJocCockpit sosPermissionJocCockpit = sosPermissionsCreator.getSosPermissionJocCockpit();
-		SOSPermissionCommands sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands();
-		sosPermissionJocCockpit.setSOSPermissionRoles(sosPermissionsCreator.getRoles(true));
-
-		currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
-		currentUser.setSosPermissionCommands(sosPermissionCommands);
-		Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
-		return sosPermissionCommands;
-	}
-
 	private boolean isPermitted(String permission) {
 		return (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated());
 	}
@@ -820,15 +799,16 @@ public class SOSServicePermissionShiro {
 					currentUser.getUsername()));
 			throw new JocException(error);
 		}
-		Session session = sosLogin.getCurrentUser().getSession();
-		String accessToken = session.getId().toString();
+
+		SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
+		String accessToken = sosShiroSession.getId().toString();
 
 		currentUser.setAccessToken(accessToken);
 		Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
 
-		SOSPermissionJocCockpit sosPermissionJocCockpit = createJocCockpitPermissionObject(accessToken, EMPTY_STRING,
-				EMPTY_STRING);
-		currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
+		SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator
+				.createJocCockpitPermissionMasterObjectList(accessToken);
+		currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
 
 		currentUser.initFolders();
 
@@ -839,9 +819,9 @@ public class SOSServicePermissionShiro {
 			}
 		}
 
-		SOSPermissionCommands sosPermissionCommands = createCommandsPermissionObject(accessToken, EMPTY_STRING,
-				EMPTY_STRING);
-		currentUser.setSosPermissionCommands(sosPermissionCommands);
+		SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator
+				.createCommandsPermissionMasterObjectList(accessToken);
+		currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
 
 		if (Globals.sosShiroProperties == null) {
 			Globals.sosShiroProperties = new JocCockpitProperties();
@@ -881,12 +861,13 @@ public class SOSServicePermissionShiro {
 	private SOSShiroCurrentUserAnswer authenticate() throws Exception {
 
 		createUser();
+		SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
 
 		SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
 		sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.getCurrentSubject().isAuthenticated());
 		sosShiroCurrentUserAnswer.setAccessToken(currentUser.getAccessToken());
 		sosShiroCurrentUserAnswer.setUser(currentUser.getUsername());
-		sosShiroCurrentUserAnswer.setSessionTimeout(currentUser.getCurrentSubject().getSession().getTimeout());
+		sosShiroCurrentUserAnswer.setSessionTimeout(sosShiroSession.getTimeout());
 
 		boolean enableTouch = "true".equals(Globals.sosShiroProperties.getProperty(
 				WebserviceConstants.ENABLE_SESSION_TOUCH, WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
@@ -950,9 +931,9 @@ public class SOSServicePermissionShiro {
 				}
 				return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
 			} else {
+				SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
 				return JOCDefaultResponse.responseStatus200WithHeaders(sosShiroCurrentUserAnswer,
-						sosShiroCurrentUserAnswer.getAccessToken(),
-						currentUser.getCurrentSubject().getSession().getTimeout());
+						sosShiroCurrentUserAnswer.getAccessToken(), sosShiroSession.getTimeout());
 			}
 
 		} catch (UnsupportedEncodingException e) {
@@ -965,15 +946,12 @@ public class SOSServicePermissionShiro {
 		}
 	}
 
-	private void resetTimeOut() {
+	private void resetTimeOut() throws SessionNotExistException {
 
 		if (currentUser != null) {
-			Session curSession = currentUser.getCurrentSubject().getSession(false);
-			if (curSession != null) {
-				curSession.touch();
-			} else {
-				throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
-			}
+			SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
+			sosShiroSession.touch();
+
 		} else {
 			LOGGER.error(USER_IS_NULL);
 		}
