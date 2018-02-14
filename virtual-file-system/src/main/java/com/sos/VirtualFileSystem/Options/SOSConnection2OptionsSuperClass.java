@@ -235,6 +235,10 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return this;
     }
 
+    @JSOptionDefinition(name = "post_command_disable_for_skipped_transfer", description = "Disable Command to be execute after transfer", key = "post_command_disable_for_skipped_transfer", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean post_command_disable_for_skipped_transfer = new SOSOptionBoolean(this, CLASSNAME
+            + ".post_command_disable_for_skipped_transfer", "", "false", "false", false);
+
     @JSOptionDefinition(name = "Pre_Command", description = "FTP-Command to be execute before transfer", key = "Pre_Command", type = "SOSOptionString  ", mandatory = false)
     public SOSOptionString preCommand = new SOSOptionString(this, CLASSNAME + ".Pre_Command", "", "", "", false);
 
@@ -248,6 +252,10 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         preCommand.setValue(pstrValue);
         return this;
     }
+
+    @JSOptionDefinition(name = "pre_command_enable_for_skipped_transfer", description = "Enable Command to be execute before transfer", key = "pre_command_enable_for_skipped_transfer", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean pre_command_enable_for_skipped_transfer = new SOSOptionBoolean(this, CLASSNAME
+            + ".pre_command_enable_for_skipped_transfer", "", "false", "false", false);
 
     @JSOptionDefinition(name = "FtpS_protocol", description = "Type of FTPS-Protocol, e.g. SSL, TLS", key = "FtpS_protocol", type = "SOSOptionString", mandatory = true)
     public SOSOptionString ftpsProtocol = new SOSOptionString(this, CLASSNAME + ".FtpS_protocol", "Type of FTPS-Protocol, e.g. SSL, TLS", "SSL",
@@ -406,7 +414,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public void setPassphrase(final SOSOptionPassword val) {
         passphrase = val;
     }
-    
+
     public SOSConnection2OptionsSuperClass() {
         objParentClass = this.getClass();
     }

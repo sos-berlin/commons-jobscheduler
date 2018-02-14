@@ -431,7 +431,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (isUnix) {
                         envs.append(String.format("export %s=%s;", k, v));
                     } else {
-                        // envs.append(String.format("set %s=%s&", k, v));
+                        envs.append(String.format("set %s=%s&", k, v));
                     }
                 });
                 LOGGER.debug(String.format("setEnv: %s", envs.toString()));
@@ -443,7 +443,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
             channelExec.connect();
-            LOGGER.debug(SOSVfs_D_163.params("stdout", cmd));
             outContent = new StringBuffer();
             byte[] tmp = new byte[1024];
             while (true) {
@@ -464,10 +463,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            if (outContent.length() > 0) {
-                LOGGER.info(outContent);
+            boolean isErrorExitCode = exitCode != null && !exitCode.equals(new Integer(0));
+            if (!isErrorExitCode && outContent.length() > 0) {
+                LOGGER.info(String.format("[%s][stdout]%s", cmd, outContent.toString().trim()));
             }
-            LOGGER.debug(SOSVfs_D_163.params("stderr", cmd));
             errReader = new BufferedReader(new InputStreamReader(err));
             errContent = new StringBuffer();
             while (true) {
@@ -477,28 +476,35 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 errContent.append(line + lineSeparator);
             }
-            LOGGER.debug(errContent);
-            if (exitCode != null && !exitCode.equals(new Integer(0))) {
-                StringBuffer errMsg = new StringBuffer();
-                errMsg.append(exitCode.toString());
-                if (errContent.length() > 0) {
-                    errMsg.append(" (");
-                    errMsg.append(errContent);
-                    errMsg.append(")");
+            if (isErrorExitCode) {
+                StringBuffer msg = new StringBuffer("[" + cmd + "]");
+                if (outContent.length() > 0) {
+                    msg.append("[stdout=" + outContent.toString().trim() + "]");
                 }
-                throw new JobSchedulerException(SOSVfs_E_164.params(errMsg));
+                if (errContent.length() > 0) {
+                    msg.append("[stderr=" + errContent.toString().trim() + "]");
+                }
+                msg.append("remote command terminated with the exit code " + exitCode.toString());
+                throw new JobSchedulerException(msg.toString());
+            } else {
+                if (errContent.length() > 0) {
+                    LOGGER.info(String.format("[%s][stderr]%s", cmd, errContent.toString().trim()));
+                }
             }
             reply = "OK";
+            //LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 throw ex;
             }
+            LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (Exception ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 raiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
             }
+            LOGGER.info(String.format("[%s]%s", cmd, reply));
         } finally {
             if (out != null) {
                 try {
@@ -528,7 +534,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
         }
     }
 
@@ -636,7 +641,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void usePublicKeyMethod() throws Exception {
         String authMethod = "publickey";
         Object kd = connection2OptionsAlternate.keepass_database.value();
-        if (kd == null) {
+        Object ke = connection2OptionsAlternate.keepass_database_entry.value();
+        if (kd == null || ke == null) {
             SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
             authenticationFile.checkMandatory(true);
             if (authenticationFile.isNotEmpty()) {
@@ -654,9 +660,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         } else {
             SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
-            org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry =
-                    (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) connection2OptionsAlternate.keepass_database_entry.value();
-
+            org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry = (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) ke;
             try {
                 byte[] pr = kpd.getAttachment(entry, connection2OptionsAlternate.keepass_attachment_property_name.getValue());
                 String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + connection2OptionsAlternate.keepass_attachment_property_name
@@ -988,12 +992,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void checkOS() {
         if (!isOSChecked) {
-            String cmd = "echo $PATH";
+            String cmd = "echo %ComSpec%";
             try {
                 CommandResult result = executePrivateCommand(cmd);
-                // @TODO parse PATH
-                if (result.getStdOut().toString().indexOf("/bin:") > -1) {
+                String stdout = result.getStdOut().toString();
+                if (stdout.indexOf("cmd.exe") > -1) {
+                    isUnix = false;
+                } else {
                     isUnix = true;
+                }
+                LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+                if (result.getStdErr().length() > 0) {
+                    LOGGER.debug(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
                 }
                 LOGGER.info(String.format("isUnix=%s", isUnix));
             } catch (Throwable e) {

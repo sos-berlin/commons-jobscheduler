@@ -1076,39 +1076,39 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public String getJobSchedulerId() {
         return jobSchedulerId;
     }
-    
+
     public void setJobSchedulerId(String jobSchedulerId) {
         this.jobSchedulerId = jobSchedulerId;
     }
-    
+
     public String getJobChain() {
         return jobChain;
     }
-    
+
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
-    
+
     public String getJobChainNodeName() {
         return jobChainNodeName;
     }
-    
+
     public void setJobChainNodeName(String jobChainNodeName) {
         this.jobChainNodeName = jobChainNodeName;
     }
-    
+
     public String getJob() {
         return job;
     }
-    
+
     public void setJob(String job) {
         this.job = job;
     }
-    
+
     public String getOrderId() {
         return orderId;
     }
-    
+
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -1116,7 +1116,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public String getTaskId() {
         return taskId;
     }
-    
+
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
