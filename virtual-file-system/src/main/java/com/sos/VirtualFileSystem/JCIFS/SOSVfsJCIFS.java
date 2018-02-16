@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -22,6 +23,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
+import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import jcifs.UniAddress;
@@ -42,6 +44,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     private String domain = null;
     private String currentDirectory = "";
     private boolean simulateShell = false;
+    private CmdShell cmdShell = null;
 
     public SOSVfsJCIFS() {
         super();
@@ -360,8 +363,31 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void executeCommand(final String cmd) {
-        LOGGER.debug("not implemented yet");
+    public void executeCommand(final String cmd) throws Exception {
+        executeCommand(cmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String cmd, Map<String, String> env) throws Exception {
+        if (cmdShell == null) {
+            cmdShell = new CmdShell();
+        }
+        String command = cmd.trim();
+        if (cmdShell.isWindows()) {
+            command = cmdShell.replaceCommand4Windows(command);
+        }
+        int exitCode = cmdShell.executeCommand(command, env);
+        if (exitCode != 0) {
+            boolean raiseException = true;
+            if (connection2OptionsAlternate != null) {
+                raiseException = connection2OptionsAlternate.raiseExceptionOnError.value();
+            }
+            if (raiseException) {
+                throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
+            } else {
+                LOGGER.info(SOSVfs_D_151.params(command, SOSVfs_E_191.params(exitCode + "")));
+            }
+        }
     }
 
     @Override
@@ -435,7 +461,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         }
         return dateTime;
     }
-    
+
     public long getModificationTimeStamp(final String path) throws Exception {
         SmbFile f = getSmbFile(this.normalizePath(path));
         if (f.exists()) {
@@ -443,7 +469,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         }
         return -1L;
     }
-    
+
     public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception {
         SmbFile f = getSmbFile(this.normalizePath(path));
         if (f.exists()) {

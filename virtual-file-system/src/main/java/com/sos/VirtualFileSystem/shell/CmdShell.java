@@ -39,6 +39,13 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         return osn != null && osn.contains("Windows");
     }
 
+    public String replaceCommand4Windows(final String cmd) {
+        String command = cmd;
+        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
+        command = command.replaceAll("(?<! )/", "\\\\");
+        return command;
+    }
+    
     public int getCC() {
         return intCC;
     }
