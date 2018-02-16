@@ -216,6 +216,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
         }
     }
+    
+    public CmdShell getCmdShell(){
+        if (objCmdShell == null) {
+            objCmdShell = new CmdShell();
+        }
+        return objCmdShell;
+    }
 
     @Override
     public void flush() {
