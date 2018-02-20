@@ -262,22 +262,30 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public String getPreCommand() {
         String delimiter;
+        String preCommand = objOptions.getPreCommand().getValue();
         if(flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
+            if(objOptions.getPreCommand().isNotDirty()) {
+                preCommand = DEFAULT_WINDOWS_PRE_COMMAND;
+            }
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
+            if(objOptions.getPreCommand().isNotDirty()) {
+                preCommand = DEFAULT_LINUX_PRE_COMMAND;
+            }
         }
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
             strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
             strb.append(" >> ").append(pidFileName).append(delimiter);
-            strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+            
+            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
             strb.append(delimiter);
             return strb.toString();
         }
         strb.append(ssh_job_get_pid_command).append(delimiter);
-        strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
         strb.append(delimiter);
         return strb.toString();
     }
