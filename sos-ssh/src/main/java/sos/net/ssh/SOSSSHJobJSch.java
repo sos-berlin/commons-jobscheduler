@@ -34,11 +34,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     protected ISOSVFSHandler vfsHandler;
     private static final Logger LOGGER = Logger.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
-    private static final String COMMAND_DELIMITER = ";";
     private static final String DEFAULT_LINUX_DELIMITER = ";";
     private static final String DEFAULT_WINDOWS_DELIMITER = "&";
     private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
     private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
+    private static final String DEFAULT_WINDOWS_PRE_COMMAND = "set \"%s=%s\"";
+    private static final String DEFAULT_LINUX_PRE_COMMAND = "export %s='%s'";
+    private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "type \"%s\"";
+    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "cat %s";
+    private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
+    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "rm %s";
     private String tempFileName;
     private String pidFileName;
     private String ssh_job_get_pid_command = "echo $$";
@@ -257,22 +262,30 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public String getPreCommand() {
         String delimiter;
+        String preCommand = objOptions.getPreCommand().getValue();
         if(flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
+            if(objOptions.getPreCommand().isNotDirty()) {
+                preCommand = DEFAULT_WINDOWS_PRE_COMMAND;
+            }
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
+            if(objOptions.getPreCommand().isNotDirty()) {
+                preCommand = DEFAULT_LINUX_PRE_COMMAND;
+            }
         }
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
             strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
             strb.append(" >> ").append(pidFileName).append(delimiter);
-            strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+            
+            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
             strb.append(delimiter);
             return strb.toString();
         }
         strb.append(ssh_job_get_pid_command).append(delimiter);
-        strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
         strb.append(delimiter);
         return strb.toString();
     }
