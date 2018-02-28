@@ -280,12 +280,24 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
             strb.append(" >> ").append(pidFileName).append(delimiter);
             
-            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+            if(flgIsWindowsShell) {
+                tempFileName = "%CD%\\" + tempFileName;
+                strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+            } else {
+                tempFileName = "`pwd`/" + tempFileName;
+                strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+            }
             strb.append(delimiter);
             return strb.toString();
         }
         strb.append(ssh_job_get_pid_command).append(delimiter);
-        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+        if(flgIsWindowsShell) {
+            tempFileName = "%CD%\\" + tempFileName;
+            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+        } else {
+            tempFileName = "`pwd`/" + tempFileName;
+            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+        }
         strb.append(delimiter);
         return strb.toString();
     }
