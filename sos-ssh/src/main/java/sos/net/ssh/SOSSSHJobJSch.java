@@ -123,6 +123,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
                 }
             }
+            if(flgIsWindowsShell) {
+                tempFileName = "%CD%\\" + tempFileName;
+            } else {
+                tempFileName = "`pwd`/" + tempFileName;
+            }
             for (String strCmd : strCommands2Execute) {
                 executedCommand = strCmd;
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value());
@@ -280,24 +285,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
             strb.append(" >> ").append(pidFileName).append(delimiter);
             
-            if(flgIsWindowsShell) {
-                tempFileName = "%CD%\\" + tempFileName;
-                strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
-            } else {
-                tempFileName = "`pwd`/" + tempFileName;
-                strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
-            }
+            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
             strb.append(delimiter);
             return strb.toString();
         }
         strb.append(ssh_job_get_pid_command).append(delimiter);
-        if(flgIsWindowsShell) {
-            tempFileName = "%CD%\\" + tempFileName;
-            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
-        } else {
-            tempFileName = "`pwd`/" + tempFileName;
-            strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
-        }
+        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
         strb.append(delimiter);
         return strb.toString();
     }
