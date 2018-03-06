@@ -8,7 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 public class ParameterSubstitutor {
@@ -22,7 +27,7 @@ public class ParameterSubstitutor {
 
     public void setOpenTag(String openTag) {
         this.openTag = openTag;
-    }
+     }
 
     public void setCloseTag(String closeTag) {
         this.closeTag = closeTag;
@@ -99,6 +104,20 @@ public class ParameterSubstitutor {
 
     public void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
+    }
+    
+    public List<String> getParameterNameFromString(String s){
+    	List<String> l = new ArrayList<String>();
+        String s2 = "ab${ab}sjfvböjsbv${12}lfb${12}nlkn";
+        String ot = Pattern.quote(openTag);
+        String ct = Pattern.quote(closeTag);
+        String regEx = ot + "([^" + ct + "]+)" + ct;
+       // Matcher m = Pattern.compile("\\$\\{([^\\}]+)\\}").matcher(s);
+        Matcher m = Pattern.compile(regEx).matcher(s);
+        while (m.find()) {
+            l.add(m.group(1));
+        } 
+        return l;
     }
 
 }
