@@ -26,6 +26,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.keepass.SOSKeePassDatabase;
 
 import sos.configuration.SOSConfiguration;
 import sos.net.mail.options.SOSSmtpMailOptions;
@@ -636,7 +637,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                         case "target_tfn_post_command":
                             break;
                         default:
-                            LOGGER.warn(SOSVfsMessageCodes.SOSVfs_W_0070.params(value, key));
+                            if (!SOSKeePassDatabase.hasKeePassVariables(value)) {
+                                LOGGER.warn(SOSVfsMessageCodes.SOSVfs_W_0070.params(value, key));
+                            }
                         }
                     }
                     value = unescape(value);
