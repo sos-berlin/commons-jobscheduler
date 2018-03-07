@@ -201,7 +201,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         }
         String command = cmd.trim();
         if (objCmdShell.isWindows()) {
-            command = replaceCommand4Windows(command);
+            command = objCmdShell.replaceCommand4Windows(command);
         }
         int exitCode = objCmdShell.executeCommand(command, env);
         if (exitCode != 0) {
@@ -216,12 +216,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
         }
     }
-
-    public String replaceCommand4Windows(final String cmd) {
-        String command = cmd;
-        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
-        command = command.replaceAll("(?<! )/", "\\\\");
-        return command;
+    
+    public CmdShell getCmdShell(){
+        if (objCmdShell == null) {
+            objCmdShell = new CmdShell();
+        }
+        return objCmdShell;
     }
 
     @Override

@@ -67,7 +67,7 @@ public class SOSVfslocalTest {
     @Test
     public void testReplaceCommand4Windows() throws Exception {
         SOSVfsLocal objSOSVfsLocal = new SOSVfsLocal();
-        String strR = objSOSVfsLocal.replaceCommand4Windows("echo /Y //host/c/nobackup/text.txt c:/nobackup/text.txt /nobackup/text.txt");
+        String strR = objSOSVfsLocal.getCmdShell().replaceCommand4Windows("echo /Y //host/c/nobackup/text.txt c:/nobackup/text.txt /nobackup/text.txt");
         assertEquals("CommandStringReplace message", "echo /Y \\\\host\\c\\nobackup\\text.txt c:\\nobackup\\text.txt \\nobackup\\text.txt", strR);
     }
 

@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.session.ExpiredSessionException;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionCommandsMasters;

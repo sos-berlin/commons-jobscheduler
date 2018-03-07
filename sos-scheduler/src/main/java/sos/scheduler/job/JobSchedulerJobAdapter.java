@@ -30,13 +30,13 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
-import sos.scheduler.misc.ParameterSubstitutor;
 import sos.spooler.Job;
 import sos.spooler.Job_chain;
 import sos.spooler.Job_chain_node;
 import sos.spooler.Order;
 import sos.spooler.Supervisor_client;
 import sos.spooler.Variable_set;
+import sos.util.ParameterSubstitutor;
 
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl, IJobSchedulerEventHandler {

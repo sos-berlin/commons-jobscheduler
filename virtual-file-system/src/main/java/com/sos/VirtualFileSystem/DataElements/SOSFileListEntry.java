@@ -243,6 +243,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     if (calculateIntegrityHash4Create) {
                         md4create.update(compressedBytes.getBytes());
                     }
+                    if (eventHandler != null) {
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put("sourcePath", this.getSourceFilename());
+                        values.put("targetPath", this.getTargetFilename());
+                        values.put("state", "5");
+                        eventHandler.updateDb(null, "YADE_FILE", values);
+                    }
                 } else {
                     // int actualBytesTransferred = 0;
                     if (eventHandler != null) {

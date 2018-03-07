@@ -215,6 +215,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             try {
                 setKeePassOptions4Provider(kpd, null, null);
                 keePass2Options(kpd);
+                resolveCommands(kpd);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(e);
@@ -223,11 +224,29 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         }
     }
 
+    private void resolveCommands(final SOSKeePassDatabase kpd) throws Exception {
+        resolveCommand(kpd, preTransferCommands);
+        resolveCommand(kpd, preCommand);
+        resolveCommand(kpd, postTransferCommands);
+        resolveCommand(kpd, postTransferCommandsOnError);
+        resolveCommand(kpd, postTransferCommandsFinal);
+        resolveCommand(kpd, tfnPostCommand);
+    }
+
+    private void resolveCommand(final SOSKeePassDatabase kpd, final SOSOptionElement el) throws Exception {
+        String command = el.getValue();
+        if (SOSKeePassDatabase.hasKeePassVariables(command)) {
+            el.setValue(kpd.resolveKeePassVariables(command));
+            LOGGER.debug(String.format("resolveCommand: %s=%s", el.getShortKey(), el.getValue()));
+        }
+    }
+
     private Entry<?, ?, ?, ?> keePass2OptionsByKeePassSyntax(final SOSKeePassDatabase kpd) throws Exception {
         Entry<?, ?, ?, ?> entry = keePass2OptionByKeePassSyntax(kpd, host, null);
         entry = keePass2OptionByKeePassSyntax(kpd, user, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, password, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, passphrase, entry);
+        entry = keePass2OptionByKeePassSyntax(kpd, domain, entry);
 
         entry = keePass2OptionByKeePassSyntax(kpd, proxyHost, entry);
         entry = keePass2OptionByKeePassSyntax(kpd, proxyUser, entry);
