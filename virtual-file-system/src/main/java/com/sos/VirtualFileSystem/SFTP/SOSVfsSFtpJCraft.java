@@ -36,6 +36,7 @@ import com.jcraft.jsch.SOSRequiredAuthPublicKey;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.UserInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -492,7 +493,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             reply = "OK";
-            //LOGGER.info(String.format("[%s]%s", cmd, reply));
+            // LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
@@ -683,6 +684,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setPassword(authenticationOptions.getPassword().getValue());
     }
 
+    private void useKeyboardInteractive() throws Exception {
+        Object ui = connection2OptionsAlternate.user_info.value();
+        if (ui == null) {
+            LOGGER.debug(String.format("use default %s implementation", SOSVfsSFtpJCraftUserInfo.class.getSimpleName()));
+            ui = new SOSVfsSFtpJCraftUserInfo();
+        }
+        sshSession.setUserInfo((UserInfo) ui);
+    }
+
     private String usePreferredAuthentications(final String debugKey, final String preferredAuthentications) throws Exception {
         LOGGER.debug(String.format("[%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
         try {
@@ -728,8 +738,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
                 if (authenticationOptions.getAuthMethod().isPublicKey()) {
                     usePublicKeyMethod();
-                } else {
+                } else if (authenticationOptions.getAuthMethod().isPassword()) {
                     usePasswordMethod();
+                } else if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+                    useKeyboardInteractive();
                 }
             }
         }
