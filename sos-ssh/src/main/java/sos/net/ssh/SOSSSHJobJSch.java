@@ -46,6 +46,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "rm %s";
     private String tempFileName;
+    private String resolvedTempFileName;
     private String pidFileName;
     private String ssh_job_get_pid_command = "echo $$";
     private Map allParams = null;
@@ -133,8 +134,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     completeCommand = getPreCommand() + strCmd;
                 }
                 try {
-                    strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    completeCommand = objJSJobUtilities.replaceSchedulerVars(completeCommand);
+                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), completeCommand));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     ExecutorService executorService = Executors.newFixedThreadPool(2);
                     final String cmdToExecute = completeCommand;
@@ -151,7 +152,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         public Void call() throws Exception {
                             Thread.sleep(1000);
                             while(!commandExecution.isDone()) {
-                                Thread.sleep(60000);
+                                Thread.sleep(1000);
                                 ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("CONT");
                             }
                             return null;
@@ -186,7 +187,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                 }
             }
-            processPostCommands(getTempFileName());
+            if (resolvedTempFileName != null) {
+                processPostCommands(resolvedTempFileName);
+            }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
                 String strErrMsg =
@@ -282,9 +285,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             strb.append(" >> ").append(pidFileName).append(delimiter);
         }
         if (objOptions.tempDirectory.isDirty()) {
-            tempFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), tempFileName);
+            resolvedTempFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), tempFileName);
+        } else {
+            resolvedTempFileName = tempFileName;
         }
-        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, tempFileName));
+        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, resolvedTempFileName));
         strb.append(delimiter);
         return strb.toString();
     }
