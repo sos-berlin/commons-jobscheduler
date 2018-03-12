@@ -4,6 +4,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -110,8 +111,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
-            for (String key : ((SOSSSHJobJSch) objR).getReturnValues().keySet()) {
-                spooler_task.order().params().set_var(key, ((SOSSSHJobJSch) objR).getReturnValues().get(key));
+            for (Entry<String, String> entry : ((SOSSSHJobJSch) objR).getReturnValues().entrySet()) {
+                spooler_task.order().params().set_var(entry.getKey(), entry.getValue());
             }
         }
     }
