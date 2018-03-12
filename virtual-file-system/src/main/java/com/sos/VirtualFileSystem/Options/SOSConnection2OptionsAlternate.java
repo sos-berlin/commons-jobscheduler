@@ -1,13 +1,16 @@
 package com.sos.VirtualFileSystem.Options;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.linguafranca.pwdb.Entry;
 
+import com.google.common.base.Joiner;
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
@@ -24,6 +27,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
 
+import sos.util.ParameterSubstitutor;
 import sos.util.SOSString;
 
 @JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
@@ -225,20 +229,57 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     private void resolveCommands(final SOSKeePassDatabase kpd) throws Exception {
-        resolveCommand(kpd, preTransferCommands);
-        resolveCommand(kpd, preCommand);
-        resolveCommand(kpd, postTransferCommands);
-        resolveCommand(kpd, postTransferCommandsOnError);
-        resolveCommand(kpd, postTransferCommandsFinal);
-        resolveCommand(kpd, tfnPostCommand);
+        Map<String, Entry<?, ?, ?, ?>> entries = resolveCommand(preTransferCommands, kpd, new HashMap<String, Entry<?, ?, ?, ?>>());
+        entries = resolveCommand(preCommand, kpd, entries);
+        entries = resolveCommand(postTransferCommands, kpd, entries);
+        entries = resolveCommand(postTransferCommandsOnError, kpd, entries);
+        entries = resolveCommand(postTransferCommandsFinal, kpd, entries);
+        entries = resolveCommand(tfnPostCommand, kpd, entries);
     }
 
-    private void resolveCommand(final SOSKeePassDatabase kpd, final SOSOptionElement el) throws Exception {
+    private Map<String, Entry<?, ?, ?, ?>> resolveCommand(final SOSOptionElement el, final SOSKeePassDatabase kpd,
+            final Map<String, Entry<?, ?, ?, ?>> lastEntries) throws Exception {
         String command = el.getValue();
-        if (SOSKeePassDatabase.hasKeePassVariables(command)) {
-            el.setValue(kpd.resolveKeePassVariables(command));
-            LOGGER.debug(String.format("resolveCommand: %s=%s", el.getShortKey(), el.getValue()));
+        if (SOSKeePassPath.hasKeePassVariables(command)) {
+            ParameterSubstitutor ps = new ParameterSubstitutor();
+            List<String> varNames = ps.getParameterNameFromString(command);
+            List<String> resolvedNames = new ArrayList<String>();
+            List<String> skippedNames = new ArrayList<String>();
+            for (String varName : varNames) {
+                SOSKeePassPath path = new SOSKeePassPath(kpd.isKDBX(), varName);
+                if (path.isValid()) {
+                    String entryKey = path.getEntryPath().toLowerCase();
+                    Entry<?, ?, ?, ?> entry = null;
+                    if (lastEntries.containsKey(entryKey)) {
+                        entry = lastEntries.get(entryKey);
+                    } else {
+                        entry = kpd.getEntryByPath(path.getEntryPath());
+                        if (entry == null) {
+                            throw new Exception(String.format("[%s][%s][%s]entry not found", el.getShortKey(), varName, path.toString()));
+                        }
+                        lastEntries.put(entryKey, entry);
+                    }
+                    String value = entry.getProperty(path.getPropertyName());
+                    if (value == null) {
+                        throw new Exception(String.format("[%s][%s][%s]value is null", el.getShortKey(), varName, path.toString()));
+                    }
+                    ps.addKey(varName, value);
+                    resolvedNames.add("${" + varName + "}");
+                } else {
+                    skippedNames.add("${" + varName + "}");
+                }
+            }
+            if (skippedNames.size() > 0) {
+                LOGGER.debug(String.format("[%s][skip]%s", el.getShortKey(), Joiner.on(",").join(skippedNames)));
+            }
+            if (resolvedNames.size() > 0) {
+                el.setValue(ps.replace(command));
+                LOGGER.debug(String.format("[%s][resolved]%s", el.getShortKey(), Joiner.on(",").join(resolvedNames)));
+            } else {
+                LOGGER.debug(String.format("[%s]nothing to resolve", el.getShortKey()));
+            }
         }
+        return lastEntries;
     }
 
     private Entry<?, ?, ?, ?> keePass2OptionsByKeePassSyntax(final SOSKeePassDatabase kpd) throws Exception {
@@ -257,13 +298,14 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     private Entry<?, ?, ?, ?> keePass2OptionsByKeePassDefault(final SOSKeePassDatabase kpd) throws Exception {
         String keyPath = objCredentialStoreOptions.credentialStoreKeyPath.getValue();
-        if (keyPath.isEmpty()) {
-            throw new Exception("credentialStoreKeyPath is missing");
+        if (keyPath.trim().isEmpty()) {
+            LOGGER.debug(String.format("skip keePass2OptionsByKeePassDefault, credentialStoreKeyPath is empty"));
+            return null;
         }
-        LOGGER.debug(String.format("keyPath=%s", keyPath));
         Entry<?, ?, ?, ?> entry = getKeePassEntry(kpd, keyPath);
         if (!entry.getUrl().isEmpty()) {
             try {
+                LOGGER.debug(String.format("try to set host, port, protocol, user, password from  %s@Url", keyPath));
                 // Possible Elements of an URL are:
                 //
                 // http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
@@ -275,31 +317,37 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 //
                 // ftp://<user>:<password>@<host>:<port>/<url-path>;type=<typecode>
                 // see
-                // http://docs.oracle.com/javase/7/docs/api/java/net/URL.html
-                URL url = new URL(entry.getUrl());
-                setIfNotDirty(host, url.getHost());
-                String urlPort = String.valueOf(url.getPort());
-                if (isEmpty(urlPort) || urlPort.equals("-1")) {
-                    urlPort = String.valueOf(url.getDefaultPort());
+                // http://docs.oracle.com/javase/7/docs/api/java/net/URI.html
+                URI uri = new URI(entry.getUrl());
+                setIfNotDirty(host, uri.getHost());
+                String uriPort = String.valueOf(uri.getPort());
+                if (isEmpty(uriPort) || uriPort.equals("-1")) {
+                    LOGGER.debug(String.format("can't evaluate port from %s@Url", keyPath));
+                } else {
+                    setIfNotDirty(port, uriPort);
                 }
-                setIfNotDirty(port, urlPort);
-                setIfNotDirty(protocol, url.getProtocol());
-                String urlUserInfo = url.getUserInfo();
-                String[] ui = urlUserInfo.split(":");
-                setIfNotDirty(user, ui[0]);
-                if (ui.length > 1) {
-                    setIfNotDirty(password, ui[1]);
+                setIfNotDirty(protocol, uri.getScheme());
+                if (SOSString.isEmpty(uri.getUserInfo())) {
+                    LOGGER.debug(String.format("can't evaluate UserInfo from %s@Url", keyPath));
+                } else {
+                    String[] ui = uri.getUserInfo().split(":");
+                    setIfNotDirty(user, ui[0]);
+                    if (ui.length > 1) {
+                        setIfNotDirty(password, ui[1]);
+                    }
                 }
-            } catch (MalformedURLException e) {
-                //
+            } catch (Throwable e) {
+                LOGGER.debug(String.format("skip set from %s@Url due an exception: %s", keyPath, e.toString()));
             }
         }
         boolean hideValue = false;
         if (isNotEmpty(entry.getUsername())) {
+            LOGGER.debug(String.format("[%s]set from %s@Username", user.getShortKey(), keyPath));
             user.setValue(entry.getUsername());
             user.setHideValue(hideValue);
         }
         if (isNotEmpty(entry.getPassword())) {
+            LOGGER.debug(String.format("[%s]set from %s@Password", password.getShortKey(), keyPath));
             password.setValue(entry.getPassword());
             password.setHideValue(hideValue);
         }
@@ -307,7 +355,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             setIfNotDirty(host, entry.getUrl());
             host.setHideValue(hideValue);
         }
-        if (hostName.isNotDirty()) {
+        if (hostName.isNotDirty() && isNotEmpty(entry.getUrl())) {
+            LOGGER.debug(String.format("[%s]set from %s@Url", hostName.getShortKey(), keyPath));
             hostName.setValue(entry.getUrl().toString());
         }
         return entry;
@@ -337,7 +386,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                     .getValue());
             if (keePassPath.isValid()) {
                 LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
-                if (!keePassPath.getEntryPath().equals(entry.getPath())) {
+                if (entry == null || !keePassPath.getEntryPath().equals(entry.getPath())) {
                     entry = getKeePassEntry(kpd, keePassPath.getEntry());
                 }
                 setKeePassOptions4Provider(kpd, entry, keePassPath.getPropertyName());
@@ -418,8 +467,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         if (option.isNotDirty() && isNotEmpty(value)) {
             if (option instanceof SOSOptionPassword) {
                 option.setValue(value);
+                LOGGER.debug(String.format("set %s=?", option.getShortKey()));
             } else {
-                LOGGER.trace("setValue = " + value);
+                LOGGER.debug(String.format("set %s=%s", option.getShortKey(), value));
             }
             option.setValue(value);
         }
