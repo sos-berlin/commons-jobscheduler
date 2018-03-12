@@ -12,6 +12,7 @@ import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
@@ -725,5 +726,20 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public void setProxyHost(SOSOptionProxyProtocol val) {
         proxyProtocol = val;
     }
+    
+    @JSOptionDefinition(name = "temp_dir", description = "Entry point or remote temp directory of the ssh session",
+            key = "temp_dir", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName tempDirectory = new SOSOptionFolderName(this, CLASSNAME + ".temp_dir",
+            "Entry point or remote temp directory of the ssh session", ".", ".", false);
+
+    public SOSOptionFolderName getTempDirectory() {
+        return tempDirectory;
+    }
+
+    public void setTempDirectory(SOSOptionFolderName val) {
+        tempDirectory = val;
+    }
+    
+    
 
 }
