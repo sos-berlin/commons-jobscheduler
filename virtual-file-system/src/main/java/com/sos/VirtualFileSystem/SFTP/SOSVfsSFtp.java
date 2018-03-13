@@ -40,6 +40,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Connection;
@@ -825,9 +826,13 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
     public ISOSVFSHandler getHandler() {
         return this;
     }
-
     @Override
     public void executeCommand(final String strCmd) throws Exception {
+        executeCommand(strCmd, null);
+    }
+    
+    @Override
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         final String strEndOfLine = System.getProperty("line.separator");
         if (sshSession == null) {
             sshSession = sshConnection.openSession();

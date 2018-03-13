@@ -366,6 +366,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
+        logINFO("not implemented yet");
+    }
+
+    @Override
     public String createScriptFile(final String pstrContent) throws Exception {
         notImplemented();
         return null;
