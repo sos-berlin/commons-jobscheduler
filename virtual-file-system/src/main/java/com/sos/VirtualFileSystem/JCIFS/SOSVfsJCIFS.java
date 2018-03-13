@@ -22,6 +22,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -368,7 +369,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void executeCommand(final String cmd, Map<String, String> env) throws Exception {
+    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
         if (cmdShell == null) {
             cmdShell = new CmdShell();
         }
@@ -376,7 +377,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         if (cmdShell.isWindows()) {
             command = cmdShell.replaceCommand4Windows(command);
         }
-        int exitCode = cmdShell.executeCommand(command, env);
+        int exitCode = cmdShell.executeCommand(command, env.getLocalEnvs());
         if (exitCode != 0) {
             boolean raiseException = true;
             if (connection2OptionsAlternate != null) {

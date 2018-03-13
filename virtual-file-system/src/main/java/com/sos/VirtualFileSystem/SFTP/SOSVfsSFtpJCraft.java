@@ -48,6 +48,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
@@ -62,6 +63,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private Session sshSession = null;
     private ChannelSftp sftpClient = null;
     private JSch secureChannel = null;
+    private Map environmentVariables = null;
     private Integer exitCode;
     private String exitSignal;
     private StringBuffer outContent;
@@ -69,13 +71,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private boolean isRemoteWindowsShell = false;
     private boolean isUnix = false;
     private boolean isOSChecked = false;
-    private int connectionTimeout = 0;
-    private boolean simulateShell = false;
+    // proxy
     private SOSOptionProxyProtocol proxyProtocol = null;
     private String proxyHost = null;
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
+    private int connectionTimeout = 0;
+    private boolean simulateShell = false;
     private ChannelExec channelExec = null;
     private final String lineSeparator = System.getProperty("line.separator");
 
@@ -409,7 +412,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void executeCommand(String cmd, Map<String, String> env) {
+    public void executeCommand(String cmd, SOSVfsEnv env) {
         checkOS();
 
         cmd = cmd.trim();
@@ -424,21 +427,29 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
             channelExec.setPty(isSimulateShell());
-
             StringBuffer envs = new StringBuffer();
             if (env != null) {
-                env.forEach((k, v) -> {
-                    // envs.append(String.format("set %s=%s", k, v));
-                    if (isUnix) {
-                        envs.append(String.format("export %s=%s;", k, v));
-                    } else {
-                        envs.append(String.format("set %s=%s&", k, v));
-                    }
-                });
-                LOGGER.debug(String.format("setEnv: %s", envs.toString()));
+                if (env.getGlobalEnvs() != null) {
+                    env.getGlobalEnvs().forEach((k, v) -> {channelExec.setEnv(k, v);});
+                }
+                if (env.getLocalEnvs() != null) {
+                    env.getLocalEnvs().forEach((k, v) -> {
+                        // envs.append(String.format("set %s=%s", k, v));
+                        if (isUnix) {
+                            envs.append(String.format("export %s=%s;", k, v));
+                        } else {
+                            envs.append(String.format("set %s=%s&", k, v));
+                        }
+                    });
+                    LOGGER.debug(String.format("setEnv: %s", envs.toString()));
+                }
             }
             cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
-            channelExec.setCommand(envs.toString() + cmd);
+            if (envs.length() > 0) {
+                channelExec.setCommand(envs.toString() + cmd);
+            } else {
+                channelExec.setCommand(cmd);
+            }
             channelExec.setInputStream(null);
             channelExec.setErrStream(null);
             out = channelExec.getInputStream();
@@ -536,6 +547,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         }
+    }
+
+    public void setEnvironmentVariables(Map<String, String> envVariables) {
+        this.environmentVariables = envVariables;
     }
 
     @Override
@@ -1002,7 +1017,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return channelExec;
     }
 
-    private void checkOS() {
+    public void checkOS() {
         if (!isOSChecked) {
             String cmd = "echo %ComSpec%";
             try {
@@ -1023,6 +1038,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             isOSChecked = true;
         }
+    }
+        
+    public boolean isUnix() {
+        return isUnix;
     }
 
     private CommandResult executePrivateCommand(String cmd) throws Exception {

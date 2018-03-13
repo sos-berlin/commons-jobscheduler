@@ -50,6 +50,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
@@ -503,7 +504,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
         sendCommand(command);
         LOGGER.info(SOSVfs_D_151.params(strCmd, getReplyString()));

@@ -37,6 +37,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /** @author KB */
@@ -324,7 +325,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         //
     }
 

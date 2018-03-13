@@ -34,6 +34,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -457,7 +458,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (delimiter.isEmpty()) {
                 try {
                     LOGGER.info(String.format("[%s]%s", commandOptionName, commands));
-                    fileTransfer.getHandler().executeCommand(commands, env);
+                    if (env != null) {
+                        SOSVfsEnv envs = new SOSVfsEnv();
+                        envs.setLocalEnvs(env);
+                        fileTransfer.getHandler().executeCommand(commands, envs);
+                    } else {
+                        fileTransfer.getHandler().executeCommand(commands);
+                    }
                 } catch (JobSchedulerException e) {
                     //LOGGER.error(e.toString());
                     throw e;
@@ -474,7 +481,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     if (command.trim().length() > 0) {
                         try {
                             LOGGER.info(String.format("[%s]%s", commandOptionName, command.trim()));
-                            fileTransfer.getHandler().executeCommand(command, env);
+                            if (env != null) {
+                                SOSVfsEnv envs = new SOSVfsEnv();
+                                envs.setLocalEnvs(env);
+                                fileTransfer.getHandler().executeCommand(commands, envs);
+                            } else {
+                                fileTransfer.getHandler().executeCommand(commands);
+                            }
                         } catch (JobSchedulerException e) {
                             //LOGGER.error(e.toString());
                             throw e;

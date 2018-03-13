@@ -1,6 +1,6 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
-import java.util.Map;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 
 public interface ISOSShell {
 
@@ -8,7 +8,7 @@ public interface ISOSShell {
 
     public void executeCommand(final String cmd) throws Exception;
 
-    public void executeCommand(final String cmd, Map<String, String> env) throws Exception;
+    public void executeCommand(String cmd, SOSVfsEnv env) throws Exception;
 
     public StringBuffer getStdErr() throws Exception;
 
