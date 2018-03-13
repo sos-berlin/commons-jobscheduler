@@ -458,11 +458,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (delimiter.isEmpty()) {
                 try {
                     LOGGER.info(String.format("[%s]%s", commandOptionName, commands));
-                    if (env != null) {
-                        fileTransfer.getHandler().executeCommand(commands, env);
-                    } else {
-                        fileTransfer.getHandler().executeCommand(commands);
-                    }
+                    fileTransfer.getHandler().executeCommand(commands, env);
                 } catch (JobSchedulerException e) {
                     //LOGGER.error(e.toString());
                     throw e;
@@ -479,11 +475,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     if (command.trim().length() > 0) {
                         try {
                             LOGGER.info(String.format("[%s]%s", commandOptionName, command.trim()));
-                            if (env != null) {
-                                fileTransfer.getHandler().executeCommand(commands, env);
-                            } else {
-                                fileTransfer.getHandler().executeCommand(commands);
-                            }
+                            fileTransfer.getHandler().executeCommand(commands, env);
                         } catch (JobSchedulerException e) {
                             //LOGGER.error(e.toString());
                             throw e;
