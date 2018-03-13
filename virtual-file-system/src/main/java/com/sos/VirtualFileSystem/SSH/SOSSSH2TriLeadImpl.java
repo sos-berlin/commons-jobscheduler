@@ -32,6 +32,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.Msg;
 import com.sos.i18n.Msg.BundleBaseName;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -557,6 +558,11 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
     @Override
     public void executeCommand(final String pstrCmd) throws Exception {
+        executeCommand(pstrCmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String pstrCmd, SOSVfsEnv env) throws Exception {
         exitStatus = null;
         exitSignal = null;
         int retval = 0;

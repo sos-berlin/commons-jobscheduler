@@ -26,6 +26,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -202,6 +203,11 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public void executeCommand(final String strCmd) throws Exception {
+        executeCommand(strCmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         final String conMethodName = CLASS_NAME + "::ExecuteCommand";
         objFTPClient.sendCommand(strCmd);
         LOGGER.debug(getHostID(SOSVfs_E_0106.params(conMethodName, strCmd, getReplyString())));

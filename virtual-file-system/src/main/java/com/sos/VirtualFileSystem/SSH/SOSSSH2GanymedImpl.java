@@ -40,6 +40,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /** @author KB */
@@ -499,9 +500,14 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         }
         return false;
     }
-
+    
     @Override
     public void executeCommand(final String pstrCmd) throws Exception {
+        executeCommand(pstrCmd, null);
+    }    
+
+    @Override
+    public void executeCommand(final String pstrCmd, SOSVfsEnv env) throws Exception {
         intExitStatus = null;
         strExitSignal = null;
         String strCmd = pstrCmd;
