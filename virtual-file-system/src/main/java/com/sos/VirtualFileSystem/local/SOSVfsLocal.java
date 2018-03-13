@@ -204,7 +204,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         if (objCmdShell.isWindows()) {
             command = objCmdShell.replaceCommand4Windows(command);
         }
-        int exitCode = objCmdShell.executeCommand(command, env.getLocalEnvs());
+        int exitCode = objCmdShell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
             if (connection2OptionsAlternate != null) {

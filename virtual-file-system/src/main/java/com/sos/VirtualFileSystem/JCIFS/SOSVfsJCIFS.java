@@ -377,7 +377,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         if (cmdShell.isWindows()) {
             command = cmdShell.replaceCommand4Windows(command);
         }
-        int exitCode = cmdShell.executeCommand(command, env.getLocalEnvs());
+        int exitCode = cmdShell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
             if (connection2OptionsAlternate != null) {
