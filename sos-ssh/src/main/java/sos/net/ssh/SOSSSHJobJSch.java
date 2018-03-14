@@ -102,7 +102,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         boolean flgScriptFileCreated = false;
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
         String executedCommand = "";
-        String completeCommand = "";
         try {
             if (!isConnected) {
                 this.connect();
@@ -155,7 +154,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         public Void call() throws Exception {
                             Thread.sleep(1000);
                             while(!commandExecution.isDone()) {
-                                Thread.sleep(1000);
+                                Thread.sleep(60000);
                                 ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("CONT");
                             }
                             return null;
@@ -196,8 +195,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
                 String strErrMsg =
-                        "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\""
-                                + "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
+                        "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"";
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
                         LOGGER.debug(this.stackTrace2String(e));
