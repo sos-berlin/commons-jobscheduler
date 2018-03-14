@@ -418,7 +418,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             StringBuffer envs = new StringBuffer();
             if (env != null) {
                 if (env.getGlobalEnvs() != null) {
-                    env.getGlobalEnvs().forEach((k, v) -> {channelExec.setEnv(k, v);});
+                    env.getGlobalEnvs().forEach((k, v) -> {
+                        channelExec.setEnv(k, v);
+                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
+                    });
                 }
                 if (env.getLocalEnvs() != null) {
                     env.getLocalEnvs().forEach((k, v) -> {
@@ -429,7 +432,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                             envs.append(String.format("set %s=%s&", k, v));
                         }
                     });
-                    LOGGER.debug(String.format("setEnv: %s", envs.toString()));
+                    if (!envs.toString().isEmpty()) {
+                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
+                    }
                 }
             }
             cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
