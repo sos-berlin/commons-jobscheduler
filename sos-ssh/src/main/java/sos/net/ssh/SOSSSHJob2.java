@@ -162,7 +162,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (isNotEmpty(strbStderrOutput)) {
             LOGGER.info("stderr = " + strbStderrOutput.toString());
 
-            objJSJobUtilities.setJSParam(STD_ERR_OUTPUT, strbStderrOutput);
             if (objOptions.ignoreStderr.value()) {
                 LOGGER.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
             } else {
@@ -191,7 +190,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             LOGGER.error(this.stackTrace2String(e));
             throw new JobSchedulerException(e.getMessage(), e);
         }
-        objJSJobUtilities.setJSParam(STD_OUT_OUTPUT, strbStdoutOutput);
     }
 
     public StringBuffer getStdOut() throws Exception {
