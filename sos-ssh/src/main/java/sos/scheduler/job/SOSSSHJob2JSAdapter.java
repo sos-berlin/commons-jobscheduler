@@ -57,13 +57,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         if (this.isOrderJob()) {
             spooler_task.order().params().set_var(EXIT_SIGNAL, "");
             spooler_task.order().params().set_var(EXIT_CODE, "");
-            spooler_task.order().params().set_var(STD_ERR_OUTPUT, "");
-            spooler_task.order().params().set_var(STD_OUT_OUTPUT, "");
         }
         spooler_task.params().set_var(EXIT_SIGNAL, "");
         spooler_task.params().set_var(EXIT_CODE, "");
-        spooler_task.params().set_var(STD_ERR_OUTPUT, "");
-        spooler_task.params().set_var(STD_OUT_OUTPUT, "");
         SOSSSHJob2 objR;
         String useJSch = spooler.var(PARAM_JITL_SSH_USE_JSCH_IMPL);
         envVarNamePrefix = spooler.var(PARAM_SCHEDULER_VARIABLE_NAME_PREFIX);
