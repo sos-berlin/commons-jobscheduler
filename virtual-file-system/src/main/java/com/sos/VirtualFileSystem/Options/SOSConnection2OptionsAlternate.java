@@ -305,7 +305,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         Entry<?, ?, ?, ?> entry = getKeePassEntry(kpd, keyPath);
         if (!entry.getUrl().isEmpty()) {
             try {
-                LOGGER.debug(String.format("try to set host, port, protocol, user, password from  %s@Url", keyPath));
+                LOGGER.debug(String.format("[%s,%s,%s,%s,%s]try to set from %s@Url", host.getShortKey(), port.getShortKey(), protocol.getShortKey(), user
+                        .getShortKey(), password.getShortKey(), keyPath));
                 // Possible Elements of an URL are:
                 //
                 // http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
@@ -322,13 +323,13 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 setIfNotDirty(host, uri.getHost());
                 String uriPort = String.valueOf(uri.getPort());
                 if (isEmpty(uriPort) || uriPort.equals("-1")) {
-                    LOGGER.debug(String.format("can't evaluate port from %s@Url", keyPath));
+                    LOGGER.debug(String.format("[%s]can't evaluate port from %s@Url", port.getShortKey(), keyPath));
                 } else {
                     setIfNotDirty(port, uriPort);
                 }
                 setIfNotDirty(protocol, uri.getScheme());
                 if (SOSString.isEmpty(uri.getUserInfo())) {
-                    LOGGER.debug(String.format("can't evaluate UserInfo from %s@Url", keyPath));
+                    LOGGER.debug(String.format("[%s,%s]can't evaluate UserInfo from %s@Url", user.getShortKey(), password.getShortKey(), keyPath));
                 } else {
                     String[] ui = uri.getUserInfo().split(":");
                     setIfNotDirty(user, ui[0]);
@@ -467,9 +468,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         if (option.isNotDirty() && isNotEmpty(value)) {
             if (option instanceof SOSOptionPassword) {
                 option.setValue(value);
-                LOGGER.debug(String.format("set %s=?", option.getShortKey()));
+                LOGGER.debug(String.format("[%s]?", option.getShortKey()));
             } else {
-                LOGGER.debug(String.format("set %s=%s", option.getShortKey(), value));
+                LOGGER.debug(String.format("[%s]%s", option.getShortKey(), value));
             }
             option.setValue(value);
         }
