@@ -323,13 +323,13 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 setIfNotDirty(host, uri.getHost());
                 String uriPort = String.valueOf(uri.getPort());
                 if (isEmpty(uriPort) || uriPort.equals("-1")) {
-                    LOGGER.debug(String.format("[%s]can't evaluate port from %s@Url", port.getShortKey(), keyPath));
+                    LOGGER.debug(String.format("[%s]skip. can't evaluate port from %s@Url", port.getShortKey(), keyPath));
                 } else {
                     setIfNotDirty(port, uriPort);
                 }
                 setIfNotDirty(protocol, uri.getScheme());
                 if (SOSString.isEmpty(uri.getUserInfo())) {
-                    LOGGER.debug(String.format("[%s,%s]can't evaluate UserInfo from %s@Url", user.getShortKey(), password.getShortKey(), keyPath));
+                    LOGGER.debug(String.format("[%s,%s]skip. can't evaluate UserInfo from %s@Url", user.getShortKey(), password.getShortKey(), keyPath));
                 } else {
                     String[] ui = uri.getUserInfo().split(":");
                     setIfNotDirty(user, ui[0]);
