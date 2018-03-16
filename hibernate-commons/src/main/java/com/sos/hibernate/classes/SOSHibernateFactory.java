@@ -42,6 +42,8 @@ public class SOSHibernateFactory implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateFactory.class);
     private static final long serialVersionUID = 1L;
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+    private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private ClassList classMapping;
     private Optional<Path> configFile = Optional.empty();
     private Configuration configuration;
@@ -86,7 +88,7 @@ public class SOSHibernateFactory implements Serializable {
         case Connection.TRANSACTION_SERIALIZABLE:
             return "TRANSACTION_SERIALIZABLE";
         default:
-            throw new SOSHibernateConfigurationException(String.format("Invalid transaction isolation level = %s.", isolationLevel));
+            throw new SOSHibernateConfigurationException(String.format("invalid transaction isolation level=%s", isolationLevel));
         }
     }
 
@@ -112,14 +114,15 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     public void build() throws SOSHibernateFactoryBuildException {
-        String method = SOSHibernate.getMethodName(logIdentifier, "build");
         try {
             initConfiguration();
             initSessionFactory();
-            String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString() : "without config file";
-            int isolationLevel = getTransactionIsolation();
-            LOGGER.debug(String.format("%s autoCommit=%s, transactionIsolation=%s, %s", method, getAutoCommit(), getTransactionIsolationName(
-                    isolationLevel), connFile));
+            if (isDebugEnabled) {
+                String method = SOSHibernate.getMethodName(logIdentifier, "build");
+                int isolationLevel = getTransactionIsolation();
+                LOGGER.debug(String.format("%s autoCommit=%s, transactionIsolation=%s", method, getAutoCommit(), getTransactionIsolationName(
+                        isolationLevel)));
+            }
         } catch (SOSHibernateConfigurationException ex) {
             throw new SOSHibernateFactoryBuildException(ex, configFile);
         } catch (PersistenceException ex) {
@@ -128,14 +131,13 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     public void close() {
-        String method = SOSHibernate.getMethodName(logIdentifier, "close");
-        LOGGER.debug(String.format("%s", method));
+        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "close") : "");
         try {
             if (sessionFactory != null && !sessionFactory.isClosed()) {
                 sessionFactory.close();
             }
         } catch (Throwable e) {
-            LOGGER.warn(String.format("%s %s", method, e.toString()), e);
+            LOGGER.warn(e.toString(), e);
         }
         sessionFactory = null;
     }
@@ -380,14 +382,20 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void configure() throws SOSHibernateConfigurationException {
-        String method = SOSHibernate.getMethodName(logIdentifier, "configure");
         try {
             if (configFile.isPresent()) {
-                LOGGER.debug(String.format("%s %s", method, configFile.get().toAbsolutePath().toString()));
                 configuration.configure(configFile.get().toUri().toURL());
             } else {
-                LOGGER.debug(String.format("%s configure connection without the hibernate file", method));
                 configuration.configure();
+            }
+            if (isDebugEnabled) {
+                String method = SOSHibernate.getMethodName(logIdentifier, "configure");
+                if (configFile.isPresent()) {
+                    LOGGER.debug(String.format("%s %s", method, configFile.get().toAbsolutePath().toString()));
+                } else {
+                    LOGGER.debug(String.format("%s configure connection without the hibernate file", method));
+                }
+
             }
         } catch (MalformedURLException e) {
             throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
@@ -424,8 +432,7 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void initConfiguration() throws SOSHibernateConfigurationException {
-        String method = SOSHibernate.getMethodName(logIdentifier, "initConfiguration");
-        LOGGER.debug(String.format("%s", method));
+        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "initConfiguration") : "");
         configuration = new Configuration();
         setConfigurationClassMapping();
         setDefaultConfigurationProperties();
@@ -448,8 +455,7 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void initSessionFactory() {
-        String method = SOSHibernate.getMethodName(logIdentifier, "initSessionFactory");
-        LOGGER.debug(String.format("%s", method));
+        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "initSessionFactory") : "");
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
@@ -470,29 +476,29 @@ public class SOSHibernateFactory implements Serializable {
                 if (key.equals(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_PASSWORD)) {
                     value = "***";
                 }
-                LOGGER.info(String.format("%s: property: %s = %s", method, key, value));
+                LOGGER.info(String.format("%s %s=%s", method, key, value));
             }
         }
     }
 
     private void setConfigurationClassMapping() {
-        String method = SOSHibernate.getMethodName(logIdentifier, "setConfigurationClassMapping");
         if (classMapping != null) {
+            String method = isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "setConfigurationClassMapping") : "";
             for (Class<?> c : classMapping.getClasses()) {
-                LOGGER.debug(String.format("%s %s", method, c.getCanonicalName()));
+                LOGGER.debug(isDebugEnabled ? String.format("%s %s", method, c.getCanonicalName()) : "");
                 configuration.addAnnotatedClass(c);
             }
         }
     }
 
     private void setConfigurationProperties() {
-        String method = SOSHibernate.getMethodName(logIdentifier, "setConfigurationProperties");
         if (configurationProperties != null) {
+            String method = isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "setConfigurationProperties") : "";
             for (Map.Entry<?, ?> entry : configurationProperties.entrySet()) {
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
                 configuration.setProperty(key, value);
-                LOGGER.debug(String.format("%s %s=%s", method, key, value));
+                LOGGER.debug(isDebugEnabled ? String.format("%s %s=%s", method, key, value) : "");
             }
             if (configuration.getProperty(SOSHibernate.HIBERNATE_PROPERTY_JDBC_FETCH_SIZE) != null) {
                 try {
@@ -509,12 +515,12 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void setDefaultConfigurationProperties() {
-        String method = SOSHibernate.getMethodName(logIdentifier, "setDefaultConfigurationProperties");
         if (useDefaultConfigurationProperties && defaultConfigurationProperties != null) {
+            String method = isTraceEnabled ? SOSHibernate.getMethodName(logIdentifier, "setDefaultConfigurationProperties") : "";
             for (Map.Entry<?, ?> entry : defaultConfigurationProperties.entrySet()) {
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                LOGGER.debug(String.format("%s %s=%s", method, key, value));
+                LOGGER.trace(isTraceEnabled ? String.format("%s %s=%s", method, key, value) : "");
                 configuration.setProperty(key, value);
             }
         }
