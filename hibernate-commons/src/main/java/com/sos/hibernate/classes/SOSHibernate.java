@@ -58,11 +58,11 @@ public class SOSHibernate {
         return null;
     }
 
-    protected static String getMethodName(String logIdentifier, String name) {
-        return String.format("%s[%s]", logIdentifier, name);
-    }
-
     protected static String getLogIdentifier(String identifier) {
         return identifier == null ? "" : String.format("[%s]", identifier);
+    }
+
+    protected static String getMethodName(String logIdentifier, String name) {
+        return String.format("%s[%s]", logIdentifier, name);
     }
 }
