@@ -1247,7 +1247,7 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    private <T> void debugObject(String method, Object item, String infos) {
+    private void debugObject(String method, Object item, String infos) {
         if (isDebugEnabled) {
             StringBuilder sb = new StringBuilder(SOSHibernate.getMethodName(logIdentifier, method));
             sb.append("[");
