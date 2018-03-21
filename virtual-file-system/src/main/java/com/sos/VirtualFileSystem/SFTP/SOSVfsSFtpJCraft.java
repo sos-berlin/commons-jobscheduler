@@ -700,7 +700,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void usePasswordMethod() throws Exception {
-        LOGGER.debug(String.format("[password]password=?"));
+        LOGGER.debug("[password]password=?");
         sshSession.setPassword(authenticationOptions.getPassword().getValue());
     }
 
@@ -877,8 +877,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
-            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost,
-                    proxyPort, proxyUser));
+            LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%s, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
+                    proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
@@ -1044,7 +1044,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             isOSChecked = true;
         }
     }
-        
+
     public boolean isUnix() {
         return isUnix;
     }

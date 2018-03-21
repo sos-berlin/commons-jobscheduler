@@ -327,13 +327,16 @@ public class SOSFileList extends SOSVfsMessageCodes {
     }
 
     public void logFileList() {
-        StringBuilder sb = new StringBuilder();
-        for (SOSFileListEntry objListItem : objFileListEntries) {
-            sb.append("\n");
-            sb.append(objListItem.getFileName4ResultList());
+        if (objFileListEntries != null && objFileListEntries.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (SOSFileListEntry entry : objFileListEntries) {
+                sb.append("\n");
+                sb.append(entry.getFileName4ResultList());
+            }
+            String msg = sb.toString();
+            LOGGER.info(msg);
+            JADE_REPORT_LOGGER.info(msg);
         }
-        LOGGER.info(sb.toString());
-        JADE_REPORT_LOGGER.info(sb.toString());
     }
 
     public void createResultSetFile() {
