@@ -345,13 +345,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
         }
         flgResultSetFileAlreadyCreated = true;
         lngNoOfRecordsInResultSetFile = 0L;
+        JSFile resultSetFile = null;
         try {
             if (objOptions.resultSetFileName.isDirty() && objOptions.resultSetFileName.isNotEmpty()) {
-                JSFile resultSetFile = objOptions.resultSetFileName.getJSFile();
-                if ("getlist".equals(objOptions.getDmzOption("operation")) && !objOptions.getDmzOption("resultfile").isEmpty()) {
+                resultSetFile = objOptions.resultSetFileName.getJSFile();
+                if ("getlist".equalsIgnoreCase(objOptions.getDmzOption("operation")) && !objOptions.getDmzOption("resultfile").isEmpty()) {
                     ISOSVirtualFile jumpResultSetFile = objDataSourceClient.getFileHandle(objOptions.getDmzOption("resultfile"));
                     if (jumpResultSetFile.fileExists()) {
-                        lngNoOfRecordsInResultSetFile = transferResultSetFile(resultSetFile, jumpResultSetFile);
+                        lngNoOfRecordsInResultSetFile = writeResultSetFileFromJumpFile(resultSetFile, jumpResultSetFile);
                     }
                 } else {
                     for (SOSFileListEntry objListItem : objFileListEntries) {
@@ -363,15 +364,28 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 if (lngNoOfRecordsInResultSetFile == 0) {
                     resultSetFile.writeLine("");
                 }
-                resultSetFile.close();
-                LOGGER.info(String.format("ResultSet to '%1$s' is written", resultSetFile.getAbsoluteFile()));
+                LOGGER.info(String.format("ResultSet to '%1$s' is written", resultSetFile.getCanonicalPath()));
             }
         } catch (Exception e) {
-            throw new JobSchedulerException("Problems occured creating ResultSetFile", e);
+            String msg = "";
+            if (resultSetFile != null) {
+                try {
+                    msg = " '" + resultSetFile.getCanonicalPath() + "'";
+                } catch (Throwable ee) {
+                }
+            }
+            throw new JobSchedulerException(String.format("Problems occured creating ResultSet file%s: %s", msg, e.toString()), e);
+        } finally {
+            if (resultSetFile != null) {
+                try {
+                    resultSetFile.close();
+                } catch (Throwable e) {
+                }
+            }
         }
     }
 
-    private long transferResultSetFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
+    private long writeResultSetFileFromJumpFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
         byte[] buffer = new byte[objOptions.bufferSize.value()];
         int bytesTransferred = 0;
         FileOutputStream fos = null;
