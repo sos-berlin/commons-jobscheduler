@@ -143,8 +143,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         final boolean oldFlg = flgIsWindowsShell;
                         flgIsWindowsShell = true;
                         setSOSVfsEnvs();
-                        // Ausnahme da bei Aufruf von setReturnValuesEnvVar(); flgIsWindowsShell nicht klar ist
-                        // und erst hier bestimmt werden kann.
+                        // only if autoDetectOS is false flgIsWindowsShell is not trustworthy when callingsetReturnValuesEnvVar();
+                        // we have to set the env var explicitely here
                         envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
                         flgIsWindowsShell = oldFlg;
                     } else {
@@ -576,15 +576,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                 }
             } else if (commandResult.getExitCode() == 9009 || commandResult.getExitCode() == 1) {
-                // call of uname under Windows OS delivers exit code 9009 and via SSH exit code 1
-                // both with bitvise SSH server and CopSSH (cygwin) with target shell cmd.exe
+                // call of uname under Windows OS delivers exit code 9009 or exit code 1 and target shell cmd.exe
+                // the exit code depends on the remote SSH implementation
                 if (forceAutoDetection) {
                     flgIsWindowsShell = true;
                 }
-                LOGGER.info("*** execute Command uname failed with exit code 9009, remote OS is Windows with cmd shell! ***");
+                LOGGER.info("*** execute Command uname failed with exit code 1 or 9009, remote OS is Windows with cmd shell! ***");
             } else if (commandResult.getExitCode() == 127) {
-                // call of uname under Windows OS delivers exit code 127
-                // with CopSSH (cygwin) with target shell /bin/bash
+                // call of uname under Windows OS  with CopSSH (cygwin) and target shell /bin/bash delivers exit code 127
                 // command uname is not installed by default through CopSSH installation
                 LOGGER.info("*** execute Command uname failed with exit code 127, remote OS is Windows with cygwin and shell is Unix like! ***");
                 if (forceAutoDetection) {
