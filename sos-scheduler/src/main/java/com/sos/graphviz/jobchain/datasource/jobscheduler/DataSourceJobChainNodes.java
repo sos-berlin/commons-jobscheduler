@@ -68,6 +68,10 @@ public class DataSourceJobChainNodes implements IDataSourceJobChainNodes {
     public JobChainNode get(String key) {
         return listOfJobChainNodes.get(key);
     }
+    
+    public int size() {
+    	return listOfJobChainNodes.size();
+    }
 
     public JSObjJobChain getJobChain() {
         return jobChain;
