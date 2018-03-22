@@ -137,7 +137,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
                 String preCommand = null;
                 if (objOptions.createEnvironmentVariables.value()) {
-                    if (objOptions.autoOSDetection.value()) {
+                    if (objOptions.autoDetectOS.value()) {
                         setSOSVfsEnvs();
                     } else {
                         preCommand = getPreCommand();
@@ -149,7 +149,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     ExecutorService executorService = Executors.newFixedThreadPool(2);
                     String completeCommand = null;
-                    if (objOptions.autoOSDetection.value()) {
+                    if (objOptions.autoDetectOS.value()) {
                         completeCommand = strCmd;
                     } else {
                         if (preCommand != null) {
@@ -162,7 +162,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     Callable<Void> runCompleteCmd = new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            if (objOptions.autoOSDetection.value()) {
+                            if (objOptions.autoDetectOS.value()) {
                                 vfsHandler.executeCommand(cmdToExecute, envVars);
                             } else {
                                 vfsHandler.executeCommand(cmdToExecute);
@@ -325,7 +325,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         } else {
             resolvedTempFileName = tempFileName;
         }
-        if (objOptions.autoOSDetection.value()) {
+        if (objOptions.autoDetectOS.value()) {
             if (flgIsWindowsShell) {
                 envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
             } else {
@@ -527,7 +527,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private void checkOsAndShell() throws SOSSSHAutoDetectionException {
         String cmdToExecute = "uname";
         LOGGER.info("*** Checking for remote Operating System and shell! ***");
-        boolean forceAutoDetection = objOptions.autoOSDetection.value();
+        boolean forceAutoDetection = objOptions.autoDetectOS.value();
+        if (!forceAutoDetection) {
+            LOGGER.info("*** parameter 'auto_detect_os' was set to 'false', only checking without setting commands automatically! ***");
+        }
         StringBuilder strb = new StringBuilder();
         strb.append("Can´t detect OS and shell automatically!\r\n");
         strb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
@@ -536,9 +539,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         SOSCommandResult commandResult = null;
         try {
             commandResult = vfsHandler.executePrivateCommand(cmdToExecute);
-            LOGGER.info("exitCode = " + commandResult.getExitCode());
-            LOGGER.info("stdOut = " + commandResult.getStdOut());
-            LOGGER.info("stdErr = " + commandResult.getStdErr());
             if (commandResult.getExitCode() == 0) {
                 // command uname was execute successfully -> OS is Unix like
                 if (commandResult.getStdOut().toString().toLowerCase().contains("linux") ||
@@ -589,9 +589,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
             }
         } catch (Exception e) {
-//            LOGGER.info("exitCode = " + commandResult.getExitCode());
-//            LOGGER.info("stdOut = " + commandResult.getStdOut());
-//            LOGGER.info("stdErr = " + commandResult.getStdErr());
             if (forceAutoDetection) {
                 throw new SOSSSHAutoDetectionException(strb.toString());
             } else {
