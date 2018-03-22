@@ -10,6 +10,6 @@ public interface IDataSourceJobChainNodes {
     public JobChain.JobChainNode get(String key);
     public String getFirstNode();
     public void setFirstNode(String firstNode);
-
+    public int size();
 }
     
