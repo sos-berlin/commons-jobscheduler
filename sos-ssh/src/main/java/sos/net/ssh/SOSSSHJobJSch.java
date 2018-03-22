@@ -139,6 +139,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 if (objOptions.createEnvironmentVariables.value()) {
                     if (objOptions.autoDetectOS.value()) {
                         setSOSVfsEnvs();
+                    } else if (objOptions.postCommandDelete.getValue().contains("del")) {
+                        final boolean oldFlg = flgIsWindowsShell;
+                        flgIsWindowsShell = true;
+                        setSOSVfsEnvs();
+                        // Ausnahme da bei Aufruf von setReturnValuesEnvVar(); flgIsWindowsShell nicht klar ist
+                        // und erst hier bestimmt werden kann.
+                        envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+                        flgIsWindowsShell = oldFlg;
                     } else {
                         preCommand = getPreCommand();
                     }
@@ -164,7 +172,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         public Void call() throws Exception {
                             if (objOptions.autoDetectOS.value()) {
                                 vfsHandler.executeCommand(cmdToExecute, envVars);
-                            } else {
+                            } else if (objOptions.postCommandDelete.getValue().contains("del")) {
+                                vfsHandler.executeCommand(cmdToExecute, envVars);
+                            }  else {
                                 vfsHandler.executeCommand(cmdToExecute);
                             }
                             return null;
