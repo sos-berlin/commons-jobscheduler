@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -12,7 +11,6 @@ import org.apache.log4j.Logger;
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.io.Files.JSCsvFile;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.enuTransferStatus;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -24,25 +22,20 @@ import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileList extends SOSVfsMessageCodes {
 
     private static final Logger LOGGER = Logger.getLogger(SOSFileList.class);
     private static final Logger JADE_REPORT_LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
-    private final String historyFields =
-            "guid;mandator;transfer_end;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;"
-                    + "port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
-    private final String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;transfer_start;modification_date";
     private final JSDataElementDate dteTransactionStart = new JSDataElementDate(now(), JSDateFormat.dfTIMESTAMPS);
     private final JSDataElementDate dteTransactionEnd = new JSDataElementDate(now(), JSDateFormat.dfTIMESTAMPS);
     private final HashMap<String, String> objSubFolders = new HashMap<>();
     private SOSFTPOptions objOptions = null;
     private Vector<SOSFileListEntry> objFileListEntries = new Vector<>();
     private boolean transferCountersCounted = false;
+    @SuppressWarnings("unused")
     private SOSFileList objParent = null;
     private ISOSVFSHandler objVFS = null;
-    private boolean flgHistoryFileAlreadyWritten = false;
     private boolean flgResultSetFileAlreadyCreated = false;
     private long sumOfFileSizes = 0L;
     public ISOSVfsFileTransfer objDataTargetClient = null;
@@ -334,13 +327,16 @@ public class SOSFileList extends SOSVfsMessageCodes {
     }
 
     public void logFileList() {
-        String strT = "";
-        for (SOSFileListEntry objListItem : objFileListEntries) {
-            String strFileName = objListItem.getFileName4ResultList();
-            strT += "\n" + strFileName;
+        if (objFileListEntries != null && objFileListEntries.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (SOSFileListEntry entry : objFileListEntries) {
+                sb.append("\n");
+                sb.append(entry.getFileName4ResultList());
+            }
+            String msg = sb.toString();
+            LOGGER.info(msg);
+            JADE_REPORT_LOGGER.info(msg);
         }
-        LOGGER.info(strT);
-        JADE_REPORT_LOGGER.info(strT);
     }
 
     public void createResultSetFile() {
@@ -349,13 +345,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
         }
         flgResultSetFileAlreadyCreated = true;
         lngNoOfRecordsInResultSetFile = 0L;
+        JSFile resultSetFile = null;
         try {
             if (objOptions.resultSetFileName.isDirty() && objOptions.resultSetFileName.isNotEmpty()) {
-                JSFile resultSetFile = objOptions.resultSetFileName.getJSFile();
-                if ("copyFromInternet".equals(objOptions.getDmzOption("operation")) && !objOptions.getDmzOption("resultfile").isEmpty()) {
+                resultSetFile = objOptions.resultSetFileName.getJSFile();
+                if ("getlist".equalsIgnoreCase(objOptions.getDmzOption("operation")) && !objOptions.getDmzOption("resultfile").isEmpty()) {
                     ISOSVirtualFile jumpResultSetFile = objDataSourceClient.getFileHandle(objOptions.getDmzOption("resultfile"));
                     if (jumpResultSetFile.fileExists()) {
-                        lngNoOfRecordsInResultSetFile = transferResultSetFile(resultSetFile, jumpResultSetFile);
+                        lngNoOfRecordsInResultSetFile = writeResultSetFileFromJumpFile(resultSetFile, jumpResultSetFile);
                     }
                 } else {
                     for (SOSFileListEntry objListItem : objFileListEntries) {
@@ -367,15 +364,28 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 if (lngNoOfRecordsInResultSetFile == 0) {
                     resultSetFile.writeLine("");
                 }
-                resultSetFile.close();
-                LOGGER.info(String.format("ResultSet to '%1$s' is written", resultSetFile.getAbsoluteFile()));
+                LOGGER.info(String.format("ResultSet to '%1$s' is written", resultSetFile.getCanonicalPath()));
             }
         } catch (Exception e) {
-            throw new JobSchedulerException("Problems occured creating ResultSetFile", e);
+            String msg = "";
+            if (resultSetFile != null) {
+                try {
+                    msg = " '" + resultSetFile.getCanonicalPath() + "'";
+                } catch (Throwable ee) {
+                }
+            }
+            throw new JobSchedulerException(String.format("Problems occured creating ResultSet file%s: %s", msg, e.toString()), e);
+        } finally {
+            if (resultSetFile != null) {
+                try {
+                    resultSetFile.close();
+                } catch (Throwable e) {
+                }
+            }
         }
     }
 
-    private long transferResultSetFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
+    private long writeResultSetFileFromJumpFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
         byte[] buffer = new byte[objOptions.bufferSize.value()];
         int bytesTransferred = 0;
         FileOutputStream fos = null;
@@ -435,8 +445,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
     public void endTransaction() {
         dteTransactionEnd.setParsePattern(JSDateFormat.dfTIMESTAMPS);
         dteTransactionEnd.Value(now());
-//        getJumpHistoryFile();
-//        writeTransferHistory();
+        // getJumpHistoryFile();
+        // writeTransferHistory();
     }
 
     public void startTransaction() {
@@ -526,174 +536,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
         }
         this.endTransaction();
     }
-
-//    public void writeTransferHistory() {
-//        if (flgHistoryFileAlreadyWritten) {
-//            return;
-//        }
-//        flgHistoryFileAlreadyWritten = true;
-//        dteTransactionEnd.setFormatString(JSDateFormat.dfTIMESTAMPS);
-//        dteTransactionStart.setFormatString(JSDateFormat.dfTIMESTAMPS);
-//        long duration = dteTransactionEnd.getDateObject().getTime() - dteTransactionStart.getDateObject().getTime();
-//        String operation = objOptions.operation.getValue();
-//        String msg = SOSVfs_D_213.params(dteTransactionStart.getFormattedValue(), dteTransactionEnd.getFormattedValue(), duration, operation);
-//        LOGGER.debug(msg);
-//        JADE_REPORT_LOGGER.info(msg);
-//        String historyFileName = objOptions.historyFileName.getValue();
-//        JSFile historyFile = null;
-//        try {
-//            if (objOptions.historyFileName.isDirty()) {
-//                historyFile = objOptions.historyFileName.getJSFile();
-//                if (objOptions.historyFileAppendMode.isTrue()) {
-//                    historyFile.setAppendMode(true);
-//                    if (!historyFile.exists()) {
-//                        historyFile.writeLine(historyFields + ";" + newHistoryFields);
-//                    }
-//                } else {
-//                    historyFile.writeLine(historyFields + ";" + newHistoryFields);
-//                }
-//                for (SOSFileListEntry entry : objFileListEntries) {
-//                    historyFile.writeLine(entry.toCsv());
-//                    lngNoOfHistoryFileRecordsWritten++;
-//                }
-//                LOGGER.info(String.format("%s records written to history file '%s', HistoryFileAppendMode = %s", lngNoOfHistoryFileRecordsWritten,
-//                        historyFileName, objOptions.historyFileAppendMode.getValue()));
-//            }
-//        } catch (Exception e) {
-//            LOGGER.warn(String.format("Error occured during writing of the history file: %s", e.toString()));
-//        } finally {
-//            if (historyFile != null) {
-//                try {
-//                    historyFile.close();
-//                } catch (Exception ex) {
-//                    //
-//                }
-//            }
-//        }
-//        for (SOSFileListEntry entry : objFileListEntries) {
-//            if (!entry.getTargetFileName().isEmpty()) {
-//                msg = entry.toString();
-//                LOGGER.info(msg);
-//                JADE_REPORT_LOGGER.info(msg);
-//            }
-//        }
-//    }
-
-//    public void getJumpHistoryFile() {
-//        String operation = this.objOptions.getDmzOption("operation");
-//        String historyFilename = this.objOptions.getDmzOption("history");
-//        if (!operation.isEmpty() && !historyFilename.isEmpty()) {
-//            File localTempHistory = null;
-//            Map<String, Map<String, String>> jumpHistoryRecords = null;
-//            try {
-//                if ("copyFromInternet".equals(operation)) {
-//                    ISOSVirtualFile historyFile = this.objDataSourceClient.getFileHandle(historyFilename);
-//                    if (historyFile.fileExists()) {
-//                        localTempHistory = transferJumpHistoryFile(historyFile);
-//                        jumpHistoryRecords = readJumpHistory(localTempHistory, "remote_filename");
-//                        for (SOSFileListEntry entry : objFileListEntries) {
-//                            if (!entry.getTargetFileName().isEmpty()) {
-//                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileName())));
-//                            }
-//                        }
-//                    }
-//                } else if ("copyToInternet".equals(operation)) {
-//                    ISOSVirtualFile historyFile = this.objDataTargetClient.getFileHandle(historyFilename);
-//                    if (historyFile.fileExists()) {
-//                        localTempHistory = transferJumpHistoryFile(historyFile);
-//                        jumpHistoryRecords = readJumpHistory(localTempHistory, "local_filename");
-//                        for (SOSFileListEntry entry : objFileListEntries) {
-//                            if (!entry.getTargetFileName().isEmpty()) {
-//                                entry.setJumpHistoryRecord(jumpHistoryRecords.get(adjustFileSeparator(entry.getTargetFileNameAndPath())));
-//                            }
-//                        }
-//                    }
-//                }
-//            } catch (JobSchedulerException e) {
-//                throw e;
-//            } catch (Exception e) {
-//                throw new JobSchedulerException(e);
-//            }
-//
-//        }
-//
-//    }
-//
-//    private Map<String, Map<String, String>> readJumpHistory(File localTempHistory, String primaryKey) {
-//        Map<String, Map<String, String>> records = new HashMap<String, Map<String, String>>();
-//        Map<String, String> recordFields = null;
-//        String primaryKeyValue = "";
-//        JSCsvFile hwFile = null;
-//        try {
-//            hwFile = new JSCsvFile(localTempHistory.getAbsolutePath());
-//            hwFile.setCheckColumnCount(false);
-//            String[] strValues = null;
-//            hwFile.loadHeaders();
-//            String[] strHeader = hwFile.getHeaders();
-//            while ((strValues = hwFile.readCSVLine()) != null) {
-//                primaryKeyValue = "";
-//                recordFields = new HashMap<String, String>();
-//                int j = 0;
-//                for (String val : strValues) {
-//                    String strFieldName = strHeader[j++];
-//                    if (val == null) {
-//                        val = "";
-//                    }
-//                    recordFields.put(strFieldName, val);
-//                    if (strFieldName.endsWith(primaryKey)) {
-//                        primaryKeyValue = adjustFileSeparator(val);
-//                    }
-//                }
-//                if (!primaryKeyValue.isEmpty()) {
-//                    records.put(primaryKeyValue, recordFields);
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new JobSchedulerException(e);
-//        } finally {
-//            try {
-//                if (hwFile != null) {
-//                    hwFile.close();
-//                }
-//            } catch (IOException e) {
-//                //
-//            }
-//        }
-//        return records;
-//    }
-//
-//    private File transferJumpHistoryFile(ISOSVirtualFile jumpHistoryFile) {
-//        File localTempHistory = null;
-//        if (jumpHistoryFile != null) {
-//            byte[] buffer = new byte[objOptions.bufferSize.value()];
-//            int bytesTransferred = 0;
-//            FileOutputStream fos = null;
-//            try {
-//                localTempHistory = File.createTempFile("jade-", null);
-//                localTempHistory.deleteOnExit();
-//                fos = new FileOutputStream(localTempHistory);
-//                while ((bytesTransferred = jumpHistoryFile.read(buffer)) != -1) {
-//                    fos.write(buffer, 0, bytesTransferred);
-//                }
-//            } catch (Exception e) {
-//                throw new JobSchedulerException(e);
-//            } finally {
-//                try {
-//                    if (fos != null) {
-//                        fos.close();
-//                    }
-//                } catch (IOException e) {
-//                    //
-//                }
-//                try {
-//                    jumpHistoryFile.closeInput();
-//                } catch (Exception e) {
-//                    //
-//                }
-//            }
-//        }
-//        return localTempHistory;
-//    }
 
     public long size() {
         long intS = 0;
