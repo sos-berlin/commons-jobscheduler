@@ -364,6 +364,9 @@ public class JSObjJobChain extends JobChain {
 
     public String createGraphVizImageFile(File imageOutputFolder, boolean showErrorNodes) throws Exception {
         File liveFolder = new File(new File(this.getHotFolderSrc().getName()).getParent());
+        if (this.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd().size() == 0){
+            return "";
+        }
         JSObjJobChain jobchain = this;
         graph = new Graph();
         graph.getGraphProperties().setDirection(RankDir.TB);
