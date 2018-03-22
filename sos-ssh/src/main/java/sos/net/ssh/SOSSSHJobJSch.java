@@ -25,8 +25,10 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
+import com.sos.exception.SOSSSHAutoDetectionException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
@@ -107,6 +109,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 this.connect();
             }
             // first check if windows is running on the remote host
+            checkOsAndShell();
             flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
             if (objOptions.command.isNotEmpty()) {
                 strCommands2Execute = objOptions.command.values();
@@ -132,19 +135,38 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             for (String strCmd : strCommands2Execute) {
                 executedCommand = strCmd;
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
+                String preCommand = null;
                 if (objOptions.createEnvironmentVariables.value()) {
-                    setSOSVfsEnvs();
+                    if (objOptions.autoOSDetection.value()) {
+                        setSOSVfsEnvs();
+                    } else {
+                        preCommand = getPreCommand();
+                    }
                 }
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     ExecutorService executorService = Executors.newFixedThreadPool(2);
-                    final String cmdToExecute = strCmd;
+                    String completeCommand = null;
+                    if (objOptions.autoOSDetection.value()) {
+                        completeCommand = strCmd;
+                    } else {
+                        if (preCommand != null) {
+                            completeCommand = preCommand + strCmd;
+                        } else {
+                            completeCommand = strCmd;
+                        }
+                    }
+                    final String cmdToExecute = completeCommand;
                     Callable<Void> runCompleteCmd = new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            vfsHandler.executeCommand(cmdToExecute, envVars);
+                            if (objOptions.autoOSDetection.value()) {
+                                vfsHandler.executeCommand(cmdToExecute, envVars);
+                            } else {
+                                vfsHandler.executeCommand(cmdToExecute);
+                            }
                             return null;
                         }
                     };
@@ -303,10 +325,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         } else {
             resolvedTempFileName = tempFileName;
         }
-        if (flgIsWindowsShell) {
-            envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
-        } else {
-            envVars.getLocalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+        if (objOptions.autoOSDetection.value()) {
+            if (flgIsWindowsShell) {
+                envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+            } else {
+                envVars.getLocalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+            }
         }
     }
     
@@ -496,6 +520,83 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             } else {
                 ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
                 LOGGER.debug("Default Linux command used to receive PID of the active shell!");
+            }
+        }
+    }
+    
+    private void checkOsAndShell() throws SOSSSHAutoDetectionException {
+        String cmdToExecute = "uname";
+        LOGGER.info("*** Checking for remote Operating System and shell! ***");
+        boolean forceAutoDetection = objOptions.autoOSDetection.value();
+        StringBuilder strb = new StringBuilder();
+        strb.append("Can´t detect OS and shell automatically!\r\n");
+        strb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
+        strb.append("preCommand, postCommandRead and postCommandDelete according to your remote shell!\r\n");
+        strb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
+        SOSCommandResult commandResult = null;
+        try {
+            commandResult = vfsHandler.executePrivateCommand(cmdToExecute);
+            LOGGER.info("exitCode = " + commandResult.getExitCode());
+            LOGGER.info("stdOut = " + commandResult.getStdOut());
+            LOGGER.info("stdErr = " + commandResult.getStdErr());
+            if (commandResult.getExitCode() == 0) {
+                // command uname was execute successfully -> OS is Unix like
+                if (commandResult.getStdOut().toString().toLowerCase().contains("linux") ||
+                        commandResult.getStdOut().toString().toLowerCase().contains("darwin") || 
+                        commandResult.getStdOut().toString().toLowerCase().contains("aix") ||
+                        commandResult.getStdOut().toString().toLowerCase().contains("hp-ux") ||
+                        commandResult.getStdOut().toString().toLowerCase().contains("solaris") ||
+                        commandResult.getStdOut().toString().toLowerCase().contains("sunos") ||
+                        commandResult.getStdOut().toString().toLowerCase().contains("freebsd")) {
+                    if (forceAutoDetection) {
+                        flgIsWindowsShell = false;
+                    }
+                    LOGGER.info("*** Command uname was executed successfully, remote OS and shell are Unix like! ***");
+                } else if (commandResult.getStdOut().toString().toLowerCase().contains("cygwin")) {
+                    // OS is Windows but shell is Unix like
+                    // unix commands have to be used
+                    LOGGER.info("*** Command uname was executed successfully, remote OS is Windows with cygwin and shell is Unix like! ***");
+                    if (forceAutoDetection) {
+                        flgIsWindowsShell = false;
+                    }
+                } else {
+                    LOGGER.info("*** Command uname was executed successfully, but the remote OS was not determined, Unix like shell is assumed! ***");                    
+                    if (forceAutoDetection) {
+                        flgIsWindowsShell = false;
+                    }
+                }
+            } else if (commandResult.getExitCode() == 9009 || commandResult.getExitCode() == 1) {
+                // call of uname under Windows OS delivers exit code 9009 and via SSH exit code 1
+                // both with bitvise SSH server and CopSSH (cygwin) with target shell cmd.exe
+                if (forceAutoDetection) {
+                    flgIsWindowsShell = true;
+                }
+                LOGGER.info("*** execute Command uname failed with exit code 9009, remote OS is Windows with cmd shell! ***");
+            } else if (commandResult.getExitCode() == 127) {
+                // call of uname under Windows OS delivers exit code 127
+                // with CopSSH (cygwin) with target shell /bin/bash
+                // command uname is not installed by default through CopSSH installation
+                LOGGER.info("*** execute Command uname failed with exit code 127, remote OS is Windows with cygwin and shell is Unix like! ***");
+                if (forceAutoDetection) {
+                    flgIsWindowsShell = false;
+                }
+            } else {
+                if (forceAutoDetection) {
+                    throw new SOSSSHAutoDetectionException(strb.toString());
+                } else {
+                    flgIsWindowsShell = false;
+                    LOGGER.info(strb.toString());
+                }
+            }
+        } catch (Exception e) {
+//            LOGGER.info("exitCode = " + commandResult.getExitCode());
+//            LOGGER.info("stdOut = " + commandResult.getStdOut());
+//            LOGGER.info("stdErr = " + commandResult.getStdErr());
+            if (forceAutoDetection) {
+                throw new SOSSSHAutoDetectionException(strb.toString());
+            } else {
+                flgIsWindowsShell = false;
+                LOGGER.error(strb.toString(), e);
             }
         }
     }

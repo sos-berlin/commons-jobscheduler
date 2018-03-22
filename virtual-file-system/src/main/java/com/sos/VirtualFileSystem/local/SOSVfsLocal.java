@@ -31,6 +31,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -644,6 +645,18 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

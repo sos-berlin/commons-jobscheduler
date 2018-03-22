@@ -20,7 +20,9 @@ import org.apache.log4j.Logger;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 
 public class SOSVfsJms extends SOSVfsTransferBaseClass {
@@ -228,6 +230,18 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     @Override
     public OutputStream getOutputStream(String fileName) {
         // not implemented, no need
+        return null;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
+        // TODO Auto-generated method stub
         return null;
     }
 

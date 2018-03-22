@@ -740,6 +740,17 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
         tempDirectory = val;
     }
     
-    
+    @JSOptionDefinition(name = "auto_os_detection", description = "automatic OS detection is used to specify remote commands by implication",
+            key = "auto_os_detection", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean autoOSDetection = new SOSOptionBoolean(this, CLASSNAME + ".auto_os_detection", 
+            "automatic OS detection is used to specify remote commands by implication", "true", "true", false);
+
+    public SOSOptionBoolean getAutoOSDetection() {
+        return autoOSDetection;
+    }
+
+    public void setAutoOSDetection(final SOSOptionBoolean autoOSDetection) {
+        this.autoOSDetection = autoOSDetection;
+    }    
 
 }

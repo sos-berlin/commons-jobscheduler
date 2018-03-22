@@ -44,5 +44,5 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
     public enuSourceOrTarget sourceOrTarget();
 
     public void setSimulateShell(boolean simulateShell);
-
+    
 }

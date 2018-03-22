@@ -46,6 +46,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -1026,7 +1027,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (!isOSChecked) {
             String cmd = "echo %ComSpec%";
             try {
-                CommandResult result = executePrivateCommand(cmd);
+                SOSCommandResult result = executePrivateCommand(cmd);
                 String stdout = result.getStdOut().toString();
                 if (stdout.indexOf("cmd.exe") > -1) {
                     isUnix = false;
@@ -1049,18 +1050,47 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return isUnix;
     }
 
-    private CommandResult executePrivateCommand(String cmd) throws Exception {
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        return executePrivateCommand(cmd, null);
+    }
+    
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         ChannelExec channel = null;
         InputStream in = null;
         InputStream err = null;
         BufferedReader errReader = null;
-        CommandResult result = new CommandResult();
+        SOSCommandResult result = new SOSCommandResult();
         try {
             cmd = cmd.trim();
             LOGGER.debug(String.format("cmd=%s", cmd));
             channel = (ChannelExec) sshSession.openChannel("exec");
             channel.setPty(isSimulateShell());
-            channel.setCommand(cmd);
+            StringBuilder envs = new StringBuilder();
+            if (env != null) {
+                if (env.getGlobalEnvs() != null) {
+                    env.getGlobalEnvs().forEach((k, v) -> {
+                        channelExec.setEnv(k, v);
+                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
+                    });
+                }
+                if (env.getLocalEnvs() != null) {
+                    env.getLocalEnvs().forEach((k, v) -> {
+                        if (!isRemoteWindowsShell) {
+                            envs.append(String.format("export \"%s=%s\";", k, v));
+                        } else {
+                            envs.append(String.format("set %s=%s&", k, v));
+                        }
+                    });
+                    if (!envs.toString().isEmpty()) {
+                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
+                    }
+                }
+            }
+            if (envs.length() > 0) {
+                channel.setCommand(envs.toString() + cmd);
+            } else {
+                channel.setCommand(cmd);
+            }
             channel.setInputStream(null);
             channel.setErrStream(null);
             in = channel.getInputStream();
@@ -1129,32 +1159,4 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return result;
     }
 
-    private class CommandResult {
-
-        private int _exitCode;
-        private StringBuffer _stdOut;
-        private StringBuffer _stdErr;
-
-        public CommandResult() {
-            _stdOut = new StringBuffer();
-            _stdErr = new StringBuffer();
-        }
-
-        @SuppressWarnings("unused")
-        public int getExitCode() {
-            return _exitCode;
-        }
-
-        public void setExitCode(int val) {
-            _exitCode = val;
-        }
-
-        public StringBuffer getStdOut() {
-            return _stdOut;
-        }
-
-        public StringBuffer getStdErr() {
-            return _stdErr;
-        }
-    }
 }
