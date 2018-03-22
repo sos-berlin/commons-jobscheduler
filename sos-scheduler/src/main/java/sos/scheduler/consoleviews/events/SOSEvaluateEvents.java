@@ -25,8 +25,8 @@ import sos.util.SOSDate;
 
 public class SOSEvaluateEvents {
 
-    private LinkedHashSet listOfActions;
-    private LinkedHashSet listOfActiveEvents;
+    private LinkedHashSet <SOSActions> listOfActions;
+    private LinkedHashSet <SchedulerEvent> listOfActiveEvents;
     private String errmsg;
     private String host;
     private int port;
@@ -37,20 +37,20 @@ public class SOSEvaluateEvents {
         super();
         host = host_;
         port = port_;
-        listOfActiveEvents = new LinkedHashSet();
+        listOfActiveEvents = new LinkedHashSet <SchedulerEvent>();
     }
 
     public void reconnect(final String host_, final int port_) {
         host = host_;
         port = port_;
-        listOfActiveEvents = new LinkedHashSet();
+        listOfActiveEvents = new LinkedHashSet<SchedulerEvent>();
     }
 
     public String getEventStatus(final SchedulerEvent event) {
         String erg = "missing";
-        Iterator i = listOfActiveEvents.iterator();
+        Iterator<SchedulerEvent> i = listOfActiveEvents.iterator();
         while (i.hasNext()) {
-            SchedulerEvent e = (SchedulerEvent) i.next();
+            SchedulerEvent e =  i.next();
             if (event.isEqual(e)) {
                 event.created = e.created;
                 event.expires = e.expires;
@@ -237,7 +237,7 @@ public class SOSEvaluateEvents {
     }
 
     public void readConfigurationFile(final File f) throws DOMException, Exception {
-        listOfActions = new LinkedHashSet();
+        listOfActions = new LinkedHashSet<SOSActions>();
         if (f.exists()) {
             buildEventsFromXMl();
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -282,11 +282,11 @@ public class SOSEvaluateEvents {
         }
     }
 
-    public LinkedHashSet getListOfActions() {
+    public LinkedHashSet<SOSActions> getListOfActions() {
         return listOfActions;
     }
 
-    public LinkedHashSet getListOfActiveEvents() {
+    public LinkedHashSet<SchedulerEvent> getListOfActiveEvents() {
         return listOfActiveEvents;
     }
 
@@ -299,7 +299,7 @@ public class SOSEvaluateEvents {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-        Iterator iActions = eval.getListOfActions().iterator();
+        Iterator<SOSActions> iActions = eval.getListOfActions().iterator();
         while (iActions.hasNext()) {
             SOSActions a = (SOSActions) iActions.next();
             // Die Nodelist verwenden
@@ -328,12 +328,12 @@ public class SOSEvaluateEvents {
                 }
             }
             if (a != null) {
-                Iterator i = a.getListOfEventGroups().iterator();
+                Iterator<SOSEventGroups> i = a.getListOfEventGroups().iterator();
                 while (i.hasNext()) {
-                    SOSEventGroups evg = (SOSEventGroups) i.next();
-                    Iterator iEvents = evg.getListOfEvents().iterator();
+                    SOSEventGroups evg = i.next();
+                    Iterator<SchedulerEvent> iEvents = evg.getListOfEvents().iterator();
                     while (iEvents.hasNext()) {
-                        SchedulerEvent event = (SchedulerEvent) iEvents.next();
+                        SchedulerEvent event = iEvents.next();
                         LOGGER.debug(event.getJobName() + " " + eval.getEventStatus(event));
                     }
                 }

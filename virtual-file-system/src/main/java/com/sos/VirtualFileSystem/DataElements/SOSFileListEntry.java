@@ -34,6 +34,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -442,7 +443,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
-            final SOSOptionString optionCommandDelimiter, Map<String, String> env) {
+            final SOSOptionString optionCommandDelimiter, SOSVfsEnv env) {
         final String methodName = "SOSFileListEntry::executeCommands";
         String commands = optionCommands.getValue().trim();
         if (commands.length() > 0) {
@@ -474,7 +475,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     if (command.trim().length() > 0) {
                         try {
                             LOGGER.info(String.format("[%s]%s", commandOptionName, command.trim()));
-                            fileTransfer.getHandler().executeCommand(command, env);
+                            fileTransfer.getHandler().executeCommand(commands, env);
                         } catch (JobSchedulerException e) {
                             //LOGGER.error(e.toString());
                             throw e;
@@ -512,6 +513,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         Map<String, String> env = new HashMap<String, String>();
         env.put(ENV_VAR_FILE_TRANSFER_STATUS, status);
         env.put(ENV_VAR_FILE_IS_TRANSFERRED, isTransferred ? "1" : "0");
+        SOSVfsEnv envs = new SOSVfsEnv();
+        envs.setLocalEnvs(env);
 
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
@@ -519,18 +522,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 LOGGER.info(String.format("[alternative_target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
                 executeCommands("alternative_target_post_command", objDataTargetClient, target.getAlternatives().postCommand, target
-                        .getAlternatives().commandDelimiter, env);
+                        .getAlternatives().commandDelimiter, envs);
             }
         } else {
             if (!isTransferred && objOptions.post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("post_command", objDataTargetClient, objOptions.postCommand, target.commandDelimiter, env);
+                executeCommands("post_command", objDataTargetClient, objOptions.postCommand, target.commandDelimiter, envs);
             }
             if (!isTransferred && target.post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter, env);
+                executeCommands("target_post_command", objDataTargetClient, target.postCommand, target.commandDelimiter, envs);
             }
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
@@ -539,13 +542,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 LOGGER.info(String.format("[alternative_source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
                 executeCommands("alternative_source_post_command", objDataSourceClient, source.getAlternatives().postCommand, source
-                        .getAlternatives().commandDelimiter, env);
+                        .getAlternatives().commandDelimiter, envs);
             }
         } else {
             if (!isTransferred && source.post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter, env);
+                executeCommands("source_post_command", objDataSourceClient, source.postCommand, source.commandDelimiter, envs);
             }
         }
     }

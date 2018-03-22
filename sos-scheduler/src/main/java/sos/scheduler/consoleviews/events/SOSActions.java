@@ -14,40 +14,40 @@ public class SOSActions {
 
     protected String name = "";
     protected String logic = "";
-    protected LinkedHashSet listOfEventGroups = null;
-    protected LinkedHashSet listOfCommands = null;
+    protected LinkedHashSet <SOSEventGroups> listOfEventGroups = null;
+    protected LinkedHashSet <SOSEventCommand> listOfCommands = null;
     protected NodeList commandNodes = null;
     protected Node commands = null;
 
     public SOSActions(final String name) {
         super();
         this.name = name;
-        listOfEventGroups = new LinkedHashSet();
-        listOfCommands = new LinkedHashSet();
+        listOfEventGroups = new LinkedHashSet<SOSEventGroups>();
+        listOfCommands = new LinkedHashSet<SOSEventCommand>();
     }
 
-    public boolean isActive(final LinkedHashSet listOfActiveEvents) {
+    public boolean isActive(final LinkedHashSet <SchedulerEvent> listOfActiveEvents) {
         String tmp = logic;
         if (logic.isEmpty() || "or".equalsIgnoreCase(logic)) {
             logic = "";
-            Iterator i = listOfEventGroups.iterator();
+            Iterator<SOSEventGroups> i = listOfEventGroups.iterator();
             while (i.hasNext()) {
-                SOSEventGroups evg = (SOSEventGroups) i.next();
+                SOSEventGroups evg = i.next();
                 logic += evg.group + " or ";
             }
             logic += " false";
         }
         if ("and".equalsIgnoreCase(logic)) {
             logic = "";
-            Iterator i = listOfEventGroups.iterator();
+            Iterator<SOSEventGroups> i = listOfEventGroups.iterator();
             while (i.hasNext()) {
-                SOSEventGroups evg = (SOSEventGroups) i.next();
+                SOSEventGroups evg = i.next();
                 logic += evg.group + " and ";
             }
             logic += " true";
         }
         BooleanExp exp = new BooleanExp(logic);
-        Iterator i = listOfEventGroups.iterator();
+        Iterator <SOSEventGroups> i = listOfEventGroups.iterator();
         while (i.hasNext()) {
             SOSEventGroups evg = (SOSEventGroups) i.next();
             exp.replace(evg.group, exp.trueFalse(evg.isActiv(listOfActiveEvents)));
@@ -56,9 +56,7 @@ public class SOSActions {
         return exp.evaluateExpression();
     }
 
-    public LinkedHashSet getListOfCommands() {
-        return listOfCommands;
-    }
+   
 
     public String getName() {
         return name;
@@ -68,7 +66,7 @@ public class SOSActions {
         return logic;
     }
 
-    public LinkedHashSet getListOfEventGroups() {
+    public LinkedHashSet <SOSEventGroups> getListOfEventGroups() {
         return listOfEventGroups;
     }
 

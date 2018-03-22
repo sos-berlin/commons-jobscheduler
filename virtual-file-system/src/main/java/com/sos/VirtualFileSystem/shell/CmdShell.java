@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
 import sos.util.SOSString;
@@ -85,7 +86,7 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         return executeCommand(pstrCommand, showCommand, null);
     }
 
-    private int executeCommand(final String[] pstrCommand, final boolean showCommand, Map<String, String> env) throws Exception {
+    private int executeCommand(final String[] pstrCommand, final boolean showCommand, SOSVfsEnv env) throws Exception {
         ByteArrayOutputStream bytStdOut = new ByteArrayOutputStream();
         ByteArrayOutputStream bytStdErr = new ByteArrayOutputStream();
         PrintStream psStdOut = new PrintStream(bytStdOut, true, CHARACTER_ENCODING);
@@ -99,7 +100,12 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         objShell = new ProcessBuilder(pstrCommand);
         if (env != null) {
             LOGGER.debug(String.format("set env=%s", env));
-            objShell.environment().putAll(env);
+            if (env.getGlobalEnvs() != null) {
+                objShell.environment().putAll(env.getGlobalEnvs());
+            }
+            if (env.getLocalEnvs() != null) {
+                objShell.environment().putAll(env.getLocalEnvs());
+            }
         }
         final Process objCommand = objShell.start();
         createOutputPipe(objCommand.getInputStream(), psStdOut);
@@ -126,7 +132,7 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         return executeCommand(createCommand(pstrcommand), true);
     }
 
-    public int executeCommand(final String pstrcommand, Map<String, String> env) throws Exception {
+    public int executeCommand(final String pstrcommand, SOSVfsEnv env) throws Exception {
         return executeCommand(createCommand(pstrcommand), true, env);
     }
 

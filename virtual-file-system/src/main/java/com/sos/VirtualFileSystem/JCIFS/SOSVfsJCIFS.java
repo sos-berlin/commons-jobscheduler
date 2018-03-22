@@ -21,7 +21,9 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -368,7 +370,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void executeCommand(final String cmd, Map<String, String> env) throws Exception {
+    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
         if (cmdShell == null) {
             cmdShell = new CmdShell();
         }
@@ -602,6 +604,18 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -7,12 +7,13 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpATTRS;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
-    
+
     private static final Logger LOGGER = Logger.getLogger(SOSVfsSFtpFileJCraft.class);
 
     public SOSVfsSFtpFileJCraft(final String fileName) {
@@ -117,11 +118,17 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
     @Override
     public long getModificationDateTime() {
+        String path = "";
         try {
+            path = adjustRelativePathName(fileName);
             SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
-            return handler.getAttributes(adjustRelativePathName(fileName)).getMTime()*1000L;
+            SftpATTRS attrs = handler.getAttributes(path);
+            if (attrs == null) {
+                throw new Exception("SftpATTRS is null");
+            }
+            return attrs.getMTime() * 1000L;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(String.format("[%s]%s", path, e.toString()), e);
             return -1L;
         }
     }
@@ -130,7 +137,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     public long setModificationDateTime(final long timestamp) {
         try {
             SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
-            int mTime = (int) (timestamp/1000L);
+            int mTime = (int) (timestamp / 1000L);
             handler.getClient().setMtime(adjustRelativePathName(fileName), mTime);
             return timestamp;
         } catch (Exception e) {

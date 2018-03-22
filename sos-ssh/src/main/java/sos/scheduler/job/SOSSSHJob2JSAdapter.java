@@ -4,6 +4,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -57,13 +58,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         if (this.isOrderJob()) {
             spooler_task.order().params().set_var(EXIT_SIGNAL, "");
             spooler_task.order().params().set_var(EXIT_CODE, "");
-            spooler_task.order().params().set_var(STD_ERR_OUTPUT, "");
-            spooler_task.order().params().set_var(STD_OUT_OUTPUT, "");
         }
         spooler_task.params().set_var(EXIT_SIGNAL, "");
         spooler_task.params().set_var(EXIT_CODE, "");
-        spooler_task.params().set_var(STD_ERR_OUTPUT, "");
-        spooler_task.params().set_var(STD_OUT_OUTPUT, "");
         SOSSSHJob2 objR;
         String useJSch = spooler.var(PARAM_JITL_SSH_USE_JSCH_IMPL);
         envVarNamePrefix = spooler.var(PARAM_SCHEDULER_VARIABLE_NAME_PREFIX);
@@ -110,8 +107,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
-            for (String key : ((SOSSSHJobJSch) objR).getReturnValues().keySet()) {
-                spooler_task.order().params().set_var(key, ((SOSSSHJobJSch) objR).getReturnValues().get(key));
+            for (Entry<String, String> entry : ((SOSSSHJobJSch) objR).getReturnValues().entrySet()) {
+                spooler_task.order().params().set_var(entry.getKey(), entry.getValue());
             }
         }
     }

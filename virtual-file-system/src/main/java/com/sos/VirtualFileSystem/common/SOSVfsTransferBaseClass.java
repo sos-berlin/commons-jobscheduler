@@ -367,7 +367,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         logINFO("not implemented yet");
     }
 

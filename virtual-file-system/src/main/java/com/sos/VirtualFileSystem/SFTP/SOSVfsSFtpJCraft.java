@@ -36,6 +36,7 @@ import com.jcraft.jsch.SOSRequiredAuthPublicKey;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.UserInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -45,8 +46,10 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
@@ -61,6 +64,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private Session sshSession = null;
     private ChannelSftp sftpClient = null;
     private JSch secureChannel = null;
+    private Map environmentVariables = null;
     private Integer exitCode;
     private String exitSignal;
     private StringBuffer outContent;
@@ -68,13 +72,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private boolean isRemoteWindowsShell = false;
     private boolean isUnix = false;
     private boolean isOSChecked = false;
-    private int connectionTimeout = 0;
-    private boolean simulateShell = false;
+    // proxy
     private SOSOptionProxyProtocol proxyProtocol = null;
     private String proxyHost = null;
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
+    private int connectionTimeout = 0;
+    private boolean simulateShell = false;
     private ChannelExec channelExec = null;
     private final String lineSeparator = System.getProperty("line.separator");
 
@@ -408,7 +413,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void executeCommand(String cmd, Map<String, String> env) {
+    public void executeCommand(String cmd, SOSVfsEnv env) {
         checkOS();
 
         cmd = cmd.trim();
@@ -423,21 +428,34 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
             channelExec.setPty(isSimulateShell());
-
-            StringBuffer envs = new StringBuffer();
+            StringBuilder envs = new StringBuilder();
             if (env != null) {
-                env.forEach((k, v) -> {
-                    // envs.append(String.format("set %s=%s", k, v));
-                    if (isUnix) {
-                        envs.append(String.format("export %s=%s;", k, v));
-                    } else {
-                        envs.append(String.format("set %s=%s&", k, v));
+                if (env.getGlobalEnvs() != null) {
+                    env.getGlobalEnvs().forEach((k, v) -> {
+                        channelExec.setEnv(k, v);
+                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
+                    });
+                }
+                if (env.getLocalEnvs() != null) {
+                    env.getLocalEnvs().forEach((k, v) -> {
+                        // envs.append(String.format("set %s=%s", k, v));
+                        if (!isRemoteWindowsShell) {
+                            envs.append(String.format("export \"%s=%s\";", k, v));
+                        } else {
+                            envs.append(String.format("set %s=%s&", k, v));
+                        }
+                    });
+                    if (!envs.toString().isEmpty()) {
+                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
                     }
-                });
-                LOGGER.debug(String.format("setEnv: %s", envs.toString()));
+                }
             }
             cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
-            channelExec.setCommand(envs.toString() + cmd);
+            if (envs.length() > 0) {
+                channelExec.setCommand(envs.toString() + cmd);
+            } else {
+                channelExec.setCommand(cmd);
+            }
             channelExec.setInputStream(null);
             channelExec.setErrStream(null);
             out = channelExec.getInputStream();
@@ -492,7 +510,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             reply = "OK";
-            //LOGGER.info(String.format("[%s]%s", cmd, reply));
+            // LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
@@ -535,6 +553,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         }
+    }
+
+    public void setEnvironmentVariables(Map<String, String> envVariables) {
+        this.environmentVariables = envVariables;
     }
 
     @Override
@@ -679,8 +701,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void usePasswordMethod() throws Exception {
-        LOGGER.debug(String.format("[password]password=?"));
+        LOGGER.debug("[password]password=?");
         sshSession.setPassword(authenticationOptions.getPassword().getValue());
+    }
+
+    private void useKeyboardInteractive() throws Exception {
+        Object ui = connection2OptionsAlternate.user_info.value();
+        if (ui == null) {
+            LOGGER.debug(String.format("use default %s implementation", SOSVfsSFtpJCraftUserInfo.class.getSimpleName()));
+            ui = new SOSVfsSFtpJCraftUserInfo();
+        }
+        sshSession.setUserInfo((UserInfo) ui);
     }
 
     private String usePreferredAuthentications(final String debugKey, final String preferredAuthentications) throws Exception {
@@ -728,8 +759,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
                 if (authenticationOptions.getAuthMethod().isPublicKey()) {
                     usePublicKeyMethod();
-                } else {
+                } else if (authenticationOptions.getAuthMethod().isPassword()) {
                     usePasswordMethod();
+                } else if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+                    useKeyboardInteractive();
                 }
             }
         }
@@ -845,8 +878,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
-            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost,
-                    proxyPort, proxyUser));
+            LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%s, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
+                    proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
@@ -990,11 +1023,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return channelExec;
     }
 
-    private void checkOS() {
+    public void checkOS() {
         if (!isOSChecked) {
             String cmd = "echo %ComSpec%";
             try {
-                CommandResult result = executePrivateCommand(cmd);
+                SOSCommandResult result = executePrivateCommand(cmd);
                 String stdout = result.getStdOut().toString();
                 if (stdout.indexOf("cmd.exe") > -1) {
                     isUnix = false;
@@ -1013,18 +1046,51 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    private CommandResult executePrivateCommand(String cmd) throws Exception {
+    public boolean isUnix() {
+        return isUnix;
+    }
+
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        return executePrivateCommand(cmd, null);
+    }
+    
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         ChannelExec channel = null;
         InputStream in = null;
         InputStream err = null;
         BufferedReader errReader = null;
-        CommandResult result = new CommandResult();
+        SOSCommandResult result = new SOSCommandResult();
         try {
             cmd = cmd.trim();
             LOGGER.debug(String.format("cmd=%s", cmd));
             channel = (ChannelExec) sshSession.openChannel("exec");
             channel.setPty(isSimulateShell());
-            channel.setCommand(cmd);
+            StringBuilder envs = new StringBuilder();
+            if (env != null) {
+                if (env.getGlobalEnvs() != null) {
+                    env.getGlobalEnvs().forEach((k, v) -> {
+                        channelExec.setEnv(k, v);
+                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
+                    });
+                }
+                if (env.getLocalEnvs() != null) {
+                    env.getLocalEnvs().forEach((k, v) -> {
+                        if (!isRemoteWindowsShell) {
+                            envs.append(String.format("export \"%s=%s\";", k, v));
+                        } else {
+                            envs.append(String.format("set %s=%s&", k, v));
+                        }
+                    });
+                    if (!envs.toString().isEmpty()) {
+                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
+                    }
+                }
+            }
+            if (envs.length() > 0) {
+                channel.setCommand(envs.toString() + cmd);
+            } else {
+                channel.setCommand(cmd);
+            }
             channel.setInputStream(null);
             channel.setErrStream(null);
             in = channel.getInputStream();
@@ -1093,32 +1159,4 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return result;
     }
 
-    private class CommandResult {
-
-        private int _exitCode;
-        private StringBuffer _stdOut;
-        private StringBuffer _stdErr;
-
-        public CommandResult() {
-            _stdOut = new StringBuffer();
-            _stdErr = new StringBuffer();
-        }
-
-        @SuppressWarnings("unused")
-        public int getExitCode() {
-            return _exitCode;
-        }
-
-        public void setExitCode(int val) {
-            _exitCode = val;
-        }
-
-        public StringBuffer getStdOut() {
-            return _stdOut;
-        }
-
-        public StringBuffer getStdErr() {
-            return _stdErr;
-        }
-    }
 }

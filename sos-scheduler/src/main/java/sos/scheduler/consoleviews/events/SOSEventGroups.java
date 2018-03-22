@@ -12,23 +12,23 @@ public class SOSEventGroups {
     protected String logic = "";
     protected String group = "";
     protected String event_class = "";
-    protected LinkedHashSet listOfEvents = null;
+    protected LinkedHashSet <SchedulerEvent> listOfEvents = null;
 
     public SOSEventGroups(final String group) {
         super();
         this.group = group;
-        listOfEvents = new LinkedHashSet();
+        listOfEvents = new LinkedHashSet<SchedulerEvent>();
     }
 
-    public boolean isActiv(final LinkedHashSet listOfActiveEvents) {
+    public boolean isActiv(final LinkedHashSet <SchedulerEvent> listOfActiveEvents) {
         boolean erg = false;
         if (logic.isEmpty()) {
             logic = "or";
         }
-        Iterator i = listOfEvents.iterator();
+        Iterator <SchedulerEvent> i = listOfEvents.iterator();
         if ("or".equalsIgnoreCase(logic)) {
             while (i.hasNext() && !erg) {
-                SchedulerEvent e = (SchedulerEvent) i.next();
+                SchedulerEvent e =  i.next();
                 erg = e.isIn(listOfActiveEvents);
             }
         } else {
@@ -54,7 +54,7 @@ public class SOSEventGroups {
         return group;
     }
 
-    public LinkedHashSet getListOfEvents() {
+    public LinkedHashSet <SchedulerEvent> getListOfEvents() {
         return listOfEvents;
     }
 

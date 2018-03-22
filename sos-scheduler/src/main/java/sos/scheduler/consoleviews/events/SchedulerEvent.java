@@ -74,8 +74,8 @@ public class SchedulerEvent {
         return logic;
     }
 
-    private HashMap properties() {
-        HashMap attr = new HashMap();
+    private HashMap<String,String> properties() {
+        HashMap <String,String> attr = new HashMap<String,String>();
         attr.put("event_title", eventTitle);
         attr.put("event_class", eventClass);
         attr.put("event_id", eventId);
@@ -91,9 +91,9 @@ public class SchedulerEvent {
 
     public boolean isEqual(SchedulerEvent eActive) {
         boolean erg = true;
-        Iterator iProperties = properties().keySet().iterator();
+        Iterator <String>iProperties = properties().keySet().iterator();
         while (iProperties.hasNext()) {
-            String trigger = iProperties.next().toString();
+            String trigger = iProperties.next();
             if (!"".equals(properties().get(trigger)) && eActive.properties().get(trigger) != null && !"expires".equalsIgnoreCase(trigger)
                     && !"created".equalsIgnoreCase(trigger) && !eActive.properties().get(trigger).equals(properties().get(trigger))) {
                 erg = false;
@@ -102,11 +102,11 @@ public class SchedulerEvent {
         return erg;
     }
 
-    public boolean isIn(LinkedHashSet listOfActiveEvents) {
+    public boolean isIn(LinkedHashSet <SchedulerEvent>listOfActiveEvents) {
         boolean erg = false;
-        Iterator i = listOfActiveEvents.iterator();
+        Iterator <SchedulerEvent> i = listOfActiveEvents.iterator();
         while (i.hasNext() && !erg) {
-            if (this.isEqual((SchedulerEvent) i.next())) {
+            if (this.isEqual(i.next())) {
                 erg = true;
             }
         }

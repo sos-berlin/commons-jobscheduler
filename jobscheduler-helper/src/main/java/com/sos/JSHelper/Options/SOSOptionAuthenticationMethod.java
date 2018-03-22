@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-/** @author KB */
 public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
 
     private static final long serialVersionUID = 806321970898790899L;
@@ -12,6 +11,7 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
     private static final String PASSWORD = "password";
     private static final String PUBLICKEY = "publickey";
     private static final String URL = "url";
+    private static final String KEYBOARD_INTERACTIVE = "keyboard-interactive";
     private enuAuthenticationMethods enuMethod = enuAuthenticationMethods.notDefined;
 
     public SOSOptionAuthenticationMethod(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
@@ -26,7 +26,8 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
     }
 
     public enum enuAuthenticationMethods {
-        publicKey(PUBLICKEY), password(PASSWORD), url(URL), notDefined("undefined"), ppk("ppk"), privatekey("privatekey");
+        publicKey(PUBLICKEY), password(PASSWORD), url(URL), notDefined("undefined"), ppk("ppk"), privatekey("privatekey"), keyboardInteractive(
+                KEYBOARD_INTERACTIVE);
 
         public final String description;
         public final String text;
@@ -51,39 +52,43 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         }
 
         public static String[] getArray() {
-            String[] strA = new String[6];
+            String[] arr = new String[7];
             int i = 0;
-            for (enuAuthenticationMethods enuType : enuAuthenticationMethods.values()) {
-                strA[i++] = enuType.name();
+            for (enuAuthenticationMethods method : enuAuthenticationMethods.values()) {
+                arr[i++] = method.name();
             }
-            return strA;
+            return arr;
         }
     }
 
     @Override
-    public void setValue(final String pstrAuthenticationMethod) {
+    public void setValue(final String method) {
         try {
-            if (isNull(pstrAuthenticationMethod)) {
-                super.setValue(pstrAuthenticationMethod);
+            if (isNull(method)) {
+                super.setValue(method);
                 enuMethod = enuAuthenticationMethods.notDefined;
             } else {
-                switch (pstrAuthenticationMethod) {
+                switch (method) {
                 case "ppk":
                 case "privatekey":
                 case PUBLICKEY:
-                    super.setValue(pstrAuthenticationMethod);
+                    super.setValue(method);
                     enuMethod = enuAuthenticationMethods.publicKey;
                     break;
                 case PASSWORD:
-                    super.setValue(pstrAuthenticationMethod);
+                    super.setValue(method);
                     enuMethod = enuAuthenticationMethods.password;
                     break;
                 case URL:
-                    super.setValue(pstrAuthenticationMethod);
+                    super.setValue(method);
                     enuMethod = enuAuthenticationMethods.url;
                     break;
+                case KEYBOARD_INTERACTIVE:
+                    super.setValue(method);
+                    enuMethod = enuAuthenticationMethods.keyboardInteractive;
+                    break;
                 default:
-                    super.setValue("*invalid*: " + pstrAuthenticationMethod);
+                    super.setValue("*invalid*: " + method);
                     enuMethod = enuAuthenticationMethods.notDefined;
                     break;
                 }
@@ -93,40 +98,52 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         }
     }
 
-    public void setValue(final enuAuthenticationMethods penuAuthMethod) {
-        switch (penuAuthMethod) {
+    public void setValue(final enuAuthenticationMethods method) {
+        switch (method) {
         case password:
             super.setValue(PASSWORD);
-            enuMethod = penuAuthMethod;
+            enuMethod = method;
             break;
         case publicKey:
         case privatekey:
         case ppk:
             super.setValue(PUBLICKEY);
-            enuMethod = penuAuthMethod;
+            enuMethod = method;
             break;
         case url:
             super.setValue(URL);
-            enuMethod = penuAuthMethod;
+            enuMethod = method;
+            break;
+        case keyboardInteractive:
+            super.setValue(KEYBOARD_INTERACTIVE);
+            enuMethod = method;
             break;
         default:
-            throw new JobSchedulerException("Invalid AuthenticationMethod : " + penuAuthMethod);
+            throw new JobSchedulerException("Invalid AuthenticationMethod : " + method);
         }
     }
 
-    public void isPassword(final boolean flgF) {
-        if (flgF) {
+    public void isPassword(final boolean value) {
+        if (value) {
             this.setValue(PASSWORD);
         } else {
             this.setValue(PUBLICKEY);
         }
     }
 
-    public void isURL(final boolean flgF) {
-        if (flgF) {
+    public void isURL(final boolean value) {
+        if (value) {
             this.setValue(URL);
         } else {
             this.setValue(URL);
+        }
+    }
+
+    public void isKeyboardInteractive(final boolean value) {
+        if (value) {
+            this.setValue(KEYBOARD_INTERACTIVE);
+        } else {
+            this.setValue(PASSWORD);
         }
     }
 
@@ -144,6 +161,11 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         this.setValue(strValue);
         return enuMethod == enuAuthenticationMethods.publicKey || enuMethod == enuAuthenticationMethods.ppk
                 || enuMethod == enuAuthenticationMethods.privatekey;
+    }
+
+    public boolean isKeyboardInteractive() {
+        this.setValue(strValue);
+        return enuMethod == enuAuthenticationMethods.keyboardInteractive;
     }
 
     public enuAuthenticationMethods getAuthenticationMethod() {

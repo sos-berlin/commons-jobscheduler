@@ -35,8 +35,10 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /** @author KB */
@@ -324,7 +326,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         //
     }
 
@@ -685,6 +687,18 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

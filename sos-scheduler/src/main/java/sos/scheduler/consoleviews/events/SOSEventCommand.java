@@ -10,7 +10,7 @@ public class SOSEventCommand {
 
     private Node command = null;
     private NamedNodeMap attr = null;
-    private LinkedHashSet listOfCommandElements = null;
+    private LinkedHashSet<SOSEventCommandElement> listOfCommandElements = null;
 
     private String getText(Node n) {
         if (n != null) {
@@ -22,7 +22,7 @@ public class SOSEventCommand {
 
     private String addCommandElements() {
         String erg = "";
-        listOfCommandElements = new LinkedHashSet();
+        listOfCommandElements = new LinkedHashSet<SOSEventCommandElement>();
         NodeList c = command.getChildNodes();
         for (int i = 0; i < c.getLength(); i++) {
             Node node = c.item(i);
@@ -55,7 +55,7 @@ public class SOSEventCommand {
         addCommandElements();
     }
 
-    public LinkedHashSet getListOfCommandElements() {
+    public LinkedHashSet<SOSEventCommandElement> getListOfCommandElements() {
         return listOfCommandElements;
     }
 
