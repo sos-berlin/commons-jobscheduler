@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.NoResultException;
-import javax.persistence.Parameter;
 import javax.persistence.PersistenceException;
 
 import org.hibernate.CacheMode;
@@ -34,7 +32,6 @@ import org.hibernate.transform.ResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -1222,15 +1219,11 @@ public class SOSHibernateSession implements Serializable {
                 sb.append(query.getClass().getSimpleName());
                 sb.append("]");
                 sb.append("[").append(query.getQueryString()).append("]");
-                try {
-                    List<String> params = new ArrayList<String>();
-                    for (Parameter<?> parameter : query.getParameters()) {
-                        params.add(parameter.getName() + "=" + query.getParameterValue(parameter.getName()));
-                    }
-                    if (params.size() > 0) {
-                        sb.append("[").append(Joiner.on(",").join(params)).append("]");
-                    }
-                } catch (Throwable e) {
+                String params = SOSHibernate.getQueryParametersAsString(query);
+                if (params != null) {
+                    sb.append("[");
+                    sb.append(params);
+                    sb.append("]");
                 }
             }
             if (infos != null) {
