@@ -10,6 +10,7 @@ import org.hibernate.hql.internal.ast.QuerySyntaxException;
 import org.hibernate.query.Query;
 
 import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernate;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 
 public class SOSHibernateException extends SOSException {
@@ -19,6 +20,7 @@ public class SOSHibernateException extends SOSException {
     private String message = null;
     private SQLException sqlException = null;
     private String statement = null;
+    private String parameters = null;
     private Object dbItem = null;
 
     public SOSHibernateException(IllegalArgumentException cause, String stmt) {
@@ -65,6 +67,7 @@ public class SOSHibernateException extends SOSException {
         }
         if (query != null) {
             statement = query.getQueryString();
+            parameters = SOSHibernate.getQueryParametersAsString(query);
         }
     }
 
@@ -143,6 +146,7 @@ public class SOSHibernateException extends SOSException {
         message = msg;
         if (query != null) {
             statement = query.getQueryString();
+            parameters = SOSHibernate.getQueryParametersAsString(query);
         }
     }
 
@@ -191,6 +195,9 @@ public class SOSHibernateException extends SOSException {
         if (statement != null) {
             result = String.format("%s [%s]", result, statement);
         }
+        if (parameters != null) {
+            result = String.format("%s[%s]", result, parameters);
+        }
         if (dbItem != null) {
             result = String.format("%s [%s]", result, SOSHibernateFactory.toString(dbItem));
         }
@@ -201,6 +208,7 @@ public class SOSHibernateException extends SOSException {
     private void handleStatement(Query<?> query) {
         if (query != null) {
             handleStatement(query.getQueryString());
+            parameters = SOSHibernate.getQueryParametersAsString(query);
         }
     }
 

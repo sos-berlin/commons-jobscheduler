@@ -4,10 +4,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.Id;
+import javax.persistence.Parameter;
 
 import org.hibernate.exception.LockAcquisitionException;
+import org.hibernate.query.Query;
 
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateLockAcquisitionException;
@@ -54,6 +57,29 @@ public class SOSHibernate {
                             .getName(), m.getName()), e);
                 }
             }
+        }
+        return null;
+    }
+
+    public static String getQueryParametersAsString(Query<?> query) {
+        if (query == null) {
+            return null;
+        }
+        try {
+            Set<Parameter<?>> set = query.getParameters();
+            if (set != null && set.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                int i = 0;
+                for (Parameter<?> parameter : set) {
+                    if (i > 0) {
+                        sb.append(",");
+                    }
+                    sb.append(parameter.getName() + "=" + query.getParameterValue(parameter.getName()));
+                    i++;
+                }
+                return sb.toString();
+            }
+        } catch (Throwable e) {
         }
         return null;
     }
