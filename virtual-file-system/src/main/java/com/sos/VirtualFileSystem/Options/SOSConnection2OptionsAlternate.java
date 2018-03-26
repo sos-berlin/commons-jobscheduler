@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.Options;
 
-import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -297,73 +296,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return entry;
     }
 
-    private Entry<?, ?, ?, ?> keePass2OptionsByKeePassDefault(final SOSKeePassDatabase kpd) throws Exception {
-        String keyPath = objCredentialStoreOptions.credentialStoreKeyPath.getValue();
-        if (keyPath.trim().isEmpty()) {
-            LOGGER.debug(String.format("skip keePass2OptionsByKeePassDefault, credentialStoreKeyPath is empty"));
-            return null;
-        }
-        Entry<?, ?, ?, ?> entry = getKeePassEntry(kpd, keyPath);
-        if (!entry.getUrl().isEmpty()) {
-            try {
-                LOGGER.debug(String.format("[%s,%s,%s,%s,%s]try to set from %s@Url", host.getShortKey(), port.getShortKey(), protocol.getShortKey(), user
-                        .getShortKey(), password.getShortKey(), keyPath));
-                // Possible Elements of an URL are:
-                //
-                // http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
-                // | | | | | | | |
-                // | | | host | url-path searchpart fragment
-                // | | password port
-                // | user
-                // protocol
-                //
-                // ftp://<user>:<password>@<host>:<port>/<url-path>;type=<typecode>
-                // see
-                // http://docs.oracle.com/javase/7/docs/api/java/net/URI.html
-                URI uri = new URI(entry.getUrl());
-                setIfNotDirty(host, uri.getHost());
-                String uriPort = String.valueOf(uri.getPort());
-                if (isEmpty(uriPort) || uriPort.equals("-1")) {
-                    LOGGER.debug(String.format("[%s]skip. can't evaluate port from %s@Url", port.getShortKey(), keyPath));
-                } else {
-                    setIfNotDirty(port, uriPort);
-                }
-                setIfNotDirty(protocol, uri.getScheme());
-                if (SOSString.isEmpty(uri.getUserInfo())) {
-                    LOGGER.debug(String.format("[%s,%s]skip. can't evaluate UserInfo from %s@Url", user.getShortKey(), password.getShortKey(), keyPath));
-                } else {
-                    String[] ui = uri.getUserInfo().split(":");
-                    setIfNotDirty(user, ui[0]);
-                    if (ui.length > 1) {
-                        setIfNotDirty(password, ui[1]);
-                    }
-                }
-            } catch (Throwable e) {
-                LOGGER.debug(String.format("skip set from %s@Url due an exception: %s", keyPath, e.toString()));
-            }
-        }
-        boolean hideValue = false;
-        if (isNotEmpty(entry.getUsername())) {
-            LOGGER.debug(String.format("[%s]set from %s@Username", user.getShortKey(), keyPath));
-            user.setValue(entry.getUsername());
-            user.setHideValue(hideValue);
-        }
-        if (isNotEmpty(entry.getPassword())) {
-            LOGGER.debug(String.format("[%s]set from %s@Password", password.getShortKey(), keyPath));
-            password.setValue(entry.getPassword());
-            password.setHideValue(hideValue);
-        }
-        if (isNotEmpty(entry.getUrl())) {
-            setIfNotDirty(host, entry.getUrl());
-            host.setHideValue(hideValue);
-        }
-        if (hostName.isNotDirty() && isNotEmpty(entry.getUrl())) {
-            LOGGER.debug(String.format("[%s]set from %s@Url", hostName.getShortKey(), keyPath));
-            hostName.setValue(entry.getUrl().toString());
-        }
-        return entry;
-    }
-
     @JSOptionDefinition(name = "user_info", description = "User Info implementation", key = "user_info", type = "SOSOptionObject", mandatory = false)
     public SOSOptionObject user_info = new SOSOptionObject(this, CLASSNAME + ".user_info", "user_info", "", "", false);
 
@@ -379,9 +311,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     private void keePass2Options(final SOSKeePassDatabase kpd) throws Exception {
         Entry<?, ?, ?, ?> entry = keePass2OptionsByKeePassSyntax(kpd);
-        if (entry == null) {
-            entry = keePass2OptionsByKeePassDefault(kpd);
-        }
         if (sshAuthFile.isNotEmpty()) {
             String optionName = sshAuthFile.getShortKey();
             SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), objCredentialStoreOptions.credentialStoreKeyPath
