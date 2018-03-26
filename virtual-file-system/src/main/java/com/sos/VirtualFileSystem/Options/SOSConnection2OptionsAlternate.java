@@ -231,6 +231,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     private void resolveCommands(final SOSKeePassDatabase kpd) throws Exception {
         Map<String, Entry<?, ?, ?, ?>> entries = resolveCommand(preTransferCommands, kpd, new HashMap<String, Entry<?, ?, ?, ?>>());
         entries = resolveCommand(preCommand, kpd, entries);
+        entries = resolveCommand(postCommand, kpd, entries);
         entries = resolveCommand(postTransferCommands, kpd, entries);
         entries = resolveCommand(postTransferCommandsOnError, kpd, entries);
         entries = resolveCommand(postTransferCommandsFinal, kpd, entries);
