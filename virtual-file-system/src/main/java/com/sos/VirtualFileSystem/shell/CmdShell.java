@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -19,6 +18,7 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     private static final String CHARACTER_ENCODING = "Cp1252";
     private static final Logger LOGGER = Logger.getLogger(CmdShell.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private String strStdOut = "";
     private String strStdErr = "";
     private int intCC = 0;
@@ -46,7 +46,7 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         command = command.replaceAll("(?<! )/", "\\\\");
         return command;
     }
-    
+
     public int getCC() {
         return intCC;
     }
@@ -99,11 +99,16 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         }
         objShell = new ProcessBuilder(pstrCommand);
         if (env != null) {
-            LOGGER.debug(String.format("set env=%s", env));
             if (env.getGlobalEnvs() != null) {
+                if(isDebugEnabled){
+                LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
+                }
                 objShell.environment().putAll(env.getGlobalEnvs());
             }
             if (env.getLocalEnvs() != null) {
+                if(isDebugEnabled){
+                LOGGER.debug(String.format("[set local envs]%s", env.getLocalEnvs()));
+                }
                 objShell.environment().putAll(env.getLocalEnvs());
             }
         }

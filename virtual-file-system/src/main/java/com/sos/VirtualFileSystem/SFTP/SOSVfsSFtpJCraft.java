@@ -59,6 +59,7 @@ import com.sos.keepass.SOSKeePassPath;
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private final static Logger LOGGER = Logger.getLogger(SOSVfsSFtpJCraft.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private final static int DEFAULT_CONNECTION_TIMEOUT = 30_000; // 0,5 minutes
     private Channel sshConnection = null;
     private Session sshSession = null;
@@ -138,7 +139,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public void login(final String user, final String password) {
         try {
             userName = user;
-            LOGGER.debug(SOSVfs_D_132.params(userName));
+            if (isDebugEnabled) {
+                LOGGER.debug(SOSVfs_D_132.params(userName));
+            }
             this.createSession(userName, host, port);
             sshSession.setPassword(password);
             setConfigFromFiles();
@@ -183,7 +186,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
             if (sshSession != null && sshSession.isConnected()) {
                 sshSession.disconnect();
-                logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
+                if (isDebugEnabled) {
+                    logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
+                }
             } else {
                 logINFO("not connected, logout useless.");
             }
@@ -203,7 +208,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             String p = path.replaceAll("//+", "/").replaceFirst("/$", "");
             SOSOptionFolderName objF = new SOSOptionFolderName(path);
             reply = "mkdir OK";
-            LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", p)));
+            if (isDebugEnabled) {
+                LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", p)));
+            }
             String[] subfolders = objF.getSubFolderArrayReverse();
             int idx = subfolders.length;
             for (String subFolder : objF.getSubFolderArrayReverse()) {
@@ -221,7 +228,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             subfolders = objF.getSubFolderArray();
             for (int i = idx; i < subfolders.length; i++) {
                 this.getClient().mkdir(subfolders[i]);
-                LOGGER.debug(getHostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
+                if (isDebugEnabled) {
+                    LOGGER.debug(getHostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
+                }
             }
         } catch (Exception e) {
             reply = e.toString();
@@ -431,9 +440,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             StringBuilder envs = new StringBuilder();
             if (env != null) {
                 if (env.getGlobalEnvs() != null) {
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
+                    }
                     env.getGlobalEnvs().forEach((k, v) -> {
                         channelExec.setEnv(k, v);
-                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
                     });
                 }
                 if (env.getLocalEnvs() != null) {
@@ -445,8 +456,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                             envs.append(String.format("set %s=%s&", k, v));
                         }
                     });
-                    if (!envs.toString().isEmpty()) {
-                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[set local envs]%s", envs));
                     }
                 }
             }
@@ -708,14 +719,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void useKeyboardInteractive() throws Exception {
         Object ui = connection2OptionsAlternate.user_info.value();
         if (ui == null) {
-            LOGGER.debug(String.format("use default %s implementation", SOSVfsSFtpJCraftUserInfo.class.getSimpleName()));
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("use default %s implementation", SOSVfsSFtpJCraftUserInfo.class.getSimpleName()));
+            }
             ui = new SOSVfsSFtpJCraftUserInfo();
         }
         sshSession.setUserInfo((UserInfo) ui);
     }
 
     private String usePreferredAuthentications(final String debugKey, final String preferredAuthentications) throws Exception {
-        LOGGER.debug(String.format("[%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
+        }
         try {
             usePublicKeyMethod();
         } catch (Exception e) {
@@ -727,8 +742,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private String useRequiredAuthentications(final String requiredAuthentications) throws Exception {
         String preferredAuthentications = requiredAuthentications;
-        LOGGER.debug(String.format("[required_authentications]preferredAuthentications=%s", preferredAuthentications));
-
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[required_authentications]preferredAuthentications=%s", preferredAuthentications));
+        }
         connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
         sshSession.setConfig("userauth.password", SOSRequiredAuthPassword.class.getName());
@@ -756,7 +772,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 preferredAuthentications = usePreferredAuthentications("password,publickey", "password,publickey");
             } else {
                 preferredAuthentications = authenticationOptions.getAuthMethod().getValue();
-                LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
+                }
                 if (authenticationOptions.getAuthMethod().isPublicKey()) {
                     usePublicKeyMethod();
                 } else if (authenticationOptions.getAuthMethod().isPassword()) {
@@ -795,7 +813,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     for (Entry<Object, Object> entry : p.entrySet()) {
                         String key = (String) entry.getKey();
                         String value = (String) entry.getValue();
-                        LOGGER.debug(String.format("set configuration setting: %s = %s", key, value));
+                        if (isDebugEnabled) {
+                            LOGGER.debug(String.format("set configuration setting: %s = %s", key, value));
+                        }
                         sshSession.setConfig(key, value);
                     }
                 } catch (Exception ex) {
@@ -994,7 +1014,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public boolean remoteIsWindowsShell() {
         executeCommand("echo %ComSpec%");
         if (outContent.toString().indexOf("cmd.exe") > -1) {
-            LOGGER.debug(SOSVfs_D_237.get());
+            if (isDebugEnabled) {
+                LOGGER.debug(SOSVfs_D_237.get());
+            }
             isRemoteWindowsShell = true;
             return true;
         }
@@ -1034,7 +1056,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 } else {
                     isUnix = true;
                 }
-                LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+                }
                 if (result.getStdErr().length() > 0) {
                     LOGGER.debug(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
                 }
@@ -1053,7 +1077,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
         return executePrivateCommand(cmd, null);
     }
-    
+
     public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         ChannelExec channel = null;
         InputStream in = null;
@@ -1062,15 +1086,19 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         SOSCommandResult result = new SOSCommandResult();
         try {
             cmd = cmd.trim();
-            LOGGER.debug(String.format("cmd=%s", cmd));
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("cmd=%s", cmd));
+            }
             channel = (ChannelExec) sshSession.openChannel("exec");
             channel.setPty(isSimulateShell());
             StringBuilder envs = new StringBuilder();
             if (env != null) {
                 if (env.getGlobalEnvs() != null) {
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
+                    }
                     env.getGlobalEnvs().forEach((k, v) -> {
                         channelExec.setEnv(k, v);
-                        LOGGER.debug(String.format("*** Environment Variable set via Jsch.setEnv: %1$s = %2$s", k, v));
                     });
                 }
                 if (env.getLocalEnvs() != null) {
@@ -1081,8 +1109,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                             envs.append(String.format("set %s=%s&", k, v));
                         }
                     });
-                    if (!envs.toString().isEmpty()) {
-                        LOGGER.debug(String.format("*** Environment Variable set via chain of commands: %s", envs.toString()));
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[set local envs]%s", envs));
                     }
                 }
             }
