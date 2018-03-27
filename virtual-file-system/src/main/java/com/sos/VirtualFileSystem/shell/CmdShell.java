@@ -100,14 +100,14 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         objShell = new ProcessBuilder(pstrCommand);
         if (env != null) {
             if (env.getGlobalEnvs() != null) {
-                if(isDebugEnabled){
-                LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
                 }
                 objShell.environment().putAll(env.getGlobalEnvs());
             }
             if (env.getLocalEnvs() != null) {
-                if(isDebugEnabled){
-                LOGGER.debug(String.format("[set local envs]%s", env.getLocalEnvs()));
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[set local envs]%s", env.getLocalEnvs()));
                 }
                 objShell.environment().putAll(env.getLocalEnvs());
             }
