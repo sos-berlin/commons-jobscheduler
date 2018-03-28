@@ -403,7 +403,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
     public int getRetryCounter(String messageId) throws Exception {
         this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-        HashMap result = new HashMap();
+        Map<String, String> result = new HashMap<String, String>();
         StringBuffer query = new StringBuffer();
         query.append("SELECT \"RETRY_COUNT\" FROM ");
         query.append(this.getTableMails());
@@ -412,13 +412,13 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append("'");
         getLogger().debug5("..query[" + query.toString() + "]");
         result = getConnection().getSingle(query.toString());
-        if (result.get("retry_count") != null && !SOSString.isEmpty(result.get("retry_count").toString())) {
+        if (result.get("retry_count") != null && !SOSString.isEmpty(result.get("retry_count"))) {
             try {
-                getLogger().info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count").toString() + "] time(s)");
+                getLogger().info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count") + "] time(s)");
             } catch (Exception e) {
                 //
             }
-            return Integer.parseInt(result.get("retry_count").toString());
+            return Integer.parseInt(result.get("retry_count"));
         }
         return -1;
     }

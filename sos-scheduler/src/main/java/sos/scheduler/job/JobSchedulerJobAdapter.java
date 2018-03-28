@@ -476,6 +476,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
+    @SuppressWarnings("deprecation")
     protected boolean isSetBackActive() {
         boolean flgRet = false;
         if (isJobchain()) {

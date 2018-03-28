@@ -1,8 +1,8 @@
 package sos.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import sos.connection.SOSConnection;
@@ -22,7 +22,7 @@ public class JobSchedulerSignalJob extends Job_impl {
     protected String sectionname = new String("scheduler");
     private SOSConnection sosConnection = null;
     private String sosSettingsFile = null;
-    private Iterator listOfSignalObject = null;
+    private Iterator<Map<String, String>> listOfSignalObject = null;
     private int countProcessOk = 0;
     private int countProcessError = 0;
     private long timeInSec = 0;
@@ -190,7 +190,7 @@ public class JobSchedulerSignalJob extends Job_impl {
             String selStr =
                     "SELECT \"SIGNAL_ID\"," + "  \"JOB_CHAIN\",  " + "  \"OPERATION\"  " + "  FROM " + TABLE_SCHEDULER_SIGNAL_OBECTS
                             + "  WHERE  \"STATUS\" = 0";
-            ArrayList list = sosConnection.getArray(selStr);
+            List<Map<String, String>> list = sosConnection.getArray(selStr);
             listOfSignalObject = list.iterator();
             if (listOfSignalObject.hasNext()) {
                 return true;
@@ -210,10 +210,10 @@ public class JobSchedulerSignalJob extends Job_impl {
         Variable_set parameters = null;
         SOSSchedulerCommand remoteCommand = null;
         String signalId = null;
-        HashMap res = null;
+        Map<String, String> res = null;
         try {
             if (listOfSignalObject.hasNext()) {
-                res = (HashMap) listOfSignalObject.next();
+                res = listOfSignalObject.next();
                 parameters = spooler_task.params();
                 if ((sosString.parseToString(getHost()).isEmpty() || "localhost".equalsIgnoreCase(sosString.parseToString(getHost())))
                         && getPort() == 4444) {
@@ -273,9 +273,9 @@ public class JobSchedulerSignalJob extends Job_impl {
                     String value = sosString.parseToString(res.get("operation")).toLowerCase();
                     request += "<param name=\"operation\" value=\"" + value + "\"/>";
                 }
-                ArrayList listOfParams = sosConnection.getArray(selParameters);
+                List<Map<String, String>> listOfParams = sosConnection.getArray(selParameters);
                 for (int i = 0; i < listOfParams.size(); i++) {
-                    HashMap h = (HashMap) listOfParams.get(i);
+                    Map<String, String> h = listOfParams.get(i);
                     String value =
                             !sosString.parseToString(h.get("value")).isEmpty() ? sosString.parseToString(h.get("value"))
                                     : sosString.parseToString(h.get("long_value"));

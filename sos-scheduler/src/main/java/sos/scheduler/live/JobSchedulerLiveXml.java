@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
@@ -134,11 +135,11 @@ public class JobSchedulerLiveXml {
 
     private void fillTableNames() throws Exception {
         String selStr = "SELECT \"TABLE_NAME\" , \"ELEMENT_PATH\"" + " FROM LIVE_OBJECT_METADATA";
-        ArrayList arrayList = new ArrayList();
+        List<Map<String, String>> arrayList = new ArrayList<Map<String, String>>();
         arrayList = conn.getArray(selStr);
-        Iterator resultset = arrayList.iterator();
+        Iterator<Map<String, String>> resultset = arrayList.iterator();
         while (resultset.hasNext()) {
-            HashMap rec = (HashMap) resultset.next();
+            Map<String, String> rec = resultset.next();
             log(getValue(rec, "element_path") + " --> " + getValue(rec, "table_name"));
             tableNames.put(getValue(rec, "element_path"), getValue(rec, "table_name"));
         }
@@ -199,13 +200,13 @@ public class JobSchedulerLiveXml {
 
     }
 
-    private String getValue(HashMap h, String k) {
+    private String getValue(Map<String, String> h, String k) {
         String erg = "";
         try {
             if (h.containsKey(k) && h.get(k) == null) {
                 erg = "";
             } else {
-                erg = h.get(k).toString();
+                erg = h.get(k);
             }
             return erg;
         } catch (Exception e) {

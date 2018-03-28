@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -70,7 +71,7 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
     private String strTargetFileNameSave = "";
 
     public static void main(final String[] args) {
-        ArrayList<FileConsumerTool> threads = new ArrayList();
+        List<FileConsumerTool> threads = new ArrayList<FileConsumerTool>();
         FileConsumerTool consumerTool = new FileConsumerTool();
         String[] unknown = CommandLineSupport.setOptions(consumerTool, args);
         if (unknown.length > 0) {
