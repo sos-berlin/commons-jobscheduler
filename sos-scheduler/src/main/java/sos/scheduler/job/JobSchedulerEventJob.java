@@ -446,7 +446,12 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
         Iterator<File> iter = specialFiles.iterator();
         while (iter.hasNext()) {
             File actionEventHandler = iter.next();
-            if (actionEventHandler.exists() && actionEventHandler.canRead()) {
+            boolean ignore = false;
+            if ("".equals(fileSpecLog)) {
+                String filename = actionEventHandler.getAbsolutePath();
+                ignore = (filename.endsWith(".job.actions.xml") || filename.endsWith(".job_chain.actions.xml") || filename.endsWith(".event_class.actions.xml"));
+            }
+            if (!ignore && actionEventHandler.exists() && actionEventHandler.canRead()) {
                 erg = true;
                 this.getLogger().debug1(".. analysing action event handler: " + actionEventHandler.getCanonicalPath());
                 SOSEvaluateEvents eval = new SOSEvaluateEvents(spooler.hostname(), spooler.tcp_port());
@@ -532,17 +537,12 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             String fileSpec = "";
             String fileSpecLog = "";
             if (!this.getEventJobChainName().isEmpty()) {
-                fileSpec = this.getEventJobChainName() + "(\\..*)?\\.job_chain\\.actions.xml$";
+                fileSpec =  "^" + this.getEventJobChainName() + "(\\..*)?\\.job_chain\\.actions.xml$";
                 fileSpecLog = "job_chain";
                 fileFound = analyseMonitorEventHandler(fileSpec, fileSpecLog);
             }
-            if (!fileFound && !this.getEventJobName().isEmpty()) {
-                fileSpec = this.getEventJobName() + "(\\..*)?\\.job\\.actions.xml$";
-                fileSpecLog = "job";
-                fileFound = analyseMonitorEventHandler(fileSpec, fileSpecLog);
-            }
             if (!fileFound && !this.getEventClass().isEmpty()) {
-                fileSpec = this.getEventClass() + "(\\..*)?\\.event_class\\.actions.xml$";
+                fileSpec =  "^" + this.getEventClass() + "(\\..*)?\\.event_class\\.actions.xml$";
                 fileSpecLog = "event_class";
                 fileFound = analyseMonitorEventHandler(fileSpec, fileSpecLog);
             }
@@ -576,7 +576,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                             "retrieving event handlers from directory: " + this.getEventHandlerFilepath() + " for file specification: "
                                     + this.getEventHandlerFilespec());
                     if (!this.getEventJobChainName().isEmpty()) {
-                        String fileSpec = this.getEventJobChainName() + "(\\..*)?\\.job_chain\\.sos.scheduler.xsl$";
+                        String fileSpec = "^" + this.getEventJobChainName() + "(\\..*)?\\.job_chain\\.sos.scheduler.xsl$";
                         this.getLogger().debug6(".. looking for special event handler for job chain: " + fileSpec);
                         Vector<?> specialFiles = SOSFile.getFilelist(this.getEventHandlerFilepath(), fileSpec, 0);
                         Iterator<?> iter = specialFiles.iterator();
@@ -589,7 +589,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         }
                     }
                     if (!this.getEventJobName().isEmpty()) {
-                        String fileSpec = this.getEventJobName() + "(\\..*)?\\.job\\.sos.scheduler.xsl$";
+                        String fileSpec =  "^" + this.getEventJobName() + "(\\..*)?\\.job\\.sos.scheduler.xsl$";
                         this.getLogger().debug6(".. looking for special event handler for job: " + fileSpec);
                         Vector<?> specialFiles = SOSFile.getFilelist(this.getEventHandlerFilepath(), fileSpec, 0);
                         Iterator<?> iter = specialFiles.iterator();
@@ -602,7 +602,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         }
                     }
                     if (!this.getEventClass().isEmpty()) {
-                        String fileSpec = this.getEventClass() + "(\\..*)?\\.event_class\\.sos.scheduler.xsl$";
+                        String fileSpec =  "^" + this.getEventClass() + "(\\..*)?\\.event_class\\.sos.scheduler.xsl$";
                         this.getLogger().debug6(".. looking for special event handlers for event class: " + fileSpec);
                         Vector<?> specialFiles = SOSFile.getFilelist(this.getEventHandlerFilepath(), fileSpec, 0);
                         Iterator<?> iter = specialFiles.iterator();
