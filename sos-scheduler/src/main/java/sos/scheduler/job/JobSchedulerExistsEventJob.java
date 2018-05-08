@@ -25,7 +25,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 /** @author andreas liebert */
 public class JobSchedulerExistsEventJob extends JobSchedulerJob {
 
-    private final String tableEvents = "SCHEDULER_EVENTS";
+    private final String tableEvents = "REPORTING_CUSTOM_EVENTS";
     private String scheduler_event_service_id = "";
 
     @Override
@@ -76,14 +76,14 @@ public class JobSchedulerExistsEventJob extends JobSchedulerJob {
     private void readEventsFromDB(final SOSConnection conn, final Spooler spooler, final Document eventsDoc, final SOSLogger log) throws Exception {
         try {
             conn.executeUpdate("DELETE FROM " + tableEvents
-                    + " WHERE \"EXPIRES\"<=%now AND (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + scheduler_event_service_id
+                    + " WHERE \"EXPIRES\"<=%now AND (\"SCHEDULER_ID\" IS NULL OR \"SCHEDULER_ID\"='' OR \"SCHEDULER_ID\"='" + scheduler_event_service_id
                     + "')");
             conn.commit();
             Vector<?> vEvents =
-                    conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", "
+                    conn.getArrayAsVector("SELECT \"SCHEDULER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", "
                             + "\"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
                             + tableEvents
-                            + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='"
+                            + " WHERE (\"SCHEDULER_ID\" IS NULL OR \"SCHEDULER_ID\"='' OR \"SCHEDULER_ID\"='"
                             + scheduler_event_service_id
                             + "') ORDER BY \"ID\" ASC");
             Iterator<?> vIterator = vEvents.iterator();
@@ -91,7 +91,7 @@ public class JobSchedulerExistsEventJob extends JobSchedulerJob {
             while (vIterator.hasNext()) {
                 HashMap<?, ?> record = (HashMap<?, ?>) vIterator.next();
                 Element event = eventsDoc.createElement("event");
-                event.setAttribute("scheduler_id", record.get("spooler_id").toString());
+                event.setAttribute("scheduler_id", record.get("scheduler_id").toString());
                 event.setAttribute("remote_scheduler_host", record.get("remote_scheduler_host").toString());
                 event.setAttribute("remote_scheduler_port", record.get("remote_scheduler_port").toString());
                 event.setAttribute("job_chain", record.get("job_chain").toString());
