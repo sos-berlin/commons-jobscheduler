@@ -600,6 +600,35 @@ public class SOSServicePermissionShiro {
 					"sos:products:joc_cockpit:customization:share:change:shared_status:make_private");
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:customization:share:change:shared_status:make_share");
+			
+			
+			
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:yade:view:status");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:yade:view:transfers");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:yade:view:files");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:yade:execute:transfer_start");
+
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:view:status");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:edit:change");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:edit:delete");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:edit:create");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:assign:change");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:assign:nonworking");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:calendar:assign:runtime");
+
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:runtime:execute:edit_xml");
 
 			sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
 			SOSPermissionListCommands sosPermissionCommands = o.createSOSPermissionListCommands();
@@ -724,32 +753,7 @@ public class SOSServicePermissionShiro {
 			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
 					"sos:products:commands:lock:change:hot_folder");
 
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:yade:view:status");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:yade:view:transfers");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:yade:view:files");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:yade:execute:transfer_start");
-
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:view:status");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:edit:change");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:edit:delete");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:edit:create");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:assign:change");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:assign:nonworking");
-			addPermission(forUser, sosPermissionCommands.getSOSPermission(),
-					"sos:products:joc_cockpit:calendar:assign:runtime");
-
-			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
-					"sos:products:joc_cockpit:runtime:execute:edit_xml");
+		
 
 			sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
