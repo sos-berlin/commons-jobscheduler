@@ -606,8 +606,6 @@ public class SOSServicePermissionShiro {
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:yade:view:status");
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
-					"sos:products:joc_cockpit:yade:view:transfers");
-			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:yade:view:files");
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:yade:execute:transfer_start");
