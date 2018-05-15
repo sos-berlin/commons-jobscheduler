@@ -468,7 +468,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="transfers" type="xs:boolean"/>
 										<xs:element name="files" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
