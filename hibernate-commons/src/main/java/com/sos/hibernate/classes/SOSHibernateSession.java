@@ -84,6 +84,10 @@ public class SOSHibernateSession implements Serializable {
 		}
 		try {
 			String sessionName = null;
+			if (factory == null || factory.getSessionFactory() == null) {
+				throw new SOSHibernateInvalidSessionException(
+						"No valid session factory available. Can not open hibernate session.");
+			}
 			if (isStatelessSession) {
 				currentSession = factory.getSessionFactory().openStatelessSession();
 				sessionName = "StatelessSession";
@@ -113,6 +117,9 @@ public class SOSHibernateSession implements Serializable {
 			throw new SOSHibernateOpenSessionException(e);
 		} catch (PersistenceException e) {
 			throw new SOSHibernateOpenSessionException(e);
+		} catch (SOSHibernateInvalidSessionException e) {
+			throw new SOSHibernateOpenSessionException(
+					"No valid session factory available. Can not open hibernate session.", e);
 		}
 	}
 
