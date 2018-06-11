@@ -35,8 +35,8 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	private AuthenticationToken authcToken;
 
 	public boolean supports(AuthenticationToken token) {
-		setAuthorizing(new SOSLdapAuthorizing());
-		return true;
+			setAuthorizing(new SOSLdapAuthorizing());
+			return true;
 	}
 
 	@Override
@@ -49,8 +49,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 				throw new RuntimeException("doGetAuthorizationInfo: authcToken.getPrincipal() is null");
 			}
 		} else {
-			throw new RuntimeException("doGetAuthorizationInfo: authcToken is null");
-
+			return authzInfo;
 		}
 
 		if (authorizing != null) {
@@ -100,8 +99,14 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken)
 			throws AuthenticationException {
 		this.authcToken = authcToken;
-
-		return super.doGetAuthenticationInfo(authcToken);
+		AuthenticationInfo authenticationInfo = null;
+		try {
+			authenticationInfo = super.doGetAuthenticationInfo(authcToken);
+			return super.doGetAuthenticationInfo(authcToken);
+		} catch (AuthenticationException e) {
+			LOGGER.info(e.getMessage());
+		}
+		return authenticationInfo;
 	}
 
 	public void setAuthorizing(SOSLdapAuthorizing authorizing) {

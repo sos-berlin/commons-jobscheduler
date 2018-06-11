@@ -366,7 +366,7 @@ public class SOSLdapAuthorizing {
             LOGGER.error("Failed to negotiate TLS connection': ", e);
             throw e;
         } catch (NamingException e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.info(e.getMessage());
         } catch (Throwable t) {
             LdapUtils.closeContext(ldapContext);
             LOGGER.error("Unexpected failure to negotiate TLS connection", t);
