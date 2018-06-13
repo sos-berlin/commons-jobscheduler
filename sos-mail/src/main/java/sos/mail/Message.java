@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -40,10 +39,11 @@ public class Message {
     private final Properties properties = System.getProperties();
     private Session session = null;
     private byte[] body;
-    private final List attachments = new LinkedList();
-    private final ArrayList fileInputStreams = new ArrayList();
+    private final List<BodyPart> attachments = new LinkedList<BodyPart>();
+    private final List<InputStream> fileInputStreams = new ArrayList<InputStream>();
     private String smtpUserName = "";
     private String smtpPassword = "";
+    @SuppressWarnings("unused")
     private String encoding;
     private String contentType;
     private boolean built = false;
@@ -121,9 +121,9 @@ public class Message {
 
     public void close() throws Exception {
         Exception exception = null;
-        for (int i = 0; i < fileInputStreams.size(); i++) {
+        for (InputStream stream : fileInputStreams) {
             try {
-                ((FileInputStream) fileInputStreams.get(i)).close();
+                stream.close();
             } catch (Exception x) {
                 if (exception == null) {
                     exception = x;
@@ -284,9 +284,8 @@ public class Message {
             MimeBodyPart b = new MimeBodyPart();
             setBodyIn(b);
             multipart.addBodyPart(b);
-            ListIterator i = attachments.listIterator();
-            while (i.hasNext()) {
-                multipart.addBodyPart((BodyPart) i.next());
+            for (BodyPart bodyPart : attachments) {
+                multipart.addBodyPart(bodyPart);
             }
             msg.setContent(multipart);
         }
