@@ -2,6 +2,7 @@ package com.sos.auth.shiro;
 
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
@@ -9,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-public class SOSFirstSuccessAuthenticator extends ModularRealmAuthenticator {
+public class SOSAuthenticator extends ModularRealmAuthenticator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SOSFirstSuccessAuthenticator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSAuthenticator.class);
 
 	protected AuthenticationInfo doMultiRealmAuthentication(Collection<Realm> realms, AuthenticationToken token) {
 		AuthenticationStrategy strategy = getAuthenticationStrategy();
@@ -25,7 +26,7 @@ public class SOSFirstSuccessAuthenticator extends ModularRealmAuthenticator {
 
 			aggregate = strategy.beforeAttempt(realm, token, aggregate);
 
-			if ((aggregate == null || aggregate.getPrincipals() == null) && realm.supports(token)) {
+			if (realm.supports(token)) {
 
 				LOGGER.trace("Attempting to authenticate token [{}] using realm [{}]", token, realm);
 
@@ -43,15 +44,23 @@ public class SOSFirstSuccessAuthenticator extends ModularRealmAuthenticator {
 				}
 
 				aggregate = strategy.afterAttempt(realm, token, info, aggregate, t);
+				if (aggregate != null && isFirstSuccessfulStrategy(strategy)) {
+					break;
+				}
 
 			} else {
-				LOGGER.debug("Realm [{}] does not support token {} or User is already logged in.  Skipping realm.", realm, token);
+				LOGGER.debug("Realm [{}] does not support token {}. Skipping realm.", realm, token);
 			}
 		}
 
 		aggregate = strategy.afterAllAttempts(token, aggregate);
 
 		return aggregate;
+
+	}
+
+	private boolean isFirstSuccessfulStrategy(AuthenticationStrategy strategy) {
+		return strategy.getClass().equals(new FirstSuccessfulStrategy().getClass());
 	}
 
 }
