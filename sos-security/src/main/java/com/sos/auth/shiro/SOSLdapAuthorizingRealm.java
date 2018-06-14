@@ -32,6 +32,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	private String groupSearchFilter;
 	private String userSearchFilter;
 	private String hostNameVerification;
+	private String roleAssignmentFromIni;
 	private AuthenticationToken authcToken;
 
 	public boolean supports(AuthenticationToken token) {
@@ -180,12 +181,35 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 		return getRolesFromLdap;
 	}
 
+	public boolean isGetRolesFromLdap() {
+		return "true".equalsIgnoreCase(getGetRolesFromLdap());
+	}
+	
+	public String getRoleAssignmentFromIni() {
+		if (roleAssignmentFromIni == null) {
+			roleAssignmentFromIni = "true";
+		}
+		return roleAssignmentFromIni;
+	}
+
+	public void setRoleAssignmentFromIni(String roleAssignmentFromIni) {
+		this.roleAssignmentFromIni = roleAssignmentFromIni;
+	}
+
+	public boolean isRoleAssignmentFromIni() {
+		return "true".equalsIgnoreCase(getRoleAssignmentFromIni());
+	}
+
 	public void setUseStartTls(String useStartTls) {
 		this.useStartTls = useStartTls;
 	}
 
 	public String getUseStartTls() {
 		return useStartTls;
+	}
+	
+	public boolean isUseStartTls() {
+		return "true".equalsIgnoreCase(useStartTls);
 	}
 
 	public String getGroupSearchFilter() {
