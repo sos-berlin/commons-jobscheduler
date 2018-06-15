@@ -36,8 +36,8 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	private AuthenticationToken authcToken;
 
 	public boolean supports(AuthenticationToken token) {
-			setAuthorizing(new SOSLdapAuthorizing());
-			return true;
+		setAuthorizing(new SOSLdapAuthorizing());
+		return true;
 	}
 
 	@Override
@@ -175,29 +175,15 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	}
 
 	public String getGetRolesFromLdap() {
-		if (getRolesFromLdap == null) {
-			getRolesFromLdap = "true";
-		}
 		return getRolesFromLdap;
-	}
-
-	public boolean isGetRolesFromLdap() {
-		return "true".equalsIgnoreCase(getGetRolesFromLdap());
-	}
-	
-	public String getRoleAssignmentFromIni() {
-		if (roleAssignmentFromIni == null) {
-			roleAssignmentFromIni = "true";
-		}
-		return roleAssignmentFromIni;
 	}
 
 	public void setRoleAssignmentFromIni(String roleAssignmentFromIni) {
 		this.roleAssignmentFromIni = roleAssignmentFromIni;
 	}
 
-	public boolean isRoleAssignmentFromIni() {
-		return "true".equalsIgnoreCase(getRoleAssignmentFromIni());
+	public String getRoleAssignmentFromIni() {
+		return roleAssignmentFromIni;
 	}
 
 	public void setUseStartTls(String useStartTls) {
@@ -206,10 +192,6 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
 	public String getUseStartTls() {
 		return useStartTls;
-	}
-	
-	public boolean isUseStartTls() {
-		return "true".equalsIgnoreCase(useStartTls);
 	}
 
 	public String getGroupSearchFilter() {
@@ -234,6 +216,18 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
 	public void setHostNameVerification(String hostNameVerification) {
 		this.hostNameVerification = hostNameVerification;
+	}
+
+	public boolean isUseStartTls_() {
+		return "true".equalsIgnoreCase(useStartTls);
+	}
+
+	public boolean isGetRolesFromLdap_() {
+		return (getRolesFromLdap == null  || "true".equalsIgnoreCase(getRolesFromLdap));
+	}
+
+	public boolean isRoleAssignmentFromIni_() {
+		return (roleAssignmentFromIni == null || "true".equalsIgnoreCase(roleAssignmentFromIni));
 	}
 
 }

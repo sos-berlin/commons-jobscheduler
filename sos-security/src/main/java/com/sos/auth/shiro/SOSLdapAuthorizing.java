@@ -80,8 +80,8 @@ public class SOSLdapAuthorizing {
 		searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
 		String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getGroupSearchFilter());
-		LOGGER.debug(String.format("getting groups from ldap using group search filter %s with group search base %s", searchFilter,
-				sosLdapAuthorizingRealm.getGroupSearchBase()));
+		LOGGER.debug(String.format("getting groups from ldap using group search filter %s with group search base %s",
+				searchFilter, sosLdapAuthorizingRealm.getGroupSearchBase()));
 
 		NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getGroupSearchBase(),
 				searchFilter, searchCtls);
@@ -147,7 +147,7 @@ public class SOSLdapAuthorizing {
 	}
 
 	private Collection<String> getGroupNamesByUser() throws NamingException {
-		 
+
 		SearchControls searchCtls = new SearchControls();
 		searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		Collection<String> groupNames = null;
@@ -205,7 +205,7 @@ public class SOSLdapAuthorizing {
 		Section s = ini.getSection("users");
 		HashMap<String, String> caseInsensitivUser = new HashMap<String, String>();
 
-		if (s != null && sosLdapAuthorizingRealm.isRoleAssignmentFromIni()) {
+		if (s != null && sosLdapAuthorizingRealm.isRoleAssignmentFromIni_()) {
 			LOGGER.debug("reading roles for " + sosLdapLoginUserName.getLogin() + " from section [users]");
 			for (Map.Entry<String, String> entry : s.entrySet()) {
 				caseInsensitivUser.put(entry.getKey().toLowerCase(), entry.getValue());
@@ -241,7 +241,7 @@ public class SOSLdapAuthorizing {
 		}
 		LOGGER.debug("userPrincipalName: " + sosLdapLoginUserName.getUserName());
 
-		if (sosLdapAuthorizingRealm.isGetRolesFromLdap()) {
+		if (sosLdapAuthorizingRealm.isGetRolesFromLdap_()) {
 			if ((sosLdapAuthorizingRealm.getSearchBase() != null
 					|| sosLdapAuthorizingRealm.getGroupSearchBase() != null)
 					&& (sosLdapAuthorizingRealm.getGroupSearchFilter() != null
@@ -341,7 +341,7 @@ public class SOSLdapAuthorizing {
 		try {
 			ldapContext = ldapContextFactory.getLdapContext(principal, credentials);
 			JndiLdapContextFactory jndiLdapContextFactory = (JndiLdapContextFactory) ldapContextFactory;
-			if (sosLdapAuthorizingRealm.isUseStartTls()) {
+			if (sosLdapAuthorizingRealm.isUseStartTls_()) {
 				LOGGER.debug("using StartTls for authentication");
 				StartTlsRequest startTlsRequest = new StartTlsRequest();
 				StartTlsResponse tls = (StartTlsResponse) ldapContext.extendedOperation(startTlsRequest);
