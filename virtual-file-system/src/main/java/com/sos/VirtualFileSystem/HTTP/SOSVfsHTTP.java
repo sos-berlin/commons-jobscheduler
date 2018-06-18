@@ -37,7 +37,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
-import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -671,12 +670,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

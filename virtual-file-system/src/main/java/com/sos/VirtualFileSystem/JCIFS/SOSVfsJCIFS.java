@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -608,12 +607,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

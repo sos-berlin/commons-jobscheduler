@@ -23,6 +23,4 @@ public interface ISOSShell {
 
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception;
 
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception;
-
 }
