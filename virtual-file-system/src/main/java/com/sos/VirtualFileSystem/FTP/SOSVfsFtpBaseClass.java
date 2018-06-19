@@ -13,7 +13,6 @@ import java.net.Proxy;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1414,12 +1413,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

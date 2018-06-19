@@ -449,8 +449,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 if (env.getLocalEnvs() != null) {
                     env.getLocalEnvs().forEach((k, v) -> {
-                        // envs.append(String.format("set %s=%s", k, v));
-                        if (!isRemoteWindowsShell) {
+                        if (isUnix) {
                             envs.append(String.format("export \"%s=%s\";", k, v));
                         } else {
                             envs.append(String.format("set %s=%s&", k, v));
@@ -1075,10 +1074,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        return executePrivateCommand(cmd, null);
-    }
-
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         ChannelExec channel = null;
         InputStream in = null;
         InputStream err = null;
@@ -1091,34 +1086,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             channel = (ChannelExec) sshSession.openChannel("exec");
             channel.setPty(isSimulateShell());
-            StringBuilder envs = new StringBuilder();
-            if (env != null) {
-                if (env.getGlobalEnvs() != null) {
-                    if (isDebugEnabled) {
-                        LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
-                    }
-                    env.getGlobalEnvs().forEach((k, v) -> {
-                        channelExec.setEnv(k, v);
-                    });
-                }
-                if (env.getLocalEnvs() != null) {
-                    env.getLocalEnvs().forEach((k, v) -> {
-                        if (!isRemoteWindowsShell) {
-                            envs.append(String.format("export \"%s=%s\";", k, v));
-                        } else {
-                            envs.append(String.format("set %s=%s&", k, v));
-                        }
-                    });
-                    if (isDebugEnabled) {
-                        LOGGER.debug(String.format("[set local envs]%s", envs));
-                    }
-                }
-            }
-            if (envs.length() > 0) {
-                channel.setCommand(envs.toString() + cmd);
-            } else {
-                channel.setCommand(cmd);
-            }
+            channel.setCommand(cmd);
             channel.setInputStream(null);
             channel.setErrStream(null);
             in = channel.getInputStream();
