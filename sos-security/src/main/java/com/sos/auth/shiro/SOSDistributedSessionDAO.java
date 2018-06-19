@@ -170,7 +170,6 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 		String session = "";
 		session = serializedSessions.get(sessionId.toString());
 		if (session == null) {
-			LOGGER.debug("SOSDistributedSessionDAO: doReadSession --> from db");
 			session = readSessionFromDb(sessionId);
 			serializedSessions.put(sessionId.toString(), session);
 		}
