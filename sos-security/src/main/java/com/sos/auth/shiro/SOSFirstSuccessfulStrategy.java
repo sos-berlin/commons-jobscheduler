@@ -20,6 +20,7 @@ public class SOSFirstSuccessfulStrategy extends AbstractAuthenticationStrategy {
 
     public AuthenticationInfo afterAttempt(Realm realm, AuthenticationToken token, AuthenticationInfo singleRealmInfo, AuthenticationInfo aggregateInfo, Throwable t) throws AuthenticationException {
     	  if (aggregateInfo != null && !CollectionUtils.isEmpty(aggregateInfo.getPrincipals())) {
+    		  realm.supports(null);
               return aggregateInfo;
           }
           return singleRealmInfo != null ? singleRealmInfo : aggregateInfo;

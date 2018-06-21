@@ -36,8 +36,13 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	private AuthenticationToken authcToken;
 
 	public boolean supports(AuthenticationToken token) {
-		setAuthorizing(new SOSLdapAuthorizing());
-		return true;
+		if (token != null) {
+			setAuthorizing(new SOSLdapAuthorizing());
+			return true;
+		} else {
+			setAuthorizing(null);
+			return false;
+		}
 	}
 
 	@Override
@@ -223,7 +228,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	}
 
 	public boolean isGetRolesFromLdap_() {
-		return (getRolesFromLdap == null  || "true".equalsIgnoreCase(getRolesFromLdap));
+		return (getRolesFromLdap == null || "true".equalsIgnoreCase(getRolesFromLdap));
 	}
 
 	public boolean isRoleAssignmentFromIni_() {
