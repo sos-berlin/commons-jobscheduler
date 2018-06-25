@@ -49,9 +49,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
 		SimpleAuthorizationInfo authzInfo = null;
 		if (authcToken != null) {
-			if (authcToken.getPrincipal() != null) {
-				LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
-			} else {
+			if (authcToken.getPrincipal() == null) {
 				throw new RuntimeException("doGetAuthorizationInfo: authcToken.getPrincipal() is null");
 			}
 		} else {
@@ -59,6 +57,8 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 		}
 
 		if (authorizing != null) {
+
+			LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
 
 			authorizing.setAuthcToken(authcToken);
 			try {

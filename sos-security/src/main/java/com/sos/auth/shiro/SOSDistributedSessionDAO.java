@@ -163,8 +163,8 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 	@Override
 	protected Session doReadSession(Serializable sessionId) {
-		LOGGER.debug("SOSDistributedSessionDAO: doReadSession");
 		if (serializedSessions == null) {
+			LOGGER.debug("SOSDistributedSessionDAO: doReadSession: initialize serializedSessions");
 			serializedSessions = new HashMap<String, String>();
 		}
 		String session = "";
