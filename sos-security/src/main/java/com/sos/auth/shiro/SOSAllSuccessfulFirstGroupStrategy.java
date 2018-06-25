@@ -27,7 +27,7 @@ public class SOSAllSuccessfulFirstGroupStrategy extends SOSAbstractAuthenticatio
 		String group = getGroup(realm.getName());
  	
 		if (singleRealmInfo == null) {
-			listOfUnsatisfiedGroups.put(group, null);
+			listOfUnsatisfiedGroups.put(group, realm);
 		}
 
 		listOfInfos.put(getGroup(realm.getName()), singleRealmInfo);
