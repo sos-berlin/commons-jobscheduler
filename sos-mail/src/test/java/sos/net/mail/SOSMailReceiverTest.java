@@ -19,7 +19,7 @@ public class SOSMailReceiverTest {
     }
 
     public void connect(final String host, final String port, final String user, final String password, final String protocol) throws Exception {
-        SOSMailReceiver receiver = new SOSMailReceiver(host, port, user, password);
+        SOSMailReceiver receiver = new SOSMailReceiver(host, port, user, password,false,"pop3");
         receiver.getSession().setDebug(true);
         receiver.connect(protocol);
         receiver.disconnect();
