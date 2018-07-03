@@ -39,6 +39,15 @@ public class SOSMailReceiver {
 		createSession();
 	}
 
+	public SOSMailReceiver(String host, String port, String user, String password) throws Exception {
+		this.host = host;
+		this.port = port;
+		this.user = user;
+		this.password = password;
+		this.protocol = "POP3";
+		this.ssl = false;
+		createSession();	}
+
 	public Session createSession() throws Exception {
 		Properties props = System.getProperties();
 

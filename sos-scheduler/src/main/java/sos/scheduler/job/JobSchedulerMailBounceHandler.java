@@ -61,6 +61,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     String protocol = "imap";
     String pop3_user = "";
     String pop3_password = "";
+    boolean mailUseSsl=false;
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
@@ -86,6 +87,12 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             }
             if (spooler_job != null) {
                 this.setJobTitle(spooler_job.title());
+            }
+            if (spooler_task.params().var("mail_use_ssl") != null && !spooler_task.params().var("mail_use_ssl").isEmpty()) {
+                if ("true".equalsIgnoreCase(spooler_task.params().var("mail_use_ssl"))) {
+                	mailUseSsl=true;
+                }
+                spooler_log.debug6(".. job parameter [mail_use_ssl]: [" + spooler_task.params().var("mail_use_ssl") + "]");
             }
             if (spooler_task.params().var("handle_bounced_mail_only") != null && !spooler_task.params().var("handle_bounced_mail_only").isEmpty()) {
                 if ("true".equalsIgnoreCase(spooler_task.params().var("handle_bounced_mail_only"))) {
@@ -117,7 +124,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         SOSMimeMessage sosMimeMessage = null;
         try {
             this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password);
+            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password,mailUseSsl,protocol);
             receiver.connect(protocol);
             folder = receiver.openFolder("INBOX", receiver.READ_WRITE);
             if (this.isHandleBouncedMessagesOnly()) {
@@ -127,7 +134,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             }
             getLogger().debug5("total found messages: " + messages.length);
             for (int i = 0; i < messages.length; i++) {
-                sosMimeMessage = new SOSMimeMessage(messages[i], this.getLogger());
+                sosMimeMessage = new SOSMimeMessage(messages[i]);
                 if (sosMimeMessage.isBounce()) {
                     handleBounceMessage(sosMimeMessage);
                 }
