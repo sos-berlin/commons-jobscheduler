@@ -664,4 +664,45 @@ public class SOSMimeMessage {
 		this.dumpedFileName = dumpedFileName;
 	}
 
+	public  String getFirstToRecipient() throws Exception {
+		return getRecipient("TO", 0);
+	}
+
+	public String getToRecipient(int index) throws Exception {
+		return getRecipient("TO", index);
+	}
+	
+	public String getFirstCCRecipient() throws Exception {
+		return getRecipient("CC", 0);
+	}
+
+	public String getCCRecipient(int index) throws Exception {
+		return getRecipient("CC", index);
+	}
+
+	public String getFirstBCCRecipient() throws Exception {
+		return getRecipient("CC", 0);
+	}
+
+	public String getBCCRecipient(int index) throws Exception {
+		return getRecipient("CC", index);
+	}
+
+	public String getRecipient(String type, int index) throws Exception {
+		List<String> l = this.getRecipientAddress(type);
+		if (l.size() > index) {
+			return l.get(index);
+		} else {
+			return "";
+		}
+	}
+
+	public  String getFirstRecipient(String type) throws Exception {
+		List<String> l = this.getRecipientAddress(type);
+		if (l.size() > 0) {
+			return l.get(0);
+		} else {
+			return "";
+		}
+	}
 }
