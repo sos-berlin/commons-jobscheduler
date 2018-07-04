@@ -681,11 +681,11 @@ public class SOSMimeMessage {
 	}
 
 	public String getFirstBCCRecipient() throws Exception {
-		return getRecipient("CC", 0);
+		return getRecipient("BCC", 0);
 	}
 
 	public String getBCCRecipient(int index) throws Exception {
-		return getRecipient("CC", index);
+		return getRecipient("BCC", index);
 	}
 
 	public String getRecipient(String type, int index) throws Exception {
