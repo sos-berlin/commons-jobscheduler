@@ -3,8 +3,8 @@ package com.sos.localization;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -33,8 +33,8 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
             getOptions().checkMandatory();
             LOGGER.debug(getOptions().dirtyString());
             String strPropertyFileName = objOptions.propertyFileNamePrefix.getValue();
-            HashMap<String, HashMap<String, I18NObject>> allKeys = new HashMap<>();
-            HashMap<String, I18NObject> mapKeys = new HashMap<>();
+            Map<String, Map<String, I18NObject>> allKeys = new HashMap<String, Map<String, I18NObject>>();
+            Map<String, I18NObject> mapKeys = new HashMap<String, I18NObject>();
             Vector<String> vecLanguages = new Vector<>();
             for (File objFile : objOptions.sourceFolderName.listFiles()) {
                 String strFileName = objFile.getName();
@@ -48,16 +48,14 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
                     strLanguage = strFileName.replaceAll("\\.properties", "");
                     strLanguage = strLanguage.substring(strPropertyFileName.length() + 1);
                     vecLanguages.add(strLanguage);
-                    Enumeration<String> e = (Enumeration<String>) objProps.propertyNames();
-                    while (e.hasMoreElements()) {
-                        String key = e.nextElement();
+                    for (String key : objProps.stringPropertyNames()) {
                         String[] strA = key.split("\\.");
                         if (strA.length < 2) {
                             LOGGER.debug(key + " = " + objProps.getProperty(key));
                         } else {
                             mapKeys = allKeys.get(strA[0]);
                             if (mapKeys == null) {
-                                mapKeys = new HashMap<>();
+                                mapKeys = new HashMap<String, I18NObject>();
                                 allKeys.put(strA[0], mapKeys);
                             }
                             String strIDent = strA[0] + "_" + strLanguage;

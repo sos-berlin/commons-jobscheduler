@@ -13,7 +13,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
     protected byte[] bteBuffer = null;
 
     public SOSNullFilter() {
-        super();
+        super(new SOSFilterOptions());
     }
 
     public SOSNullFilter(final SOSFilterOptions pobjOptions) {
