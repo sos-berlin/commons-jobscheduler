@@ -57,9 +57,9 @@ public class HttpClient {
             if (port == null) {
                 throw new IllegalArgumentException("http port is required"); 
             }
-            hostPort = "localhost:" + port;
+            hostPort = "127.0.0.1:" + port;
             if (port.indexOf(":") > -1) {
-                hostPort = port.replaceFirst("^0\\.0\\.0\\.0", "localhost");
+                hostPort = port.replaceFirst("^0\\.0\\.0\\.0", "127.0.0.1");
             }
             SOSXmlCommand sosXmlCommand = new SOSXmlCommand(String.format(XML_COMMAND_API_PATH, hostPort));
             sosXmlCommand.setConnectTimeout(5000);
