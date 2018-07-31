@@ -99,10 +99,15 @@
 			<artifactId>jzlib</artifactId>
         </dependency>
 
-        <dependency>
+        <!-- dependency>
             <groupId>jcifs</groupId>
             <artifactId>jcifs</artifactId>
-        </dependency>
+        </dependency-->
+        
+        <dependency>
+			<groupId>eu.agno3.jcifs</groupId>
+			<artifactId>jcifs-ng</artifactId>
+		</dependency>
 
         <!-- This is a replacement dependency for the jar file /SOS_LIB/commons-ssl.jar  		   -->
         <!-- which does not exist in any open accessible maven repository. 						   -->
