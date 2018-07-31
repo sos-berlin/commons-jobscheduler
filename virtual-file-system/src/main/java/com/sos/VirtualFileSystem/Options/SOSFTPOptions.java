@@ -635,6 +635,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                         case "target_pre_command":
                         case "target_post_command":
                         case "target_tfn_post_command":
+                            
+                        case "jump_post_transfer_commands_on_error":
+                        case "jump_post_transfer_commands_final":
+                        case "jump_post_transfer_commands_on_success":
+                        case "jump_pre_transfer_commands":
                             break;
                         default:
                             if (!SOSKeePassPath.hasKeePassVariables(value)) {
