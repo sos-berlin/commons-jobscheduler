@@ -27,12 +27,14 @@ import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-import jcifs.UniAddress;
+import jcifs.CIFSContext;
+import jcifs.CIFSException;
+import jcifs.config.PropertyConfiguration;
+import jcifs.context.BaseContext;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
-import jcifs.smb.SmbSession;
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -40,7 +42,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     private static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFS.class);
     private static final int DEFAULT_PORT = 445;
-    private NtlmPasswordAuthentication authentication = null;
+    // private NtlmPasswordAuthentication authentication = null;
+    private CIFSContext authentication = null;
+    private Properties properties = new Properties();
     private boolean isConnected = false;
     private String domain = null;
     private String currentDirectory = "";
@@ -100,6 +104,13 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public void disconnect() {
         reply = "disconnect OK";
         isConnected = false;
+        if (authentication != null) {
+            try {
+                authentication.close();
+            } catch (CIFSException e) {
+                LOGGER.debug(String.format("disconnect: %s", e.toString()), e);
+            }
+        }
         this.logINFO(reply);
     }
 
@@ -527,7 +538,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                         String key = (String) entry.getKey();
                         String value = (String) entry.getValue();
                         LOGGER.debug(String.format("set configuration setting: %s = %s", key, value));
-                        jcifs.Config.setProperty(key, value);
+                        // jcifs.Config.setProperty(key, value);
+                        // TODO
+                        properties.put(key, value);
                     }
                 } catch (Exception ex) {
                     LOGGER.warn(String.format("error on read configuration file[%s]: %s", file, ex.toString()));
@@ -546,9 +559,13 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     private void smbLogin(String domain, String host, int port, String user, String password) throws Exception {
         setConfigFromFiles();
-        UniAddress hostAddress = UniAddress.getByName(host);
-        authentication = new NtlmPasswordAuthentication(domain, user, password);
-        SmbSession.logon(hostAddress, port, authentication);
+        // UniAddress hostAddress = UniAddress.getByName(host);
+        // authentication = new NtlmPasswordAuthentication(domain, user, password);
+        // SmbSession.logon(hostAddress, port, authentication);
+
+        BaseContext bc = new BaseContext(new PropertyConfiguration(properties));
+        NtlmPasswordAuthentication creds = new NtlmPasswordAuthentication(bc, domain, user, password);
+        authentication = bc.withCredentials(creds);
     }
 
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
