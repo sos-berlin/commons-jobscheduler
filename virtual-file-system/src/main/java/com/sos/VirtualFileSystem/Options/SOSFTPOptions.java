@@ -640,6 +640,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                         case "jump_post_transfer_commands_final":
                         case "jump_post_transfer_commands_on_success":
                         case "jump_pre_transfer_commands":
+                            
+                        case "file_path":
                             break;
                         default:
                             if (!SOSKeePassPath.hasKeePassVariables(value)) {
