@@ -100,7 +100,7 @@ public class SOSSSLSocketFactory extends SSLSocketFactory {
     private void doTunnelHandshake(Socket tunnel, String host, int port) throws IOException {
         OutputStream out = tunnel.getOutputStream();
         String msg =
-                "CONNECT " + host + ":" + port + " HTTP/1.0\n" + "User-Agent: " + sun.net.www.protocol.http.HttpURLConnection.userAgent + "\r\n\r\n";
+                "CONNECT " + host + ":" + port + " HTTP/1.0\n" + "\r\n\r\n";
         byte b[];
         try {
             b = msg.getBytes("ASCII7");

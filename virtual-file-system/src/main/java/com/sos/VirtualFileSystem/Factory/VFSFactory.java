@@ -96,7 +96,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
         }
         classLoader = Thread.currentThread().getContextClassLoader();
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ssh2.getText())) {
-            Class objA;
+            Class<?> objA;
             if (useTrilead) {
                 objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
             } else {
@@ -188,7 +188,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
         }
         ISOSVFSHandler objC = null;
         try {
-            Class objA = null;
+            Class<?> objA = null;
             if (objConnectionOptions != null && objConnectionOptions.javaClassPath.isDirty()) {
                 String[] strJars = objConnectionOptions.javaClassPath.getValue().split(";");
                 for (String strJarFileName : strJars) {

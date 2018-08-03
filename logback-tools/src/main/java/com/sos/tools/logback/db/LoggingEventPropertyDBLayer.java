@@ -3,8 +3,7 @@ package com.sos.tools.logback.db;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -18,7 +17,6 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     private static final String LOGGER_NAME = "loggerName";
 
     private LoggingEventPropertyFilter filter = null;
-    private Logger logger = Logger.getLogger(LoggingEventPropertyDBLayer.class);
 
     public LoggingEventPropertyDBLayer(String configurationFileName) {
         super();
@@ -27,12 +25,11 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         this.filter.setOrderCriteria(EVENT_ID);
     }
 
-    private Query setQueryParams(String hql) throws Exception {
-        Query query = null;
+    private Query<LoggingEventPropertyDBItem> setQueryParams(String hql) throws Exception {
         sosHibernateSession.beginTransaction();
-        query = sosHibernateSession.createQuery(hql);
+        Query<LoggingEventPropertyDBItem> query = sosHibernateSession.createQuery(hql);
         if (filter.getEventId() != null) {
-            query.setLong(EVENT_ID, filter.getEventId());
+            query.setParameter(EVENT_ID, filter.getEventId());
         }
         if (filter.getMappedKey() != null && !filter.getMappedKey().equals("")) {
             query.setParameter(MAPPED_KEY, filter.getMappedKey());
@@ -98,9 +95,9 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter.setMappedKey(mappedKey);
         filter.setMappedValue(mappedValue);
         filter.setLoggerName(loggerName);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+        Query<LoggingEventPropertyDBItem> query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
                 + this.filter.getSortMode());
-        return query.list();
+        return query.getResultList();
     }
 
     /** Because LOGGING_EVENT_PROPERTY works with composite eventId + mappedKey
@@ -113,16 +110,16 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+        Query<LoggingEventPropertyDBItem> query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
                 + this.filter.getSortMode());
-        return query.list();
+        return query.getResultList();
     }
 
     public List<LoggingEventPropertyDBItem> getAll() throws Exception {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + this.filter.getOrderCriteria() + this.filter.getSortMode());
-        return query.list();
+        Query<LoggingEventPropertyDBItem> query = setQueryParams("from LoggingEventPropertyDBItem events " + this.filter.getOrderCriteria() + this.filter.getSortMode());
+        return query.getResultList();
     }
 
     public int deleteProtocol(String uuid, String loggerName) {
@@ -130,7 +127,7 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     }
 
     public int delete(Long eventId) throws Exception {
-        LoggingEventDBLayer eventLayer = new LoggingEventDBLayer(getConfigurationFileName());
+        //LoggingEventDBLayer eventLayer = new LoggingEventDBLayer(getConfigurationFileName());
         sosHibernateSession.beginTransaction();
         sosHibernateSession.delete(eventId);
         sosHibernateSession.commit();
@@ -138,14 +135,14 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
         String hql = "delete from LoggingEventPropertyDBItem" + getWhere();
-        Query query = setQueryParams(hql);
+        Query<LoggingEventPropertyDBItem> query = setQueryParams(hql);
         int row = query.executeUpdate();
         return row;
     }
 
     public int deleteAll() throws Exception {
         String hql = "delete from LoggingEventPropertyDBItem";
-        Query query = setQueryParams(hql);
+        Query<LoggingEventPropertyDBItem> query = setQueryParams(hql);
         int row = query.executeUpdate();
         return row;
     }

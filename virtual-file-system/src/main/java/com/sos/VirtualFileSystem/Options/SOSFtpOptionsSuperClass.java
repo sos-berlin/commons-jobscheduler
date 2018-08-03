@@ -1379,9 +1379,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         jumpCommand = pJumpCommand;
     }
 
-    @JSOptionDefinition(name = "jump_command_delimiter", description = "Command delimiter characters are specified using t", key = "jump_command_delimiter", type = "SOSOptionString", mandatory = true)
+    @JSOptionDefinition(name = "jump_command_delimiter", description = "Command delimiter for jump pre and post commands", key = "jump_command_delimiter", type = "SOSOptionString", mandatory = true)
     public SOSOptionString jumpCommandDelimiter = new SOSOptionString(this, CLASSNAME + ".jump_command_delimiter",
-            "Command delimiter characters are specified using t", "%%", "%%", true);
+            "Command delimiter for jump pre and post commands", ";", ";", true);
 
     @Override
     public SOSOptionString getJumpCommandDelimiter() {

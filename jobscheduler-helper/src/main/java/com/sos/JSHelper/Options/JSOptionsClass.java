@@ -55,7 +55,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected final String conChangedMsg = "%3$s: changed from '%1$s' to '%2$s'.";
     protected HashMap<String, String> objSettings = null;
     protected HashMap<String, String> objProcessedOptions = null;
-    protected Class objClassName4PreferenceStore = this.getClass();
+    protected Class<?> objClassName4PreferenceStore = this.getClass();
     protected Msg objMsg = null;
     protected String strAlternativePrefix = "";
     private static final String CLASS_NAME = "JSOptionsClass";
@@ -80,7 +80,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public JSOptionPropertyFolderName UserDir = new JSOptionPropertyFolderName(this, "", "", "", "", false);
     public boolean gflgSubsituteVariables = true;
     public String TestVar = "Wert von TestVar";
-    public Class objParentClass = this.getClass();
+    public Class<?> objParentClass = this.getClass();
     public String gstrApplicationName = "JobScheduler";
     public String gstrApplicationDocuUrl = "http://docu.sos-berlin.com";
     public Preferences objPreferenceStore = null;
@@ -358,9 +358,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public HashMap<String, String> getSettings4StepName() {
         HashMap<String, String> objS = new HashMap<String, String>();
         int intStartPos = strCurrentNodeName.length() + 1;
-        for (final Object element : settings().entrySet()) {
-            final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-            String strMapKey = mapItem.getKey().toString();
+        for (Map.Entry<String, String> mapItem : settings().entrySet()) {
+            String strMapKey = mapItem.getKey();
             String strValue = mapItem.getValue();
             if (strMapKey.indexOf("/") != -1) {
                 if (strMapKey.startsWith(strCurrentNodeName + "/")) {
@@ -415,13 +414,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         String strLSKey = "";
         if (!strCurrentNodeName.isEmpty()) {
             strLSKey = strCurrentNodeName + "/" + pstrKey.replaceAll("_", "");
-            for (final Object element : objSettings.entrySet()) {
-                final Map.Entry mapItem = (Map.Entry) element;
-                String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                String strMapKey = mapItem.getKey();
                 strMapKey = strMapKey.replaceAll("_", "");
                 if (strLSKey.equalsIgnoreCase(strMapKey)) {
                     if (mapItem.getValue() != null) {
-                        strTemp = mapItem.getValue().toString();
+                        strTemp = mapItem.getValue();
                     } else {
                         strTemp = null;
                     }
@@ -430,13 +428,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                 }
             }
         }
-        for (final Object element : objSettings.entrySet()) {
-            final Map.Entry mapItem = (Map.Entry) element;
-            String strMapKey = mapItem.getKey().toString();
+        for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+            String strMapKey = mapItem.getKey();
             String lstrMapKey = strMapKey.replaceAll("_", "");
             if (strKey.equalsIgnoreCase(lstrMapKey)) {
                 if (mapItem.getValue() != null) {
-                    strTemp = mapItem.getValue().toString();
+                    strTemp = mapItem.getValue();
                 } else {
                     strTemp = null;
                 }
@@ -450,13 +447,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             strKey = strKey.substring(++i);
             if (!strCurrentNodeName.isEmpty()) {
                 strLSKey = strCurrentNodeName + "/" + strKey;
-                for (final Object element : objSettings.entrySet()) {
-                    final Map.Entry mapItem = (Map.Entry) element;
-                    String strMapKey = mapItem.getKey().toString();
+                for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                    String strMapKey = mapItem.getKey();
                     String lstrMapKey = strMapKey.replaceAll("_", "");
                     if (strLSKey.equalsIgnoreCase(lstrMapKey)) {
                         if (mapItem.getValue() != null) {
-                            strTemp = mapItem.getValue().toString();
+                            strTemp = mapItem.getValue();
                         } else {
                             strTemp = null;
                         }
@@ -465,13 +461,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     }
                 }
             }
-            for (final Object element : objSettings.entrySet()) {
-                final Map.Entry mapItem = (Map.Entry) element;
-                String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                String strMapKey = mapItem.getKey();
                 String lstrMapKey = strMapKey.replaceAll("_", "");
                 if (!strLSKey.isEmpty() && strLSKey.equalsIgnoreCase(lstrMapKey)) {
                     if (mapItem.getValue() != null) {
-                        strTemp = mapItem.getValue().toString();
+                        strTemp = mapItem.getValue();
                     } else {
                         strTemp = null;
                     }
@@ -497,22 +492,21 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public boolean checkNotProcessedOptions() {
         boolean flgIsOK = true;
-        int intNumberOfNotProcessedOptions = 0;
+        //int intNumberOfNotProcessedOptions = 0;
         if (objSettings != null) {
-            for (final Object element : objSettings.entrySet()) {
-                final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-                String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                String strMapKey = mapItem.getKey();
                 String strT = objProcessedOptions.get(strMapKey);
                 if (strT == null) {
                     String strValue = null;
                     if (mapItem.getValue() != null) {
-                        strValue = mapItem.getValue().toString();
+                        strValue = mapItem.getValue();
                     } else {
                         strValue = null;
                     }
                     LOGGER.warn(String.format("SOSOPT-W-001: Option '%1$s' with value '%2$s' is unknown and not processed", strMapKey, strValue));
                     flgIsOK = false;
-                    intNumberOfNotProcessedOptions++;
+                    //intNumberOfNotProcessedOptions++;
                 }
             }
         }
@@ -626,11 +620,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public void options2ClipBoard() {
         String strT = "";
         if (objSettings != null) {
-            for (final Object element : objSettings.entrySet()) {
-                final Map.Entry mapItem = (Map.Entry) element;
-                final String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                final String strMapKey = mapItem.getKey();
                 if (mapItem.getValue() != null) {
-                    String strTemp = mapItem.getValue().toString();
+                    String strTemp = mapItem.getValue();
                     strT += "\n" + strMapKey + "=" + strTemp;
                 }
             }
@@ -979,8 +972,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             objProp.load(new FileInputStream(pstrPropertiesFileName));
             message(conMethodName + ": PropertyFile red. Name '" + pstrPropertiesFileName + "'.");
             this.settings();
-            for (final Object element : objProp.entrySet()) {
-                final Map.Entry mapItem = (Map.Entry) element;
+            for (Map.Entry<Object, Object> mapItem : objProp.entrySet()) {
                 final String strMapKey = mapItem.getKey().toString();
                 if (mapItem.getValue() != null) {
                     final String strTemp = mapItem.getValue().toString();
@@ -1005,8 +997,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public void loadProperties(final Properties pobjProp) {
         this.settings();
-        for (final Object element : pobjProp.entrySet()) {
-            final Map.Entry mapItem = (Map.Entry) element;
+        for (Map.Entry<Object, Object> mapItem : pobjProp.entrySet()) {
             final String strMapKey = mapItem.getKey().toString();
             if (mapItem.getValue() != null) {
                 final String strTemp = mapItem.getValue().toString();
@@ -1076,7 +1067,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public String getOptionByName(final String pstrOptionName) {
         String strValue = null;
-        Class c = this.getClass();
+        Class<?> c = this.getClass();
         strValue = getOptionValue(c, pstrOptionName);
         if (strValue == null) {
             c = objParentClass.getClass();
@@ -1085,7 +1076,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strValue;
     }
 
-    private String getOptionValue(final Class c, final String pstrOptionName) {
+    private String getOptionValue(final Class<?> c, final String pstrOptionName) {
         String strValue = null;
         Field objField = null;
         try {
@@ -1102,8 +1093,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         } catch (final NoSuchFieldException objException) {
             Method objMethod;
             try {
-                objMethod = c.getMethod(pstrOptionName, null);
-                strValue = (String) objMethod.invoke(this, null);
+                objMethod = c.getMethod(pstrOptionName);
+                strValue = (String) objMethod.invoke(this);
             } catch (final SecurityException exception) {
                 LOGGER.error(exception.getMessage(), exception);
             } catch (final NoSuchMethodException exception) {
@@ -1123,7 +1114,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public Properties getTextProperties() {
         if (objP == null) {
-            objP = objP = new Properties();
+            objP = new Properties();
         }
         return objP;
     }
@@ -1191,11 +1182,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public void dumpSettings() {
         final String conMethodName = CLASS_NAME + "::DumpSettings";
-        for (final Object element : objSettings.entrySet()) {
-            final Map.Entry mapItem = (Map.Entry) element;
-            final String strMapKey = mapItem.getKey().toString();
+        for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+            final String strMapKey = mapItem.getKey();
             if (mapItem.getValue() != null) {
-                String strTemp = mapItem.getValue().toString();
+                String strTemp = mapItem.getValue();
                 if ("ftp_password".equals(strMapKey)) {
                     strTemp = "***";
                 }
@@ -1278,7 +1268,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                             }
                             if (enuIterate4What == IterationTypes.setRecord) {
                                 SOSOptionElement.gflgProcessHashMap = true;
-                                objDE.gflgProcessHashMap = true;
+                                //objDE.gflgProcessHashMap = true;
                                 objDE.mapValue();
                             }
                             if (enuIterate4What == IterationTypes.CheckMandatory) {
@@ -1487,11 +1477,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         String strTemp;
         HashMap<String, String> hsmNewMap = new HashMap<String, String>();
         if (phsmParameters != null) {
-            for (final Object element : phsmParameters.entrySet()) {
-                final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-                String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
+                String strMapKey = mapItem.getKey();
                 if (mapItem.getValue() != null) {
-                    strTemp = mapItem.getValue().toString();
+                    strTemp = mapItem.getValue();
                 } else {
                     strTemp = null;
                 }
@@ -1499,11 +1488,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     hsmNewMap.put(strMapKey, strTemp);
                 }
             }
-            for (final Object element : phsmParameters.entrySet()) {
-                final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-                String strMapKey = mapItem.getKey().toString();
+            for (Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
+                String strMapKey = mapItem.getKey();
                 if (mapItem.getValue() != null) {
-                    strTemp = mapItem.getValue().toString();
+                    strTemp = mapItem.getValue();
                 } else {
                     strTemp = null;
                 }

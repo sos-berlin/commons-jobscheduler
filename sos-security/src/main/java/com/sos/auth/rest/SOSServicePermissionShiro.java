@@ -896,9 +896,9 @@ public class SOSServicePermissionShiro {
 	private JOCDefaultResponse login(String basicAuthorization, String user, String pwd)
 			throws JocException, SOSHibernateException {
 
-		Globals.sosShiroProperties = new JocCockpitProperties();
-		Globals.setProperties();
-		SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Login");
+	    Globals.sosShiroProperties = new JocCockpitProperties();
+        Globals.setProperties();
+        SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Login");
 
 		try {
 

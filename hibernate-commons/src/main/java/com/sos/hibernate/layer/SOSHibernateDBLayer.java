@@ -1,16 +1,15 @@
 package com.sos.hibernate.layer;
 
 import java.io.File;
-import org.apache.log4j.Logger;
+
 import com.sos.hibernate.classes.ClassList;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.hibernate.classes.SOSHibernateFactory;
   
 /** @author Uwe Risse */
 public class SOSHibernateDBLayer {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateDBLayer.class);
     protected SOSHibernateSession sosHibernateSession = null;
     private SOSHibernateFactory sosHibernateFactory=null;
     private String configurationFileName = null;
