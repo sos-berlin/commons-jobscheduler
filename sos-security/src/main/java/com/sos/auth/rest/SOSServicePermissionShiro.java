@@ -897,6 +897,7 @@ public class SOSServicePermissionShiro {
 			throws JocException, SOSHibernateException {
 
 	    Globals.sosShiroProperties = new JocCockpitProperties();
+	    Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
         SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Login");
 
