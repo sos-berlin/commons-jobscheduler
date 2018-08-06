@@ -94,14 +94,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private ISOSVirtualFile objSourceTransferFile = null;
     private SOSFileList objParent = null;
     private boolean flgFileExists = false;
-    private String checksum = "N/A";
-    private String checksum4check = "N/A";
+    private String sourceFileChecksum = "N/A";
+    private String targetFileChecksum = "N/A";
+    private ISOSVirtualFile targetChecksumFile = null;
     private Date dteStartTransfer = null;
     private Date dteEndTransfer = null;
     private ISOSVfsFileTransfer objVfsHandler = null;
     private boolean flgSteadyFlag = false;
     private boolean targetFileAlreadyExists = false;
-    private ISOSVirtualFile checksumFile = null;
     private FTPFile objFTPFile = null;
     private String strCSVRec = new String();
     private String strRenamedSourceFileName = null;
@@ -189,26 +189,28 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         if (source == null) {
             raiseException(SOSVfs_E_273.params("Source"));
         }
-        MessageDigest md4create = null;
-        MessageDigest md4check = null;
-        boolean calculateIntegrityHash4Create = true;
-        if (calculateIntegrityHash4Create) {
+
+        MessageDigest targetChecksum = null;
+        boolean targetCreateIntegrityHashFile = objOptions.createIntegrityHashFile.isTrue();
+        if (targetCreateIntegrityHashFile) {
             try {
-                md4create = MessageDigest.getInstance(objOptions.integrityHashType.getValue());
+                targetChecksum = MessageDigest.getInstance(objOptions.integrityHashType.getValue());
             } catch (NoSuchAlgorithmException e1) {
                 LOGGER.error(e1.toString());
                 objOptions.createIntegrityHashFile.value(false);
-                calculateIntegrityHash4Create = false;
+                targetCreateIntegrityHashFile = false;
             }
         }
-        boolean calculateIntegrityHash4Check = objOptions.checkIntegrityHash.isTrue() && objOptions.compressFiles.isTrue();
-        if (calculateIntegrityHash4Check) {
+
+        MessageDigest sourceChecksum = null;
+        boolean sourceCheckIntegrityHash = objOptions.checkIntegrityHash.isTrue() && objOptions.compressFiles.isTrue();
+        if (sourceCheckIntegrityHash) {
             try {
-                md4check = MessageDigest.getInstance(objOptions.integrityHashType.getValue());
+                sourceChecksum = MessageDigest.getInstance(objOptions.integrityHashType.getValue());
             } catch (NoSuchAlgorithmException e1) {
                 LOGGER.error(e1.toString());
                 objOptions.checkIntegrityHash.value(false);
-                calculateIntegrityHash4Check = false;
+                sourceCheckIntegrityHash = false;
             }
         }
         executePreCommands(false);
@@ -227,22 +229,22 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     cumulativeFileSeperatorLength = bytes.length;
                     Buffer compressedBytes = compress(bytes);
                     target.write(compressedBytes.getBytes());
-                    if (calculateIntegrityHash4Check) {
-                        md4check.update(bytes);
+                    if (sourceCheckIntegrityHash) {
+                        sourceChecksum.update(bytes);
                     }
-                    if (calculateIntegrityHash4Create) {
-                        md4create.update(compressedBytes.getBytes());
+                    if (targetCreateIntegrityHashFile) {
+                        targetChecksum.update(compressedBytes.getBytes());
                     }
                 }
                 if (source.getFileSize() <= 0) {
                     byte[] bytes = new byte[0];
                     Buffer compressedBytes = compress(bytes);
                     target.write(compressedBytes.getBytes());
-                    if (calculateIntegrityHash4Check) {
-                        md4check.update(bytes);
+                    if (sourceCheckIntegrityHash) {
+                        sourceChecksum.update(bytes);
                     }
-                    if (calculateIntegrityHash4Create) {
-                        md4create.update(compressedBytes.getBytes());
+                    if (targetCreateIntegrityHashFile) {
+                        targetChecksum.update(compressedBytes.getBytes());
                     }
                     if (eventHandler != null) {
                         Map<String, String> values = new HashMap<String, String>();
@@ -281,11 +283,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                             // values.put("state", "5");
                             // eventHandler.updateDb(null, "YADE_FILE", values);
                             // }
-                            if (calculateIntegrityHash4Check) {
-                                md4check.update(buffer, 0, bytesTransferred);
+                            if (sourceCheckIntegrityHash) {
+                                sourceChecksum.update(buffer, 0, bytesTransferred);
                             }
-                            if (calculateIntegrityHash4Create) {
-                                md4create.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+                            if (targetCreateIntegrityHashFile) {
+                                targetChecksum.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
                             }
                         } catch (JobSchedulerException e) {
                             if (eventHandler != null) {
@@ -324,18 +326,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (objDataTargetClient.isNegativeCommandCompletion()) {
                 raiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
             }
-            if (calculateIntegrityHash4Create) {
-                checksum = toHexString(md4create.digest());
-                checksum4check = checksum;
-                LOGGER.debug(SOSVfs_I_274.params(checksum, strTargetFileName, objOptions.integrityHashType.getValue()));
+            if (targetCreateIntegrityHashFile) {
+                targetFileChecksum = toHexString(targetChecksum.digest());
+                sourceFileChecksum = targetFileChecksum;
+                LOGGER.debug(SOSVfs_I_274.params(targetFileChecksum, strTargetFileName, objOptions.integrityHashType.getValue()));
             }
-            if (calculateIntegrityHash4Check) {
-                checksum4check = toHexString(md4check.digest());
-                LOGGER.debug(SOSVfs_I_274.params(checksum4check, strSourceFileName, objOptions.integrityHashType.getValue()));
+            if (sourceCheckIntegrityHash) {
+                sourceFileChecksum = toHexString(sourceChecksum.digest());
+                LOGGER.debug(SOSVfs_I_274.params(sourceFileChecksum, strSourceFileName, objOptions.integrityHashType.getValue()));
             }
             this.setNoOfBytesTransferred(totalBytesTransferred);
             totalBytesTransferred += cumulativeFileSeperatorLength;
-            checkChecksumFile(source, target);
+            checkSourceChecksumFile(source, target);
             executeTFNPostCommnands();
             return true;
         } catch (JobSchedulerException e) {
@@ -368,19 +370,19 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    public void createChecksumFile() {
-        createChecksumFile(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName));
+    public void createTargetChecksumFile() {
+        createTargetChecksumFile(makeFullPathName(objOptions.targetDir.getValue(), strTargetFileName));
     }
 
-    public void createChecksumFile(String targetFileName) {
-        targetFileName = resolveDotsInPath(targetFileName);
+    public void createTargetChecksumFile(String targetFileName) {
         if (objOptions.createIntegrityHashFile.isTrue() && isTransferred()) {
             ISOSVirtualFile checksumFile = null;
             try {
+                targetFileName = resolveDotsInPath(targetFileName);
                 checksumFile = objDataTargetClient.getFileHandle(targetFileName + "." + objOptions.integrityHashType.getValue());
-                checksumFile.write(checksum.getBytes());
+                checksumFile.write(targetFileChecksum.getBytes());
                 LOGGER.info(SOSVfs_I_285.params(checksumFile.getName()));
-                setChecksumFile(checksumFile);
+                targetChecksumFile = checksumFile;
             } catch (JobSchedulerException e) {
                 throw e;
             } finally {
@@ -391,32 +393,32 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void checkChecksumFile(ISOSVirtualFile source, ISOSVirtualFile target) {
+    private void checkSourceChecksumFile(ISOSVirtualFile sourceFile, ISOSVirtualFile targetFile) {
         if (objOptions.checkIntegrityHash.isTrue()) {
-            ISOSVirtualFile sourceChecksumFile = null;
-            String sourceChecksumFileName = source.getName() + "." + objOptions.securityHashType.getValue();
+            ISOSVirtualFile sourceFileChecksumFile = null;
+            String sourceFileChecksumFileName = sourceFile.getName() + "." + objOptions.securityHashType.getValue();
             try {
-                sourceChecksumFile = getDataSourceClient().getFileHandle(sourceChecksumFileName);
-                if (sourceChecksumFile.fileExists()) {
-                    String origChecksum = sourceChecksumFile.file2String().trim();
-                    if (!origChecksum.equals(checksum4check)) {
+                sourceFileChecksumFile = getDataSourceClient().getFileHandle(sourceFileChecksumFileName);
+                if (sourceFileChecksumFile.fileExists()) {
+                    String checksum = sourceFileChecksumFile.file2String().trim();
+                    if (!checksum.equals(sourceFileChecksum)) {
                         try {
-                            if (target.fileExists()) {
-                                target.delete();
+                            if (targetFile.fileExists()) {
+                                targetFile.delete();
                             }
                         } catch (Exception ex) {
                             LOGGER.debug(ex.toString(), ex);
                         }
-                        String strT = String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'",
-                                sourceChecksumFileName, origChecksum, checksum4check);
                         setStatus(enuTransferStatus.transfer_aborted);
-                        throw new JobSchedulerException(strT);
+                        throw new JobSchedulerException(String.format(
+                                "Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'", sourceFileChecksumFileName,
+                                checksum, sourceFileChecksum));
                     } else {
                         LOGGER.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
-                                sourceChecksumFileName, origChecksum, checksum4check));
+                                sourceFileChecksumFileName, checksum, sourceFileChecksum));
                     }
                 } else {
-                    LOGGER.info(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
+                    LOGGER.info(String.format("Checksum file '%1$s' not found", sourceFileChecksumFileName));
                 }
             } catch (JobSchedulerException e) {
                 throw e;
@@ -695,7 +697,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     @Override
     public String getMd5() {
-        return checksum;
+        return targetFileChecksum;
     }
 
     @Override
@@ -1152,7 +1154,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 }
             }
             if (objOptions.transactional.isFalse()) {
-                createChecksumFile(objTargetFile.getName());
+                createTargetChecksumFile(objTargetFile.getName());
                 if (strRenamedSourceFileName != null) {
                     renameSourceFile(objSourceFile);
                 }
@@ -1186,10 +1188,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 //
             }
         }
-    }
-
-    public String getChecksum() {
-        return checksum;
     }
 
     public void setAtomicFileName(final String pstrValue) {
@@ -1634,16 +1632,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         this.targetFileAlreadyExists = targetFileAlreadyExists;
     }
 
-    public boolean hasChecksumFile() {
-        return checksumFile != null;
+    public boolean hasTargetChecksumFile() {
+        return targetChecksumFile != null;
     }
 
-    public void setChecksumFile(ISOSVirtualFile checksumFile) {
-        this.checksumFile = checksumFile;
-    }
-
-    public ISOSVirtualFile getChecksumFile() {
-        return checksumFile;
+    public ISOSVirtualFile getTargetChecksumFile() {
+        return targetChecksumFile;
     }
 
     private String getTransferTimeAsString(Date time) {
