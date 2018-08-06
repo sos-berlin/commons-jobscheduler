@@ -203,7 +203,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
 
         MessageDigest sourceChecksum = null;
-        boolean sourceCheckIntegrityHash = objOptions.checkIntegrityHash.isTrue() && objOptions.compressFiles.isTrue();
+        boolean sourceCheckIntegrityHash = objOptions.checkIntegrityHash.isTrue();
         if (sourceCheckIntegrityHash) {
             try {
                 sourceChecksum = MessageDigest.getInstance(objOptions.integrityHashType.getValue());
