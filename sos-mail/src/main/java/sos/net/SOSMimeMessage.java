@@ -32,6 +32,8 @@ import javax.mail.internet.MimeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
 
@@ -86,7 +88,11 @@ public class SOSMimeMessage {
 	}
 
 	private final void setFrom() throws Exception {
-		from = mimeMessage.getFrom()[0].toString();
+	    if (mimeMessage.getFrom() != null && mimeMessage.getFrom().length > 0) {
+	        from = mimeMessage.getFrom()[0].toString();
+	    } else {
+	        throw new JobSchedulerException("From is empty or null!");
+	    }
 	}
 
 	public void setFromName() throws Exception {
