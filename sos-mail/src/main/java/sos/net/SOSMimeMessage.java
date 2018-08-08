@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,11 +28,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
-import sos.util.NullBufferedWriter;
-import sos.util.SOSClassUtil;
-import sos.util.SOSDate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import sos.util.SOSClassUtil;
+import sos.util.SOSDate;
 
 
 public class SOSMimeMessage {
@@ -52,23 +52,33 @@ public class SOSMimeMessage {
 	private String dumpedFileName = "";
 	Vector<SOSMailAttachment> sosMailAttachmentList = new Vector<SOSMailAttachment>();
 
-	public SOSMimeMessage(final Message message) throws Exception {
-		this((MimeMessage) message);
-	}
+    public SOSMimeMessage(final Message message) throws Exception {
+        this((MimeMessage) message);
+    }
+
+    public SOSMimeMessage(final Message message, Boolean harmless) throws Exception {
+        this.mimeMessage = (MimeMessage) message;
+    }
 
 	public SOSMimeMessage(final MimeMessage mimeMessage) throws Exception {
 		this.mimeMessage = mimeMessage;
-		setSentDateAsString();
-		setFrom();
-		setFromName();
-		setFromAddress();
-		processAttachment(this.mimeMessage);
+		init();
 	}
 
 	 
 	public MimeMessage getMessage() {
 		return mimeMessage;
 	}
+	
+    public void init() throws Exception {
+        if (this.mimeMessage != null) {
+            setSentDateAsString();
+            setFrom();
+            setFromName();
+            setFromAddress();
+            processAttachment(this.mimeMessage);
+        }
+    }
  
 
 	public String getFrom() throws Exception {
@@ -107,7 +117,7 @@ public class SOSMimeMessage {
 		return SOSDate.getDateAsString(mimeMessage.getSentDate(), dateFormat);
 	}
 
-	private final void setSentDateAsString() throws Exception {
+	public final void setSentDateAsString() throws Exception {
 		if (mimeMessage.getSentDate() != null) {
 			sentDateAsString = SOSDate.getDateAsString(mimeMessage.getSentDate(), localDateFormat);
 		}
