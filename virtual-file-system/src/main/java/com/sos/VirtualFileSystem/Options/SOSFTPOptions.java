@@ -539,30 +539,28 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return ((params.get(key) != null) && params.get(key).equalsIgnoreCase(value));
     }
 
-	private void handleFileOrderSource(HashMap<String, String> params) {
-		boolean b = false;
-		b = ((isEmpty(params, "file_path") || isEqualIgnoreCase(params, "file_path", "${scheduler_file_path}"))
-				&& isEmpty(params, "source_dir") && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
-		if (b && !isEmpty(params, "scheduler_file_path")) {
-			LOGGER.debug(String.format(
-					"Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
-							+ "file_spec or source_dir has been specified",
-					params.get("scheduler_file_path")));
-			params.put("file_path", params.get("scheduler_file_path"));
-		}
+    private void handleFileOrderSource(HashMap<String, String> params) {
+        boolean b = false;
+        b = ((isEmpty(params, "file_path") || isEqualIgnoreCase(params, "file_path", "${scheduler_file_path}")) && isEmpty(params, "source_dir")
+                && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
+        if (b && !isEmpty(params, "scheduler_file_path")) {
+            LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
+                    + "file_spec or source_dir has been specified", params.get("scheduler_file_path")));
+            params.put("file_path", params.get("scheduler_file_path"));
+        }
 
-		b = (!isEmpty(params, "scheduler_file_path") && isEqualIgnoreCase(params, "file_path", "${scheduler_file_name}") && isEmpty(params, "file_spec"));
-		if (b) {
-			File f = new File(params.get("scheduler_file_path"));
-			String path = params.get("source_dir");
-			String basename = f.getName();
-			LOGGER.debug(String.format(
-					"Using base filename %s from parameter SCHEDULER_FILE_PATH %s and path %s for the parameter file_path, as file_path=${scheduler_file_name} "
-							+ "and no file_spec has been specified",
-					basename, params.get("scheduler_file_path"), path));
-			params.put("file_path", basename);
-		}
-	}
+        b = (!isEmpty(params, "scheduler_file_path") && isEqualIgnoreCase(params, "file_path", "${scheduler_file_name}") && isEmpty(params,
+                "file_spec"));
+        if (b) {
+            File f = new File(params.get("scheduler_file_path"));
+            String path = params.get("source_dir");
+            String basename = f.getName();
+            LOGGER.debug(String.format(
+                    "Using base filename %s from parameter SCHEDULER_FILE_PATH %s and path %s for the parameter file_path, as file_path=${scheduler_file_name} "
+                            + "and no file_spec has been specified", basename, params.get("scheduler_file_path"), path));
+            params.put("file_path", basename);
+        }
+    }
 
     public void setAllOptions2(HashMap<String, String> params) {
         Map<String, String> mapFromIniFile = new HashMap<String, String>();
@@ -600,8 +598,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             conf = new SOSConfiguration(settings.getValue(), profile.getValue());
             Properties profileProps = conf.getParameterAsProperties();
             if (profileProps.isEmpty()) {
-                String strM = SOSVfsMessageCodes.SOSVfs_E_0060.params(profile.getValue(), settings.getValue());
-                throw new JobSchedulerException(strM);
+                String sf = originalSettingsFile == null ? settings.getValue() : originalSettingsFile;
+                throw new JobSchedulerException(String.format("[%s]not found profile=%s", sf, profile.getValue()));
             }
             conf = new SOSConfiguration(settings.getValue(), "globals");
             Properties globalsProps = conf.getParameterAsProperties();
@@ -649,12 +647,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                         case "target_pre_command":
                         case "target_post_command":
                         case "target_tfn_post_command":
-                            
+
                         case "jump_post_transfer_commands_on_error":
                         case "jump_post_transfer_commands_final":
                         case "jump_post_transfer_commands_on_success":
                         case "jump_pre_transfer_commands":
-                            
+
                         case "file_path":
                             break;
                         default:
