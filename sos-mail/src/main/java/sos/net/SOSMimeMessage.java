@@ -37,7 +37,6 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
 
-
 public class SOSMimeMessage {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SOSMimeMessage.class);
@@ -54,45 +53,43 @@ public class SOSMimeMessage {
 	private String dumpedFileName = "";
 	Vector<SOSMailAttachment> sosMailAttachmentList = new Vector<SOSMailAttachment>();
 
-    public SOSMimeMessage(final Message message) throws Exception {
-        this((MimeMessage) message);
-    }
+	public SOSMimeMessage(final Message message) throws Exception {
+		this((MimeMessage) message);
+	}
 
-    public SOSMimeMessage(final Message message, Boolean harmless) throws Exception {
-        this.mimeMessage = (MimeMessage) message;
-    }
+	public SOSMimeMessage(final Message message, Boolean harmless) throws Exception {
+		this.mimeMessage = (MimeMessage) message;
+	}
 
 	public SOSMimeMessage(final MimeMessage mimeMessage) throws Exception {
 		this.mimeMessage = mimeMessage;
 		init();
 	}
 
-	 
 	public MimeMessage getMessage() {
 		return mimeMessage;
 	}
-	
-    public void init() throws Exception {
-        if (this.mimeMessage != null) {
-            setSentDateAsString();
-            setFrom();
-            setFromName();
-            setFromAddress();
-            processAttachment(this.mimeMessage);
-        }
-    }
- 
+
+	public void init() throws Exception {
+		if (this.mimeMessage != null) {
+			setSentDateAsString();
+			setFrom();
+			setFromName();
+			setFromAddress();
+			processAttachment(this.mimeMessage);
+		}
+	}
 
 	public String getFrom() throws Exception {
 		return from;
 	}
 
 	private final void setFrom() throws Exception {
-	    if (mimeMessage.getFrom() != null && mimeMessage.getFrom().length > 0) {
-	        from = mimeMessage.getFrom()[0].toString();
-	    } else {
-	        throw new JobSchedulerException("From is empty or null!");
-	    }
+		if (mimeMessage.getFrom() != null && mimeMessage.getFrom().length > 0) {
+			from = mimeMessage.getFrom()[0].toString();
+		} else {
+			throw new JobSchedulerException("From is empty or null!");
+		}
 	}
 
 	public void setFromName() throws Exception {
@@ -214,13 +211,21 @@ public class SOSMimeMessage {
 			int numParts = mp.getCount();
 			for (int i = 0; i < numParts; ++i) {
 				if (mp.getBodyPart(i).isMimeType("text/plain")) {
-					return (String) mp.getBodyPart(i).getContent();
+					if (mp.getBodyPart(i).getContent() == null) {
+						return "";
+					} else {
+						return (String) mp.getBodyPart(i).getContent();
+					}
 				} else if (mp.getBodyPart(i).isMimeType("multipart/*")) {
 					MimeMultipart mmp = (MimeMultipart) mp.getBodyPart(i).getContent();
 					int numBodyParts = mmp.getCount();
 					for (int j = 0; j < numBodyParts; ++j) {
 						if (mmp.getBodyPart(j).isMimeType("text/plain")) {
-							return (String) mmp.getBodyPart(j).getContent();
+							if (mmp.getBodyPart(j).getContent() == null) {
+								return "";
+							} else {
+								return (String) mmp.getBodyPart(j).getContent();
+							}
 						}
 					}
 				}
@@ -370,9 +375,10 @@ public class SOSMimeMessage {
 	public void saveFile(File file, final byte[] input) throws Exception {
 		FileOutputStream fos = null;
 		BufferedOutputStream bos = null;
+		File saveFile = file;
 		try {
 			for (int i = 0; file.exists(); i++) {
-				file = new File(file.getAbsolutePath() + "_" + i);
+				file = new File(saveFile.getAbsolutePath() + "_" + i);
 			}
 			fos = new FileOutputStream(file);
 			bos = new BufferedOutputStream(fos);
@@ -425,8 +431,9 @@ public class SOSMimeMessage {
 		f = f.replace("\\", "_");
 		return f;
 	}
-	
-	public void saveAttachments(SOSMimeMessage message, String attachmentFileNamePattern , final String targetFolderName, boolean saveFilesWithoutFilename) throws Exception {
+
+	public void saveAttachments(SOSMimeMessage message, String attachmentFileNamePattern, final String targetFolderName,
+			boolean saveFilesWithoutFilename) throws Exception {
 		String attachmentFileName = null;
 		if (attachmentFileNamePattern == null || attachmentFileNamePattern.isEmpty()) {
 			attachmentFileNamePattern = "${filename}";
@@ -438,7 +445,7 @@ public class SOSMimeMessage {
 			throw new Exception("File [" + targetFolderName + "] does not exists!!");
 		}
 		Iterator<SOSMailAttachment> it = sosMailAttachmentList.iterator();
-		
+
 		int count = 0;
 		for (; it.hasNext();) {
 			attachment = it.next();
@@ -451,8 +458,8 @@ public class SOSMimeMessage {
 				attachmentFileName = attachmentFileNamePattern.replace("${filename}", attachmentFileName);
 				attachmentFileName = attachmentFileName.replace("${messageId}", message.getMessageId());
 				attachmentFileName = attachmentFileName.replace("${subject}", message.getSubject());
-				attachmentFileName = normalize(attachmentFileName); 
- 				fileToSave = new File(targetFolderName, attachmentFileName);
+				attachmentFileName = normalize(attachmentFileName);
+				fileToSave = new File(targetFolderName, attachmentFileName);
 				saveFile(fileToSave, attachment.getContent());
 				count++;
 				LOGGER.debug(".. attachment file [" + attachment.getFilename() + "] successfully saved.");
@@ -460,7 +467,6 @@ public class SOSMimeMessage {
 		}
 		LOGGER.debug(".. [" + count + "] Attachment(s) saved to " + targetFolderName);
 	}
- 
 
 	public void dumpMessage(final File file, final boolean append) throws Exception {
 		dumpFile(file, mimeMessage.getInputStream(), append);
@@ -501,12 +507,12 @@ public class SOSMimeMessage {
 	}
 
 	@SuppressWarnings("unchecked")
-    public Enumeration<Header> getHeaders() throws Exception {
+	public Enumeration<Header> getHeaders() throws Exception {
 		return mimeMessage.getAllHeaders();
 	}
 
 	@SuppressWarnings("unchecked")
-    public String dumpHeaders() throws IOException, MessagingException {
+	public String dumpHeaders() throws IOException, MessagingException {
 		StringBuilder sb = new StringBuilder();
 		Header header = null;
 		for (Enumeration<Header> e = mimeMessage.getAllHeaders(); e.hasMoreElements();) {
@@ -639,7 +645,7 @@ public class SOSMimeMessage {
 	}
 
 	@SuppressWarnings("unchecked")
-    public int incrementHeader(final String headerName) throws MessagingException {
+	public int incrementHeader(final String headerName) throws MessagingException {
 		Header header = null;
 		int value = -1;
 		for (Enumeration<Header> e = mimeMessage.getAllHeaders(); e.hasMoreElements();) {
@@ -665,7 +671,7 @@ public class SOSMimeMessage {
 	 * @throws MessagingException
 	 */
 	@SuppressWarnings("unchecked")
-    public String getHeaderValue(final String headerName) throws Exception {
+	public String getHeaderValue(final String headerName) throws Exception {
 		Header header = null;
 		for (Enumeration<Header> e = mimeMessage.getAllHeaders(); e.hasMoreElements();) {
 			header = e.nextElement();
@@ -684,14 +690,14 @@ public class SOSMimeMessage {
 		this.dumpedFileName = dumpedFileName;
 	}
 
-	public  String getFirstToRecipient() throws Exception {
+	public String getFirstToRecipient() throws Exception {
 		return getRecipient("TO", 0);
 	}
 
 	public String getToRecipient(int index) throws Exception {
 		return getRecipient("TO", index);
 	}
-	
+
 	public String getFirstCCRecipient() throws Exception {
 		return getRecipient("CC", 0);
 	}
@@ -717,7 +723,7 @@ public class SOSMimeMessage {
 		}
 	}
 
-	public  String getFirstRecipient(String type) throws Exception {
+	public String getFirstRecipient(String type) throws Exception {
 		List<String> l = this.getRecipientAddress(type);
 		if (l.size() > 0) {
 			return l.get(0);
