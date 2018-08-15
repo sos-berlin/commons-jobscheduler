@@ -171,6 +171,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
         if (sshConnection != null) {
             try {
+                if (sshConnection.getSession() != null) {
+                    LOGGER.debug("***** Session still alive, disconnecting...");
+                    sshConnection.getSession().disconnect();
+                    LOGGER.debug("***** Session disconnected. proceeding to disconnect the connection...");
+                }
                 sshConnection.disconnect();
                 sshConnection = null;
             } catch (Exception ex) {

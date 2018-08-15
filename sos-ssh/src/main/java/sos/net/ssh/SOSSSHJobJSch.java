@@ -151,11 +151,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         preCommand = getPreCommand();
                     }
                 }
+                ExecutorService executorService = null;
+                Future<Void> sendSignalExecution = null;
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
-                    ExecutorService executorService = Executors.newFixedThreadPool(2);
+                    executorService = Executors.newFixedThreadPool(2);
                     String completeCommand = null;
                     if (objOptions.autoDetectOS.value()) {
                         completeCommand = strCmd;
@@ -170,6 +172,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     Callable<Void> runCompleteCmd = new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
+                            LOGGER.debug("***** Command Execution started! *****");
                             if (objOptions.autoDetectOS.value()) {
                                 vfsHandler.executeCommand(cmdToExecute, envVars);
                             } else if (objOptions.postCommandDelete.getValue().contains("del")) {
@@ -177,6 +180,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             }  else {
                                 vfsHandler.executeCommand(cmdToExecute);
                             }
+                            LOGGER.debug("***** Command Execution finished! *****");
                             return null;
                         }
                     };
@@ -192,10 +196,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             return null;
                         }
                     };
-                    @SuppressWarnings("unused")
-                    Future<Void> sendSignalExecution = executorService.submit(sendSignal);
+                    sendSignalExecution = executorService.submit(sendSignal);
                     // wait until command execution is finished 
                     commandExecution.get();
+                    ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("KILL");
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
                     checkStdErr();
@@ -218,6 +222,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             LOGGER.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
+                    }
+                }
+                finally {
+                    if (executorService != null) {
+                        if (commandExecution != null) {
+                            commandExecution.cancel(false);
+                        }
+                        executorService.shutdownNow();
                     }
                 }
             }
@@ -257,7 +269,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     public void disconnect() {
         if (isConnected) {
             try {
+                if (prePostCommandVFSHandler != null) {
+                    LOGGER.debug("***** prePostCommandVFSHandler disconnecting... *****");
+                    prePostCommandVFSHandler.closeConnection();
+                    LOGGER.debug("***** prePostCommandVFSHandler disconnected! *****");
+                }
+                LOGGER.debug("***** vfsHandler disconnecting... *****");
                 vfsHandler.closeConnection();
+                LOGGER.debug("***** vfsHandler disconnected! *****");
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -491,6 +510,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         } catch (Exception e) {
             LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+        } finally {
+            try {
+              LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
+              prePostCommandVFSHandler.closeConnection();
+              LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         }
     }
 
