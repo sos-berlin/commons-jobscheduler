@@ -35,6 +35,7 @@ import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.classes.audit.SecurityAudit;
+import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
@@ -795,10 +796,11 @@ public class SOSServicePermissionShiro {
 		currentUser.setCurrentSubject(sosLogin.getCurrentUser());
 
 		if (sosLogin.getCurrentUser() == null) {
-			JocError error = new JocError();
-			error.setMessage(String.format("%s: Could not login with user: %s password:*******", sosLogin.getMsg(),
-					currentUser.getUsername()));
-			throw new JocException(error);
+		    SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
+	        sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+	        sosShiroCurrentUserAnswer.setMessage(String.format("%s: Could not login with user: %s password:*******", sosLogin.getMsg(),
+                    currentUser.getUsername()));
+			throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
 		}
 
 		SOSShiroSession sosShiroSession = new SOSShiroSession(currentUser);
@@ -899,11 +901,12 @@ public class SOSServicePermissionShiro {
 	    Globals.sosShiroProperties = new JocCockpitProperties();
 	    Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
-        SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Login");
+        SOSHibernateSession sosHibernateSession = null;
 
 		try {
 
-			TimeZone.setDefault(TimeZone.getTimeZone(UTC));
+		    sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Login");
+		    TimeZone.setDefault(TimeZone.getTimeZone(UTC));
 
 			SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
 			sosShiroIniShare.provideIniFile();
@@ -938,13 +941,14 @@ public class SOSServicePermissionShiro {
 						sosShiroCurrentUserAnswer.getAccessToken(), sosShiroSession.getTimeout());
 			}
 
-		} catch (UnsupportedEncodingException e) {
+		} catch (JocAuthenticationException e) {
+		    return JOCDefaultResponse.responseStatus401(e.getSosShiroCurrentUserAnswer());
+        } catch (UnsupportedEncodingException e) {
 			return JOCDefaultResponse.responseStatusJSError(AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
-
 		} catch (Exception e) {
 			return JOCDefaultResponse.responseStatusJSError(e);
 		} finally {
-			sosHibernateSession.close();
+		    Globals.disconnect(sosHibernateSession);
 		}
 	}
 
