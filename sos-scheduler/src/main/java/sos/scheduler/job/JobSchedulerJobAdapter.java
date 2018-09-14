@@ -115,7 +115,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         try {
             if (isNotNull(pSchedulerParameterSet)) {
                 schedulerParameters = convertVariableSet2HashMap(pSchedulerParameterSet);
-                schedulerParameters.putAll(getSpecialParameters());
+//                schedulerParameters.putAll(getSpecialParameters());
                 for (String key : schedulerParameters.keySet()) {
                     String value = schedulerParameters.get(key);
                     if (value != null) {
