@@ -7,7 +7,6 @@ import java.util.Date;
 import com.sos.hibernate.SOSHibernateConstants;
 import com.sos.i18n.I18NBase;
 
-/** @author Uwe Risse */
 public abstract class SOSHibernateFilter extends I18NBase {
 
     protected String dateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
