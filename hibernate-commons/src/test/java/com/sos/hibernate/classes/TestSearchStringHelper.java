@@ -44,13 +44,13 @@ public class TestSearchStringHelper {
 		values.add("test");
 		String s2 = SearchStringHelper.getStringSetSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetSql", "(fieldname='test' or 1=0)", s2);
+		assertEquals("testGetSetSql", " (fieldname='test' or 1=0) ", s2);
 
 		values = new HashSet<String>();
 		values.add("te%st");
 		s2 = SearchStringHelper.getStringSetSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetSql", "(fieldname like 'te%st' or 1=0)", s2);
+		assertEquals("testGetSetSql", " (fieldname like 'te%st' or 1=0) ", s2);
 
 		values = new HashSet<String>();
 		values.add("te%st");
@@ -59,7 +59,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getStringSetSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetStringSetSql",
-				"(fieldname like 'te%st' or fieldname='test' or fieldname like '%test' or 1=0)", s2);
+				" (fieldname like 'te%st' or fieldname='test' or fieldname like '%test' or 1=0) ", s2);
  
 	}
 
@@ -69,13 +69,13 @@ public class TestSearchStringHelper {
 		values.add(1);
 		String s2 = SearchStringHelper.getIntegerSetSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetSql", "(fieldname=1 or 1=0)", s2);
+		assertEquals("testGetSetSql", " (fieldname=1 or 1=0) ", s2);
 
 		values = new HashSet<Integer>();
 		values.add(2);
 		s2 = SearchStringHelper.getIntegerSetSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetSql", "(fieldname=2 or 1=0)", s2);
+		assertEquals("testGetSetSql", " (fieldname=2 or 1=0) ", s2);
 
 		values = new HashSet<Integer>();
 		values.add(1);
@@ -83,7 +83,7 @@ public class TestSearchStringHelper {
 		values.add(3);
 		s2 = SearchStringHelper.getIntegerSetSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetStringSetSql", "(fieldname=1 or fieldname=2 or fieldname=3 or 1=0)", s2);
+		assertEquals("testGetStringSetSql", " (fieldname=1 or fieldname=2 or fieldname=3 or 1=0) ", s2);
 	}
 
 	@Test
@@ -92,13 +92,13 @@ public class TestSearchStringHelper {
 		values.add("test");
 		String s2 = SearchStringHelper.getSetPathSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname like %test or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like %test or 1=0) ");
 
 		values = new HashSet<String>();
 		values.add("te%st");
 		s2 = SearchStringHelper.getSetPathSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname like %te%st or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like %te%st or 1=0) ");
 
 		values = new HashSet<String>();
 		values.add("te%st");
@@ -107,7 +107,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getSetPathSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like %te%st or fieldname like %test or fieldname like %test or 1=0)");
+				" (fieldname like %te%st or fieldname like %test or fieldname like %test or 1=0) ");
 
 		values = new HashSet<String>();
 		values.add("/te%st");
@@ -117,7 +117,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getSetPathSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like /te%st or fieldname=/rest or fieldname like %fest or fieldname like %fest or 1=0)");
+				" (fieldname like /te%st or fieldname=/rest or fieldname like %fest or fieldname like %fest or 1=0) ");
 
 	}
 
@@ -128,13 +128,13 @@ public class TestSearchStringHelper {
 		values.add("test");
 		String s2 = SearchStringHelper.getStringListSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname='test' or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname='test' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("te%st");
 		s2 = SearchStringHelper.getStringListSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname like 'te%st' or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like 'te%st' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("te%st");
@@ -143,7 +143,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getStringListSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like 'te%st' or fieldname='test' or fieldname like '%test' or 1=0)");
+				" (fieldname like 'te%st' or fieldname='test' or fieldname like '%test' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("/te%st");
@@ -153,7 +153,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getStringListSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname='fest' or 1=0)");
+				" (fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname='fest' or 1=0) ");
 	}
 	
 	@Test
@@ -163,13 +163,13 @@ public class TestSearchStringHelper {
 		values.add("test");
 		String s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname like '%test' or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like '%test' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("te%st");
 		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, "(fieldname like '%te%st' or 1=0)");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like '%te%st' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("te%st");
@@ -178,7 +178,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like '%te%st' or fieldname like '%test' or fieldname like '%test' or 1=0)");
+				" (fieldname like '%te%st' or fieldname like '%test' or fieldname like '%test' or 1=0) ");
 
 		values = new ArrayList<String>();
 		values.add("/te%st");
@@ -188,7 +188,7 @@ public class TestSearchStringHelper {
 		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				"(fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname like '%fest' or 1=0)");
+				" (fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname like '%fest' or 1=0) ");
 
 	}
 

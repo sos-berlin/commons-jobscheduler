@@ -38,7 +38,7 @@ public class SearchStringHelper {
 		}
 		sql.append("1=0");
 
-		return "(" + sql.toString() + ")";
+		return " (" + sql.toString() + ") ";
 	}
 
 	public static String getIntegerSetSql(Set<Integer> values, String fieldName) {
@@ -50,7 +50,7 @@ public class SearchStringHelper {
 		}
 		sql.append("1=0");
 
-		return "(" + sql.toString() + ")";
+		return " (" + sql.toString() + ") ";
 	}
 
 	public static String getSetPathSql(Set<String> values, String fieldName) {
@@ -62,7 +62,7 @@ public class SearchStringHelper {
 		}
 		sql.append("1=0");
 
-		return "(" + sql.toString() + ")";
+		return " (" + sql.toString() + ") ";
 	}
 
 	public static String getStringListSql(List<String> values, String fieldName) {
@@ -73,7 +73,7 @@ public class SearchStringHelper {
 		}
 		sql.append("1=0");
 
-		return "(" + sql.toString() + ")";
+		return " (" + sql.toString() + ") ";
 	}
 
 	public static String getStringListPathSql(List<String> values, String fieldName) {
@@ -85,7 +85,7 @@ public class SearchStringHelper {
 		}
 		sql.append("1=0");
 
-		return "(" + sql.toString() + ")";
+		return " (" + sql.toString() + ") ";
 	}
 
 	public static boolean isDBWildcardSearch(String regex) {
