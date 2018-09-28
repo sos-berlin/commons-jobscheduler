@@ -669,4 +669,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public SOSOptionString configuration_files = new SOSOptionString(this, CLASSNAME + ".configuration_files",
             "List of the app configuration files separated by semicolon", "", "", false);
 
+    @JSOptionDefinition(name = "server_alive_interval", description = "Sets the interval to send a keep-alive message. can contains not integer value", key = "server_alive_interval", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString server_alive_interval = new SOSOptionString(this, CLASSNAME + ".server_alive_interval",
+            "Sets the interval to send a keep-alive message", "", "", false);
+    
+    @JSOptionDefinition(name = "server_alive_count_max", description = "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", key = "server_alive_count_max", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger server_alive_count_max = new SOSOptionInteger(this, CLASSNAME + ".server_alive_count_max",
+            "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
 }

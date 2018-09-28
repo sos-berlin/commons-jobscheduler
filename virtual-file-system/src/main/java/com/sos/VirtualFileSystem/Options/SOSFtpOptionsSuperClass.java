@@ -1734,6 +1734,14 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpConfigurationFiles = jumpConfigurationFiles;
     }
 
+    @JSOptionDefinition(name = "jump_server_alive_interval", description = "Sets the interval to send a keep-alive message. can contains not integer value", key = "jump_server_alive_interval", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_server_alive_interval = new SOSOptionString(this, CLASSNAME + ".jump_server_alive_interval",
+            "Sets the interval to send a keep-alive message", "", "", false);
+    
+    @JSOptionDefinition(name = "jump_server_alive_count_max", description = "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", key = "jump_server_alive_count_max", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger jump_server_alive_count_max = new SOSOptionInteger(this, CLASSNAME + ".jump_server_alive_count_max",
+            "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
+    
     @JSOptionDefinition(name = "local_dir", description = "local_dir Local directory into which or from which", key = "local_dir", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName localDir = new SOSOptionFolderName(this, CLASSNAME + ".local_dir",
             "local_dir Local directory into which or from which", "", "", false);

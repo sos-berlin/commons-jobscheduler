@@ -716,7 +716,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void usePasswordMethod() throws Exception {
-        LOGGER.debug("[password]password=?");
+        LOGGER.debug("[password]");
         sshSession.setPassword(authenticationOptions.getPassword().getValue());
     }
 
@@ -791,7 +791,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         try {
             setConnectionTimeout();
             sshSession.setConfig("PreferredAuthentications", preferredAuthentications);
+            setServerAlive();
             setConfigFromFiles();
+
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[sshSession]Timeout=%s ms, ServerAliveInterval=%s ms, ServerAliveCountMax=%s", sshSession.getTimeout(),
+                        sshSession.getServerAliveInterval(), sshSession.getServerAliveCountMax()));
+            }
+
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception e) {
@@ -801,6 +808,53 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.info(SOSVfs_D_133.params(userName));
         this.logReply();
         return this;
+    }
+
+    private void setServerAlive() {
+        String sai = connection2OptionsAlternate.server_alive_interval.getValue();
+        if (!SOSString.isEmpty(sai)) {
+            try {
+                sshSession.setServerAliveInterval(resolve2Milliseconds(sai));
+                String sacm = connection2OptionsAlternate.server_alive_count_max.getValue();
+                if (!SOSString.isEmpty(sacm)) {
+                    sshSession.setServerAliveCountMax(Integer.parseInt(sacm));
+                }
+            } catch (Exception ex) {
+                LOGGER.warn(String.format("[setServerAlive]%s", ex.toString()), ex);
+            }
+        }
+    }
+
+    private int resolve2Milliseconds(String val) throws Exception {
+        if (!SOSString.isEmpty(val)) {
+            val = val.trim();
+            int mills = 0;
+            String[] arr = val.split(" ");
+            for (String s : arr) {
+                s = s.trim().toLowerCase();
+                if (!SOSString.isEmpty(s)) {
+                    String sub = s;
+                    try {
+                        if (s.endsWith("h")) {
+                            sub = s.substring(0, s.length() - 1);
+                            mills += 1_000 * 60 * 60 * Long.parseLong(sub);
+                        } else if (s.endsWith("m")) {
+                            sub = s.substring(0, s.length() - 1);
+                            mills += 1_000 * 60 * Long.parseLong(sub);
+                        } else if (s.endsWith("s")) {
+                            sub = s.substring(0, s.length() - 1);
+                            mills += 1_000 * Long.parseLong(sub);
+                        } else {
+                            mills += Long.parseLong(sub);
+                        }
+                    } catch (Exception ex) {
+                        throw new Exception(String.format("invalid integer value = %s (%s) : %s", sub, s, ex.toString()));
+                    }
+                }
+            }
+            return mills;
+        }
+        return 0;
     }
 
     private void setConfigFromFiles() {
@@ -891,7 +945,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void setConnectionTimeout() throws Exception {
         if (connectionTimeout > 0) {
-            LOGGER.info(String.format("connectionTimeout=%s ms", connectionTimeout));
             sshSession.setTimeout(connectionTimeout);
         }
     }
