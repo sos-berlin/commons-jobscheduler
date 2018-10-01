@@ -111,6 +111,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 spooler_task.order().params().set_var(entry.getKey(), entry.getValue());
             }
         }
+//        objR.disconnect();
     }
 
     private void createOrderForWatchdog() {

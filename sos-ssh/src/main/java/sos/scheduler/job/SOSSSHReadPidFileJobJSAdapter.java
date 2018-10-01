@@ -2,17 +2,16 @@ package sos.scheduler.job;
 
 import java.util.HashMap;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.spooler.Variable_set;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
-    private Variable_set allParams;
+    private HashMap<String, String> allParams;
 
     @Override
     public boolean spooler_process() throws Exception {
@@ -28,11 +27,11 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     private void doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.merge(getParameters());
+        allParams.putAll(getParameters());
         SOSSSHJobOptions options = null;
         try {
             SOSSSHJob2 sshJob = new SOSSSHReadPidFileJob();
-            ((SOSSSHReadPidFileJob) sshJob).setTempPidFileName(allParams.value(PID_FILE_NAME_KEY));
+            ((SOSSSHReadPidFileJob) sshJob).setTempPidFileName(allParams.get(PID_FILE_NAME_KEY));
             logger.debug("SOSSSHReadPidFileJob instantiated!");
             options = sshJob.getOptions();
             options.setCurrentNodeName(this.getCurrentNodeName(false));

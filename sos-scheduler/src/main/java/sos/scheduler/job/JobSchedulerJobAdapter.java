@@ -59,7 +59,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private String orderStateForTest = "order_state_for_test";
     private boolean loggerConfigured = false;
     private IJobSchedulerEventHandler eventHandler = null;
-
+    private Variable_set orderParams = null;
+    private HashMap<String, String> taskParams = null;
+    private HashMap<String, String> globalSchedulerParams = null;
+    private Order order = null;
+    private Boolean orderIsChecked = null;
+    private Integer schedulerLogLevel = null;
     
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -94,7 +99,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         logger = Logger.getRootLogger();
             if (!loggerConfigured) {
                 LOG_D_0020.toLog();
-                int schedulerLogLevel = spooler_log.level(); 
+                if (schedulerLogLevel == null) {
+                    schedulerLogLevel = spooler_log.level(); 
+                }
                 if (schedulerLogLevel > 1) {
                     logger.setLevel(Level.ERROR);
                 } else if (schedulerLogLevel == 1) {
@@ -110,11 +117,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
     }
 
-    protected HashMap<String, String> getSchedulerParameterAsProperties(final Variable_set pSchedulerParameterSet) {
+    protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
         schedulerParameters = new HashMap<String, String>();
         try {
             if (isNotNull(pSchedulerParameterSet)) {
-                schedulerParameters = convertVariableSet2HashMap(pSchedulerParameterSet);
+                schedulerParameters = pSchedulerParameterSet;
 //                schedulerParameters.putAll(getSpecialParameters());
                 for (String key : schedulerParameters.keySet()) {
                     String value = schedulerParameters.get(key);
@@ -146,7 +153,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected HashMap<String, String> getSchedulerParameterAsProperties() {
-        return getSchedulerParameterAsProperties(getJobOrOrderParameters());
+        return getJobOrOrderParameters();
     }
 
     protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
@@ -202,26 +209,36 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return deleteCurrentNodeNameFromKeys(pSchedulerParameterSet);
     }
 
-    protected Variable_set getJobOrOrderParameters() {
+    protected HashMap<String, String> getJobOrOrderParameters() {
         try {
-            Variable_set objJobOrOrderParameters = spooler.create_variable_set();
-            objJobOrOrderParameters.merge(getTaskParams());
+            HashMap<String, String> jobOrOrderParameters = new HashMap<String, String>();
+            jobOrOrderParameters.putAll(getTaskParams());
             if (isJobchain() && hasOrderParameters()) {
-                objJobOrOrderParameters.merge(getOrderParams());
+                jobOrOrderParameters.putAll(convertVariableSet2HashMap(getOrderParams()));
             }
-            JSJ_D_0070.toLog(objJobOrOrderParameters.count());
-            return objJobOrOrderParameters;
+            JSJ_D_0070.toLog(jobOrOrderParameters.size());
+            return jobOrOrderParameters;
+//            Variable_set objJobOrOrderParameters = spooler.create_variable_set();
+//            objJobOrOrderParameters.merge(getTaskParams());
+//            if (isJobchain() && hasOrderParameters()) {
+//                objJobOrOrderParameters.merge(getOrderParams());
+//            }
+//            JSJ_D_0070.toLog(objJobOrOrderParameters.count());
+//            return objJobOrOrderParameters;
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0050.get(e), e);
         }
     }
 
-    public Variable_set getParameters() {
+    public HashMap<String, String> getParameters() {
         return getJobOrOrderParameters();
     }
 
-    protected Variable_set getTaskParams() {
-        return spooler_task.params();
+    protected HashMap<String, String> getTaskParams() {
+        if(taskParams == null) {
+            taskParams = convertVariableSet2HashMap(spooler_task.params());
+        }
+        return taskParams;
     }
 
     protected Order getOrder() {
@@ -229,24 +246,28 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected Variable_set getOrderParams() {
-        if (spooler_task.order() == null) {
+        Order o = getOrder();
+        if (o == null) {
             return null;
         } else {
-            return spooler_task.order().params();
+            return o.params();
         }
     }
 
-    public Variable_set getGlobalSchedulerParameters() {
-        return spooler.variables();
+    public HashMap<String, String> getGlobalSchedulerParameters() {
+        if (globalSchedulerParams == null) {
+            globalSchedulerParams = convertVariableSet2HashMap(spooler.variables());
+        }
+        return globalSchedulerParams;
     }
 
     @Override
     public void setJSParam(final String pstrKey, final String pstrValue) {
-        if (isNotNull(spooler_task.params())) {
-            spooler_task.params().set_var(pstrKey, pstrValue);
+        if (isNotNull(taskParams)) {
+            taskParams.put(pstrKey, pstrValue);
         }
         if (hasOrderParameters()) {
-            spooler_task.order().params().set_var(pstrKey, pstrValue);
+            orderParams.set_var(pstrKey, pstrValue);
         }
         if (isNotNull(schedulerParameters)) {
             schedulerParameters.put(pstrKey, pstrValue);
@@ -306,7 +327,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         specialParams.put("SCHEDULER_DIRECTORY", spooler.directory());
         specialParams.put("SCHEDULER_CONFIGURATION_DIRECTORY", spooler.configuration_directory());
         if (isJobchain()) {
-            Order order = spooler_task.order();
+            Order order = getOrder();
             Job_chain jobChain = order.job_chain();
             Job_chain_node jobChainNode = order.job_chain_node();
             specialParams.put("SCHEDULER_JOB_CHAIN_NAME", jobChain.name());
@@ -366,7 +387,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         final String conMethodName = "JobSchedulerJobAdapter::getNodeName";
         String lstrNodeName = "node1";
         if (spooler_task != null) {
-            Order objCurrentOrder = spooler_task.order();
+            Order objCurrentOrder = getOrder();
             if (isNotNull(objCurrentOrder)) {
                 lstrNodeName = objCurrentOrder.state();
                 if (verbose) {
@@ -414,12 +435,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public void setNextNodeState(final String pstrNodeName) {
         if (isJobchain()) {
-            spooler_task.order().set_state(pstrNodeName);
+            getOrder().set_state(pstrNodeName);
         }
     }
 
     public boolean isJobchain() {
-        return isNotNull(spooler_job) && isNotNull(spooler_task) && isNotNull(spooler_task.order()) && isNotNull(spooler_job.order_queue());
+        return isNotNull(getOrder());
         }
 
     public String setOrderParameter(final String pstrParameterName, final String pstrParameterValue) {
@@ -480,7 +501,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected boolean isSetBackActive() {
         boolean flgRet = false;
         if (isJobchain()) {
-            Order objOrder = spooler_task.order();
+            Order objOrder = getOrder();
             if (objOrder.setback_count() > 0 && objOrder.setback_count() >= getJob().setback_max()) {
                 flgRet = true;
             }
@@ -567,7 +588,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
             if (isJobchain()) {
                 try {
-                    spooler_task.order().set_state_text(stateText);
+                    getOrder().set_state_text(stateText);
                 } catch (Exception e) {
                     //
                 }
