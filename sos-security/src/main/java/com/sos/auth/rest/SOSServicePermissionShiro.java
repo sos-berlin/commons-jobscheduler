@@ -429,6 +429,8 @@ public class SOSServicePermissionShiro {
 			SOSPermissionListJoc sosPermissionJoc = o.createSOSPermissionListJoc();
 
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+					"sos:products:joc_cockpit:joc:view:log");
+			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:jobscheduler_master:view:status");
 			addPermission(forUser, sosPermissionJoc.getSOSPermission(),
 					"sos:products:joc_cockpit:jobscheduler_master:view:parameter");
