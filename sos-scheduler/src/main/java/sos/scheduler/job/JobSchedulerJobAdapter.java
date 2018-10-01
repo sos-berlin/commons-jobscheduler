@@ -62,8 +62,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private Variable_set orderParams = null;
     private Variable_set taskParams = null;
     private Variable_set globalSchedulerParams = null;
-    private Order order = null;
-    private Boolean orderIsChecked = null;
     private Integer schedulerLogLevel = null;
     
     public JobSchedulerJobAdapter() {
@@ -229,17 +227,14 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     protected Variable_set getTaskParams() {
         if(taskParams == null) {
-            taskParams = spooler_task.params();
+            taskParams = spooler.create_variable_set();
+            taskParams.merge(spooler_task.params());
         }
         return taskParams;
     }
 
     protected Order getOrder() {
-        if (orderIsChecked == null) {
-            order = spooler_task.order();
-            orderIsChecked = (order != null);
-        }
-        return order;
+        return spooler_task.order();
     }
 
     protected Variable_set getOrderParams() {
@@ -247,7 +242,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             return null;
         } else {
             if (orderParams == null) {
-                orderParams = getOrder().params();
+                orderParams = spooler.create_variable_set();
+                orderParams.merge(getOrder().params());
             }
             return orderParams;
         }
@@ -255,7 +251,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     public Variable_set getGlobalSchedulerParameters() {
         if (globalSchedulerParams == null) {
-            globalSchedulerParams = spooler.variables();
+            globalSchedulerParams = spooler.create_variable_set();
+            globalSchedulerParams.merge(spooler.variables());
         }
         return globalSchedulerParams;
     }
