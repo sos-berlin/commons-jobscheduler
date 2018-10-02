@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Method;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -370,6 +375,19 @@ public abstract class SOSFileSystemOperations {
 				minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, sortCriteria, sortOrder);
 		return nrOfRemovedObjects > 0;
 	}
+	
+	private void removeFileNio(File f) {
+		Path path = FileSystems.getDefault().getPath(f.getAbsolutePath());
+		try {
+			Files.delete(path);
+		} catch (NoSuchFileException x) {
+			throw new JobSchedulerException(path + "no exists");
+		} catch (DirectoryNotEmptyException x) {
+			throw new JobSchedulerException(path + "directory not empty");
+		} catch (IOException x) {
+			throw new JobSchedulerException(path + "file permission issue");
+		}
+	}
 
 	public int removeFileCnt(final File file, final String fileSpec, final int flags, final int fileSpecFlags,
 			final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
@@ -500,9 +518,7 @@ public abstract class SOSFileSystemOperations {
 					throw new JobSchedulerException("cannot remove file: " + currentFile.getCanonicalPath());
 				}
 			} else {
-				if (!currentFile.delete()) {
-					throw new JobSchedulerException("cannot remove file: " + currentFile.getCanonicalPath());
-				}
+				removeFileNio(currentFile);
 			}
 			nrOfRemovedFiles++;
 		}
@@ -520,9 +536,7 @@ public abstract class SOSFileSystemOperations {
 							throw new JobSchedulerException("directory is not readable: " + f.getCanonicalPath());
 						}
 						if (f.list().length == 0) {
-							if (!f.delete()) {
-								throw new JobSchedulerException("cannot remove directory: " + f.getCanonicalPath());
-							}
+							removeFileNio(f);
 							LOGGER.info("remove directory " + f.getPath());
 						} else {
 							LOGGER.debug("directory [" + f.getCanonicalPath()
@@ -606,9 +620,7 @@ public abstract class SOSFileSystemOperations {
 			f = element;
 			if (recDeleteEmptyDir(f, fileSpec, fileSpecFlags)) {
 				if (p.matcher(f.getName()).matches()) {
-					if (!f.delete()) {
-						throw new JobSchedulerException("cannot remove directory: " + f.getCanonicalPath());
-					}
+					removeFileNio(f);
 					LOGGER.info("remove directory " + f.getPath());
 				}
 			} else {
