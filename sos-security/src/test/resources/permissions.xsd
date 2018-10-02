@@ -526,6 +526,19 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Joc">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="log" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
