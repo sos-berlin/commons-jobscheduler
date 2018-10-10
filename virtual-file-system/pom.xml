@@ -138,7 +138,11 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
-
+		<dependency>
+			<groupId>org.jurr.jsch</groupId>
+			<artifactId>jsch-111-bugfix</artifactId>
+			<version>1.0.0</version>
+		</dependency>
     </dependencies>
 
 </project>

@@ -19,6 +19,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jurr.jsch.bugfix111.JSCH111BugFix;
 
 import sos.util.SOSString;
 
@@ -86,6 +87,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     public SOSVfsSFtpJCraft() {
         super();
+    	JSCH111BugFix.init();
         JSch.setLogger(new SOSVfsSFtpJCraftLogger());
         secureChannel = new JSch();
     }

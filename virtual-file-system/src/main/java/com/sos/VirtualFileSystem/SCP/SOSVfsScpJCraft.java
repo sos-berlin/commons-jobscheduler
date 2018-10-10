@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jurr.jsch.bugfix111.JSCH111BugFix;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -51,6 +52,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 
     public SOSVfsScpJCraft() {
         super();
+    	JSCH111BugFix.init();
         secureChannel = new JSch();
     }
 
