@@ -268,7 +268,7 @@ public class SOSServicePermissionShiro {
 			JocAuditLog jocAuditLog = new JocAuditLog(user, "./logout");
 			SecurityAudit s = new SecurityAudit(comment);
 			jocAuditLog.logAuditMessage(s);
-			jocAuditLog.storeAuditLogEntry(s);
+			//jocAuditLog.storeAuditLogEntry(s);
 			try {
 
 				Globals.forceClosingHttpClients(currentUser, accessToken);
@@ -930,7 +930,7 @@ public class SOSServicePermissionShiro {
 			JocAuditLog jocAuditLog = new JocAuditLog(currentUser.getUsername(), "./login");
 			SecurityAudit s = new SecurityAudit(getRolesAsString(true));
 			jocAuditLog.logAuditMessage(s);
-			jocAuditLog.storeAuditLogEntry(s);
+			//jocAuditLog.storeAuditLogEntry(s);
 
 			if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
 				if (sosLogin != null) {
