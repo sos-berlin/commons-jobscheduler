@@ -71,8 +71,8 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                             port = Integer.parseInt(this.getParameters().value("port"));
                             portChanged = true;
                         } catch (Exception e) {
-                            throw new Exception("illegal, non-numeric value [" + this.getParameters().value("port") + "] for parameter [port]: "
-                                    + e.getMessage());
+                            throw new Exception(
+                                    "illegal, non-numeric value [" + this.getParameters().value("port") + "] for parameter [port]: " + e.getMessage());
                         }
                     }
                     if (this.getParameters().value("smtp_user") != null && !this.getParameters().value("smtp_user").isEmpty()) {
@@ -128,11 +128,10 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                     if (this.getParameters().value("queue_mail_on_error") != null && !this.getParameters().value("queue_mail_on_error").isEmpty()) {
                         queueMailOnError = !"false".equalsIgnoreCase(this.getParameters().value("queue_mail_on_error"));
                     }
-                    if (this.getParameters().value("cleanup_attachment") != null
-                            && !this.getParameters().value("cleanup_attachment").isEmpty()
+                    if (this.getParameters().value("cleanup_attachment") != null && !this.getParameters().value("cleanup_attachment").isEmpty()
                             && ("1".equals(this.getParameters().value("cleanup_attachment"))
-                                    || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")) || "yes".equalsIgnoreCase(this.getParameters()
-                                    .value("cleanup_attachment")))) {
+                                    || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment"))
+                                    || "yes".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")))) {
                         cleanupAttachment = true;
                     }
 
@@ -167,16 +166,25 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         sosMail = new SOSMail(host);
                         sosMail.setQueueDir(queueDir);
                         sosMail.setFrom(from);
+                        try {
+                            SOSSettings smtpSettings = new SOSProfileSettings(spooler.ini_path());
+                            Properties smtpProperties = smtpSettings.getSection("smtp");
+                            sosMail.setProperties(smtpProperties);
 
-                        SOSSettings smtpSettings = new SOSProfileSettings(spooler.ini_path());
-                        Properties smtpProperties = smtpSettings.getSection("smtp");
-                        if (!smtpProperties.isEmpty()) {
-                            if (smtpProperties.getProperty("mail.smtp.user") != null && !smtpProperties.getProperty("mail.smtp.user").isEmpty()) {
-                                sosMail.setUser(smtpProperties.getProperty("mail.smtp.user"));
+                            if (!smtpProperties.isEmpty()) {
+                                if (smtpProperties.getProperty("mail.smtp.user") != null && !smtpProperties.getProperty("mail.smtp.user").isEmpty()) {
+                                    sosMail.setUser(smtpProperties.getProperty("mail.smtp.user"));
+                                }
+                                if (smtpProperties.getProperty("mail.smtp.password") != null && !smtpProperties.getProperty("mail.smtp.password").isEmpty()) {
+                                    sosMail.setPassword(smtpProperties.getProperty("mail.smtp.password"));
+                                }
+                                if (smtpProperties.getProperty("mail.smtp.port") != null && !smtpProperties.getProperty("mail.smtp.port").isEmpty()) {
+                                    sosMail.setPort(smtpProperties.getProperty("mail.smtp.port"));
+                                }
                             }
-                            if (smtpProperties.getProperty("mail.smtp.password") != null && !smtpProperties.getProperty("mail.smtp.password").isEmpty()) {
-                                sosMail.setPassword(smtpProperties.getProperty("mail.smtp.password"));
-                            }
+                        } catch (Exception e) {
+                            // The job is running on an Universal Agent that
+                            // does not suppor .ini_path()
                         }
                     }
                     if (portChanged) {
@@ -233,9 +241,8 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                     this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
                     sosMail.setQueueMailOnError(queueMailOnError);
                     if (!sosMail.send()) {
-                        this.getLogger().warn(
-                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
-                                        + sosMail.getLastError());
+                        this.getLogger().warn("mail server is unavailable, mail for recipient [" + to + "] is queued in local directory ["
+                                + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
                     }
                     if (cleanupAttachment) {
                         for (String attachment : attachments) {

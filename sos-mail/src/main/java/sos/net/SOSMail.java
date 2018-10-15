@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -242,6 +243,15 @@ public class SOSMail {
         this.initMessage();
         clearRecipients();
         clearAttachments();
+    }
+    
+    public void setProperties(Properties smtpProperties) {
+        Properties props = System.getProperties();
+        for (Map.Entry<Object, Object> e : smtpProperties.entrySet()) {
+            String key = (String) e.getKey();
+            String value = (String) e.getValue();
+            props.put(key, value);
+          }
     }
 
     public void initMessage() throws Exception {
@@ -1649,5 +1659,7 @@ public class SOSMail {
             throw new Exception("error occurred sending mail: " + e.getMessage());
         }
     }
+
+
 
 }
