@@ -104,6 +104,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         boolean flgScriptFileCreated = false;
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
         String executedCommand = "";
+        ExecutorService executorService = null;
+        Future<Void> sendSignalExecution = null;
         try {
             if (!isConnected) {
                 this.connect();
@@ -151,8 +153,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         preCommand = getPreCommand();
                     }
                 }
-                ExecutorService executorService = null;
-                Future<Void> sendSignalExecution = null;
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
@@ -199,7 +199,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     sendSignalExecution = executorService.submit(sendSignal);
                     // wait until command execution is finished 
                     commandExecution.get();
-                    ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("KILL");
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
                     checkStdErr();
@@ -222,14 +221,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             LOGGER.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
-                    }
-                }
-                finally {
-                    if (executorService != null) {
-                        if (commandExecution != null) {
-                            commandExecution.cancel(false);
-                        }
-                        executorService.shutdownNow();
                     }
                 }
             }
@@ -258,6 +249,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         } finally {
             vfsHandler.getStdOut().setLength(0);
             vfsHandler.getStdErr().setLength(0);
+            if (executorService != null) {
+                ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("KILL");
+                if (commandExecution != null) {
+                    commandExecution.cancel(false);
+                }
+                executorService.shutdownNow();
+            }
             if (keepConnected == false) {
                 disconnect();
             }
