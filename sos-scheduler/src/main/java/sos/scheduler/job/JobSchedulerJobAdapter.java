@@ -31,10 +31,7 @@ import com.sos.localization.Messages;
 
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
 import sos.spooler.Job;
-import sos.spooler.Job_chain;
-import sos.spooler.Job_chain_node;
 import sos.spooler.Order;
-import sos.spooler.Supervisor_client;
 import sos.spooler.Variable_set;
 import sos.util.ParameterSubstitutor;
 
@@ -151,7 +148,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 	}
 
 	protected HashMap<String, String> getSchedulerParameterAsProperties() {
-		return getJobOrOrderParameters();
+		return getSchedulerParameterAsProperties(getJobOrOrderParameters());
 	}
 
 	protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
@@ -281,7 +278,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 			for (Entry<String, String> entry : schedulerParameters.entrySet()) {
 				String value = entry.getValue();
 				String paramName = entry.getKey();
-
+				
 				if (value != null && !value.isEmpty()) {
 					parameterSubstitutor.addKey(paramName, value);
 				}
@@ -311,47 +308,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 		return resultString;
 	}
 
-	private HashMap<String, String> getSpecialParameters() {
-		HashMap<String, String> specialParams = new HashMap<String, String>();
-		if (spooler == null) {
-			return specialParams;
-		}
-		specialParams.put("SCHEDULER_HOST", spooler.hostname());
-		specialParams.put("SCHEDULER_TCP_PORT", "" + spooler.tcp_port());
-		specialParams.put("SCHEDULER_UDP_PORT", "" + spooler.udp_port());
-		specialParams.put("SCHEDULER_ID", spooler.id());
-		specialParams.put("SCHEDULER_DIRECTORY", spooler.directory());
-		specialParams.put("SCHEDULER_CONFIGURATION_DIRECTORY", spooler.configuration_directory());
-		if (isJobchain()) {
-			Order order = getOrder();
-			Job_chain jobChain = order.job_chain();
-			Job_chain_node jobChainNode = order.job_chain_node();
-			specialParams.put("SCHEDULER_JOB_CHAIN_NAME", jobChain.name());
-			specialParams.put("SCHEDULER_JOB_CHAIN_TITLE", jobChain.title());
-			specialParams.put("SCHEDULER_JOB_CHAIN_PATH", jobChain.path());
-			specialParams.put("SCHEDULER_ORDER_ID", order.id());
-			specialParams.put("SCHEDULER_NODE_NAME", getCurrentNodeName(false));
-			specialParams.put("SCHEDULER_NEXT_NODE_NAME", jobChainNode.next_state());
-			specialParams.put("SCHEDULER_NEXT_ERROR_NODE_NAME", jobChainNode.error_state());
-		}
-		specialParams.put("SCHEDULER_JOB_NAME", this.getJobName());
-		specialParams.put("SCHEDULER_JOB_FOLDER", this.getJobFolder());
-		specialParams.put("SCHEDULER_JOB_PATH", this.getJobFolder() + "/" + this.getJobName());
-		specialParams.put("SCHEDULER_JOB_TITLE", this.getJobTitle());
-		specialParams.put("SCHEDULER_TASK_ID", "" + spooler_task.id());
-		Supervisor_client objRemoteConfigurationService;
-		try {
-			objRemoteConfigurationService = spooler.supervisor_client();
-			if (objRemoteConfigurationService != null) {
-				specialParams.put("SCHEDULER_SUPERVISOR_HOST", objRemoteConfigurationService.hostname());
-				specialParams.put("SCHEDULER_SUPERVISOR_PORT", "" + objRemoteConfigurationService.tcp_port());
-			}
-		} catch (Exception e) {
-			specialParams.put("SCHEDULER_SUPERVISOR_HOST", "n.a.");
-			specialParams.put("SCHEDULER_SUPERVISOR_PORT", "n.a.");
-		}
-		return specialParams;
-	}
+
 
 	public String stackTrace2String(final Exception e) {
 		String strT = null;
