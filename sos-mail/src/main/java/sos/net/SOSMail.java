@@ -260,7 +260,7 @@ public class SOSMail {
     public Session createSession() throws Exception {
         Properties props = System.getProperties();
         props.put("mail.host", host);
-        props.put("mail.port", port);
+        props.put("mail.smtp.port", port);
         props.put("mail.smtp.timeout", String.valueOf(timeout));
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.class", "com.sun.mail.SMTPTransport");
