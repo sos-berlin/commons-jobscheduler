@@ -243,12 +243,7 @@ public class SOSMail {
 
 
     public void setProperties(Properties smtpProperties) {
-        Properties props = System.getProperties();
-        for (Map.Entry<Object, Object> e : smtpProperties.entrySet()) {
-            String key = (String) e.getKey();
-            String value = (String) e.getValue();
-            props.put(key, value);
-          }
+    	System.getProperties().putAll(smtpProperties);
     }
 
     
