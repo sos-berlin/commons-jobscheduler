@@ -170,7 +170,14 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                             SOSSettings smtpSettings = new SOSProfileSettings(spooler.ini_path());
                             Properties smtpProperties = smtpSettings.getSection("smtp");
                             sosMail.setProperties(smtpProperties);
+                            if (smtpProperties != null && smtpProperties.get("mail.smtp.timeout") != null) {
+                                try {
+                                    sosMail.setTimeout(
+                                            Integer.parseInt(smtpProperties.get("mail.smtp.timeout").toString()));
+                                } catch (NumberFormatException e) {
 
+                                }
+                            }
                             if (!smtpProperties.isEmpty()) {
                                 if (smtpProperties.getProperty("mail.smtp.user") != null && !smtpProperties.getProperty("mail.smtp.user").isEmpty()) {
                                     sosMail.setUser(smtpProperties.getProperty("mail.smtp.user"));
