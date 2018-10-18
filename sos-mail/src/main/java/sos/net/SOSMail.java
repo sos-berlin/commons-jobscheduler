@@ -255,7 +255,7 @@ public class SOSMail {
     public Session createSession() throws Exception {
         Properties props = System.getProperties();
         props.put("mail.host", host);
-        props.put("mail.port", port);
+        props.put("mail.smtp.port", port);
         props.put("mail.smtp.timeout", String.valueOf(timeout));
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.class", "com.sun.mail.SMTPTransport");
@@ -372,21 +372,21 @@ public class SOSMail {
         return true;
     }
 
-    public String substituteSubject(final String template, final HashMap replacements) throws Exception {
+    public String substituteSubject(final String template, final Map<String,String> replacements) throws Exception {
         if (!templates.containsKey(template + "_subject")) {
             throw new Exception("substituteSubject(): template does not exist: " + template + "_subject");
         }
         return substitute(templates.get(template + "_subject").toString(), replacements, false);
     }
 
-    public String substituteBody(final String template, final HashMap replacements, final boolean nl2br) throws Exception {
+    public String substituteBody(final String template, final Map<String,String> replacements, final boolean nl2br) throws Exception {
         if (!templates.containsKey(template + "_body")) {
             throw new Exception("substituteBody(): template does not exist: " + template + "_body");
         }
         return substitute(templates.get(template + "_body").toString(), replacements, nl2br);
     }
 
-    public String substituteBody(final String template, final HashMap replacements) throws Exception {
+    public String substituteBody(final String template, final Map<String,String> replacements) throws Exception {
         if (!templates.containsKey(template + "_body")) {
             throw new Exception("substituteBody(): template does not exist: " + template + "_body");
         }
@@ -394,7 +394,7 @@ public class SOSMail {
     }
 
     @Deprecated
-    private String substitute(String content, final HashMap<String, String> replacements, final boolean nl2br) throws Exception {
+    private String substitute(String content, final Map<String, String> replacements, final boolean nl2br) throws Exception {
         String key = null;
         String value = null;
         if ("de".equalsIgnoreCase(this.getLanguage())) {
@@ -868,7 +868,7 @@ public class SOSMail {
 
     public String dumpHeaders() throws IOException, MessagingException {
         String s = "";
-        for (Enumeration e = message.getAllHeaders(); e.hasMoreElements();) {
+        for (Enumeration<?> e = message.getAllHeaders(); e.hasMoreElements();) {
             Header header = (Header) e.nextElement();
             s += "\n" + header.getName() + ": " + header.getValue();
         }
@@ -1465,7 +1465,7 @@ public class SOSMail {
             if (!toList.isEmpty()) {
                 sb = new StringBuilder();
                 for (ListIterator<String> e = toList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
@@ -1475,7 +1475,7 @@ public class SOSMail {
             if (!ccList.isEmpty()) {
                 sb = new StringBuilder();
                 for (ListIterator<String> e = ccList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
@@ -1484,8 +1484,8 @@ public class SOSMail {
             }
             if (!bccList.isEmpty()) {
                 sb = new StringBuilder();
-                for (ListIterator e = bccList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                for (ListIterator<String> e = bccList.listIterator(); e.hasNext();) {
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
