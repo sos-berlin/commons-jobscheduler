@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -97,7 +98,7 @@ public class SOSHibernateFactory implements Serializable {
             return null;
         }
         try {
-            return ReflectionToStringBuilder.toString(o);
+            return ReflectionToStringBuilder.toString(o, ToStringStyle.SHORT_PREFIX_STYLE);
         } catch (Throwable t) {
         }
         return o.toString();
