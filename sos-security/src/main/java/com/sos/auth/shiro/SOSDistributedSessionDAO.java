@@ -38,11 +38,11 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 	}
 
 	private void copySessionToDb(Serializable sessionId, String session) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
 			LOGGER.debug("SOSDistributedSessionDAO: copySessionToDb");
 
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
 
@@ -71,22 +71,26 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 				jocConfigurationDbItem.setId(id);
 			}
 			Globals.commit(sosHibernateSession);
-			sosHibernateSession.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+			sosHibernateSession = null;
 		}
 	}
 
 	private String readSessionFromDb(Serializable sessionId) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
+
 			String sessionIdString = "";
 			if (sessionId != null) {
 				sessionIdString = sessionId.toString();
 			}
 			LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
 
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
@@ -111,6 +115,8 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 		} catch (JocException e) {
 			throw new RuntimeException(e);
+		} finally {
+			Globals.disconnect(sosHibernateSession);
 		}
 	}
 
@@ -139,11 +145,11 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 	@Override
 	protected void doDelete(Session session) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
 			LOGGER.debug("SOSDistributedSessionDAO: doDelete Session ->" + getSessionId(session));
 
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
 			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
@@ -158,6 +164,9 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 			throw new RuntimeException(e);
 		} catch (JocException e) {
 			throw new RuntimeException(e);
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+
 		}
 	}
 
