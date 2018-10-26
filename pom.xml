@@ -20,7 +20,6 @@
     </scm>
 
     <modules>
-        <!--module>ftp-history</module-->
         <module>h2-connection</module>
         <module>hibernate-commons</module>
         <module>jobscheduler-helper</module>
