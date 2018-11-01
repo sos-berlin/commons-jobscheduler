@@ -904,6 +904,13 @@ public class SOSServicePermissionShiro {
 	    Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
         SOSHibernateSession sosHibernateSession = null;
+        
+        if (basicAuthorization.isEmpty()) {
+            String s = user + ":" + pwd;
+            byte[] authEncBytes = org.apache.commons.codec.binary.Base64.encodeBase64(s.getBytes());
+            String authStringEnc = new String(authEncBytes);
+            basicAuthorization = "Basic " + authStringEnc;
+        }
 
 		try {
 
