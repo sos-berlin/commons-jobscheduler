@@ -1,8 +1,6 @@
 package com.sos.auth.shiro;
 
 import static org.junit.Assert.*;
-
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.junit.Test;
 
 public class SOSLdapAuthorizingTest {
@@ -18,5 +16,4 @@ public class SOSLdapAuthorizingTest {
         sosLdapAuthorizing.getRoleNamesForUserTest(sosLdapAuthorizingRealm, "00000000-0000-1000-7362-0800207F02E6");
 
     }
-
 }

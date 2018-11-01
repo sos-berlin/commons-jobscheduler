@@ -17,7 +17,6 @@ import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "com.sos.net.messages", defaultLocale = "en")
 public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
@@ -44,30 +43,29 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecute() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file=test", "-user=test",
+        String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "homer.sos",  "-user=test",
                 "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.authFile.getValue(), "test");
         assertEquals("user", objOptions.user.getValue(), "test");
     }
 
-    @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+    @Test
     public void testExecuteUsingKeyFile() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls", "-auth_method=publickey", "-host", "wilma.sos",
-                "-auth_file=./src/test/resources/testing-key.key", "-user", "test", "-password", "12345" };
+        String strArgs[] = new String[] { "-command", "ls", "-auth_method=publickey", "-host", "homer.sos",
+                "-auth_file=src/test/resources/id_rsa.homer", "-user", "test"};
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.authFile.getValue(), "test");
-        assertEquals("user", objOptions.user.getValue(), "test");
+        assertEquals("auth_file", "src/test/resources/id_rsa.homer",objOptions.authFile.getValue());
+        assertEquals("user", "test", objOptions.user.getValue());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testExecuteWithCC() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls;exit 5", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
-                "kb", "-password", "kb" };
+        String strArgs[] = new String[] { "-command", "ls;exit 5", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test", "-user",
+                "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertEquals("auth_file", objOptions.authFile.getValue(), "test");
@@ -78,7 +76,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteWithCC0() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "true" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
@@ -90,7 +88,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteWithCCAndIgnore() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "false" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
@@ -115,7 +113,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteCmdString() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command_script", "ps;ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command_script", "ps;ls", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
@@ -127,7 +125,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void testExecuteCmdScriptFile() throws Exception {
         initializeClazz();
         String strArgs[] = new String[] { "-command_script_file", "R:/nobackup/junittests/testdata/SSH/hostname.sh", "-auth_method", "password",
-                "-host", "wilma.sos", "-auth_file", "test", "-user", "test", "-password", "12345" };
+                "-host", "homer.sos", "-auth_file", "test", "-user", "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertEquals("auth_file", objOptions.authFile.getValue(), "test");
@@ -137,7 +135,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteCommands() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command_script", "ps;ls $SCHEDULER_PARAM_test", "-auth_method", "password", "-host", "wilma.sos",
+        String strArgs[] = new String[] { "-command_script", "ps;ls $SCHEDULER_PARAM_test", "-auth_method", "password", "-host", "homer.sos",
                 "-auth_file", "test", "-user", "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.setJSJobUtilites(this);
@@ -153,7 +151,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         objScriptFile.writeLine("ps");
         objScriptFile.deleteOnExit();
         objScriptFile.close();
-        String strArgs[] = new String[] { "-command_script_file", "t.1", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command_script_file", "t.1", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.setJSJobUtilites(this);
@@ -166,7 +164,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Ignore("Test set to Ignore for later examination")
     public void testSimulateShellParam() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test",
+        String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "homer.sos", "-port", "22", "-user", "test",
                 "-password", "12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@192:~>", "-simulate_shell_login_timeout",
                 "100000" };
         objOptions.commandLineArgs(strArgs);
@@ -177,7 +175,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public String replaceSchedulerVars(final String pstrString2Modify) {
         String strTemp = pstrString2Modify;
         HashMap<String, String> objJobOrOrderParams = new HashMap<String, String>();
-        objJobOrOrderParams.put("host", "wilma");
+        objJobOrOrderParams.put("host", "homer");
         objJobOrOrderParams.put("test", ".");
         objJobOrOrderParams.put("test1", "value_of_test1");
         if (isNotNull(objJobOrOrderParams)) {

@@ -10,7 +10,7 @@ import com.sos.joc.exceptions.JocException;
 public class TestSOSServicePermissionShiro {
 
     private static final String SHIRO_MAPPED_ROLE = "application_manager";
-    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_PASSWORD = "root";
     private static final String LDAP_USER = "root";
 
    

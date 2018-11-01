@@ -271,7 +271,7 @@ public class JSFileTest {
 
     @Test
     public void testExistsAndCanWrite() {
-        JSTextFile objFile = new JSTextFile("./abcd.properties");
+        JSTextFile objFile = new JSTextFile("src/test/resources/log4j.properties");
         if (!objFile.exists() && objFile.getParentFile().canWrite()) {
             assertTrue("geht nicht", false);
         }
