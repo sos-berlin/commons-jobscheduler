@@ -46,12 +46,12 @@ public class SOSUserDBItem extends DbItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public Long getId() {
         return id;
     }
 
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public void setId(Long id) {
         this.id = id;
     }
@@ -74,22 +74,22 @@ public class SOSUserDBItem extends DbItem {
         this.sosUserPermissionDBItems = sosUserPermissionDBItems;
     }
 
-    @Column(name = "`SOS_USER_NAME`", nullable = false)
+    @Column(name = "[SOS_USER_NAME`", nullable = false)
     public void setSosUserName(String sosUserName) {
         this.sosUserName = sosUserName;
     }
 
-    @Column(name = "`SOS_USER_NAME`", nullable = false)
+    @Column(name = "[SOS_USER_NAME`", nullable = false)
     public String getSosUserName() {
         return sosUserName;
     }
 
-    @Column(name = "`SOS_USER_PASSWORD`", nullable = false)
+    @Column(name = "[SOS_USER_PASSWORD`", nullable = false)
     public void setSosUserPassword(String sosUserPassword) {
         this.sosUserPassword = sosUserPassword;
     }
 
-    @Column(name = "`SOS_USER_PASSWORD`", nullable = false)
+    @Column(name = "[SOS_USER_PASSWORD`", nullable = false)
     public String getSosUserPassword() {
         return sosUserPassword;
     }

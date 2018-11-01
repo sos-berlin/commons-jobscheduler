@@ -17,42 +17,42 @@ public class SOSUserPermissionDBItem extends DbItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public Long getId() {
         return id;
     }
 
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Column(name = "`SOS_USER_PERMISSION`", nullable = false)
+    @Column(name = "[SOS_USER_PERMISSION`", nullable = false)
     public void setSosUserPermission(String sosUserPermission) {
         this.sosUserPermission = sosUserPermission;
     }
 
-    @Column(name = "`SOS_USER_PERMISSION`", nullable = false)
+    @Column(name = "[SOS_USER_PERMISSION`", nullable = false)
     public String getSosUserPermission() {
         return sosUserPermission;
     }
 
-    @Column(name = "`USER_ID`")
+    @Column(name = "[USER_ID]")
     public Long getUserId() {
         return userId;
     }
 
-    @Column(name = "`USER_ID`")
+    @Column(name = "[USER_ID]")
     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    @Column(name = "`ROLE_ID`")
+    @Column(name = "[ROLE_ID]")
     public Long getRoleId() {
         return roleId;
     }
 
-    @Column(name = "`ROLE_ID`")
+    @Column(name = "[ROLE_ID]")
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
