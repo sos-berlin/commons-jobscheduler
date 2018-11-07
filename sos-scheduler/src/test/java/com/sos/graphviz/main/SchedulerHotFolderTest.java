@@ -283,6 +283,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadJobChainByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "BuildJars.job_chain.xml";
@@ -295,6 +296,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadJobByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "junitModel/testOrderJob.job.xml";
@@ -307,6 +309,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadLockByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "junitModel/testlock.lock.xml";
@@ -359,6 +362,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public void testDateRange() {
         for (int i = 20; i < 60; i++) {
             LOGGER.info(addDays(new Date(), i) + " --- " + i);
@@ -424,6 +428,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadOrderByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "BuildJars,1.order.xml";

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<hibernate-configuration>
+ <session-factory>
+  <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
+  <property name="hibernate.connection.password">scheduler</property>
+  <property name="hibernate.connection.url">jdbc:mysql://galadriel:3306/reporting</property>
+  <property name="hibernate.connection.username">scheduler</property>
+  <property name="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</property>
+  <property name="hibernate.show_sql">false</property>
+  <property name="hibernate.format_sql">true</property>
+  <property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>
+  <property name="javax.persistence.validation.mode">none</property>
+
+  <property name="hibernate.c3p0.minPoolSize">5</property>
+  <property name="hibernate.c3p0.maxPoolSize">10</property>
+  <property name="hibernate.c3p0.initialPoolSize">5</property>
+  <property name="hibernate.c3p0.acquireIncrement">1</property>
+  <property name="hibernate.c3p0.idleConnectionTestPeriod">1800</property>
+  <property name="hibernate.c3p0.maxIdleTime">14400</property>
+  <property name="hibernate.c3p0.maxConnectionAge">14400</property>
+  <property name="hibernate.c3p0.maxStatements">0</property>
+  <property name="hibernate.c3p0.maxStatementsPerConnection">0</property>
+  <property name="hibernate.c3p0.statementCacheNumDeferredCloseThreads">1</property>
+  <property name="hibernate.c3p0.numHelperThreads">3</property>
+  <property name="hibernate.c3p0.checkoutTimeout">0</property>
+  <property name="hibernate.c3p0.acquireRetryAttempts">1</property>
+ </session-factory>
+</hibernate-configuration>
