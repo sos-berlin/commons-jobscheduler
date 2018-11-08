@@ -106,7 +106,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
     public void testExecuteUsingKeyFile() throws Exception {
         LOGGER.info("****testExecuteUsingKeyFile started****");
         String strArgs[] = new String[] { "-command", "echo ****testExecuteUsingKeyFile successfully processed!****", "-auth_method", "publickey",
-                "-host", "homer.sos", "-auth_file", "src/test/resources/id_rsa", "-user", "test", "-command_delimiter", ";" };
+                "-host", "homer.sos", "-auth_file", "src/test/resources/id_rsa.homer", "-user", "test", "-command_delimiter", ";" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());

@@ -88,11 +88,11 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteWithCCAndIgnore() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command", "ls;exit 0", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "id_rsa.homer",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "false" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.authFile.getValue(), "test");
+        assertEquals("auth_file", objOptions.authFile.getValue(), "id_rsa.homer");
         assertEquals("user", objOptions.user.getValue(), "test");
         assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
     }
@@ -124,7 +124,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     @Test
     public void testExecuteCmdScriptFile() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command_script_file", "R:/nobackup/junittests/testdata/SSH/hostname.sh", "-auth_method", "password",
+        String strArgs[] = new String[] { "-command_script_file", "src/test/resources/hostname.sh", "-auth_method", "password",
                 "-host", "homer.sos", "-auth_file", "test", "-user", "test", "-password", "12345" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
