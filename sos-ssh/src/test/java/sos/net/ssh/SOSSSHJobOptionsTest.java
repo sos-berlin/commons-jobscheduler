@@ -3,6 +3,7 @@ package sos.net.ssh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -13,7 +14,6 @@ import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.io.Files.JSXMLFile;
 
-/** @author KB */
 public class SOSSSHJobOptionsTest {
 
     private static final Logger LOGGER = Logger.getLogger(SOSSSHJobOptionsTest.class);
@@ -36,6 +36,8 @@ public class SOSSSHJobOptionsTest {
         JSXMLFile objXF = objOptions.toXMLFile(strTempFileName);
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
         objO2.loadXML(objXF);
+        File f = new File(strTempFileName);
+        f.delete();
         assertEquals(strParameterName, strParameterValue, objO2.user.getValue());
     }
 
