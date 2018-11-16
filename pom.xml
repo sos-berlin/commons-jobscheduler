@@ -26,7 +26,6 @@
         <module>jobscheduler-object-model</module>
         <module>jobscheduler-web-services</module>
         <module>jobscheduler-web-services-globals</module>
-        <module>logback-tools</module>
         <module>sos-net</module>
         <module>sos-dialog</module>
         <module>sos-scheduler</module>
