@@ -60,7 +60,7 @@ public class SOSAuthenticator extends ModularRealmAuthenticator {
 	}
 
 	private boolean isFirstSuccessfulStrategy(AuthenticationStrategy strategy) {
-		return strategy.getClass().equals(new FirstSuccessfulStrategy().getClass());
+		return strategy.getClass().equals(FirstSuccessfulStrategy.class);
 	}
 
 }
