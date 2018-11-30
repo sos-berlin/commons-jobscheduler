@@ -189,7 +189,7 @@
 										<xs:element name="configuration" type="xs:boolean"/>
 										<xs:element name="orderLog" type="xs:boolean"/>
 										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -238,7 +238,7 @@
 										<xs:element name="configuration" type="xs:boolean"/>
 										<xs:element name="history" type="xs:boolean"/>
 										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -261,7 +261,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumention"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -275,7 +275,7 @@
 										<xs:element name="taskLog" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
 										<xs:element name="history" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -301,7 +301,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumentation"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -313,7 +313,7 @@
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -324,7 +324,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumentation"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -361,7 +361,7 @@
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -372,7 +372,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumentation"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -501,7 +501,7 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -523,7 +523,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumentation"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
