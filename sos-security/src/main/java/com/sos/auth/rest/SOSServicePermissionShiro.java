@@ -515,7 +515,6 @@ public class SOSServicePermissionShiro {
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:add_substitute");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:edit_content");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change:hot_folder");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:documentation");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:assign_documentation");
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:configuration");

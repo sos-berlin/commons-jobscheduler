@@ -336,7 +336,7 @@
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
-										<xs:element name="documentation"/>
+										<xs:element name="documentation" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -349,7 +349,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="assignDocumentation"/>
+							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
