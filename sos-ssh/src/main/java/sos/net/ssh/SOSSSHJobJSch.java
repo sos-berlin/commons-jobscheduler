@@ -155,7 +155,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    LOGGER.info(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     executorService = Executors.newFixedThreadPool(2);
                     String completeCommand = null;

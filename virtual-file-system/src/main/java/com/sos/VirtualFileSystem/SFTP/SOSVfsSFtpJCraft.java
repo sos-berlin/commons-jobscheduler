@@ -500,7 +500,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             boolean isErrorExitCode = exitCode != null && !exitCode.equals(new Integer(0));
             if (!isErrorExitCode && outContent.length() > 0) {
-                LOGGER.info(String.format("[%s][stdout]%s", cmd, outContent.toString().trim()));
+                LOGGER.info(String.format("[%s]", cmd));
+                LOGGER.info(String.format("[stdout]%s", outContent.toString().trim()));
             }
             errReader = new BufferedReader(new InputStreamReader(err));
             errContent = new StringBuffer();
@@ -1115,13 +1116,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 } else {
                     isUnix = true;
                 }
-                if (isDebugEnabled) {
-                    LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
-                }
+//                if (isDebugEnabled) {
+//                    LOGGER.debug(String.format("[%s][stdout]%s", cmd, stdout.trim()));
+//                }
                 if (result.getStdErr().length() > 0) {
                     LOGGER.debug(String.format("[%s][stderr]%s", cmd, result.getStdErr().toString().trim()));
                 }
-                LOGGER.info(String.format("isUnix=%s", isUnix));
+//                LOGGER.info(String.format("isUnix=%s", isUnix));
             } catch (Throwable e) {
                 LOGGER.warn(String.format("[%s]%s", cmd, e.toString()));
             }
