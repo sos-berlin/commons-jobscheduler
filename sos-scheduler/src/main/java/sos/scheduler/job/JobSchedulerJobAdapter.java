@@ -29,7 +29,7 @@ import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 
-import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
+import sos.spooler.IMonitor_impl;
 import sos.spooler.Job;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
@@ -37,9 +37,9 @@ import sos.util.ParameterSubstitutor;
 
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob
-		implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl, IJobSchedulerEventHandler {
+		implements JSJobUtilities, IJSCommands, IMonitor_impl, IJobSchedulerEventHandler {
 
-	protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
+    protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
 	protected Messages Messages = null;
 	protected HashMap<String, String> schedulerParameters = new HashMap<String, String>();
 	protected HashMap<String, String> hsmParameters = null;
@@ -51,7 +51,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 	public static final boolean conJobFailure = false;
 	public static final boolean conJobChainSuccess = true;
 	public static final boolean conJobChainFailure = false;
-	public final String conMessageFilePath = "com_sos_scheduler_messages";
+	public static final boolean continueWithProcess = true;
+    public static final boolean continueWithProcessBefore = true;
+    public static final boolean continueWithTaskAfter = false;
+    public final String conMessageFilePath = "com_sos_scheduler_messages";
 	private ParameterSubstitutor parameterSubstitutor;
 	private String jobNameForTest = "job_name_for_test";
 	private String orderStateForTest = "order_state_for_test";
