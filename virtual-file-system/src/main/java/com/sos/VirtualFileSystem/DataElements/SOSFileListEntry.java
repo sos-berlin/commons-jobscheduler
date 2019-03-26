@@ -20,8 +20,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 
-import sos.util.SOSString;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
@@ -37,6 +35,8 @@ import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
@@ -70,7 +70,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private static final String FIELD_TRANSFER_END = "transfer_end";
     private static final String FIELD_MANDATOR = "mandator";
     private static final String FIELD_GUID = "guid";
-    private static final String FIELD_MODIFICATION_DATE = "modification_date";
     private static final Logger LOGGER = Logger.getLogger(SOSFileListEntry.class);
     private static final Logger JADE_REPORT_LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
     private final String guid = UUID.randomUUID().toString();
@@ -103,7 +102,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private boolean flgSteadyFlag = false;
     private boolean targetFileAlreadyExists = false;
     private FTPFile objFTPFile = null;
-    private String strCSVRec = new String();
     private String strRenamedSourceFileName = null;
     private SOSVfsConnectionPool objConnPoolSource = null;
     private SOSVfsConnectionPool objConnPoolTarget = null;
@@ -1370,6 +1368,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public String getTargetFileName() {
+        if (strTargetFileName == null || strTargetFileName.isEmpty()) {
+            return getSourceFilename();
+        }
         return strTargetFileName;
     }
 
