@@ -66,11 +66,11 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
 		</dependency>
-		<dependency>
+		<!-- dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<classifier>no_aop</classifier>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
