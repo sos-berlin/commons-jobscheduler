@@ -57,6 +57,19 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("Accept", "application/json");
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
+
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken) throws UnsupportedEncodingException, InterruptedException, SOSException,
+            URISyntaxException {
+        super();
+        booleanExpression = new BooleanExp("");
+        this.sosHibernateSession = sosHibernateSession;
+
+        jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
+        jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
+        jobSchedulerRestApiClient.addHeader("Accept", "application/json");
+        jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", accessToken);
+    }
+
     public void reInit() throws SOSHibernateException {
         jsJobInConditions = null;
         jsJobOutConditions = null;
@@ -191,7 +204,7 @@ public class JSConditionResolver {
                 if (validate(taskEndEvent, outCondition)) {
                     System.out.println("create events ------>");
                     outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents);
-                   
+
                 } else {
                     System.out.println(expression + "-->false");
                 }
