@@ -171,7 +171,7 @@ public class SOSServicePermissionShiro {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getSize() {
-        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
             return JOCDefaultResponse.responseStatus200(-1);
         } else {
             return JOCDefaultResponse.responseStatus200(Globals.jocWebserviceDataContainer.getCurrentUsersList().size());

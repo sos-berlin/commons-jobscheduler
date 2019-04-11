@@ -1,0 +1,4 @@
+
+joc.account = "root:root"
+joc.url = "http://localhost:4446"
+http.timeout = 5000

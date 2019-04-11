@@ -66,6 +66,7 @@ public class TestConfigurationModifierFileSelector {
             JobSchedulerFileElement jobSchedulerFileElement = configurationModifierFileSelector.getJobSchedulerElement("/myJob");
             if (jobSchedulerFileElement != null) {
                 ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions2 = new ConfigurationModifierFileSelectorOptions();
+                configurationModifierFileSelectorOptions2.setRecursive(true);
                 configurationModifierFileSelectorOptions2.setRegexSelector("^global_.*$");
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions2);
                 configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(
