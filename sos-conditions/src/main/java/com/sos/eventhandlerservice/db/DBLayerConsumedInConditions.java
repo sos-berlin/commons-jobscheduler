@@ -13,6 +13,7 @@ public class DBLayerConsumedInConditions {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerConsumedInConditions.class);
     private static final String DBItemConsumedInCondition = DBItemConsumedInCondition.class.getSimpleName();
+    private static final String DBItemInCondition = DBItemInCondition.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerConsumedInConditions(SOSHibernateSession session) {
@@ -73,11 +74,22 @@ public class DBLayerConsumedInConditions {
 
     public int delete(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
         String hql = "delete from " + DBItemConsumedInCondition + getWhere(filterConsumedInConditions);
-        int row = 0;
         Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(hql);
         query = bindParameters(filterConsumedInConditions, query);
 
-        row = sosHibernateSession.executeUpdate(query);
+        int row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
+
+    public int deleteWorkflow(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
+
+        String select = "select i.id from " + DBItemConsumedInCondition + " c, " + DBItemInCondition
+                + " i where c.inConditionId = i.id and c.session=:session and i.workflow=:workflow";
+        String hql = "delete from " + DBItemConsumedInCondition + " where inConditionId in ( " + select + ")";
+        Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(hql);
+        query.setParameter("session", filterConsumedInConditions.getSession());
+        query.setParameter("workflow", filterConsumedInConditions.getWorkflow());
+        int row = sosHibernateSession.executeUpdate(query);
         return row;
     }
 

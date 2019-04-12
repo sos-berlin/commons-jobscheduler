@@ -8,13 +8,14 @@ import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 @Table(name = Constants.OUT_CONDITIONS_TABLE)
 @SequenceGenerator(name = Constants.OUT_CONDITIONS_TABLE_SEQUENCE, sequenceName = Constants.OUT_CONDITIONS_TABLE_SEQUENCE, allocationSize = 1)
 
-public class DBItemOutCondition implements IJSJobConditionKey{
+public class DBItemOutCondition implements IJSJobConditionKey {
 
     private Long id;
     private String masterId;
     private String job;
     private String expression;
- 
+    private String workflow;
+
     public DBItemOutCondition() {
 
     }
@@ -58,5 +59,13 @@ public class DBItemOutCondition implements IJSJobConditionKey{
     public void setExpression(String expression) {
         this.expression = expression;
     }
- 
+
+    @Column(name = "[WORKFLOW]", nullable = true)
+    public String getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(String workflow) {
+        this.workflow = workflow;
+    }
 }

@@ -12,7 +12,11 @@ import org.junit.Test;
 
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemEvent;
+import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
+import com.sos.eventhandlerservice.db.DBLayerOutConditionEvents;
+import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
+import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
@@ -64,4 +68,39 @@ public class TestEventsDb {
         }
     }
 
+    @Test
+    public void testDeleteInWorkflow() throws SOSHibernateException {
+        SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
+        sosHibernateSession.setAutoCommit(false);
+
+        try {
+            FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+            filterConsumedInConditions.setSession("now");
+            filterConsumedInConditions.setWorkflow("test");
+            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerConsumedInConditions.deleteWorkflow(filterConsumedInConditions);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+    }
+
+    @Test
+    public void testDeleteOutWorkflow() throws SOSHibernateException {
+        SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
+        sosHibernateSession.setAutoCommit(false);
+
+        try {
+            FilterEvents filter = new FilterEvents();
+            filter.setSession("now");
+            filter.setWorkflow("test");
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.deleteWorkflow(filter);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+    }
 }

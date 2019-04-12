@@ -18,6 +18,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
     private String masterId;
     private String job;
     private String expression;
+    private String workflow;
     private List<JSOutConditionEvent> listOfOutConditionEvents;
 
     public JSOutCondition() {
@@ -30,6 +31,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         this.masterId = itemOutCondition.getMasterId();
         this.job = itemOutCondition.getJob();
         this.expression = itemOutCondition.getExpression();
+        this.workflow = itemOutCondition.getWorkflow();
     }
 
     public Long getId() {
@@ -65,6 +67,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setCreated(new Date());
             itemEvent.setEvent(outConditionEvent.getEvent());
             itemEvent.setSession("now");
+            itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
             event.setItemEvent(itemEvent);
             System.out.println("create event ------>" + event.getEvent());
 
@@ -78,6 +81,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             }
             jsEvents.addEvent(event);
         }
+    }
+
+    
+    public String getWorkflow() {
+        return workflow;
     }
 
 }

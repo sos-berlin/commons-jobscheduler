@@ -14,6 +14,7 @@ public class DBItemInCondition implements IJSJobConditionKey{
     private String masterId;
     private String job;
     private String expression;
+    private String workflow;
 
     public DBItemInCondition() {
 
@@ -59,6 +60,14 @@ public class DBItemInCondition implements IJSJobConditionKey{
         this.expression = expression;
     }
 
-    
+
+    @Column(name = "[WORKFLOW]", nullable = true)
+    public String getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(String workflow) {
+        this.workflow = workflow;
+    }
 
 }

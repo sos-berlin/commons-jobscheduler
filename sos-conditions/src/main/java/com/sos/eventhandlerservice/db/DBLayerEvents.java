@@ -12,6 +12,7 @@ public class DBLayerEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerEvents.class);
     private static final String DBItemEvents = DBItemEvent.class.getSimpleName();
+    private static final String DBItemOutCondition = DBItemOutCondition.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerEvents(SOSHibernateSession session) {
@@ -26,6 +27,7 @@ public class DBLayerEvents {
         FilterEvents filter = new FilterEvents();
         filter.setEvent("");
         filter.setSession("");
+        filter.setWorkflow("");
         return filter;
     }
 
@@ -43,6 +45,11 @@ public class DBLayerEvents {
             and = " and ";
         }
 
+        if (filter.getOutConditionId() != null) {
+            where += and + " outConditionId = :outConditionId";
+            and = " and ";
+        }
+
         if (!"".equals(where.trim())) {
             where = "where " + where;
         }
@@ -55,6 +62,9 @@ public class DBLayerEvents {
         }
         if (filter.getSession() != null && !"".equals(filter.getSession())) {
             query.setParameter("session", filter.getSession());
+        }
+        if (filter.getOutConditionId() != null) {
+            query.setParameter("outConditionId", filter.getOutConditionId());
         }
         return query;
     }
@@ -70,7 +80,7 @@ public class DBLayerEvents {
         }
         return sosHibernateSession.getResultList(query);
     }
-    
+
     public Integer delete(FilterEvents filter) throws SOSHibernateException {
         String hql = "delete from " + DBItemEvents + " " + getWhere(filter);
         int row = 0;
@@ -79,7 +89,7 @@ public class DBLayerEvents {
 
         row = sosHibernateSession.executeUpdate(query);
         return row;
-       
+
     }
 
     public void store(DBItemEvent itemEvent) throws SOSHibernateException {
@@ -88,6 +98,18 @@ public class DBLayerEvents {
         filter.setEvent(itemEvent.getSession());
         delete(filter);
         sosHibernateSession.save(itemEvent);
+    }
+
+    public int deleteWorkflow(FilterEvents filter) throws SOSHibernateException {
+
+        String select = "select o.id from " + DBItemEvents + " e, " + DBItemOutCondition
+                + " o where e.outConditionId = o.id and o.workflow=:workflow and e.session=:session";
+        String hql = "delete from " + DBItemEvents + " where outConditionId in ( " + select + ")";
+        Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);
+        query.setParameter("workflow", filter.getWorkflow());
+        query.setParameter("session", filter.getSession());
+        int row = sosHibernateSession.executeUpdate(query);
+        return row;
     }
 
 }

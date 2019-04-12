@@ -12,6 +12,7 @@ import com.sos.eventhandlerservice.classes.Constants;
 public class DBItemEvent {
 
     private Long id;
+    private Long outConditionId;
     private String session;
     private String event;
     private Date created;
@@ -49,6 +50,15 @@ public class DBItemEvent {
 
     public void setEvent(String event) {
         this.event = event;
+    }
+    
+    @Column(name = "[OUT_CONDITION_ID]", nullable = false)
+    public Long getOutConditionId() {
+        return outConditionId;
+    }
+
+    public void setOutConditionId(Long outConditionId) {
+        this.outConditionId = outConditionId;
     }
     
     @Temporal(TemporalType.TIMESTAMP)

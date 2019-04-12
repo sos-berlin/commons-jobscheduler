@@ -48,6 +48,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return itemInCondition.getExpression();
     }
 
+    public String getWorkflow() {
+        return itemInCondition.getWorkflow();
+    }
+    
     public void addCommand(JSInConditionCommand inConditionCommand) {
         listOfInConditionCommands.add(inConditionCommand);
     }

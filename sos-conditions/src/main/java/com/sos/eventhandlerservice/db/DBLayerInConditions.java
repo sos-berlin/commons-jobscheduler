@@ -10,7 +10,6 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditions;
-import com.sos.joc.model.conditions.OutConditions;
 
 public class DBLayerInConditions {
 
@@ -31,6 +30,7 @@ public class DBLayerInConditions {
         FilterInConditions filter = new FilterInConditions();
         filter.setMasterId("");
         filter.setJob("");
+        filter.setWorkflow("");
         return filter;
     }
 
@@ -48,6 +48,11 @@ public class DBLayerInConditions {
             and = " and ";
         }
 
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            where += and + " i.workflow = :workflow";
+            and = " and ";
+        }
+
         where = "where 1=1 " + and + where;
         return where;
     }
@@ -58,6 +63,9 @@ public class DBLayerInConditions {
         }
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());
+        }
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            query.setParameter("workflow", filter.getWorkflow());
         }
 
         return query;
@@ -97,6 +105,7 @@ public class DBLayerInConditions {
             dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
             dbItemInCondition.setJob(inConditions.getJob());
             dbItemInCondition.setMasterId(inConditions.getMasterId());
+            dbItemInCondition.setWorkflow(inCondition.getWorkflow());
             sosHibernateSession.save(dbItemInCondition);
 
             dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);

@@ -32,6 +32,7 @@ public class DBLayerOutConditions {
         FilterOutConditions filter = new FilterOutConditions();
         filter.setMasterId("");
         filter.setJob("");
+        filter.setWorkflow("");
         return filter;
     }
 
@@ -49,6 +50,11 @@ public class DBLayerOutConditions {
             and = " and ";
         }
 
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            where += and + " o.workflow = :workflow";
+            and = " and ";
+        }
+
         where = "where 1=1 " + and + where;
         return where;
     }
@@ -59,6 +65,10 @@ public class DBLayerOutConditions {
         }
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());
+        }
+
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            query.setParameter("workflow", filter.getWorkflow());
         }
 
         return query;
@@ -98,6 +108,7 @@ public class DBLayerOutConditions {
             dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
             dbItemOutCondition.setJob(outConditions.getJob());
             dbItemOutCondition.setMasterId(outConditions.getMasterId());
+            dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
             sosHibernateSession.save(dbItemOutCondition);
 
             dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);

@@ -3,6 +3,7 @@ package com.sos.eventhandlerservice.db;
 public class FilterConsumedInConditions {
 
     private Long inConditionId;
+    private String workflow;
     private String session;
 
     public Long getInConditionId() {
@@ -19,6 +20,14 @@ public class FilterConsumedInConditions {
 
     public void setSession(String session) {
         this.session = session;
+    }
+
+    public String getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(String workflow) {
+        this.workflow = workflow;
     }
 
 }
