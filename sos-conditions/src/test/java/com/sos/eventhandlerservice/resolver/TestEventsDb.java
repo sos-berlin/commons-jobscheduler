@@ -1,20 +1,17 @@
 package com.sos.eventhandlerservice.resolver;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Date;
-import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
-import com.sos.eventhandlerservice.db.DBLayerOutConditionEvents;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.hibernate.classes.SOSHibernateFactory;
@@ -24,16 +21,20 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 
+@Ignore
 public class TestEventsDb {
 
+    @Ignore
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
     }
 
+    @Ignore
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
     }
 
+    @Ignore
     @Before
     public void setUp() throws Exception {
     }
@@ -46,6 +47,7 @@ public class TestEventsDb {
         return sosHibernateFactory.openStatelessSession();
     }
 
+    @Ignore
     @Test
     public void testConditions() throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
@@ -68,6 +70,7 @@ public class TestEventsDb {
         }
     }
 
+    @Ignore
     @Test
     public void testDeleteInWorkflow() throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
@@ -86,6 +89,7 @@ public class TestEventsDb {
         }
     }
 
+    @Ignore
     @Test
     public void testDeleteOutWorkflow() throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");

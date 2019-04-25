@@ -7,24 +7,30 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.hibernate.exceptions.SOSHibernateException;
 
+@Ignore
 public class TestInConditions {
 
+    @Ignore
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
     }
 
+    @Ignore
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
     }
 
+    @Ignore
     @Before
     public void setUp() throws Exception {
     }
 
+    @Ignore
     @Test
     public void testConditions() throws SOSHibernateException {
         JSConditions jsConditions = new JSConditions();
