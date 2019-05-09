@@ -3,7 +3,9 @@ package com.sos.eventhandlerservice.db;
 public class FilterConsumedInConditions {
 
     private Long inConditionId;
-    private String workflow;
+    private String masterId="";
+    private String workflow="";
+    private String job="";
     private String session;
 
     public Long getInConditionId() {
@@ -28,6 +30,26 @@ public class FilterConsumedInConditions {
 
     public void setWorkflow(String workflow) {
         this.workflow = workflow;
+    }
+
+    
+    public String getJob() {
+        return job;
+    }
+
+    
+    public void setJob(String job) {
+        this.job = job;
+    }
+
+    
+    public String getMasterId() {
+        return masterId;
+    }
+
+    
+    public void setMasterId(String masterId) {
+        this.masterId = masterId;
     }
 
 }

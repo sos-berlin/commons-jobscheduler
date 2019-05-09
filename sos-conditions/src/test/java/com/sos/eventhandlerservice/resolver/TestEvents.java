@@ -1,5 +1,6 @@
 package com.sos.eventhandlerservice.resolver;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -7,7 +8,6 @@ import java.net.URISyntaxException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.eventhandlerservice.classes.Constants;
@@ -18,7 +18,7 @@ import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
  
-@Ignore
+
 public class TestEvents {
 
     
@@ -29,25 +29,23 @@ public class TestEvents {
         return sosHibernateFactory.openStatelessSession();
     }
     
-    @Ignore
+     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
     }
 
-    @Ignore
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
     }
 
-    @Ignore
     @Before
     public void setUp() throws Exception {
     }
 
-    @Ignore
     @Test
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
-        JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"));
+        File f = new File("src/test/resources/config/private/private.conf");
+        JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f);
         expressionResolver.init();
         expressionResolver.resolveInConditions();
     }

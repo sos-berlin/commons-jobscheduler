@@ -30,6 +30,10 @@ public class JSEvent {
     public String getEvent() {
         return itemEvent.getEvent();
     }
+    
+    public String getWorkflow() {
+        return itemEvent.getWorkflow();
+    }
 
     public Date getCreated() {
         return itemEvent.getCreated();

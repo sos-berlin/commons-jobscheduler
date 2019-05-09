@@ -68,6 +68,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setEvent(outConditionEvent.getEvent());
             itemEvent.setSession("now");
             itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
+            itemEvent.setWorkflow(this.workflow);
             event.setItemEvent(itemEvent);
             System.out.println("create event ------>" + event.getEvent());
 

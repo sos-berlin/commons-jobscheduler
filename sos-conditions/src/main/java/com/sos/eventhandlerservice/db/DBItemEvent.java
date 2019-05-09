@@ -15,6 +15,7 @@ public class DBItemEvent {
     private Long outConditionId;
     private String session;
     private String event;
+    private String workflow;
     private Date created;
 
     public DBItemEvent() {
@@ -50,6 +51,15 @@ public class DBItemEvent {
 
     public void setEvent(String event) {
         this.event = event;
+    }
+    
+    @Column(name = "[WORKFLOW]", nullable = false)
+    public String getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(String workflow) {
+        this.workflow = workflow;
     }
     
     @Column(name = "[OUT_CONDITION_ID]", nullable = false)

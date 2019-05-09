@@ -7,5 +7,7 @@ public interface IJSCondition {
     public String getJob();
 
     public String getExpression();
+    
+    public String getWorkflow();
  
 }

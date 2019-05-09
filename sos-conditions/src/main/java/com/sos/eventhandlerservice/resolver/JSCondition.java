@@ -9,10 +9,12 @@ public class JSCondition {
 
     private String conditionType;
     private String conditionParam;
+    private String conditionWorkflow;
 
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
+        conditionWorkflow = getConditionWorkflow(conditionParam);
 
     }
 
@@ -28,6 +30,14 @@ public class JSCondition {
 
     private String getConditionTypeParam(String condition) {
         String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "");
+        return s;
+    }
+
+    private String getConditionWorkflow(String conditionParam) {
+        String s = "";
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.substring(0, conditionParam.indexOf("."));
+        }
         return s;
     }
 
@@ -48,6 +58,10 @@ public class JSCondition {
 
     public String getConditionParam() {
         return conditionParam;
+    }
+
+    public String getConditionWorkflow() {
+        return conditionWorkflow;
     }
 
 }

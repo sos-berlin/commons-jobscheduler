@@ -1,5 +1,6 @@
 package com.sos.eventhandlerservice.servlet;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
 
@@ -11,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.classes.Constants;
-import com.sos.eventhandlerservice.classes.CustomEvent;
+import com.sos.eventhandlerservice.classes.ConditionCustomEvent;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
@@ -43,13 +44,14 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
 
             reportingSession = reportingFactory.openStatelessSession();
-
-            conditionResolver = new JSConditionResolver(reportingSession);
+            File f = new File("src/test/resources/config/private/private.conf");
+            conditionResolver = new JSConditionResolver(reportingSession, f);
             conditionResolver.init();
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent };
             start(observedEventTypes);
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.error(String.format("%s: %s", method, e.toString()), e);
         } finally {
             if (reportingSession != null) {
@@ -100,10 +102,18 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     case "VariablesCustomEvent":
                         // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
-                        CustomEvent customEvent = new CustomEvent((JsonObject) entry);
-                        if ("InitConditionResolver".equalsIgnoreCase(customEvent.getKey())) {
+                        ConditionCustomEvent customEvent = new ConditionCustomEvent((JsonObject) entry);
+                        switch (customEvent.getKey()) {
+                        case "InitConditionResolver":
                             conditionResolver.reInit();
                             resolveInConditions = true;
+                            break;
+                        case "ResetConditionResolver":
+                            String workflow = customEvent.getWorkflow();
+                            String job = customEvent.getJob();
+                            conditionResolver.removeInconditionsByWorkflow(workflow);
+                            conditionResolver.removeInconditionsByJob(job);
+                            break;
                         }
                         break;
                     }

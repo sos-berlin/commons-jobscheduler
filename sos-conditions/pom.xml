@@ -10,7 +10,7 @@
 		<version>1.12.10-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.sos-berlin.jitl</groupId>
+	<groupId>com.sos-berlin.jobscheduler</groupId>
 	<artifactId>sos-conditions</artifactId>
 	<name>${project.artifactId}</name>
 
@@ -40,13 +40,13 @@
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 
@@ -99,12 +99,10 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 
-		<!-- this dependency is needed as long as tests in this artifact are located 
-			in the main/java folder and not in main/test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -127,7 +125,7 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

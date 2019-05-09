@@ -58,8 +58,22 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken) throws UnsupportedEncodingException, InterruptedException, SOSException,
-            URISyntaxException {
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf) throws UnsupportedEncodingException, InterruptedException,
+            SOSException, URISyntaxException {
+        super();
+        booleanExpression = new BooleanExp("");
+        this.sosHibernateSession = sosHibernateSession;
+        AccessTokenProvider accessTokenProvider = new AccessTokenProvider(privateConf.getAbsolutePath());
+        WebserviceCredentials webserviceCredentials = accessTokenProvider.getAccessToken(null);
+
+        jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
+        jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
+        jobSchedulerRestApiClient.addHeader("Accept", "application/json");
+        jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
+    }
+
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken) throws UnsupportedEncodingException, InterruptedException,
+            SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
@@ -150,12 +164,16 @@ public class JSConditionResolver {
             }
             case "event": {
                 String event = jsCondition.getConditionParam();
+                event = event.replace(jsCondition.getConditionWorkflow() + ".", "");
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
                 jsEventKey.setSession("now");
-                if (jsEvents.getEvent(jsEventKey) != null) {
-                    expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
-                    expressionValue = expressionValue.replace(jsCondition.getConditionParam(), "true");
+                JSEvent jsEvent = jsEvents.getEvent(jsEventKey);
+                if (jsEvent != null) {
+                    if (jsCondition.getConditionWorkflow().isEmpty() || jsCondition.getConditionWorkflow().equals(jsEvent.getWorkflow())) {
+                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
+                        expressionValue = expressionValue.replace(jsCondition.getConditionParam(), "true");
+                    }
                 }
 
                 break;
@@ -233,4 +251,57 @@ public class JSConditionResolver {
         return booleanExpression;
     }
 
+    public void removeInconditionsByWorkflow(String workflow) throws SOSHibernateException {
+
+        if (!workflow.isEmpty()) {
+            try {
+                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                filterConsumedInConditions.setSession("now");
+                filterConsumedInConditions.setWorkflow(workflow);
+                DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+                sosHibernateSession.beginTransaction();
+                dbLayerConsumedInConditions.deleteConsumedInConditionsByWorkflow(filterConsumedInConditions);
+                sosHibernateSession.commit();
+            } catch (Exception e) {
+                sosHibernateSession.rollback();
+            }
+
+            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                    String expression = inCondition.getJob() + ":" + inCondition.getExpression();
+                    if (workflow.equals(inCondition.getWorkflow()) && inCondition.isConsumed()) {
+                        System.out.println(expression + " no longer consumed");
+                        inCondition.setConsumed(false);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeInconditionsByJob(String job) throws SOSHibernateException {
+        if (!job.isEmpty()) {
+
+            try {
+                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                filterConsumedInConditions.setSession("now");
+                filterConsumedInConditions.setJob(job);
+                DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+                sosHibernateSession.beginTransaction();
+                dbLayerConsumedInConditions.deleteConsumedInConditionsByWorkflow(filterConsumedInConditions);
+                sosHibernateSession.commit();
+            } catch (Exception e) {
+                sosHibernateSession.rollback();
+            }
+
+            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                    String expression = inCondition.getJob() + ":" + inCondition.getExpression();
+                    if (job.equals(inCondition.getJob()) && inCondition.isConsumed()) {
+                        System.out.println(expression + " no longer consumed");
+                        inCondition.setConsumed(false);
+                    }
+                }
+            }
+        }
+    }
 }
