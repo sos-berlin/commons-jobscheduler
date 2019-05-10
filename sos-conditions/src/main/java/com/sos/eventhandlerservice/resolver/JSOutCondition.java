@@ -58,9 +58,28 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
+    public JSEvent storeOutConditionEvent(SOSHibernateSession sosHibernateSession, DBItemEvent itemEvent) throws SOSHibernateException {
+        sosHibernateSession.setAutoCommit(false);
+        
+        JSEvent event = new JSEvent();
+
+        event.setItemEvent(itemEvent);
+        System.out.println("create event ------>" + event.getEvent());
+
+        try {
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.store(itemEvent);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+        return event;
+
+    }
+
     public void storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents) throws SOSHibernateException {
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
-            JSEvent event = new JSEvent();
             sosHibernateSession.setAutoCommit(false);
 
             DBItemEvent itemEvent = new DBItemEvent();
@@ -69,22 +88,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setSession("now");
             itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
             itemEvent.setWorkflow(this.workflow);
-            event.setItemEvent(itemEvent);
-            System.out.println("create event ------>" + event.getEvent());
-
-            try {
-                DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-                sosHibernateSession.beginTransaction();
-                dbLayerEvents.store(itemEvent);
-                sosHibernateSession.commit();
-            } catch (Exception e) {
-                sosHibernateSession.rollback();
-            }
+            JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);
             jsEvents.addEvent(event);
         }
     }
 
-    
     public String getWorkflow() {
         return workflow;
     }

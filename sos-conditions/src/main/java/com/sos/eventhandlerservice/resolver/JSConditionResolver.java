@@ -304,4 +304,13 @@ public class JSConditionResolver {
             }
         }
     }
+    
+    public boolean eventExist(JSEventKey jsEventKey) {
+        return jsEvents.getEvent(jsEventKey) != null;
+    }
+
+    
+    public JSEvents getJsEvents() {
+        return jsEvents;
+    }
 }

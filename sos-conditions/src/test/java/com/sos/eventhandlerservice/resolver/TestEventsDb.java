@@ -101,7 +101,7 @@ public class TestEventsDb {
             filter.setWorkflow("test");
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteWorkflow(filter);
+            dbLayerEvents.deleteEventsFromWorkflow(filter);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();

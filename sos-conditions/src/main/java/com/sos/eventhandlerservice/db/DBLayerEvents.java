@@ -45,6 +45,11 @@ public class DBLayerEvents {
             and = " and ";
         }
 
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            where += and + " workflow = :workflow";
+            and = " and ";
+        }
+
         if (filter.getOutConditionId() != null) {
             where += and + " outConditionId = :outConditionId";
             and = " and ";
@@ -62,6 +67,9 @@ public class DBLayerEvents {
         }
         if (filter.getSession() != null && !"".equals(filter.getSession())) {
             query.setParameter("session", filter.getSession());
+        }
+        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
+            query.setParameter("workflow", filter.getWorkflow());
         }
         if (filter.getOutConditionId() != null) {
             query.setParameter("outConditionId", filter.getOutConditionId());
@@ -100,7 +108,7 @@ public class DBLayerEvents {
         sosHibernateSession.save(itemEvent);
     }
 
-    public int deleteWorkflow(FilterEvents filter) throws SOSHibernateException {
+    public int deleteEventsFromWorkflow(FilterEvents filter) throws SOSHibernateException {
 
         String select = "select o.id from " + DBItemEvents + " e, " + DBItemOutCondition
                 + " o where e.outConditionId = o.id and o.workflow=:workflow and e.session=:session";
