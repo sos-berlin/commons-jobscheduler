@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -187,8 +188,9 @@ public class JSConditionResolver {
         return booleanExpression.evaluateExpression();
     }
 
-    public void resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
+    public List<String> resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
             URISyntaxException {
+        List<String> listOfWorkflows = new ArrayList<String>();
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expression = inCondition.getJob() + ":" + inCondition.getExpression();
@@ -197,6 +199,9 @@ public class JSConditionResolver {
                 if (validate(null, inCondition)) {
                     if (!inCondition.isConsumed()) {
                         inCondition.executeCommands(sosHibernateSession, jobSchedulerRestApiClient);
+                        if (!listOfWorkflows.contains(inCondition.getWorkflow())) {
+                            listOfWorkflows.add(inCondition.getWorkflow());
+                        }
                     } else {
                         System.out.println(inCondition.getExpression() + "-->already consumed");
                     }
@@ -206,6 +211,7 @@ public class JSConditionResolver {
                 System.out.println("");
             }
         }
+        return listOfWorkflows;
     }
 
     public void resolveOutConditions(TaskEndEvent taskEndEvent, String masterId, String job) throws SOSHibernateException {
@@ -251,65 +257,35 @@ public class JSConditionResolver {
         return booleanExpression;
     }
 
-    public void removeInconditionsByWorkflow(String workflow) throws SOSHibernateException {
+    public void removeConsumedInconditions(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
 
-        if (!workflow.isEmpty()) {
-            try {
-                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-                filterConsumedInConditions.setSession("now");
-                filterConsumedInConditions.setWorkflow(workflow);
-                DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-                sosHibernateSession.beginTransaction();
-                dbLayerConsumedInConditions.deleteConsumedInConditionsByWorkflow(filterConsumedInConditions);
-                sosHibernateSession.commit();
-            } catch (Exception e) {
-                sosHibernateSession.rollback();
-            }
+        try {
+            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
 
-            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                    String expression = inCondition.getJob() + ":" + inCondition.getExpression();
-                    if (workflow.equals(inCondition.getWorkflow()) && inCondition.isConsumed()) {
-                        System.out.println(expression + " no longer consumed");
-                        inCondition.setConsumed(false);
-                    }
+        for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+            for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                String expression = inCondition.getJob() + ":" + inCondition.getExpression();
+                if (filterConsumedInConditions.getWorkflow().equals(inCondition.getWorkflow()) && (filterConsumedInConditions.getJob().equals(
+                        inCondition.getJob()) || filterConsumedInConditions.getJob().isEmpty()) && inCondition.isConsumed()) {
+                    System.out.println(expression + " no longer consumed");
+                    inCondition.setConsumed(false);
                 }
             }
         }
+
     }
 
-    public void removeInconditionsByJob(String job) throws SOSHibernateException {
-        if (!job.isEmpty()) {
-
-            try {
-                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-                filterConsumedInConditions.setSession("now");
-                filterConsumedInConditions.setJob(job);
-                DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-                sosHibernateSession.beginTransaction();
-                dbLayerConsumedInConditions.deleteConsumedInConditionsByWorkflow(filterConsumedInConditions);
-                sosHibernateSession.commit();
-            } catch (Exception e) {
-                sosHibernateSession.rollback();
-            }
-
-            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                    String expression = inCondition.getJob() + ":" + inCondition.getExpression();
-                    if (job.equals(inCondition.getJob()) && inCondition.isConsumed()) {
-                        System.out.println(expression + " no longer consumed");
-                        inCondition.setConsumed(false);
-                    }
-                }
-            }
-        }
-    }
-    
-    public boolean eventExist(JSEventKey jsEventKey) {
-        return jsEvents.getEvent(jsEventKey) != null;
+    public boolean eventExist(JSEventKey jsEventKey, String workflow) {
+        JSEvent jsEvent = jsEvents.getEvent(jsEventKey);
+        return jsEvent != null && (workflow == null || workflow.isEmpty() || jsEvent.getWorkflow().equals(workflow));
     }
 
-    
     public JSEvents getJsEvents() {
         return jsEvents;
     }

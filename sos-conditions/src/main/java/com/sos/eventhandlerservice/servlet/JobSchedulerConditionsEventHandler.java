@@ -3,6 +3,7 @@ package com.sos.eventhandlerservice.servlet;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.util.List;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -11,10 +12,11 @@ import javax.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.classes.ConditionCustomEvent;
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
+import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -104,15 +106,20 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
                         ConditionCustomEvent customEvent = new ConditionCustomEvent((JsonObject) entry);
                         switch (customEvent.getKey()) {
+                        case "CheckConditions":
+                            resolveInConditions = true;
                         case "InitConditionResolver":
                             conditionResolver.reInit();
                             resolveInConditions = true;
                             break;
                         case "ResetConditionResolver":
-                            String workflow = customEvent.getWorkflow();
-                            String job = customEvent.getJob();
-                            conditionResolver.removeInconditionsByWorkflow(workflow);
-                            conditionResolver.removeInconditionsByJob(job);
+
+                            FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                            filterConsumedInConditions.setSession("now");
+                            filterConsumedInConditions.setWorkflow(customEvent.getWorkflow());
+                            filterConsumedInConditions.setJob(customEvent.getJob());
+
+                            conditionResolver.removeConsumedInconditions(filterConsumedInConditions);
                             break;
                         }
                         break;
@@ -120,7 +127,14 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                 }
             }
             if (resolveInConditions) {
-                conditionResolver.resolveInConditions();
+
+                final long timeStart = System.currentTimeMillis();
+                List<String> listOfWorkflows = conditionResolver.resolveInConditions();
+                for (String workflow : listOfWorkflows) {
+                    notifyJoc(workflow);
+                }
+                final long timeEnd = System.currentTimeMillis();
+                System.out.println("Resolving all InConditions: " + (timeEnd - timeStart) + " ms.");
             }
         } catch (
 
@@ -138,6 +152,10 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             reportingFactory.close();
             reportingFactory = null;
         }
+    }
+
+    private void notifyJoc(String workflow) {
+        // TODO: CustomEvent schicken.
     }
 
     private void createReportingFactory(Path configFile) throws Exception {

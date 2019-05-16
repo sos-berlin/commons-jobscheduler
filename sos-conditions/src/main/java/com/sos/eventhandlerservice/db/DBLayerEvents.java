@@ -104,6 +104,7 @@ public class DBLayerEvents {
         FilterEvents filter = new FilterEvents();
         filter.setEvent(itemEvent.getEvent());
         filter.setEvent(itemEvent.getSession());
+        filter.setWorkflow(itemEvent.getWorkflow());
         delete(filter);
         sosHibernateSession.save(itemEvent);
     }
