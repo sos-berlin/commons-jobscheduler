@@ -106,8 +106,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
                         ConditionCustomEvent customEvent = new ConditionCustomEvent((JsonObject) entry);
                         switch (customEvent.getKey()) {
-                        case "CheckConditions":
-                            resolveInConditions = true;
+                        
                         case "InitConditionResolver":
                             conditionResolver.reInit();
                             resolveInConditions = true;
