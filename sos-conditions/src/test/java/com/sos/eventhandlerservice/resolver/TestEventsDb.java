@@ -82,7 +82,7 @@ public class TestEventsDb {
             filterConsumedInConditions.setWorkflow("test");
             DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerConsumedInConditions.deleteConsumedInConditionsByWorkflow(filterConsumedInConditions);
+            dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();
