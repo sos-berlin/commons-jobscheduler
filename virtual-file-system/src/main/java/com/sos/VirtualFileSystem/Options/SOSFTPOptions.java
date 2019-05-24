@@ -1151,4 +1151,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         this.parentTransferId = parentTransferId;
     }
 
+    @Override
+    public void setUseKeyAgent(SOSOptionBoolean keyAgent) {
+        
+    }
+
+    @Override
+    public SOSOptionBoolean isUseKeyAgent() {
+        return null;
+    }
+
 }

@@ -676,4 +676,18 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     @JSOptionDefinition(name = "server_alive_count_max", description = "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", key = "server_alive_count_max", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger server_alive_count_max = new SOSOptionInteger(this, CLASSNAME + ".server_alive_count_max",
             "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
+    
+    @JSOptionDefinition(name = "use_keyagent", description = "Using a keyagent to get the privat key file", key = "use_keyagent",
+            type = "SOSOptionBoolean", mandatory = true)
+    public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", 
+            "Using a keyagent to get the privat key file", "true", "true", true);
+
+    public SOSOptionBoolean isUseKeyAgent() {
+        return useKeyAgent;
+    }
+
+    public void setUseKeyAgent(final SOSOptionBoolean useKeyAgent) {
+        this.useKeyAgent = useKeyAgent;
+    }
+
 }

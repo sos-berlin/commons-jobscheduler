@@ -76,6 +76,19 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public void setRaiseExceptionOnError(final SOSOptionBoolean raiseExceptionOnError) {
         this.raiseExceptionOnError = raiseExceptionOnError;
     }
+    
+    @JSOptionDefinition(name = "use_keyagent", description = "Using a keyagent to get the privat key file", key = "use_keyagent",
+            type = "SOSOptionBoolean", mandatory = true)
+    public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", 
+            "Using a keyagent to get the privat key file", "true", "true", true);
+
+    public SOSOptionBoolean isUseKeyAgent() {
+        return useKeyAgent;
+    }
+
+    public void setUseKeyAgent(final SOSOptionBoolean useKeyAgent) {
+        this.useKeyAgent = useKeyAgent;
+    }
 
     @JSOptionDefinition(name = "auth_file", description = "auth_file", key = "auth_file", type = "SOSOptionString", mandatory = false)
     public SOSOptionInFileName authFile = new SOSOptionInFileName(this, CLASSNAME + ".auth_file", "auth_file", null, null, false);
