@@ -12,13 +12,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.jurr.jsch.bugfix111.JSCH111BugFix;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.Connector;
+import com.jcraft.jsch.agentproxy.ConnectorFactory;
+import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
@@ -37,13 +41,14 @@ import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** @author Robert Ehrlich */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 
     public static final String conConfigurationSTRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
-    private final Logger logger = Logger.getLogger(SOSVfsScpJCraft.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsScpJCraft.class);
     private Channel sshConnection = null;
     private Session sshSession = null;
     private ChannelSftp sftpClient = null;
@@ -52,7 +57,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 
     public SOSVfsScpJCraft() {
         super();
-    	JSCH111BugFix.init();
+        JSCH111BugFix.init();
         secureChannel = new JSch();
     }
 
@@ -100,13 +105,13 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
     public void login(final String pUserName, final String pPassword) {
         try {
             userName = pUserName;
-            logger.debug(SOSVfs_D_132.params(userName));
+            LOGGER.debug(SOSVfs_D_132.params(userName));
             this.createSession(userName, host, port);
             sshSession.setPassword(pPassword);
             sshSession.connect();
             this.createSftpClient();
             reply = "OK";
-            logger.info(SOSVfs_D_133.params(userName));
+            LOGGER.info(SOSVfs_D_133.params(userName));
             this.logReply();
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_134.params("authentication"));
@@ -148,7 +153,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         try {
             SOSOptionFolderName objF = new SOSOptionFolderName(path);
             reply = "mkdir OK";
-            logger.debug(getHostID(SOSVfs_D_179.params("mkdir", path)));
+            LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", path)));
             for (String strSubFolder : objF.getSubFolderArray()) {
                 SftpATTRS attributes = getAttributes(strSubFolder);
                 if (attributes == null) {
@@ -159,7 +164,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                     }
                 }
             }
-            logger.debug(getHostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
+            LOGGER.debug(getHostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
             raiseException(e, SOSVfs_E_134.params("[mkdir]"));
@@ -173,10 +178,10 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             reply = "rmdir OK";
             for (String subfolder : objF.getSubFolderArrayReverse()) {
                 String strT = subfolder + "/";
-                logger.debug(getHostID(SOSVfs_D_179.params("rmdir", strT)));
+                LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", strT)));
                 this.getClient().rmdir(strT);
                 reply = "rmdir OK";
-                logger.debug(getHostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+                LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
             }
             logINFO(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
@@ -334,7 +339,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
         }
         reply = "mv OK";
-        logger.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
     @Override
@@ -356,7 +361,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
             channelExec.connect();
-            logger.debug(SOSVfs_D_163.params("stdout", cmd));
+            LOGGER.debug(SOSVfs_D_163.params("stdout", cmd));
             StringBuffer outContent = new StringBuffer();
             byte[] tmp = new byte[1024];
             while (true) {
@@ -377,8 +382,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                     //
                 }
             }
-            logger.debug(outContent);
-            logger.debug(SOSVfs_D_163.params("stderr", cmd));
+            LOGGER.debug(outContent.toString());
+            LOGGER.debug(SOSVfs_D_163.params("stderr", cmd));
             errReader = new BufferedReader(new InputStreamReader(err));
             StringBuffer errContent = new StringBuffer();
             while (true) {
@@ -388,7 +393,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 }
                 errContent.append(line + strEndOfLine);
             }
-            logger.debug(errContent);
+            LOGGER.debug(errContent.toString());
             if (exitCode != null && !exitCode.equals(new Integer(0))) {
                 throw new JobSchedulerException(SOSVfs_E_164.params(exitCode));
             }
@@ -475,7 +480,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             throw new JobSchedulerException(SOSVfs_E_193.params("cwd", pathname), ex);
         } finally {
             String strM = SOSVfs_D_194.params(pathname, getReplyString());
-            logger.debug(strM);
+            LOGGER.debug(strM);
         }
         return true;
     }
@@ -523,7 +528,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         String path = null;
         try {
             path = this.getClient().pwd();
-            logger.debug(getHostID(SOSVfs_D_195.params(path)));
+            LOGGER.debug(getHostID(SOSVfs_D_195.params(path)));
             logReply();
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_134.params("getCurrentPath"));
@@ -535,18 +540,37 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         authenticationOptions = pAuthenticationOptions;
         userName = authenticationOptions.getUser().getValue();
         String password = authenticationOptions.getPassword().getValue();
-        logger.debug(SOSVfs_D_132.params(userName));
+        LOGGER.debug(SOSVfs_D_132.params(userName));
         this.createSession(userName, host, port);
         if (authenticationOptions.getAuthMethod().isPublicKey()) {
-            logger.debug(SOSVfs_D_165.params("userid", "publickey"));
-            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
-            authenticationFile.checkMandatory(true);
-            if (authenticationFile.isNotEmpty()) {
-                secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+            LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
+
+            if (authenticationOptions.isUseKeyAgent().isTrue()) {
+                Connector con = null;
+
+                try {
+                    ConnectorFactory cf = ConnectorFactory.getDefault();
+                    con = cf.createConnector();
+                } catch (AgentProxyException e) {
+                    LOGGER.error(e.getMessage(),e);
+                }
+
+                if (con != null) {
+                    IdentityRepository irepo = new RemoteIdentityRepository(con);
+                    secureChannel.setIdentityRepository(irepo);
+                }
+            } else {
+
+                SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
+                authenticationFile.checkMandatory(true);
+                if (authenticationFile.isNotEmpty()) {
+                    secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
+                }
             }
+
         } else {
             if (authenticationOptions.getAuthMethod().isPassword()) {
-                logger.debug(SOSVfs_D_165.params("userid", "password"));
+                LOGGER.debug(SOSVfs_D_165.params("userid", "password"));
                 sshSession.setPassword(password);
             } else {
                 throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuthMethod().getValue()));
@@ -556,11 +580,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().getValue(),
-                    authenticationOptions.getAuthFile().getValue()));
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().getValue(), authenticationOptions.getAuthFile()
+                    .getValue()));
         }
         reply = "OK";
-        logger.info(SOSVfs_D_133.params(userName));
+        LOGGER.info(SOSVfs_D_133.params(userName));
         this.logReply();
         return this;
     }
@@ -582,7 +606,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
     private void doConnect(final String phost, final int pport) {
         host = phost;
         port = pport;
-        logger.info(SOSVfs_D_0101.params(host, port));
+        LOGGER.info(SOSVfs_D_0101.params(host, port));
         if (!this.isConnected()) {
             this.logReply();
         } else {
