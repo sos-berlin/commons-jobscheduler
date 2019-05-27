@@ -141,19 +141,15 @@
 		<dependency>
 			<groupId>org.jurr.jsch</groupId>
 			<artifactId>jsch-111-bugfix</artifactId>
-			<version>1.0.0</version>
 		</dependency>
-<!-- https://mvnrepository.com/artifact/jsch-agent-proxy/jsch-agent-proxy -->
-<dependency>
-    <groupId>jsch-agent-proxy</groupId>
-    <artifactId>jsch-agent-proxy</artifactId>
-    <version>0.0.4</version>
-</dependency>
-<dependency>
-    <groupId>com.jcraft</groupId>
-    <artifactId>jsch.agentproxy.connector-factory</artifactId>
-    <version>0.0.9</version>
-</dependency>
+        <dependency>
+            <groupId>jsch-agent-proxy</groupId>
+            <artifactId>jsch-agent-proxy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.connector-factory</artifactId>
+        </dependency>
 
     </dependencies>
 
