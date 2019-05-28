@@ -769,7 +769,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception e) {
             LOGGER.warn(e.toString());
         }
-        usePasswordMethod();
+        if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+            useKeyboardInteractive();
+        } else {
+            usePasswordMethod();
+        }
         return preferredAuthentications;
     }
 
@@ -784,7 +788,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
 
         usePublicKeyMethod();
-        usePasswordMethod();
+        if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+            useKeyboardInteractive();
+        } else {
+            usePasswordMethod();
+        }
+
         return preferredAuthentications;
     }
 
