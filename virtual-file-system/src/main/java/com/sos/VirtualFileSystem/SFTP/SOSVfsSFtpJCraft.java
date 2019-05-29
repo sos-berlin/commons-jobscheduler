@@ -35,6 +35,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.ProxySOCKS4;
 import com.jcraft.jsch.ProxySOCKS5;
+import com.jcraft.jsch.SOSRequiredAuthKeyboardInteractive;
 import com.jcraft.jsch.SOSRequiredAuthPassword;
 import com.jcraft.jsch.SOSRequiredAuthPublicKey;
 import com.jcraft.jsch.Session;
@@ -784,13 +785,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
         connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
-        sshSession.setConfig("userauth.password", SOSRequiredAuthPassword.class.getName());
         sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
 
         usePublicKeyMethod();
         if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+            sshSession.setConfig("userauth.keyboard-interactive", SOSRequiredAuthKeyboardInteractive.class.getName());
             useKeyboardInteractive();
         } else {
+            sshSession.setConfig("userauth.password", SOSRequiredAuthPassword.class.getName());
             usePasswordMethod();
         }
 
