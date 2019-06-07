@@ -3,6 +3,7 @@ package com.sos.eventhandlerservice.servlet;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.json.JsonArray;
@@ -18,22 +19,40 @@ import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
+import com.sos.eventhandlerservice.resolver.JSEvent;
+import com.sos.eventhandlerservice.resolver.JSEvents;
+import com.sos.eventhandlerservice.resolver.JSInCondition;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.classes.event.JobSchedulerEvent.EventType;
 import com.sos.jitl.classes.event.JobSchedulerPluginEventHandler;
 import com.sos.jitl.classes.plugin.PluginMailer;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.scheduler.engine.eventbus.EventPublisher;
+import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerConditionsEventHandler.class);
+    public static final String CUSTOM_EVENT_KEY = JobSchedulerConditionsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
     private int waitInterval = 2;
     JSConditionResolver conditionResolver;
 
+    public static enum CustomEventType {
+        InconditionValidated, EventCreated
+    }
+
+    public static enum CustomEventTypeValue {
+        incondition
+    }
+
     public JobSchedulerConditionsEventHandler() {
         super();
+    }
+
+    public JobSchedulerConditionsEventHandler(SchedulerXmlCommandExecutor xmlCommandExecutor, EventPublisher eventBus) {
+        super(xmlCommandExecutor, eventBus);
     }
 
     @Override
@@ -47,6 +66,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
             reportingSession = reportingFactory.openStatelessSession();
             File f = new File("src/test/resources/config/private/private.conf");
+            f = new File(getSettings().getConfigDirectory() + "/private/private.conf");
             conditionResolver = new JSConditionResolver(reportingSession, f);
             conditionResolver.init();
 
@@ -98,7 +118,10 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                     switch (jobSchedulerEvent.getType()) {
                     case "TaskEnded":
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        conditionResolver.resolveOutConditions(taskEndEvent, "scheduler_joc_cockpit", taskEndEvent.getJobPath());
+                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit", taskEndEvent.getJobPath());
+                        for (JSEvent jsNewEvent : jsNewEvents.getListOfEvents().values()) {
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                        }
                         resolveInConditions = true;
                         break;
 
@@ -106,7 +129,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
                         ConditionCustomEvent customEvent = new ConditionCustomEvent((JsonObject) entry);
                         switch (customEvent.getKey()) {
-                        
+
                         case "InitConditionResolver":
                             conditionResolver.reInit();
                             resolveInConditions = true;
@@ -128,9 +151,9 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             if (resolveInConditions) {
 
                 final long timeStart = System.currentTimeMillis();
-                List<String> listOfWorkflows = conditionResolver.resolveInConditions();
-                for (String workflow : listOfWorkflows) {
-                    notifyJoc(workflow);
+                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
+                for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+                    publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
                 }
                 final long timeEnd = System.currentTimeMillis();
                 System.out.println("Resolving all InConditions: " + (timeEnd - timeStart) + " ms.");
@@ -151,10 +174,6 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             reportingFactory.close();
             reportingFactory = null;
         }
-    }
-
-    private void notifyJoc(String workflow) {
-        // TODO: CustomEvent schicken.
     }
 
     private void createReportingFactory(Path configFile) throws Exception {

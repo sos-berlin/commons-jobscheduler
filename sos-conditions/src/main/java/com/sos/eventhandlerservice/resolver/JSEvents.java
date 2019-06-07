@@ -34,4 +34,9 @@ public class JSEvents {
     public Map<JSEventKey, JSEvent> getListOfEvents() {
         return listOfEvents;
     }
+
+    public void addAll(Map<JSEventKey, JSEvent> listOfNewEvents) {
+        listOfEvents.putAll(listOfNewEvents);
+
+    }
 }

@@ -10,6 +10,8 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditions;
+import com.sos.joc.model.conditions.JobInCondition;
+import com.sos.joc.model.conditions.JobOutCondition;
 import com.sos.joc.model.conditions.OutCondition;
 import com.sos.joc.model.conditions.OutConditions;
 
@@ -86,7 +88,7 @@ public class DBLayerOutConditions {
         }
         return sosHibernateSession.getResultList(query);
     }
-    
+
     public int delete(FilterOutConditions filterOutConditions) throws SOSHibernateException {
         String hql = "delete from " + DBItemOutCondition + " o " + getWhere(filterOutConditions);
         int row = 0;
@@ -99,19 +101,22 @@ public class DBLayerOutConditions {
 
     public void deleteInsert(OutConditions outConditions) throws SOSHibernateException {
         DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
-        FilterOutConditions filterOutConditions = new FilterOutConditions();
-        filterOutConditions.setJob(outConditions.getJob());
-        filterOutConditions.setMasterId(outConditions.getMasterId());
-        delete(filterOutConditions);
-        for (OutCondition outCondition : outConditions.getOutconditions()) {
-            DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
-            dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
-            dbItemOutCondition.setJob(outConditions.getJob());
-            dbItemOutCondition.setMasterId(outConditions.getMasterId());
-            dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
-            sosHibernateSession.save(dbItemOutCondition);
+        for (JobOutCondition jobOutCondition : outConditions.getJobsOutconditions()) {
 
-            dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
+            FilterOutConditions filterOutConditions = new FilterOutConditions();
+            filterOutConditions.setJob(jobOutCondition.getJob());
+            filterOutConditions.setMasterId(outConditions.getMasterId());
+            delete(filterOutConditions);
+            for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
+                DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
+                dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
+                dbItemOutCondition.setJob(jobOutCondition.getJob());
+                dbItemOutCondition.setMasterId(outConditions.getMasterId());
+                dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
+                sosHibernateSession.save(dbItemOutCondition);
+
+                dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
+            }
         }
     }
 

@@ -12,8 +12,12 @@ import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);
     private Long id;
     private String masterId;
     private String job;
@@ -60,11 +64,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     public JSEvent storeOutConditionEvent(SOSHibernateSession sosHibernateSession, DBItemEvent itemEvent) throws SOSHibernateException {
         sosHibernateSession.setAutoCommit(false);
-        
+
         JSEvent event = new JSEvent();
 
         event.setItemEvent(itemEvent);
-        System.out.println("create event ------>" + event.getEvent());
+        LOGGER.debug("create event ------>" + event.getEvent());
 
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);

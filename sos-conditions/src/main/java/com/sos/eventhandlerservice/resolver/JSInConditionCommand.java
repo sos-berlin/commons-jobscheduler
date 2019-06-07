@@ -8,9 +8,12 @@ import java.net.URL;
 import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
 import com.sos.exception.SOSException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSInConditionCommand {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSInConditionCommand.class);
     private DBItemInConditionCommand itemInConditionCommand;
 
     public void setItemInConditionCommand(DBItemInConditionCommand itemInConditionCommand) {
@@ -33,19 +36,19 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private void startJob(JobSchedulerRestApiClient jobSchedulerRestApiClient, String job, String param) throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException,
-            MalformedURLException {
-     
+    private void startJob(JobSchedulerRestApiClient jobSchedulerRestApiClient, String job, String param) throws UnsupportedEncodingException,
+            InterruptedException, SOSException, URISyntaxException, MalformedURLException {
+
         URL url = new URL("http://localhost:4446/joc/api/jobs/start");
 
-        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url,
-                "{\"jobs\":[{\"job\":\""+job+"\",\"at\":\"now\"}],\"jobschedulerId\":\"scheduler_joc_cockpit\",\"auditLog\":{}}");
-        System.out.println(answer);
+        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, "{\"jobs\":[{\"job\":\"" + job
+                + "\",\"at\":\"now\"}],\"jobschedulerId\":\"scheduler_joc_cockpit\",\"auditLog\":{}}");
     }
 
-    public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException {
+    public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,
+            MalformedURLException, InterruptedException, SOSException, URISyntaxException {
         if ("showlog".equalsIgnoreCase(getCommand())) {
-            System.out.println(getCommandParam());
+            LOGGER.info(getCommandParam());
         }
         if ("start_job".equalsIgnoreCase(getCommand())) {
             startJob(jobSchedulerRestApiClient, jsInCondition.getJob(), getCommandParam());
@@ -57,7 +60,7 @@ public class JSInConditionCommand {
 
     private void addOrder(JobSchedulerRestApiClient jobSchedulerRestApiClient, String commandParam) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

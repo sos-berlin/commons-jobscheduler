@@ -363,7 +363,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void executeCommand(final String strCmd) throws Exception {
-        executeCommand(strCmd, null);
     }
 
     @Override

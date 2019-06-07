@@ -16,9 +16,12 @@ import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
     private boolean consumed;
@@ -62,7 +65,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public void executeCommands(SOSHibernateSession sosHibernateSession, JobSchedulerRestApiClient jobSchedulerRestApiClient)
             throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException {
-        System.out.println("execute commands ------>");
+        LOGGER.debug("execute commands ------>");
         this.markAsConsumed(sosHibernateSession);
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             inConditionCommand.executeCommand(jobSchedulerRestApiClient, this);

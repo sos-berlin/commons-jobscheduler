@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.mapping.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.eventhandlerservice.classes.TaskEndEvent;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
@@ -137,7 +135,7 @@ public class JSConditionResolver {
         }
     }
 
-    public boolean validate(TaskEndEvent taskEndEvent, IJSCondition condition) {
+    public boolean validate(Integer taskReturnCode, IJSCondition condition) {
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         jobConditionKey.setJob(condition.getJob());
         jobConditionKey.setMasterId(condition.getMasterId());
@@ -149,7 +147,7 @@ public class JSConditionResolver {
             switch (jsCondition.getConditionType()) {
             case "returncode": {
                 Integer returncode = jsCondition.getConditionIntegerParam();
-                if (taskEndEvent != null && returncode != null && returncode.equals(taskEndEvent.getReturnCode())) {
+                if (taskReturnCode != null && returncode != null && returncode.equals(taskReturnCode)) {
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
                 }
 
@@ -188,34 +186,33 @@ public class JSConditionResolver {
         return booleanExpression.evaluateExpression();
     }
 
-    public List<String> resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
+    public List<JSInCondition> resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
             URISyntaxException {
-        List<String> listOfWorkflows = new ArrayList<String>();
+        List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expression = inCondition.getJob() + ":" + inCondition.getExpression();
 
-                System.out.println("---InCondition: " + expression);
+                LOGGER.debug("---InCondition: " + expression);
                 if (validate(null, inCondition)) {
                     if (!inCondition.isConsumed()) {
                         inCondition.executeCommands(sosHibernateSession, jobSchedulerRestApiClient);
-                        if (!listOfWorkflows.contains(inCondition.getWorkflow())) {
-                            listOfWorkflows.add(inCondition.getWorkflow());
-                        }
+                        listOfValidatedInconditions.add(inCondition);
                     } else {
-                        System.out.println(inCondition.getExpression() + "-->already consumed");
+                        LOGGER.debug(inCondition.getExpression() + "-->already consumed");
                     }
                 } else {
-                    System.out.println(expression + "-->false");
+                    LOGGER.debug(expression + "-->false");
                 }
-                System.out.println("");
+                LOGGER.debug("");
             }
         }
-        return listOfWorkflows;
+        return listOfValidatedInconditions;
     }
 
-    public void resolveOutConditions(TaskEndEvent taskEndEvent, String masterId, String job) throws SOSHibernateException {
+    public JSEvents resolveOutConditions(Integer taskReturnCode, String masterId, String job) throws SOSHibernateException {
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
+        JSEvents newJsEvents=new JSEvents();
         jobConditionKey.setJob(job);
         jobConditionKey.setMasterId(masterId);
         JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
@@ -224,17 +221,19 @@ public class JSConditionResolver {
             for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
                 String expression = outCondition.getJob() + ":" + outCondition.getExpression();
 
-                System.out.println("---OutCondition: " + expression);
-                if (validate(taskEndEvent, outCondition)) {
-                    System.out.println("create events ------>");
-                    outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents);
+                LOGGER.debug("---OutCondition: " + expression);
+                if (validate(taskReturnCode, outCondition)) {
+                    LOGGER.debug("create events ------>");
+                    outCondition.storeOutConditionEvents(sosHibernateSession, newJsEvents);
 
                 } else {
-                    System.out.println(expression + "-->false");
+                    LOGGER.debug(expression + "-->false");
                 }
-                System.out.println("");
+                LOGGER.debug("");
             }
         }
+        jsEvents.addAll(newJsEvents.getListOfEvents());
+        return newJsEvents;
     }
 
     public void resolveOutConditions() {
@@ -242,13 +241,13 @@ public class JSConditionResolver {
             for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
                 String expression = outCondition.getJob() + ":" + outCondition.getExpression();
 
-                System.out.println("---OutCondition: " + expression);
+                LOGGER.debug("---OutCondition: " + expression);
                 if (validate(null, outCondition)) {
-                    System.out.println(expression + "-->true");
+                    LOGGER.debug(expression + "-->true");
                 } else {
-                    System.out.println(expression + "-->false");
+                    LOGGER.debug(expression + "-->false");
                 }
-                System.out.println("");
+                LOGGER.debug("");
             }
         }
     }
@@ -273,7 +272,7 @@ public class JSConditionResolver {
                 String expression = inCondition.getJob() + ":" + inCondition.getExpression();
                 if (filterConsumedInConditions.getWorkflow().equals(inCondition.getWorkflow()) && (filterConsumedInConditions.getJob().equals(
                         inCondition.getJob()) || filterConsumedInConditions.getJob().isEmpty()) && inCondition.isConsumed()) {
-                    System.out.println(expression + " no longer consumed");
+                    LOGGER.debug(expression + " no longer consumed");
                     inCondition.setConsumed(false);
                 }
             }

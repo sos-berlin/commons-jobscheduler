@@ -1,5 +1,6 @@
 package com.sos.eventhandlerservice.resolver;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -19,7 +20,6 @@ import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
  
 
-@Ignore
 public class TestInConditionResolver {
 
     
@@ -30,25 +30,27 @@ public class TestInConditionResolver {
         return sosHibernateFactory.openStatelessSession();
     }
     
-    @Ignore
+    
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
     }
 
-    @Ignore
+    
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
     }
 
-    @Ignore
+    
     @Before
     public void setUp() throws Exception {
     }
 
-    @Ignore
+    
     @Test
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
-        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"));
+        File f = new File("src/test/resources/config/private/private.conf");
+
+        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f);
         conditionResolver.init();
         conditionResolver.resolveInConditions();
         conditionResolver.resolveOutConditions();

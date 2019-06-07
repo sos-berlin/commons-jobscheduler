@@ -8,14 +8,14 @@ import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 
 public class JSJobOutConditions {
 
-    Map<JSJobConditionKey, JSOutConditions> listOfJobOutConditions;
+    Map<JSJobConditionKey, JSOutConditions> listOfJobOutConditions;    
 
     public JSJobOutConditions() {
         super();
         this.listOfJobOutConditions = new HashMap<JSJobConditionKey, JSOutConditions>();
     }
-
-    public void addInCondition(JSOutCondition outCondition) {
+    
+    public void addOutCondition(JSOutCondition outCondition) {
         JSJobConditionKey jobConditionKey = new JSJobConditionKey(outCondition);
         JSOutConditions jsOutConditions = listOfJobOutConditions.get(jobConditionKey);
         if (jsOutConditions == null) {
@@ -45,7 +45,7 @@ public class JSJobOutConditions {
             outConditionEvent.setItemOutCondition(itemOutConditionWithEvent.getDbItemOutConditionEvent());
             jsOutCondition.addEvent(outConditionEvent);
             jsOutCondition.setItemOutCondition(itemOutConditionWithEvent.getDbItemOutCondition());
-            addInCondition(jsOutCondition);
+            addOutCondition(jsOutCondition);
 
         }
     }

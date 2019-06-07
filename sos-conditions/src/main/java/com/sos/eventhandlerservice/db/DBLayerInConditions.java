@@ -10,6 +10,8 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditions;
+import com.sos.joc.model.conditions.JobInCondition;
+import com.sos.joc.model.job.JobPath;
 
 public class DBLayerInConditions {
 
@@ -96,19 +98,22 @@ public class DBLayerInConditions {
 
     public void deleteInsert(InConditions inConditions) throws SOSHibernateException {
         DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
-        FilterInConditions filterInConditions = new FilterInConditions();
-        filterInConditions.setJob(inConditions.getJob());
-        filterInConditions.setMasterId(inConditions.getMasterId());
-        delete(filterInConditions);
-        for (InCondition inCondition : inConditions.getInconditions()) {
-            DBItemInCondition dbItemInCondition = new DBItemInCondition();
-            dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
-            dbItemInCondition.setJob(inConditions.getJob());
-            dbItemInCondition.setMasterId(inConditions.getMasterId());
-            dbItemInCondition.setWorkflow(inCondition.getWorkflow());
-            sosHibernateSession.save(dbItemInCondition);
+        for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
+            FilterInConditions filterInConditions = new FilterInConditions();
+            filterInConditions.setJob(jobInCondition.getJob());
+            filterInConditions.setMasterId(inConditions.getMasterId());
+            delete(filterInConditions);
 
-            dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
+            for (InCondition inCondition : jobInCondition.getInconditions()) {
+                DBItemInCondition dbItemInCondition = new DBItemInCondition();
+                dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
+                dbItemInCondition.setJob(jobInCondition.getJob());
+                dbItemInCondition.setMasterId(inConditions.getMasterId());
+                dbItemInCondition.setWorkflow(inCondition.getWorkflow());
+                sosHibernateSession.save(dbItemInCondition);
+
+                dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
+            }
         }
     }
 

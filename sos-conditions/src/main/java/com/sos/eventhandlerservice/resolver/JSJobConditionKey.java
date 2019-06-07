@@ -1,6 +1,5 @@
 package com.sos.eventhandlerservice.resolver;
 
-import com.sos.eventhandlerservice.db.DBItemInCondition;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 
 public class JSJobConditionKey {
