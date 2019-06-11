@@ -47,7 +47,7 @@ public class JSInConditionCommand {
     private void startJob(JobSchedulerRestApiClient jobSchedulerRestApiClient, String job, String param) throws UnsupportedEncodingException,
             InterruptedException, SOSException, URISyntaxException, MalformedURLException {
 
-        URL url = new URL(settings.getJocUrl() + "/joc/api/jobs/start");
+        URL url = new URL(settings.getJocUrl() + "/jobs/start");
 
         String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, "{\"jobs\":[{\"job\":\"" + job
                 + "\",\"at\":\"now\"}],\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"auditLog\":{}}");

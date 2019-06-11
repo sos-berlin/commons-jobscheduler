@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemOutCondition;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
@@ -89,7 +90,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             DBItemEvent itemEvent = new DBItemEvent();
             itemEvent.setCreated(new Date());
             itemEvent.setEvent(outConditionEvent.getEvent());
-            itemEvent.setSession("now");
+            itemEvent.setSession(Constants.getSession());
             itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
             itemEvent.setWorkflow(this.workflow);
             JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);

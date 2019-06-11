@@ -11,6 +11,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
@@ -82,6 +83,7 @@ public class JSConditionResolver {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
+        this.settings = new EventHandlerSettings();
         this.settings.setJocUrl(jocUrl);
 
         jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
@@ -136,6 +138,7 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSession(Constants.getSession());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
@@ -173,7 +176,7 @@ public class JSConditionResolver {
                 event = event.replace(jsCondition.getConditionWorkflow() + ".", "");
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
-                jsEventKey.setSession("now");
+                jsEventKey.setSession(Constants.getSession());
                 JSEvent jsEvent = jsEvents.getEvent(jsEventKey);
                 if (jsEvent != null) {
                     if (jsCondition.getConditionWorkflow().isEmpty() || jsCondition.getConditionWorkflow().equals(jsEvent.getWorkflow())) {

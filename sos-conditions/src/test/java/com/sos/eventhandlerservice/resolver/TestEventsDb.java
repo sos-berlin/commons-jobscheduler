@@ -97,7 +97,7 @@ public class TestEventsDb {
 
         try {
             FilterEvents filter = new FilterEvents();
-            filter.setSession("now");
+            filter.setSession(Constants.getSession());
             filter.setWorkflow("test");
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemInCondition;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
@@ -77,7 +78,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
         dbItemConsumedInCondition.setCreated(new Date());
         dbItemConsumedInCondition.setInConditionId(this.getId());
-        dbItemConsumedInCondition.setSession("now");
+        dbItemConsumedInCondition.setSession(Constants.getSession());
         try {
             DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             sosHibernateSession.beginTransaction();

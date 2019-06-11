@@ -17,6 +17,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
+import com.sos.jitl.classes.event.EventHandlerSettings;
  
 
 public class TestEvents {
@@ -45,7 +46,9 @@ public class TestEvents {
     @Test
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
         File f = new File("src/test/resources/config/private/private.conf");
-        JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f);
+        EventHandlerSettings settings = new EventHandlerSettings();
+        settings.setJocUrl("http://localhost:4446");
+        JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f,settings );
         expressionResolver.init();
         expressionResolver.resolveInConditions();
     }
