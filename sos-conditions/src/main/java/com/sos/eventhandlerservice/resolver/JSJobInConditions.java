@@ -5,13 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
+import com.sos.jitl.classes.event.EventHandlerSettings;
 
 public class JSJobInConditions {
 
+    private EventHandlerSettings settings;
+
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
 
-    public JSJobInConditions() {
+    public JSJobInConditions(EventHandlerSettings settings) {
         super();
+        this.settings = settings;
         this.listOfJobInConditions = new HashMap<JSJobConditionKey, JSInConditions>();
     }
 
@@ -41,7 +45,7 @@ public class JSJobInConditions {
             if (jsInCondition == null) {
                 jsInCondition = new JSInCondition();
             }
-            JSInConditionCommand inConditionCommand = new JSInConditionCommand();
+            JSInConditionCommand inConditionCommand = new JSInConditionCommand(settings);
             inConditionCommand.setItemInConditionCommand(itemInConditionWithCommand.getDbItemInConditionCommand());
             jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
             jsInCondition.addCommand(inConditionCommand);

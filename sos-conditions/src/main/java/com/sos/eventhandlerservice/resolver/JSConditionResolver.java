@@ -27,6 +27,7 @@ import com.sos.eventhandlerservice.resolver.interfaces.IJSCondition;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
 import com.sos.jitl.restclient.AccessTokenProvider;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
@@ -42,14 +43,16 @@ public class JSConditionResolver {
     private SOSHibernateSession sosHibernateSession;
     private BooleanExp booleanExpression;
     private JobSchedulerRestApiClient jobSchedulerRestApiClient;
-
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
+    private EventHandlerSettings settings;
+    
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException, SOSException,
             URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
         AccessTokenProvider accessTokenProvider = new AccessTokenProvider();
         WebserviceCredentials webserviceCredentials = accessTokenProvider.getAccessToken(null);
+        this.settings.setJocUrl(accessTokenProvider.getJocUrl());
 
         jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
@@ -57,13 +60,16 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf) throws UnsupportedEncodingException, InterruptedException,
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf, EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException,
             SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
+        this.settings = settings;
+
         AccessTokenProvider accessTokenProvider = new AccessTokenProvider(privateConf.getAbsolutePath());
         WebserviceCredentials webserviceCredentials = accessTokenProvider.getAccessToken(null);
+        this.settings.setJocUrl(accessTokenProvider.getJocUrl());
 
         jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
@@ -71,11 +77,12 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken) throws UnsupportedEncodingException, InterruptedException,
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken, String jocUrl) throws UnsupportedEncodingException, InterruptedException,
             SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
+        this.settings.setJocUrl(jocUrl);
 
         jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
@@ -108,7 +115,7 @@ public class JSConditionResolver {
             for (DBItemInConditionWithCommand dbItemInCondition : listOfInConditions) {
                 dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
             }
-            jsJobInConditions = new JSJobInConditions();
+            jsJobInConditions = new JSJobInConditions(settings);
             jsJobInConditions.setListOfJobInConditions(listOfInConditions);
 
         }

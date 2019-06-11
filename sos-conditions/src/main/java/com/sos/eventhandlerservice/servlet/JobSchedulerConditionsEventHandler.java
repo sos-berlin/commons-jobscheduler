@@ -3,7 +3,6 @@ package com.sos.eventhandlerservice.servlet;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.json.JsonArray;
@@ -65,9 +64,8 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
 
             reportingSession = reportingFactory.openStatelessSession();
-            File f = new File("src/test/resources/config/private/private.conf");
-            f = new File(getSettings().getConfigDirectory() + "/private/private.conf");
-            conditionResolver = new JSConditionResolver(reportingSession, f);
+            File f = new File(getSettings().getConfigDirectory() + "/private/private.conf");
+            conditionResolver = new JSConditionResolver(reportingSession, f, this.getSettings());
             conditionResolver.init();
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent };
@@ -156,7 +154,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                     publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
                 }
                 final long timeEnd = System.currentTimeMillis();
-                System.out.println("Resolving all InConditions: " + (timeEnd - timeStart) + " ms.");
+                LOGGER.debug("Resolving all InConditions: " + (timeEnd - timeStart) + " ms.");
             }
         } catch (
 

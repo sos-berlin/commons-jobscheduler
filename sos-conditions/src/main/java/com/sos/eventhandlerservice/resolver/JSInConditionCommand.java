@@ -5,16 +5,24 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
-import com.sos.exception.SOSException;
-import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
+import com.sos.exception.SOSException;
+import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 
 public class JSInConditionCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInConditionCommand.class);
     private DBItemInConditionCommand itemInConditionCommand;
+    private EventHandlerSettings settings;
+
+    public JSInConditionCommand(EventHandlerSettings settings) {
+        super();
+        this.settings = settings;
+    }
 
     public void setItemInConditionCommand(DBItemInConditionCommand itemInConditionCommand) {
         this.itemInConditionCommand = itemInConditionCommand;
@@ -39,10 +47,10 @@ public class JSInConditionCommand {
     private void startJob(JobSchedulerRestApiClient jobSchedulerRestApiClient, String job, String param) throws UnsupportedEncodingException,
             InterruptedException, SOSException, URISyntaxException, MalformedURLException {
 
-        URL url = new URL("http://localhost:4446/joc/api/jobs/start");
+        URL url = new URL(settings.getJocUrl() + "/joc/api/jobs/start");
 
         String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, "{\"jobs\":[{\"job\":\"" + job
-                + "\",\"at\":\"now\"}],\"jobschedulerId\":\"scheduler_joc_cockpit\",\"auditLog\":{}}");
+                + "\",\"at\":\"now\"}],\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"auditLog\":{}}");
     }
 
     public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,

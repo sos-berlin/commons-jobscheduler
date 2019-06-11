@@ -2,6 +2,7 @@ package com.sos.eventhandlerservice.resolver;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.servlet.JobSchedulerConditionsEventHandler;
 import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.classes.plugin.PluginMailer;
 
 public class ConditionServletTest {
 
@@ -28,12 +30,16 @@ public class ConditionServletTest {
         settings.setHttpHost(host);
         settings.setHttpPort(port);
         settings.setHibernateConfigurationReporting(hibernateFile);
+        settings.setConfigDirectory(Paths.get("src/test/resources/config"));
+        settings.setSchedulerId("scheduler_joc_cockpit");
+        settings.setJocUrl("http://localhost:4446");
 
         JobSchedulerConditionsEventHandler eventHandler = new JobSchedulerConditionsEventHandler();
         eventHandler.setIdentifier("JobSchedulerConditions");
         try {
             eventHandler.onPrepare(settings);
-            eventHandler.onActivate(null);
+            PluginMailer mailer = new PluginMailer(eventHandler.getIdentifier(), new HashMap<>());
+            eventHandler.onActivate(mailer);
         } catch (Exception e) {
             throw e;
         } finally {
