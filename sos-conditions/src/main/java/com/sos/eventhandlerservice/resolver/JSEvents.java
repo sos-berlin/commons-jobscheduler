@@ -19,6 +19,10 @@ public class JSEvents {
         this.listOfEvents.put(event.getKey(), event);
     }
 
+    public void removeEvent(JSEventKey eventKey) {
+        this.listOfEvents.remove(eventKey);
+    }
+
     public JSEvent getEvent(JSEventKey eventKey) {
         return this.listOfEvents.get(eventKey);
     }

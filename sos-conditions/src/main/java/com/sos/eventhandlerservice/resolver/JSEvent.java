@@ -3,6 +3,7 @@ package com.sos.eventhandlerservice.resolver;
 import java.util.Date;
 
 import com.sos.eventhandlerservice.db.DBItemEvent;
+import com.sos.eventhandlerservice.db.DBLayerEvents;
 
 public class JSEvent {
 
@@ -30,7 +31,7 @@ public class JSEvent {
     public String getEvent() {
         return itemEvent.getEvent();
     }
-    
+
     public String getWorkflow() {
         return itemEvent.getWorkflow();
     }

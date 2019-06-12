@@ -6,6 +6,9 @@ public class ConditionCustomEvent {
     // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
 
     private String type;
+    private String session;
+    private String event;
+    private String outConditionId;
     private String source;
     private String workflow;
     private String job;
@@ -19,9 +22,12 @@ public class ConditionCustomEvent {
 
         JsonObject variables = entry.getJsonObject("variables");
         if (variables != null) {
-            this.source = variables.getString("source","");
-            this.workflow = variables.getString("workflow","");
-            this.job = variables.getString("job","");
+            this.event = variables.getString("event", "");
+            this.session = variables.getString("session", "");
+            this.source = variables.getString("source", "");
+            this.workflow = variables.getString("workflow", "");
+            this.job = variables.getString("job", "");
+            this.outConditionId = variables.getString("outConditionId", "");
         }
         this.eventId = entry.getInt("eventId");
     }
@@ -42,14 +48,25 @@ public class ConditionCustomEvent {
         return eventId;
     }
 
-    
     public String getWorkflow() {
         return workflow;
     }
 
-    
     public String getJob() {
         return job;
+    }
+
+    public String getSession() {
+        return session;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    
+    public String getOutConditionId() {
+        return outConditionId;
     }
 
 }

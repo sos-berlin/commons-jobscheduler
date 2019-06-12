@@ -5,8 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +47,9 @@ public class JSConditionResolver {
     private BooleanExp booleanExpression;
     private JobSchedulerRestApiClient jobSchedulerRestApiClient;
     private EventHandlerSettings settings;
-    
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException, SOSException,
-            URISyntaxException {
+
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) throws UnsupportedEncodingException,
+            InterruptedException, SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
@@ -61,8 +63,8 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf, EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException,
-            SOSException, URISyntaxException {
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf, EventHandlerSettings settings)
+            throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
@@ -78,8 +80,8 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken, String jocUrl) throws UnsupportedEncodingException, InterruptedException,
-            SOSException, URISyntaxException {
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken, String jocUrl) throws UnsupportedEncodingException,
+            InterruptedException, SOSException, URISyntaxException {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
@@ -103,6 +105,7 @@ public class JSConditionResolver {
 
         if (jsJobInConditions == null) {
             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+            filterConsumedInConditions.setSession(Constants.getSession());
             DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
                     filterConsumedInConditions, 0);
@@ -112,6 +115,7 @@ public class JSConditionResolver {
             }
 
             FilterInConditions filterInConditions = new FilterInConditions();
+
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
             for (DBItemInConditionWithCommand dbItemInCondition : listOfInConditions) {
@@ -222,7 +226,7 @@ public class JSConditionResolver {
 
     public JSEvents resolveOutConditions(Integer taskReturnCode, String masterId, String job) throws SOSHibernateException {
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
-        JSEvents newJsEvents=new JSEvents();
+        JSEvents newJsEvents = new JSEvents();
         jobConditionKey.setJob(job);
         jobConditionKey.setMasterId(masterId);
         JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
@@ -287,7 +291,27 @@ public class JSConditionResolver {
                 }
             }
         }
+    }
 
+    public void removeEventsFromWorkflow(FilterEvents filter) throws SOSHibernateException {
+        try {
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.deleteEventsFromWorkflow(filter);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+        Map<JSEventKey, JSEvent> tempMap = new HashMap<JSEventKey, JSEvent>();
+        for (JSEvent jsEvent : jsEvents.getListOfEvents().values()) {
+            if (filter.getWorkflow().equals(jsEvent.getWorkflow())) {
+                LOGGER.debug(jsEvent.getEvent() + " removed");
+            } else {
+                tempMap.put(jsEvent.getKey(), jsEvent);
+            }
+        }
+        jsEvents.getListOfEvents().clear();
+        jsEvents.getListOfEvents().putAll(tempMap);
     }
 
     public boolean eventExist(JSEventKey jsEventKey, String workflow) {
@@ -297,5 +321,51 @@ public class JSConditionResolver {
 
     public JSEvents getJsEvents() {
         return jsEvents;
+    }
+
+    public void addEvent(FilterEvents filterEvents) throws SOSHibernateException {
+        JSEvent event = new JSEvent();
+        DBItemEvent itemEvent = new DBItemEvent();
+        itemEvent.setCreated(new Date());
+        itemEvent.setEvent(filterEvents.getEvent());
+        itemEvent.setOutConditionId(filterEvents.getOutConditionId());
+        itemEvent.setSession(filterEvents.getSession());
+        itemEvent.setWorkflow(filterEvents.getWorkflow());
+        event.setItemEvent(itemEvent);
+        jsEvents.addEvent(event);
+
+        try {
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            sosHibernateSession.setAutoCommit(false);
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.store(itemEvent);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+    }
+
+    public void removeEvent(FilterEvents filterEvents) throws SOSHibernateException {
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+
+        sosHibernateSession.setAutoCommit(false);
+
+        try {
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.delete(filterEvents);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+
+        JSEventKey jsEventKey = new JSEventKey();
+        jsEventKey.setEvent(filterEvents.getEvent());
+        jsEventKey.setSession(filterEvents.getSession());
+        jsEvents.removeEvent(jsEventKey);
+        LOGGER.debug(jsEventKey.getEvent() + " removed");
+
+        jsEvents.removeEvent(jsEventKey);
+        LOGGER.debug(jsEventKey.getEvent() + " removed");
+
     }
 }

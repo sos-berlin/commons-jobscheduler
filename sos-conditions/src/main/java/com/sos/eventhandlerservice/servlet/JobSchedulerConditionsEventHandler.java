@@ -17,12 +17,14 @@ import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
+import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.eventhandlerservice.resolver.JSEvent;
 import com.sos.eventhandlerservice.resolver.JSEvents;
 import com.sos.eventhandlerservice.resolver.JSInCondition;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.classes.event.JobSchedulerEvent.EventType;
 import com.sos.jitl.classes.event.JobSchedulerPluginEventHandler;
 import com.sos.jitl.classes.plugin.PluginMailer;
@@ -36,6 +38,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
     public static final String CUSTOM_EVENT_KEY = JobSchedulerConditionsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
     private int waitInterval = 2;
+    private String session;
     JSConditionResolver conditionResolver;
 
     public static enum CustomEventType {
@@ -59,6 +62,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
         super.onActivate(mailer);
 
         String method = "onActivate";
+        session = Constants.getSession();
         SOSHibernateSession reportingSession = null;
         try {
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
@@ -108,15 +112,28 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
         LOGGER.debug(String.format("%s: onNonEmptyEvent=%s, eventId=%s", method, onNonEmptyEvent, eventId));
         boolean resolveInConditions = false;
 
+        if (!Constants.getSession().equals(this.session)) {
+            try {
+                conditionResolver.reInit();
+            } catch (SOSHibernateException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        }
+
         try {
             for (JsonValue entry : events) {
                 if (entry != null) {
-                    System.out.println(entry.toString());
+                    LOGGER.debug(entry.toString());
                     JobSchedulerEvent jobSchedulerEvent = new JobSchedulerEvent((JsonObject) entry);
+                    FilterEvents filterEvents = null;
+
                     switch (jobSchedulerEvent.getType()) {
+
                     case "TaskEnded":
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit", taskEndEvent.getJobPath());
+                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit",
+                                taskEndEvent.getJobPath());
                         for (JSEvent jsNewEvent : jsNewEvents.getListOfEvents().values()) {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
                         }
@@ -132,14 +149,43 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                             conditionResolver.reInit();
                             resolveInConditions = true;
                             break;
+                        case "AddEvent":
+                            filterEvents = new FilterEvents();
+                            filterEvents.setSession(customEvent.getSession());
+                            filterEvents.setWorkflow(customEvent.getWorkflow());
+                            filterEvents.setEvent(customEvent.getEvent());
+                            try {
+                            filterEvents.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
+                            }   
+                            catch (NumberFormatException e) {
+                                LOGGER.warn("could not add event " + filterEvents.getEvent() + ": NumberFormatException with - " + filterEvents.getOutConditionId());
+                            }
+                            
+                            conditionResolver.addEvent(filterEvents);
+                            break;
+                        case "RemoveEvent":
+                            filterEvents = new FilterEvents();
+
+                            filterEvents.setSession(customEvent.getSession());
+                            filterEvents.setEvent(customEvent.getEvent());
+                            conditionResolver.removeEvent(filterEvents);
+                            break;
+
                         case "ResetConditionResolver":
 
                             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                            filterConsumedInConditions.setMasterId(super.getSettings().getSchedulerId());
                             filterConsumedInConditions.setSession(Constants.getSession());
                             filterConsumedInConditions.setWorkflow(customEvent.getWorkflow());
                             filterConsumedInConditions.setJob(customEvent.getJob());
 
                             conditionResolver.removeConsumedInconditions(filterConsumedInConditions);
+                            
+                            filterEvents = new FilterEvents();
+                            filterEvents.setSession(customEvent.getSession());
+                            filterEvents.setWorkflow(customEvent.getWorkflow());
+                            conditionResolver.removeEventsFromWorkflow(filterEvents);
+
                             break;
                         }
                         break;
