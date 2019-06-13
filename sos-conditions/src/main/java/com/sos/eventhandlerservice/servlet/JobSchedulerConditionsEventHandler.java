@@ -149,6 +149,9 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                             conditionResolver.reInit();
                             resolveInConditions = true;
                             break;
+                        case "StartConditionResolver":
+                            resolveInConditions = true;
+                            break;                            
                         case "AddEvent":
                             filterEvents = new FilterEvents();
                             filterEvents.setSession(customEvent.getSession());
