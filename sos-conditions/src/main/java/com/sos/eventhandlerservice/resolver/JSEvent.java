@@ -3,7 +3,6 @@ package com.sos.eventhandlerservice.resolver;
 import java.util.Date;
 
 import com.sos.eventhandlerservice.db.DBItemEvent;
-import com.sos.eventhandlerservice.db.DBLayerEvents;
 
 public class JSEvent {
 
@@ -13,6 +12,7 @@ public class JSEvent {
         JSEventKey jsEventKey = new JSEventKey();
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
+        jsEventKey.setWorkflow(itemEvent.getWorkflow());
         return jsEventKey;
     }
 

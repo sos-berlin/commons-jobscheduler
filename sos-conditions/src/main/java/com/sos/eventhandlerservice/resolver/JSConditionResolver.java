@@ -181,12 +181,10 @@ public class JSConditionResolver {
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
                 jsEventKey.setSession(Constants.getSession());
-                JSEvent jsEvent = jsEvents.getEvent(jsEventKey);
+                JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, jsCondition.getConditionWorkflow());
                 if (jsEvent != null) {
-                    if (jsCondition.getConditionWorkflow().isEmpty() || jsCondition.getConditionWorkflow().equals(jsEvent.getWorkflow())) {
-                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
-                        expressionValue = expressionValue.replace(jsCondition.getConditionParam(), "true");
-                    }
+                    expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
+                    expressionValue = expressionValue.replace(jsCondition.getConditionParam(), "true");
                 }
 
                 break;
@@ -278,6 +276,7 @@ public class JSConditionResolver {
             dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
             sosHibernateSession.commit();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
 
@@ -299,28 +298,13 @@ public class JSConditionResolver {
             sosHibernateSession.beginTransaction();
             dbLayerEvents.deleteEventsFromWorkflow(filter);
             sosHibernateSession.commit();
+
+            jsEvents = null;
+            initEvents();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
-        Map<JSEventKey, JSEvent> tempMap = new HashMap<JSEventKey, JSEvent>();
-        for (JSEvent jsEvent : jsEvents.getListOfEvents().values()) {
-            if (filter.getWorkflow().equals(jsEvent.getWorkflow())) {
-                LOGGER.debug(jsEvent.getEvent() + " removed");
-            } else {
-                tempMap.put(jsEvent.getKey(), jsEvent);
-            }
-        }
-        jsEvents.getListOfEvents().clear();
-        jsEvents.getListOfEvents().putAll(tempMap);
-    }
-
-    public boolean eventExist(JSEventKey jsEventKey, String workflow) {
-        JSEvent jsEvent = jsEvents.getEvent(jsEventKey);
-        return jsEvent != null && (workflow == null || workflow.isEmpty() || jsEvent.getWorkflow().equals(workflow));
-    }
-
-    public JSEvents getJsEvents() {
-        return jsEvents;
     }
 
     public void addEvent(FilterEvents filterEvents) throws SOSHibernateException {
@@ -341,6 +325,7 @@ public class JSConditionResolver {
             dbLayerEvents.store(itemEvent);
             sosHibernateSession.commit();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
     }
@@ -355,17 +340,18 @@ public class JSConditionResolver {
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
 
-        JSEventKey jsEventKey = new JSEventKey();
-        jsEventKey.setEvent(filterEvents.getEvent());
-        jsEventKey.setSession(filterEvents.getSession());
-        jsEvents.removeEvent(jsEventKey);
-        LOGGER.debug(jsEventKey.getEvent() + " removed");
+        jsEvents = null;
+        initEvents();
+        LOGGER.debug(filterEvents.getEvent() + " removed");
 
-        jsEvents.removeEvent(jsEventKey);
-        LOGGER.debug(jsEventKey.getEvent() + " removed");
+    }
 
+    public Boolean eventExist(JSEventKey jsEventKey, String workflow) {
+        JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, workflow);
+        return jsEvent != null;
     }
 }

@@ -48,9 +48,13 @@ public class JSInConditionCommand {
             InterruptedException, SOSException, URISyntaxException, MalformedURLException {
 
         URL url = new URL(settings.getJocUrl() + "/jobs/start");
+        String body = "{\"jobs\":[{\"job\":\"" + job + "\",\"at\":\"now\"}],\"jobschedulerId\":\"" + settings.getSchedulerId()
+                + "\",\"auditLog\":{}}";
 
-        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, "{\"jobs\":[{\"job\":\"" + job
-                + "\",\"at\":\"now\"}],\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"auditLog\":{}}");
+        LOGGER.debug(url.toString());
+        LOGGER.debug(body);
+        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
+        LOGGER.trace(answer);
     }
 
     public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,

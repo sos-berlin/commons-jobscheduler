@@ -77,6 +77,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             dbLayerEvents.store(itemEvent);
             sosHibernateSession.commit();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
             sosHibernateSession.rollback();
         }
         return event;

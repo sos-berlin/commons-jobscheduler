@@ -43,4 +43,20 @@ public class JSEvents {
         listOfEvents.putAll(listOfNewEvents);
 
     }
+
+    public JSEvent getEventByWorkFlow(JSEventKey jsEventKey, String conditionWorkflow) {
+        if (conditionWorkflow.isEmpty()) {
+            for (JSEventKey eventKey : this.listOfEvents.keySet()) {
+                jsEventKey.setWorkflow(eventKey.getWorkflow());
+                JSEvent jsEvent = getEvent(jsEventKey);
+                if (jsEvent != null) {
+                    return jsEvent;
+                }
+            }
+        } else {
+            jsEventKey.setWorkflow(conditionWorkflow);
+            return getEvent(jsEventKey);
+        }
+        return null;
+    }
 }
