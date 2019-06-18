@@ -10,11 +10,26 @@ public class JSCondition {
     private String conditionType;
     private String conditionParam;
     private String conditionWorkflow;
+    private String conditionDate;
 
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
         conditionWorkflow = getConditionWorkflow(conditionParam);
+        conditionDate = getConditionDate(conditionParam);
+
+    }
+
+    private String getConditionDate(String conditionParam) {
+        if (conditionParam != null) {
+            String[] conditionParts = conditionParam.split("\\[");
+            if (conditionParts.length > 1) {
+                String s = conditionParts[1].trim();
+                s = s.replaceAll("]", "");
+                return s.trim();
+            }
+        }
+        return "today";
 
     }
 
@@ -64,4 +79,7 @@ public class JSCondition {
         return conditionWorkflow;
     }
 
+    public String getConditionDate() {
+        return conditionDate;
+    }
 }

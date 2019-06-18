@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.classes.Constants;
+import com.sos.eventhandlerservice.classes.EventDate;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
@@ -177,10 +178,13 @@ public class JSConditionResolver {
             }
             case "event": {
                 String event = jsCondition.getConditionParam();
+                event = event.replace("[" + jsCondition.getConditionDate() + "]", "");
                 event = event.replace(jsCondition.getConditionWorkflow() + ".", "");
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
-                jsEventKey.setSession(Constants.getSession());
+                
+                EventDate eventDate = new EventDate();             
+                jsEventKey.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
                 JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, jsCondition.getConditionWorkflow());
                 if (jsEvent != null) {
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
