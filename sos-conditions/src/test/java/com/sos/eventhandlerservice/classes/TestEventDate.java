@@ -36,8 +36,6 @@ public class TestEventDate {
         assertEquals("testGetEventDate1", s_today, s_yesterday_p1);
         assertEquals("testGetEventDate2", s_today_2, s_yesterday_1);
         assertEquals("testGetEventDate3", s_today_1, s_yesterday);
-        assertEquals("testGetEventDate4", s_yesterday_p1, s_yesterday_p1);
-        assertEquals("testGetEventDate5", s_today, s_today);
         assertEquals("testGetEventDate6", s_all, "*");
         assertEquals("testGetEventDate6", s_date, "2019.169");
 

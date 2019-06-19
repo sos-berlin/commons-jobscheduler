@@ -143,7 +143,7 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
-            filterEvents.setSession(Constants.getSession());
+            //filterEvents.setSession(Constants.getSession());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
