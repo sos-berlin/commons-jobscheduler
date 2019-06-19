@@ -49,7 +49,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public String getExpression() {
-        return itemInCondition.getExpression() +  " ";
+        return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") +  " ";
     }
 
     public String getWorkflow() {
