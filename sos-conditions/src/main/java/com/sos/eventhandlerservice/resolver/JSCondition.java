@@ -11,12 +11,14 @@ public class JSCondition {
     private String conditionParam;
     private String conditionWorkflow;
     private String conditionDate;
+    private String conditionValue;
 
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
         conditionWorkflow = getConditionWorkflow(conditionParam);
         conditionDate = getConditionDate(conditionParam);
+        conditionValue = condition;
 
     }
 
@@ -81,5 +83,9 @@ public class JSCondition {
 
     public String getConditionDate() {
         return conditionDate;
+    }
+
+    public String getConditonValue() {
+        return conditionValue;
     }
 }

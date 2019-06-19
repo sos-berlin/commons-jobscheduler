@@ -187,8 +187,7 @@ public class JSConditionResolver {
                 jsEventKey.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
                 JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, jsCondition.getConditionWorkflow());
                 if (jsEvent != null) {
-                    expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
-                    expressionValue = expressionValue.replace(jsCondition.getConditionParam(), "true");
+                    expressionValue = expressionValue.replace(jsCondition.getConditonValue() + " ", "true ");
                 }
 
                 break;
