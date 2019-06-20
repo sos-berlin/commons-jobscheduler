@@ -19,7 +19,6 @@ public class JSCondition {
         conditionWorkflow = getConditionWorkflow(conditionParam);
         conditionDate = getConditionDate(conditionParam);
         conditionValue = condition;
-
     }
 
     private String getConditionDate(String conditionParam) {
@@ -87,5 +86,12 @@ public class JSCondition {
 
     public String getConditonValue() {
         return conditionValue;
+    }
+
+    public String getEventName() {
+        String event = conditionParam;
+        event = event.replace("[" + this.getConditionDate() + "]", "");
+        event = event.replace(this.getConditionWorkflow() + ".", "");        
+        return event;
     }
 }

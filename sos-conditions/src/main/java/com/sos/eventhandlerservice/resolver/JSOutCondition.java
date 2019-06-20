@@ -5,9 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.sos.eventhandlerservice.classes.Constants;
+import com.sos.eventhandlerservice.classes.EventDate;
 import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemOutCondition;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
+import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSCondition;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -77,10 +79,28 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             dbLayerEvents.store(itemEvent);
             sosHibernateSession.commit();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
         return event;
+
+    }
+
+    public void deleteOutConditionEvent(SOSHibernateSession sosHibernateSession, FilterEvents filter) throws SOSHibernateException {
+        sosHibernateSession.setAutoCommit(false);
+
+        LOGGER.debug("delete event ------>" + filter.getEvent());
+
+        try {
+
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.delete(filter);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            sosHibernateSession.rollback();
+        }
 
     }
 
@@ -90,12 +110,32 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
             DBItemEvent itemEvent = new DBItemEvent();
             itemEvent.setCreated(new Date());
-            itemEvent.setEvent(outConditionEvent.getEvent());
-            itemEvent.setSession(Constants.getSession());
-            itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
-            itemEvent.setWorkflow(this.workflow);
-            JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);
-            jsEvents.addEvent(event);
+            itemEvent.setEvent(outConditionEvent.getEventValue());
+
+            if (outConditionEvent.isCreateCommand()) {
+                itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
+                itemEvent.setWorkflow(this.workflow);
+                itemEvent.setSession(Constants.getSession());
+                JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);
+                jsEvents.addEvent(event);
+            } else {
+                if (outConditionEvent.isDeleteCommand()) {
+                    JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
+
+                    FilterEvents filterEvent = new FilterEvents();
+                    filterEvent.setEvent(jsCondition.getEventName());
+                    EventDate eventDate = new EventDate();
+                    filterEvent.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
+                    filterEvent.setWorkflow(jsCondition.getConditionWorkflow());
+
+                    deleteOutConditionEvent(sosHibernateSession, filterEvent);
+                    JSEventKey eventKey = new JSEventKey();
+                    eventKey.setEvent(filterEvent.getEvent());
+                    eventKey.setSession(filterEvent.getSession());
+                    eventKey.setWorkflow(filterEvent.getWorkflow());
+                    jsEvents.removeEvent(eventKey);
+                }
+            }
         }
     }
 

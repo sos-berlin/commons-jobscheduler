@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,9 +176,8 @@ public class JSConditionResolver {
                 break;
             }
             case "event": {
-                String event = jsCondition.getConditionParam();
-                event = event.replace("[" + jsCondition.getConditionDate() + "]", "");
-                event = event.replace(jsCondition.getConditionWorkflow() + ".", "");
+                String event = jsCondition.getEventName();
+         
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
                 
