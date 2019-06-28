@@ -14,6 +14,7 @@ import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.checkrunhistory.JobHistoryHelper;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 
@@ -61,8 +62,6 @@ public class JSInConditionCommand {
         LOGGER.trace(answer);
     }
 
-   
-
     public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,
             MalformedURLException, InterruptedException, SOSException, URISyntaxException {
         if ("showlog".equalsIgnoreCase(getCommand())) {
@@ -78,11 +77,12 @@ public class JSInConditionCommand {
 
     private void addOrder(JobSchedulerRestApiClient jobSchedulerRestApiClient, String commandParam) throws MalformedURLException, SOSException {
         URL url = new URL(settings.getJocUrl() + "/orders/add");
-        String jobChain = "x";
-        String orderId = "y";
+        JobHistoryHelper jobHistoryHelper = new JobHistoryHelper();
+        String orderId = jobHistoryHelper.getOrderId(commandParam);
+        String jobChain = jobHistoryHelper.getJobChainName(commandParam);
         
-        String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() + 
-                "\",\"orders\":[{\"jobChain\":\"" + jobChain + "\",\"orderId\":\"" + orderId + "\",\"at\":\"now\"}],\"auditLog\":{}}";
+        String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"orders\":[{\"jobChain\":\"" + jobChain + "\",\"orderId\":\""
+                + orderId + "\",\"at\":\"now\"}],\"auditLog\":{}}";
         LOGGER.debug(url.toString());
         LOGGER.debug(body);
         String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
