@@ -40,6 +40,11 @@ public class DBLayerOutConditionEvents {
             and = " and ";
         }
 
+        if (filter.getCommand() != null && !"".equals(filter.getCommand())) {
+            where += and + " command = :command";
+            and = " and ";
+        }
+
         if (filter.getOutConditionId() != null) {
             where += and + " outConditionId = :outConditionId";
             and = " and ";
@@ -52,6 +57,9 @@ public class DBLayerOutConditionEvents {
     }
 
     private <T> Query<T> bindParameters(FilterOutConditionEvents filter, Query<T> query) {
+        if (filter.getCommand() != null && !"".equals(filter.getCommand())) {
+            query.setParameter("command", filter.getCommand());
+        }
         if (filter.getEvent() != null && !"".equals(filter.getEvent())) {
             query.setParameter("event", filter.getEvent());
         }

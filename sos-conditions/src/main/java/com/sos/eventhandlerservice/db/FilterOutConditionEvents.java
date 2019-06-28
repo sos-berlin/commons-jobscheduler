@@ -6,6 +6,7 @@ public class FilterOutConditionEvents {
     private String event;
     private String workflow;
     private String session;
+    private String command;
     
     public Long getOutConditionId() {
         return outConditionId;
@@ -41,6 +42,16 @@ public class FilterOutConditionEvents {
     
     public void setSession(String session) {
         this.session = session;
+    }
+
+    
+    public String getCommand() {
+        return command;
+    }
+
+    
+    public void setCommand(String command) {
+        this.command = command;
     }
 
     

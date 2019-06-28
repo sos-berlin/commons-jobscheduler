@@ -2,6 +2,7 @@ package com.sos.eventhandlerservice.db;
 
 import javax.persistence.*;
 import com.sos.eventhandlerservice.classes.Constants;
+import com.sos.eventhandlerservice.classes.Constants.OutConditionEventCommand;
 
 @Entity
 @Table(name = Constants.OUT_CONDITION_EVENTS_TABLE)
@@ -12,6 +13,7 @@ public class DBItemOutConditionEvent {
     private Long id;
     private Long outConditionId;
     private String event;
+    private String command;
 
     public DBItemOutConditionEvent() {
 
@@ -47,5 +49,24 @@ public class DBItemOutConditionEvent {
     public void setEvent(String event) {
         this.event = event;
     }
+    
+    @Column(name = "[COMMAND]", nullable = false)
+    public String getCommand() {
+        return command;
+    }
 
+    public void setCommand(String command) {
+        this.command = command;
+    }
+    
+    @Transient
+    public boolean isDelete() {
+        return command != null && OutConditionEventCommand.delete.name().equalsIgnoreCase(command);
+    }
+    
+    @Transient
+    public boolean isCreate() {
+        return command == null || OutConditionEventCommand.create.name().equalsIgnoreCase(command);
+    }
+    
 }

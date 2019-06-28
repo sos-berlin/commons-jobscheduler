@@ -108,11 +108,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
             sosHibernateSession.setAutoCommit(false);
 
-            DBItemEvent itemEvent = new DBItemEvent();
-            itemEvent.setCreated(new Date());
-            itemEvent.setEvent(outConditionEvent.getEventValue());
 
             if (outConditionEvent.isCreateCommand()) {
+                DBItemEvent itemEvent = new DBItemEvent();
+                itemEvent.setCreated(new Date());
+                itemEvent.setEvent(outConditionEvent.getEventValue());
                 itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
                 itemEvent.setWorkflow(this.workflow);
                 itemEvent.setSession(Constants.getSession());

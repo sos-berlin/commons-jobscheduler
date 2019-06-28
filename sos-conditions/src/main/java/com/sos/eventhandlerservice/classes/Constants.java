@@ -5,6 +5,10 @@ import java.util.Calendar;
 import com.sos.hibernate.classes.ClassList;
 
 public class Constants {
+    
+    public static enum OutConditionEventCommand {
+        create, delete
+    }
 
     public static final String DBItemEvent = com.sos.eventhandlerservice.db.DBItemEvent.class.getSimpleName();
     public static final String EVENTS_TABLE_SEQUENCE = "SOS_JS_EVENTS_ID_SEQ";

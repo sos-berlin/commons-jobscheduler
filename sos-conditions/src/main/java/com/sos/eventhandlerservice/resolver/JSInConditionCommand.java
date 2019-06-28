@@ -4,12 +4,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.classes.Constants;
+import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
 import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 
@@ -57,6 +61,8 @@ public class JSInConditionCommand {
         LOGGER.trace(answer);
     }
 
+   
+
     public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,
             MalformedURLException, InterruptedException, SOSException, URISyntaxException {
         if ("showlog".equalsIgnoreCase(getCommand())) {
@@ -70,9 +76,17 @@ public class JSInConditionCommand {
         }
     }
 
-    private void addOrder(JobSchedulerRestApiClient jobSchedulerRestApiClient, String commandParam) {
-        // TODO Auto-generated method stub
-
+    private void addOrder(JobSchedulerRestApiClient jobSchedulerRestApiClient, String commandParam) throws MalformedURLException, SOSException {
+        URL url = new URL(settings.getJocUrl() + "/orders/add");
+        String jobChain = "x";
+        String orderId = "y";
+        
+        String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() + 
+                "\",\"orders\":[{\"jobChain\":\"" + jobChain + "\",\"orderId\":\"" + orderId + "\",\"at\":\"now\"}],\"auditLog\":{}}";
+        LOGGER.debug(url.toString());
+        LOGGER.debug(body);
+        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
+        LOGGER.trace(answer);
     }
 
 }
