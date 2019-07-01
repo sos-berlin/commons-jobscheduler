@@ -19,7 +19,7 @@ public class DBLayerEvents {
         this.sosHibernateSession = session;
     }
 
-    public DBItemEvent getEventsDbItem(final Long id) throws Exception {
+    public DBItemEvent getEventsDbItem(final Long id) throws SOSHibernateException  {
         return (DBItemEvent) sosHibernateSession.get(DBItemEvent.class, id);
     }
 
@@ -118,6 +118,16 @@ public class DBLayerEvents {
         query.setParameter("workflow", filter.getWorkflow());
         query.setParameter("session", filter.getSession());
         int row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
+
+    public int updateEvents(Long oldId, Long newId) throws SOSHibernateException   {
+        String hql = "update " + DBItemEvents + " set outConditionId=" + newId + " where outConditionId=:oldId";
+        int row = 0;
+        Query<DBItemEvent> query = sosHibernateSession.createQuery(hql);
+        query.setParameter("oldId", oldId);
+
+        row = sosHibernateSession.executeUpdate(query);
         return row;
     }
 

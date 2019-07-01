@@ -8,9 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.joc.model.conditions.InCondition;
-import com.sos.joc.model.conditions.InConditions;
-import com.sos.joc.model.conditions.JobInCondition;
 import com.sos.joc.model.conditions.JobOutCondition;
 import com.sos.joc.model.conditions.OutCondition;
 import com.sos.joc.model.conditions.OutConditions;
@@ -26,8 +23,8 @@ public class DBLayerOutConditions {
         this.sosHibernateSession = session;
     }
 
-    public DBItemInCondition getConditionsDbItem(final Long id) throws Exception {
-        return (DBItemInCondition) sosHibernateSession.get(DBItemInCondition.class, id);
+    public DBItemOutCondition getOutConditionsDbItem(final Long id) throws Exception {
+        return (DBItemOutCondition) sosHibernateSession.get(DBItemOutCondition.class, id);
     }
 
     public FilterOutConditions resetFilter() {
@@ -101,21 +98,28 @@ public class DBLayerOutConditions {
 
     public void deleteInsert(OutConditions outConditions) throws SOSHibernateException {
         DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         for (JobOutCondition jobOutCondition : outConditions.getJobsOutconditions()) {
 
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJob(jobOutCondition.getJob());
             filterOutConditions.setMasterId(outConditions.getMasterId());
             delete(filterOutConditions);
+                        
             for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
+                Long oldId = outCondition.getId();
+                
                 DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
                 dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
                 dbItemOutCondition.setMasterId(outConditions.getMasterId());
                 dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
                 sosHibernateSession.save(dbItemOutCondition);
-
+                Long newId = dbItemOutCondition.getId();
+                dbLayerEvents.updateEvents(oldId,newId);
                 dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
+                
+
             }
         }
     }

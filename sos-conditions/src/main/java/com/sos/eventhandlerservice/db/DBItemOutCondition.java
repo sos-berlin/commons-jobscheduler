@@ -1,5 +1,8 @@
 package com.sos.eventhandlerservice.db;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.persistence.*;
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
@@ -67,5 +70,11 @@ public class DBItemOutCondition implements IJSJobConditionKey {
 
     public void setWorkflow(String workflow) {
         this.workflow = workflow;
+    }
+
+    @Transient
+    public String getPath() {
+        Path path = Paths.get(job);
+        return path.getParent().toString().replace("\\", "/");
     }
 }

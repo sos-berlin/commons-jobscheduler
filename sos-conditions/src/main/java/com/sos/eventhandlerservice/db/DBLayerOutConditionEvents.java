@@ -100,11 +100,9 @@ public class DBLayerOutConditionEvents {
         for (OutConditionEvent outConditionEvent : outCondition.getOutconditionEvents()) {
             DBItemOutConditionEvent dbItemOutConditionEvent = new DBItemOutConditionEvent();
             dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
-            if (outConditionEvent.getCommand().isEmpty()) {
-                dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
-            } else {
-                dbItemOutConditionEvent.setEvent(outConditionEvent.getCommand() + ":" + outConditionEvent.getEvent());
-            }
+            dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
+            dbItemOutConditionEvent.setCommand(outConditionEvent.getCommand());
+
             sosHibernateSession.save(dbItemOutConditionEvent);
         }
     }
