@@ -57,17 +57,6 @@ public class JSCondition {
         return s;
     }
 
-    public Integer getConditionIntegerParam() {
-        Integer i = null;
-
-        try {
-            i = Integer.parseInt(conditionParam);
-        } catch (NumberFormatException e) {
-            LOGGER.warn("Wrong Integer value in " + conditionParam);
-        }
-        return i;
-    }
-
     public String getConditionType() {
         return conditionType;
     }

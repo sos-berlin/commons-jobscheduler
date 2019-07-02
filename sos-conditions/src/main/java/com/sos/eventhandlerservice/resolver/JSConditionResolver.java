@@ -160,8 +160,8 @@ public class JSConditionResolver {
         for (JSCondition jsCondition : listOfConditions) {
             switch (jsCondition.getConditionType()) {
             case "returncode": {
-                Integer returncode = jsCondition.getConditionIntegerParam();
-                if (taskReturnCode != null && returncode != null && returncode.equals(taskReturnCode)) {
+                JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
+                if (returnCodeResolver.resolve(taskReturnCode,jsCondition.getConditionParam())) {
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
                 }
 
