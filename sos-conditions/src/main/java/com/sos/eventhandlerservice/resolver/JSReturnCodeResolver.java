@@ -11,7 +11,7 @@ public class JSReturnCodeResolver {
         super();
     }
 
-    private boolean isInInterval(int taskReturnCode, String interval) {
+    private boolean isInInterval(Integer taskReturnCode, String interval) {
         interval = interval.trim();
         if (interval.startsWith("-")) {
             interval = "0" + interval;
@@ -44,11 +44,13 @@ public class JSReturnCodeResolver {
         return false;
     }
 
-    public boolean resolve(int taskReturnCode, String returnCode) {
-        String[] intervals = returnCode.split(",");
-        for (int i = 0; i < intervals.length; i++) {
-            if (isInInterval(taskReturnCode, intervals[i])) {
-                return true;
+    public boolean resolve(Integer taskReturnCode, String returnCode) {
+        if (taskReturnCode != null) {
+            String[] intervals = returnCode.split(",");
+            for (int i = 0; i < intervals.length; i++) {
+                if (isInInterval(taskReturnCode, intervals[i])) {
+                    return true;
+                }
             }
         }
         return false;
