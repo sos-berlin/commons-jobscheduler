@@ -21,6 +21,7 @@ import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -302,6 +303,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
+            alternateOptions.setWithoutSFTPChannel(true);
             vfsHandler.connect(alternateOptions);
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");

@@ -840,7 +840,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
 
             sshSession.connect();
-            this.createSftpClient();
+            if (!connection2OptionsAlternate.getWithoutSFTPChannel().value()) {
+                this.createSftpClient();
+            }
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
