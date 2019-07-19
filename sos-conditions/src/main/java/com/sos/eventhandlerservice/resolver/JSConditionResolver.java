@@ -12,6 +12,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.eventhandlerservice.classes.CheckHistoryCacheRule;
+import com.sos.eventhandlerservice.classes.CheckHistoryCondition;
+import com.sos.eventhandlerservice.classes.CheckHistoryKey;
+import com.sos.eventhandlerservice.classes.CheckHistoryValue;
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.classes.EventDate;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
@@ -47,6 +51,8 @@ public class JSConditionResolver {
     private BooleanExp booleanExpression;
     private JobSchedulerRestApiClient jobSchedulerRestApiClient;
     private EventHandlerSettings settings;
+    private CheckHistoryCondition checkHistoryCondition;
+    private List<CheckHistoryCacheRule> listOfCheckHistoryChacheRules;
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) throws UnsupportedEncodingException,
             InterruptedException, SOSException, URISyntaxException {
@@ -61,6 +67,7 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
         jobSchedulerRestApiClient.addHeader("Accept", "application/json");
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
+        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf, EventHandlerSettings settings)
@@ -78,6 +85,7 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
         jobSchedulerRestApiClient.addHeader("Accept", "application/json");
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
+        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken, String jocUrl) throws UnsupportedEncodingException,
@@ -92,12 +100,14 @@ public class JSConditionResolver {
         jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
         jobSchedulerRestApiClient.addHeader("Accept", "application/json");
         jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", accessToken);
+        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
     public void reInit() throws SOSHibernateException {
         jsJobInConditions = null;
         jsJobOutConditions = null;
         jsEvents = null;
+        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
         this.init();
     }
 
@@ -134,7 +144,175 @@ public class JSConditionResolver {
             jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
         }
 
+        if (listOfCheckHistoryChacheRules == null) {
+            listOfCheckHistoryChacheRules = new ArrayList<CheckHistoryCacheRule>();
+            CheckHistoryCacheRule checkHistoryCacheRule = new CheckHistoryCacheRule();
+
+            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedSuccessful");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedWithError");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedTodaySuccessful");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedTodayWithError");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedWithError");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedIsEndedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedSuccessulIsEndedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedWithErrorIsEndedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedIsStartedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedSuccessfulIsStartedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("lastCompletedWithErrorIsStartedBefore");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedToday");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedTodayCompletedSuccessful");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedTodayCompletedWithError");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedTodayCompleted");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("prev");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("prevSuccessful");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("prevError");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedToday");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedTodaySuccessfully");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedTodayWithError");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedWithErrorAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isCompletedSuccessfulAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedWithErrorAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("isStartedSuccessfulAfter");
+            checkHistoryCacheRule.setValidateAlways(false);
+            checkHistoryCacheRule.setValidateIfFalse(true);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+
+        }
+
         initEvents();
+        initCheckHistory();
 
     }
 
@@ -142,18 +320,51 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
-            //filterEvents.setSession(Constants.getSession());
+            // filterEvents.setSession(Constants.getSession());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
     }
 
-    public boolean validate(Integer taskReturnCode, IJSCondition condition) {
-        JSJobConditionKey jobConditionKey = new JSJobConditionKey();
-        jobConditionKey.setJob(condition.getJob());
-        jobConditionKey.setMasterId(condition.getMasterId());
+    public void initCheckHistory() throws SOSHibernateException {
 
+        for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+            for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                String expressionValue = inCondition.getExpression();
+                JSConditions jsConditions = new JSConditions();
+                List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
+                for (JSCondition jsCondition : listOfConditions) {
+                    if ("job".equals(jsCondition.getConditionType())) {
+                        try {
+                            checkHistoryCondition.validate(jsCondition, inCondition.getJob());
+                        } catch (Exception e) {
+                            LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + inCondition.getJob());
+                        }
+                    }
+                }
+            }
+        }
+
+        for (JSOutConditions jobOutConditions : jsJobOutConditions.getListOfJobOutConditions().values()) {
+            for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
+                String expressionValue = outCondition.getExpression();
+                JSConditions jsConditions = new JSConditions();
+                List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
+                for (JSCondition jsCondition : listOfConditions) {
+                    if ("job".equals(jsCondition.getConditionType())) {
+                        try {
+                            checkHistoryCondition.validate(jsCondition, outCondition.getJob());
+                        } catch (Exception e) {
+                            LOGGER.warn("Could not validate expression:" + expressionValue + " in out-condition of job " + outCondition.getJob());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean validate(Integer taskReturnCode, IJSCondition condition) {
         String expressionValue = condition.getExpression();
         JSConditions jsConditions = new JSConditions();
         List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
@@ -161,7 +372,7 @@ public class JSConditionResolver {
             switch (jsCondition.getConditionType()) {
             case "returncode": {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
-                if (returnCodeResolver.resolve(taskReturnCode,jsCondition.getConditionParam())) {
+                if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
                 }
 
@@ -175,14 +386,35 @@ public class JSConditionResolver {
 
                 break;
             }
+            case "job": {
+                try {
+                    if (checkHistoryCondition.validate(jsCondition, condition.getJob()).getValidateResult()) {
+                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
+                                "true ");
+                    }
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+                break;
+            }
             case "event": {
                 String event = jsCondition.getEventName();
-         
+
                 JSEventKey jsEventKey = new JSEventKey();
                 jsEventKey.setEvent(event);
-                
-                EventDate eventDate = new EventDate();             
-                jsEventKey.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
+
+                EventDate eventDate = new EventDate();
+                String date = jsCondition.getConditionDate();
+                try {
+                    if (eventDate.isPrev(date)) {
+                        CheckHistoryValue checkHistoryValue = checkHistoryCondition.getPrev(date, condition.getJob());
+                        date = String.valueOf(checkHistoryValue.getStartTime().getYear()) + "." + String.valueOf(checkHistoryValue.getStartTime()
+                                .getDayOfYear());
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
+                }
+                jsEventKey.setSession(eventDate.getEventDate(date));
                 JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, jsCondition.getConditionWorkflow());
                 if (jsEvent != null) {
                     expressionValue = expressionValue.replace(jsCondition.getConditonValue() + " ", "true ");
@@ -354,5 +586,17 @@ public class JSConditionResolver {
     public Boolean eventExist(JSEventKey jsEventKey, String workflow) {
         JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, workflow);
         return jsEvent != null;
+    }
+
+    public void checkHistoryCache(String jobPath) throws Exception {
+        CheckHistoryKey checkHistoryKey = new CheckHistoryKey(jobPath, "");
+        for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
+            checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
+            CheckHistoryValue validateResult = checkHistoryCondition.get(checkHistoryKey);
+            if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
+                    .getValidateResult()))) {
+                checkHistoryCondition.validate(validateResult.getJsCondition(), jobPath);
+            }
+        }
     }
 }

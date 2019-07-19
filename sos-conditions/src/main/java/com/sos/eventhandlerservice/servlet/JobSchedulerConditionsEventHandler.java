@@ -31,6 +31,7 @@ import com.sos.jitl.classes.plugin.PluginMailer;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 
 public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventHandler {
 
@@ -114,6 +115,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
         if (!Constants.getSession().equals(this.session)) {
             try {
+                this.session = Constants.getSession();
                 conditionResolver.reInit();
             } catch (SOSHibernateException e) {
                 LOGGER.error(e.getMessage(), e);
@@ -131,7 +133,11 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                     switch (jobSchedulerEvent.getType()) {
 
                     case "TaskEnded":
+                        
+                       
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
+                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath());
+
                         JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit",
                                 taskEndEvent.getJobPath());
                         for (JSEvent jsNewEvent : jsNewEvents.getListOfEvents().values()) {

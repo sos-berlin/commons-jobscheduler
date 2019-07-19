@@ -39,6 +39,8 @@ public class EventDate {
             break;
         case "*":
             return "*";
+        case "prev":
+            return "*";
         case "yesterday":
             d = addCalendar(new Date(), -1 + operand, java.util.Calendar.DATE);
             calendar.setTime(d);
@@ -58,5 +60,9 @@ public class EventDate {
         calendar.add(c, add);
         return calendar.getTime();
     }
+
+    public boolean isPrev(String conditionEventDate) {
+        return conditionEventDate.toLowerCase().trim().startsWith("prev");
+     }
 
 }

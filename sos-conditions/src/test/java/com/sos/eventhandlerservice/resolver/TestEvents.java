@@ -18,6 +18,7 @@ import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.reporting.db.DBLayer;
  
 
 public class TestEvents {
@@ -26,6 +27,8 @@ public class TestEvents {
     private SOSHibernateSession getSession(String confFile) throws SOSHibernateFactoryBuildException, SOSHibernateOpenSessionException, SOSHibernateConfigurationException   {
         SOSHibernateFactory sosHibernateFactory = new SOSHibernateFactory(confFile);
         sosHibernateFactory.addClassMapping(Constants.getConditionsClassMapping());
+        sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
+
         sosHibernateFactory.build();
         return sosHibernateFactory.openStatelessSession();
     }
@@ -48,6 +51,7 @@ public class TestEvents {
         File f = new File("src/test/resources/config/private/private.conf");
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setJocUrl("http://localhost:4446");
+        settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f,settings );
         expressionResolver.init();
         expressionResolver.resolveInConditions();

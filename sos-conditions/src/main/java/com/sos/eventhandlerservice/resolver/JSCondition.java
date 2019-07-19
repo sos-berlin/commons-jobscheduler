@@ -12,11 +12,15 @@ public class JSCondition {
     private String conditionWorkflow;
     private String conditionDate;
     private String conditionValue;
+    private String conditionJob;
+    private String conditionQuery;
 
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
         conditionWorkflow = getConditionWorkflow(conditionParam);
+        conditionJob = getConditionJob(conditionParam);
+        conditionQuery = getConditionQuery(conditionParam);
         conditionDate = getConditionDate(conditionParam);
         conditionValue = condition;
     }
@@ -34,6 +38,22 @@ public class JSCondition {
 
     }
 
+    private String getConditionJob(String conditionParam) {
+        String s = "";
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.split("\\.")[0];
+        }
+        return s;
+    }
+
+    private String getConditionQuery(String conditionParam) {
+        String s = conditionParam;
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.split("\\.")[1];
+        }
+        return s;
+    }
+
     private String getConditionType(String condition) {
         String[] conditionParts = condition.split(":");
         if (conditionParts.length == 1) {
@@ -41,11 +61,10 @@ public class JSCondition {
         } else {
             return conditionParts[0];
         }
-
     }
 
     private String getConditionTypeParam(String condition) {
-        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "");
+        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "");
         return s;
     }
 
@@ -77,10 +96,18 @@ public class JSCondition {
         return conditionValue;
     }
 
+    public String getConditionJob() {
+        return conditionJob;
+    }
+
     public String getEventName() {
         String event = conditionParam;
         event = event.replace("[" + this.getConditionDate() + "]", "");
-        event = event.replace(this.getConditionWorkflow() + ".", "");        
+        event = event.replace(this.getConditionWorkflow() + ".", "");
         return event;
+    }
+
+    public String getConditionQuery() {
+        return conditionQuery;
     }
 }
