@@ -42,6 +42,9 @@ import com.sos.jitl.restclient.WebserviceCredentials;
 
 public class JSConditionResolver {
 
+    private static final String JOB = "job";
+    private static final String JOB_CHAIN = "job_chain";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JSConditionResolver.class);
 
     private JSJobInConditions jsJobInConditions;
@@ -335,12 +338,19 @@ public class JSConditionResolver {
                 JSConditions jsConditions = new JSConditions();
                 List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
                 for (JSCondition jsCondition : listOfConditions) {
-                    if ("job".equals(jsCondition.getConditionType())) {
-                        try {
-                            checkHistoryCondition.validate(jsCondition, inCondition.getJob());
-                        } catch (Exception e) {
-                            LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + inCondition.getJob());
+                    try {
+                        switch (jsCondition.getConditionType()) {
+                        case JOB: {
+                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob());
+                            break;
                         }
+                        case JOB_CHAIN: {
+                            checkHistoryCondition.validateJobChain(jsCondition);
+                            break;
+                        }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + inCondition.getJob());
                     }
                 }
             }
@@ -352,12 +362,19 @@ public class JSConditionResolver {
                 JSConditions jsConditions = new JSConditions();
                 List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
                 for (JSCondition jsCondition : listOfConditions) {
-                    if ("job".equals(jsCondition.getConditionType())) {
-                        try {
-                            checkHistoryCondition.validate(jsCondition, outCondition.getJob());
-                        } catch (Exception e) {
-                            LOGGER.warn("Could not validate expression:" + expressionValue + " in out-condition of job " + outCondition.getJob());
+                    try {
+                        switch (jsCondition.getConditionType()) {
+                        case JOB: {
+                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob());
+                            break;
                         }
+                        case JOB_CHAIN: {
+                            checkHistoryCondition.validateJobChain(jsCondition);
+                            break;
+                        }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + outCondition.getJob());
                     }
                 }
             }
@@ -386,9 +403,20 @@ public class JSConditionResolver {
 
                 break;
             }
-            case "job": {
+            case JOB: {
                 try {
-                    if (checkHistoryCondition.validate(jsCondition, condition.getJob()).getValidateResult()) {
+                    if (checkHistoryCondition.validateJob(jsCondition, condition.getJob()).getValidateResult()) {
+                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
+                                "true ");
+                    }
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+                break;
+            }
+            case JOB_CHAIN: {
+                try {
+                    if (checkHistoryCondition.validateJobChain(jsCondition).getValidateResult()) {
                         expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
                                 "true ");
                     }
@@ -589,13 +617,13 @@ public class JSConditionResolver {
     }
 
     public void checkHistoryCache(String jobPath) throws Exception {
-        CheckHistoryKey checkHistoryKey = new CheckHistoryKey(jobPath, "");
+        CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
         for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
             checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
             CheckHistoryValue validateResult = checkHistoryCondition.get(checkHistoryKey);
             if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
                     .getValidateResult()))) {
-                checkHistoryCondition.validate(validateResult.getJsCondition(), jobPath);
+                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath);
             }
         }
     }

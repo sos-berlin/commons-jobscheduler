@@ -13,6 +13,7 @@ public class JSCondition {
     private String conditionDate;
     private String conditionValue;
     private String conditionJob;
+    private String conditionJobChain;
     private String conditionQuery;
 
     public JSCondition(String condition) {
@@ -20,6 +21,7 @@ public class JSCondition {
         conditionParam = getConditionTypeParam(condition);
         conditionWorkflow = getConditionWorkflow(conditionParam);
         conditionJob = getConditionJob(conditionParam);
+        conditionJobChain = getConditionJobChain(conditionParam);
         conditionQuery = getConditionQuery(conditionParam);
         conditionDate = getConditionDate(conditionParam);
         conditionValue = condition;
@@ -45,6 +47,10 @@ public class JSCondition {
         }
         return s;
     }
+    
+    private String getConditionJobChain(String conditionParam) {
+       return getConditionJob(conditionParam);
+    }
 
     private String getConditionQuery(String conditionParam) {
         String s = conditionParam;
@@ -64,7 +70,7 @@ public class JSCondition {
     }
 
     private String getConditionTypeParam(String condition) {
-        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "");
+        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "").replaceFirst("job_chain:", "");
         return s;
     }
 
@@ -109,5 +115,10 @@ public class JSCondition {
 
     public String getConditionQuery() {
         return conditionQuery;
+    }
+
+    
+    public String getConditionJobChain() {
+        return conditionJobChain;
     }
 }

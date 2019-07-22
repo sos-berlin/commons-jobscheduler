@@ -1,23 +1,25 @@
 package com.sos.eventhandlerservice.classes;
 
-import com.sos.eventhandlerservice.resolver.JSEventKey;
-
+ 
 public class CheckHistoryKey {
-    public CheckHistoryKey(String job, String query) {
+    private String type;
+    private String name;
+    private String query;
+    
+    
+    public CheckHistoryKey(String type, String name, String query) {
         super();
-        this.job = job;
+        this.type = type;
+        this.name = name;
         this.query = query;
     }
 
-    private String job;
-    private String query;
-    
-    public String getJob() {
-        return job;
+    public String getName() {
+        return name;
     }
     
-    public void setJob(String job) {
-        this.job = job;
+    public void setJob(String name) {
+        this.name = name;
     }
     
     public String getQuery() {
@@ -32,13 +34,18 @@ public class CheckHistoryKey {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof CheckHistoryKey) {
             CheckHistoryKey checkHistoryKey = (CheckHistoryKey) obj;
-            return job.equals(checkHistoryKey.job) && query.equals(checkHistoryKey.query);
+            return name.equals(checkHistoryKey.name) && query.equals(checkHistoryKey.query);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (job + "." + query).hashCode();
+        return (name + "." + query).hashCode();
+    }
+
+    
+    public String getType() {
+        return type;
     }
 }

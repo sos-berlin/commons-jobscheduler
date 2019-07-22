@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.eventhandlerservice.classes.ConditionCustomEvent;
 import com.sos.eventhandlerservice.classes.Constants;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
+import com.sos.eventhandlerservice.classes.OrderFinishedEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
@@ -132,6 +133,11 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     switch (jobSchedulerEvent.getType()) {
 
+                    case "OrderFinished":
+                        OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain());
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")");
+                        break;
                     case "TaskEnded":
                         
                        
