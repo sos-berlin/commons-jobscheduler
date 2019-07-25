@@ -436,8 +436,8 @@ public class JSConditionResolver {
                 try {
                     if (eventDate.isPrev(date)) {
                         CheckHistoryValue checkHistoryValue = checkHistoryCondition.getPrev(date, condition.getJob());
-                        date = String.valueOf(checkHistoryValue.getStartTime().getYear()) + "." + String.valueOf(checkHistoryValue.getStartTime()
-                                .getDayOfYear());
+                        date = String.valueOf(checkHistoryValue.getStartTime().getMonthValue()) + "." + String.valueOf(checkHistoryValue.getStartTime()
+                                .getDayOfMonth());
                     }
                 } catch (Exception e) {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
@@ -483,11 +483,11 @@ public class JSConditionResolver {
         return listOfValidatedInconditions;
     }
 
-    public JSEvents resolveOutConditions(Integer taskReturnCode, String masterId, String job) throws SOSHibernateException {
+    public JSEvents resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         JSEvents newJsEvents = new JSEvents();
         jobConditionKey.setJob(job);
-        jobConditionKey.setMasterId(masterId);
+        jobConditionKey.setJobSchedulerId(jobSchedulerId);
         JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
 
         if (jobOutConditions != null) {

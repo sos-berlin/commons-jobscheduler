@@ -29,7 +29,7 @@ public class DBLayerOutConditions {
 
     public FilterOutConditions resetFilter() {
         FilterOutConditions filter = new FilterOutConditions();
-        filter.setMasterId("");
+        filter.setJobSchedulerId("");
         filter.setJob("");
         filter.setWorkflow("");
         return filter;
@@ -39,8 +39,8 @@ public class DBLayerOutConditions {
         String where = "";
         String and = "";
 
-        if (filter.getMasterId() != null && !"".equals(filter.getMasterId())) {
-            where += and + " o.masterId = :masterId";
+        if (filter.getJobSchedulerId() != null && !"".equals(filter.getJobSchedulerId())) {
+            where += and + " o.schedulerId = :schedulerId";
             and = " and ";
         }
 
@@ -59,8 +59,8 @@ public class DBLayerOutConditions {
     }
 
     private <T> Query<T> bindParameters(FilterOutConditions filter, Query<T> query) {
-        if (filter.getMasterId() != null && !"".equals(filter.getMasterId())) {
-            query.setParameter("masterId", filter.getMasterId());
+        if (filter.getJobSchedulerId() != null && !"".equals(filter.getJobSchedulerId())) {
+            query.setParameter("schedulerId", filter.getJobSchedulerId());
         }
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());
@@ -103,7 +103,7 @@ public class DBLayerOutConditions {
 
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJob(jobOutCondition.getJob());
-            filterOutConditions.setMasterId(outConditions.getMasterId());
+            filterOutConditions.setJobSchedulerId(outConditions.getJobSchedulerId());
             delete(filterOutConditions);
                         
             for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
@@ -112,7 +112,7 @@ public class DBLayerOutConditions {
                 DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
                 dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
-                dbItemOutCondition.setMasterId(outConditions.getMasterId());
+                dbItemOutCondition.setSchedulerId(outConditions.getJobSchedulerId());
                 dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
                 sosHibernateSession.save(dbItemOutCondition);
                 Long newId = dbItemOutCondition.getId();

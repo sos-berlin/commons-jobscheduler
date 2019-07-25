@@ -3,7 +3,7 @@ package com.sos.eventhandlerservice.db;
 public class FilterConsumedInConditions {
 
     private Long inConditionId;
-    private String masterId="";
+    private String jobSchedulerIdId="";
     private String workflow="";
     private String job="";
     private String session;
@@ -43,13 +43,13 @@ public class FilterConsumedInConditions {
     }
 
     
-    public String getMasterId() {
-        return masterId;
+    public String getJobSchedulerId() {
+        return jobSchedulerIdId;
     }
 
     
-    public void setMasterId(String masterId) {
-        this.masterId = masterId;
+    public void setJobSchedulerId(String jobSchedulerId) {
+        this.jobSchedulerIdId = jobSchedulerId;
     }
 
 }

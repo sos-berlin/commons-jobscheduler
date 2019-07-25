@@ -42,7 +42,7 @@ public class JSInConditionCommand {
     }
 
     public String getCommand() {
-        return itemInConditionCommand.getCommand();
+        return itemInConditionCommand.getCommand().replaceAll("_", "").toLowerCase();
     }
 
     public String getCommandParam() {
@@ -64,13 +64,13 @@ public class JSInConditionCommand {
 
     public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, JSInCondition jsInCondition) throws UnsupportedEncodingException,
             MalformedURLException, InterruptedException, SOSException, URISyntaxException {
-        if ("showlog".equalsIgnoreCase(getCommand())) {
+        if ("writelog".equalsIgnoreCase(getCommand())) {
             LOGGER.info(getCommandParam());
         }
-        if ("start_job".equalsIgnoreCase(getCommand())) {
+        if ("startjob".equalsIgnoreCase(getCommand())) {
             startJob(jobSchedulerRestApiClient, jsInCondition.getJob(), getCommandParam());
         }
-        if ("add_order".equalsIgnoreCase(getCommand())) {
+        if ("addorder".equalsIgnoreCase(getCommand())) {
             addOrder(jobSchedulerRestApiClient, getCommandParam());
         }
     }

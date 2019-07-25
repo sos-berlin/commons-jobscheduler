@@ -52,8 +52,7 @@ public class CheckHistoryCondition {
     
     public CheckHistoryValue validateJobChain(JSCondition jsCondition) throws Exception {
         String jobChain = jsCondition.getConditionJobChain();
-        jobChain.replace('[','(');
-        jobChain.replace(']',')');
+        jobChain = jobChain.replace('[','(').replace(']',')');
        
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB_CHAIN, jobChain, jsCondition.getConditionQuery().toLowerCase());
         CheckHistoryValue validateResult = checkHistoryCache.get(checkHistoryKey);

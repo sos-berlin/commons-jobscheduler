@@ -29,8 +29,8 @@ public class DBItemOutConditionWithEvent implements IJSJobConditionKey {
     }
 
     @Override
-    public String getMasterId() {
-        return dbItemOutCondition.getMasterId();
+    public String getJobSchedulerId() {
+        return dbItemOutCondition.getJobSchedulerId();
     }
 
     @Override

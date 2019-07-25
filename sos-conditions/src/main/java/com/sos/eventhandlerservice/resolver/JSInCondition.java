@@ -40,8 +40,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return itemInCondition.getId();
     }
 
-    public String getMasterId() {
-        return itemInCondition.getMasterId();
+    public String getJobSchedulerId() {
+        return itemInCondition.getSchedulerId();
     }
 
     public String getJob() {

@@ -65,12 +65,12 @@ public class JSCondition {
         if (conditionParts.length == 1) {
             return "event";
         } else {
-            return conditionParts[0];
+            return conditionParts[0].replaceAll("_","").toLowerCase();
         }
     }
 
     private String getConditionTypeParam(String condition) {
-        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "").replaceFirst("job_chain:", "");
+        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "").replaceFirst("jobchain:", "");
         return s;
     }
 

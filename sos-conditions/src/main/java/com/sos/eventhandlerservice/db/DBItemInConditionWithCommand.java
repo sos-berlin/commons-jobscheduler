@@ -41,8 +41,8 @@ public class DBItemInConditionWithCommand implements IJSJobConditionKey {
     }
 
     @Override
-    public String getMasterId() {
-        return this.dbItemInCondition.getMasterId();
+    public String getJobSchedulerId() {
+        return this.dbItemInCondition.getJobSchedulerId();
     }
 
     @Override

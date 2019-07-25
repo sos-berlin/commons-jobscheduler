@@ -4,12 +4,12 @@ import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 
 public class JSJobConditionKey {
 
-    private String masterId;
+    private String jobSchedulerId;
     private String job;
 
 
     public JSJobConditionKey(IJSJobConditionKey jsJobConditionKey) {
-        masterId = jsJobConditionKey.getMasterId();
+        jobSchedulerId = jsJobConditionKey.getJobSchedulerId();
         job = jsJobConditionKey.getJob();
     }
 
@@ -18,7 +18,7 @@ public class JSJobConditionKey {
 
    
     public JSJobConditionKey(JSOutCondition outCondition) {
-        masterId = outCondition.getMasterId();
+        jobSchedulerId = outCondition.getJobSchedulerId();
         job = outCondition.getJob();
     }
 
@@ -26,22 +26,22 @@ public class JSJobConditionKey {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof JSJobConditionKey) {
             JSJobConditionKey jobConditionKey = (JSJobConditionKey) obj;
-            return masterId.equals(jobConditionKey.masterId) && job.equals(jobConditionKey.job);
+            return jobSchedulerId.equals(jobConditionKey.jobSchedulerId) && job.equals(jobConditionKey.job);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (masterId + "." + job).hashCode();
+        return (jobSchedulerId + "." + job).hashCode();
     }
 
-    public String getMasterId() {
-        return masterId;
+    public String getJobSchedulerId() {
+        return jobSchedulerId;
     }
 
-    public void setMasterId(String masterId) {
-        this.masterId = masterId;
+    public void setJobSchedulerId(String jobSchedulerId) {
+        this.jobSchedulerId = jobSchedulerId;
     }
 
     public String getJob() {

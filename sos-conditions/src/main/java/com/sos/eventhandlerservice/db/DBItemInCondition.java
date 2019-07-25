@@ -11,7 +11,7 @@ import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
 public class DBItemInCondition implements IJSJobConditionKey{
 
     private Long id;
-    private String masterId;
+    private String schedulerId;
     private String job;
     private String expression;
     private String workflow;
@@ -33,13 +33,13 @@ public class DBItemInCondition implements IJSJobConditionKey{
         this.id = id;
     }
 
-    @Column(name = "[MASTER_ID]", nullable = false)
-    public String getMasterId() {
-        return masterId;
+    @Column(name = "[SCHEDULER_ID]", nullable = false)
+    public String getSchedulerId() {
+        return schedulerId;
     }
 
-    public void setMasterId(String masterId) {
-        this.masterId = masterId;
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
     }
 
     @Column(name = "[JOB]", nullable = false)
@@ -68,6 +68,12 @@ public class DBItemInCondition implements IJSJobConditionKey{
 
     public void setWorkflow(String workflow) {
         this.workflow = workflow;
+    }
+
+    @Override
+    @Transient
+    public String getJobSchedulerId() {
+        return getSchedulerId();
     }
 
 }

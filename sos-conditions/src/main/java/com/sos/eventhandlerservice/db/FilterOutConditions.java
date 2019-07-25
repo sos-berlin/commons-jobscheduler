@@ -2,16 +2,16 @@ package com.sos.eventhandlerservice.db;
 
 public class FilterOutConditions {
 
-    private String masterId;
+    private String jobSchedulerId;
     private String job;
     private String workflow;
 
-    public String getMasterId() {
-        return masterId;
+    public String getJobSchedulerId() {
+        return jobSchedulerId;
     }
 
-    public void setMasterId(String masterId) {
-        this.masterId = masterId;
+    public void setJobSchedulerId(String jobSchedulerId) {
+        this.jobSchedulerId = jobSchedulerId;
     }
 
     public String getJob() {

@@ -1,5 +1,6 @@
 package com.sos.eventhandlerservice.db;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.hibernate.query.Query;
@@ -30,7 +31,7 @@ public class DBLayerInConditions {
 
     public FilterInConditions resetFilter() {
         FilterInConditions filter = new FilterInConditions();
-        filter.setMasterId("");
+        filter.setJobSchedulerId("");
         filter.setJob("");
         filter.setWorkflow("");
         return filter;
@@ -40,8 +41,8 @@ public class DBLayerInConditions {
         String where = "";
         String and = "";
 
-        if (filter.getMasterId() != null && !"".equals(filter.getMasterId())) {
-            where += and + " i.masterId = :masterId";
+        if (filter.getJobSchedulerId() != null && !"".equals(filter.getJobSchedulerId())) {
+            where += and + " i.schedulerId = :schedulerId";
             and = " and ";
         }
 
@@ -60,8 +61,8 @@ public class DBLayerInConditions {
     }
 
     private <T> Query<T> bindParameters(FilterInConditions filter, Query<T> query) {
-        if (filter.getMasterId() != null && !"".equals(filter.getMasterId())) {
-            query.setParameter("masterId", filter.getMasterId());
+        if (filter.getJobSchedulerId() != null && !"".equals(filter.getJobSchedulerId())) {
+            query.setParameter("schedulerId", filter.getJobSchedulerId());
         }
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());
@@ -101,15 +102,15 @@ public class DBLayerInConditions {
         for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
             FilterInConditions filterInConditions = new FilterInConditions();
             filterInConditions.setJob(jobInCondition.getJob());
-            filterInConditions.setMasterId(inConditions.getMasterId());
+            filterInConditions.setJobSchedulerId(inConditions.getJobSchedulerId());
             delete(filterInConditions);
 
             for (InCondition inCondition : jobInCondition.getInconditions()) {
                 DBItemInCondition dbItemInCondition = new DBItemInCondition();
                 dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
                 dbItemInCondition.setJob(jobInCondition.getJob());
-                dbItemInCondition.setMasterId(inConditions.getMasterId());
-                dbItemInCondition.setWorkflow(inCondition.getWorkflow());
+                dbItemInCondition.setSchedulerId(inConditions.getJobSchedulerId());
+                dbItemInCondition.setWorkflow(Paths.get(inCondition.getWorkflow()).getFileName().toString());
                 sosHibernateSession.save(dbItemInCondition);
 
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);

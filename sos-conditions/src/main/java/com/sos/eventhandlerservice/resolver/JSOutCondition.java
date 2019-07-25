@@ -22,7 +22,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);
     private Long id;
-    private String masterId;
+    private String jobSchedulerId;
     private String job;
     private String expression;
     private String workflow;
@@ -35,7 +35,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     public void setItemOutCondition(DBItemOutCondition itemOutCondition) {
         this.id = itemOutCondition.getId();
-        this.masterId = itemOutCondition.getMasterId();
+        this.jobSchedulerId = itemOutCondition.getJobSchedulerId();
         this.job = itemOutCondition.getJob();
         this.expression = itemOutCondition.getExpression();
         this.workflow = itemOutCondition.getWorkflow();
@@ -45,8 +45,8 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return this.id;
     }
 
-    public String getMasterId() {
-        return this.masterId;
+    public String getJobSchedulerId() {
+        return this.jobSchedulerId;
     }
 
     public String getJob() {

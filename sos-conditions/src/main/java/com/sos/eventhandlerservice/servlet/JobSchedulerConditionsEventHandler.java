@@ -189,7 +189,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         case "ResetConditionResolver":
 
                             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-                            filterConsumedInConditions.setMasterId(super.getSettings().getSchedulerId());
+                            filterConsumedInConditions.setJobSchedulerId(super.getSettings().getSchedulerId());
                             filterConsumedInConditions.setSession(Constants.getSession());
                             filterConsumedInConditions.setWorkflow(customEvent.getWorkflow());
                             filterConsumedInConditions.setJob(customEvent.getJob());
