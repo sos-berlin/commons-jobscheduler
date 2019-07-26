@@ -186,6 +186,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             return null;
                         }
                     };
+                    
                     commandExecution = executorService.submit(runCompleteCmd);
                     Callable<Void> sendSignal = new Callable<Void>() {
 
@@ -259,7 +260,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             if (executorService != null) {
                 ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("KILL");
                 if (commandExecution != null) {
-                    commandExecution.cancel(false);
+                    commandExecution.cancel(true);
+                }
+                if (sendSignalExecution != null) {
+                    sendSignalExecution.cancel(true);
                 }
                 executorService.shutdownNow();
             }
