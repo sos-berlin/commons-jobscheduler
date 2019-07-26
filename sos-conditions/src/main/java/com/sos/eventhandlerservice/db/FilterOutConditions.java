@@ -1,10 +1,14 @@
 package com.sos.eventhandlerservice.db;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FilterOutConditions {
 
     private String jobSchedulerId;
     private String job;
     private String workflow;
+    private List<String> events;
 
     public String getJobSchedulerId() {
         return jobSchedulerId;
@@ -30,4 +34,16 @@ public class FilterOutConditions {
         this.workflow = workflow;
     }
 
+    public void addEvent(String event) {
+        if (events == null) {
+            events = new ArrayList<String>();
+        }
+        if (!events.contains(event)) {
+            events.add(event);
+        }
+    }
+
+    public List<String> getListOfEvents() {
+        return events;
+    }
 }

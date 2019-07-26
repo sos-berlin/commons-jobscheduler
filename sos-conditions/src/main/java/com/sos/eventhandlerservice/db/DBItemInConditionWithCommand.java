@@ -49,5 +49,6 @@ public class DBItemInConditionWithCommand implements IJSJobConditionKey {
     public String getJob() {
         return this.dbItemInCondition.getJob();
     }
+ 
 
 }

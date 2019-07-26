@@ -150,7 +150,13 @@ public class JSConditionResolver {
         if (listOfCheckHistoryChacheRules == null) {
             listOfCheckHistoryChacheRules = new ArrayList<CheckHistoryCacheRule>();
             CheckHistoryCacheRule checkHistoryCacheRule = new CheckHistoryCacheRule();
+            checkHistoryCacheRule.setQueryString("returnCode");
+            checkHistoryCacheRule.setValidateAlways(true);
+            checkHistoryCacheRule.setValidateIfFalse(false);
+            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
 
+            
+            checkHistoryCacheRule = new CheckHistoryCacheRule();
             checkHistoryCacheRule.setQueryString("lastCompletedRunEndedSuccessful");
             checkHistoryCacheRule.setValidateAlways(true);
             checkHistoryCacheRule.setValidateIfFalse(false);
@@ -341,7 +347,7 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob());
+                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob(),0);
                             break;
                         }
                         case JOB_CHAIN: {
@@ -365,7 +371,7 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob());
+                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob(),0);
                             break;
                         }
                         case JOB_CHAIN: {
@@ -405,7 +411,7 @@ public class JSConditionResolver {
             }
             case JOB: {
                 try {
-                    if (checkHistoryCondition.validateJob(jsCondition, condition.getJob()).getValidateResult()) {
+                    if (checkHistoryCondition.validateJob(jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
                                 "true ");
                     }
@@ -436,8 +442,8 @@ public class JSConditionResolver {
                 try {
                     if (eventDate.isPrev(date)) {
                         CheckHistoryValue checkHistoryValue = checkHistoryCondition.getPrev(date, condition.getJob());
-                        date = String.valueOf(checkHistoryValue.getStartTime().getMonthValue()) + "." + String.valueOf(checkHistoryValue.getStartTime()
-                                .getDayOfMonth());
+                        date = String.valueOf(checkHistoryValue.getStartTime().getMonthValue()) + "." + String.valueOf(checkHistoryValue
+                                .getStartTime().getDayOfMonth());
                     }
                 } catch (Exception e) {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
@@ -616,14 +622,15 @@ public class JSConditionResolver {
         return jsEvent != null;
     }
 
-    public void checkHistoryCache(String jobPath) throws Exception {
+    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception {
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
         for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
             checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
-            CheckHistoryValue validateResult = checkHistoryCondition.get(checkHistoryKey);
+            CheckHistoryValue validateResult = checkHistoryCondition.getCache(checkHistoryKey);
             if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
                     .getValidateResult()))) {
-                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath);
+                checkHistoryCondition.putCache(checkHistoryKey,null);
+                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath,taskReturnCode);
             }
         }
     }

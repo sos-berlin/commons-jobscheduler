@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.JobOutCondition;
 import com.sos.joc.model.conditions.OutCondition;
@@ -52,6 +53,10 @@ public class DBLayerOutConditions {
         if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
             where += and + " o.workflow = :workflow";
             and = " and ";
+        }
+
+        if (filter.getListOfEvents() != null && filter.getListOfEvents().size() > 0) {
+            where += and + SearchStringHelper.getStringListPathSql(filter.getListOfEvents(), "e.event");
         }
 
         where = "where 1=1 " + and + where;
@@ -105,10 +110,10 @@ public class DBLayerOutConditions {
             filterOutConditions.setJob(jobOutCondition.getJob());
             filterOutConditions.setJobSchedulerId(outConditions.getJobSchedulerId());
             delete(filterOutConditions);
-                        
+
             for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
                 Long oldId = outCondition.getId();
-                
+
                 DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
                 dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
@@ -116,9 +121,8 @@ public class DBLayerOutConditions {
                 dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
                 sosHibernateSession.save(dbItemOutCondition);
                 Long newId = dbItemOutCondition.getId();
-                dbLayerEvents.updateEvents(oldId,newId);
+                dbLayerEvents.updateEvents(oldId, newId);
                 dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
-                
 
             }
         }

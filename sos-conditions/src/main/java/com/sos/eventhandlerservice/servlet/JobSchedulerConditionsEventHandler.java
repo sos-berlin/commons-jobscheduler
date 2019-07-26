@@ -135,14 +135,14 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     case "OrderFinished":
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
-                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain());
-                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")");
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain(),null);
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")",null);
                         break;
                     case "TaskEnded":
                         
                        
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath());
+                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(),taskEndEvent.getReturnCode());
 
                         JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit",
                                 taskEndEvent.getJobPath());
