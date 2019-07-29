@@ -9,7 +9,7 @@ public class JSCondition {
 
     private String conditionType;
     private String conditionParam;
-    private String conditionWorkflow;
+    private String conditionJobStream;
     private String conditionDate;
     private String conditionValue;
     private String conditionJob;
@@ -19,7 +19,7 @@ public class JSCondition {
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
-        conditionWorkflow = getConditionWorkflow(conditionParam);
+        conditionJobStream = getConditionJobStream(conditionParam);
         conditionJob = getConditionJob(conditionParam);
         conditionJobChain = getConditionJobChain(conditionParam);
         conditionQuery = getConditionQuery(conditionParam);
@@ -74,7 +74,7 @@ public class JSCondition {
         return s;
     }
 
-    private String getConditionWorkflow(String conditionParam) {
+    private String getConditionJobStream(String conditionParam) {
         String s = "";
         if (conditionParam.indexOf(".") >= 0) {
             s = conditionParam.substring(0, conditionParam.indexOf("."));
@@ -90,8 +90,8 @@ public class JSCondition {
         return conditionParam;
     }
 
-    public String getConditionWorkflow() {
-        return conditionWorkflow;
+    public String getConditionJobStream() {
+        return conditionJobStream;
     }
 
     public String getConditionDate() {
@@ -109,7 +109,7 @@ public class JSCondition {
     public String getEventName() {
         String event = conditionParam;
         event = event.replace("[" + this.getConditionDate() + "]", "");
-        event = event.replace(this.getConditionWorkflow() + ".", "");
+        event = event.replace(this.getConditionJobStream() + ".", "");
         return event;
     }
 

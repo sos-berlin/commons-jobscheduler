@@ -15,7 +15,7 @@ public class DBItemEvent {
     private Long outConditionId;
     private String session;
     private String event;
-    private String workflow;
+    private String jobStream;
     private Date created;
 
     public DBItemEvent() {
@@ -53,13 +53,13 @@ public class DBItemEvent {
         this.event = event;
     }
     
-    @Column(name = "[WORKFLOW]", nullable = false)
-    public String getWorkflow() {
-        return workflow;
+    @Column(name = "[JOBSTREAM]", nullable = false)
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
     
     @Column(name = "[OUT_CONDITION_ID]", nullable = false)

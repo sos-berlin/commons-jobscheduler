@@ -48,17 +48,17 @@ public class JSEvents {
 
     }
 
-    public JSEvent getEventByWorkFlow(JSEventKey jsEventKey, String conditionWorkflow) {
-        if (conditionWorkflow.isEmpty()) {
+    public JSEvent getEventByJobStream(JSEventKey jsEventKey, String conditionJobStream) {
+        if (conditionJobStream.isEmpty()) {
             for (JSEventKey eventKey : this.listOfEvents.keySet()) {
-                jsEventKey.setWorkflow(eventKey.getWorkflow());
+                jsEventKey.setJobStream(eventKey.getJobStream());
                 JSEvent jsEvent = getEvent(jsEventKey);
                 if (jsEvent != null) {
                     return jsEvent;
                 }
             }
         } else {
-            jsEventKey.setWorkflow(conditionWorkflow);
+            jsEventKey.setJobStream(conditionJobStream);
             return getEvent(jsEventKey);
         }
         return null;

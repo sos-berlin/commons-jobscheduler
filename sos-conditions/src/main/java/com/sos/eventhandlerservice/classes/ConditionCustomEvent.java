@@ -10,7 +10,7 @@ public class ConditionCustomEvent {
     private String event;
     private String outConditionId;
     private String source;
-    private String workflow;
+    private String jobStream;
     private String job;
     private String key;
     private Integer eventId;
@@ -25,7 +25,7 @@ public class ConditionCustomEvent {
             this.event = variables.getString("event", "");
             this.session = variables.getString("session", "");
             this.source = variables.getString("source", "");
-            this.workflow = variables.getString("workflow", "");
+            this.jobStream = variables.getString("jobStream", "");
             this.job = variables.getString("job", "");
             this.outConditionId = variables.getString("outConditionId", "");
         }
@@ -48,8 +48,8 @@ public class ConditionCustomEvent {
         return eventId;
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
     public String getJob() {

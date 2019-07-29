@@ -4,7 +4,7 @@ public class FilterInConditions {
 
     private String jobSchedulerId;
     private String job;
-    private String workflow;
+    private String jobStream;
 
     public String getJobSchedulerId() {
         return jobSchedulerId;
@@ -22,12 +22,12 @@ public class FilterInConditions {
         this.job = job;
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
 }

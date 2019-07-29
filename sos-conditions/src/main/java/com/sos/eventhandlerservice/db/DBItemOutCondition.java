@@ -17,7 +17,7 @@ public class DBItemOutCondition implements IJSJobConditionKey {
     private String schedulerId;
     private String job;
     private String expression;
-    private String workflow;
+    private String jobStream;
 
     public DBItemOutCondition() {
 
@@ -63,13 +63,13 @@ public class DBItemOutCondition implements IJSJobConditionKey {
         this.expression = expression;
     }
 
-    @Column(name = "[WORKFLOW]", nullable = true)
-    public String getWorkflow() {
-        return workflow;
+    @Column(name = "[JOBSTREAM]", nullable = true)
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
     @Transient

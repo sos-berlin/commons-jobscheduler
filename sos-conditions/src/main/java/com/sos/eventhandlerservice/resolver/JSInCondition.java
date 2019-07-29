@@ -52,8 +52,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") +  " ";
     }
 
-    public String getWorkflow() {
-        return itemInCondition.getWorkflow();
+    public String getJobStream() {
+        return itemInCondition.getJobStream();
     }
     
     public void addCommand(JSInConditionCommand inConditionCommand) {

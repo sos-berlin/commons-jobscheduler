@@ -167,7 +167,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         case "AddEvent":
                             filterEvents = new FilterEvents();
                             filterEvents.setSession(customEvent.getSession());
-                            filterEvents.setWorkflow(customEvent.getWorkflow());
+                            filterEvents.setJobStream(customEvent.getJobStream());
                             filterEvents.setEvent(customEvent.getEvent());
                             try {
                             filterEvents.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
@@ -191,15 +191,15 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
                             filterConsumedInConditions.setJobSchedulerId(super.getSettings().getSchedulerId());
                             filterConsumedInConditions.setSession(Constants.getSession());
-                            filterConsumedInConditions.setWorkflow(customEvent.getWorkflow());
+                            filterConsumedInConditions.setJobStream(customEvent.getJobStream());
                             filterConsumedInConditions.setJob(customEvent.getJob());
 
                             conditionResolver.removeConsumedInconditions(filterConsumedInConditions);
                             
                             filterEvents = new FilterEvents();
                             filterEvents.setSession(customEvent.getSession());
-                            filterEvents.setWorkflow(customEvent.getWorkflow());
-                            conditionResolver.removeEventsFromWorkflow(filterEvents);
+                            filterEvents.setJobStream(customEvent.getJobStream());
+                            conditionResolver.removeEventsFromJobStream(filterEvents);
 
                             break;
                         }

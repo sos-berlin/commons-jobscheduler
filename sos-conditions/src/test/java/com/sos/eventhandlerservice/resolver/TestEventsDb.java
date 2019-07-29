@@ -79,7 +79,7 @@ public class TestEventsDb {
         try {
             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
             filterConsumedInConditions.setSession("now");
-            filterConsumedInConditions.setWorkflow("test");
+            filterConsumedInConditions.setJobStream("test");
             DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             sosHibernateSession.beginTransaction();
             dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
@@ -98,10 +98,10 @@ public class TestEventsDb {
         try {
             FilterEvents filter = new FilterEvents();
             filter.setSession(Constants.getSession());
-            filter.setWorkflow("test");
+            filter.setJobStream("test");
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsFromWorkflow(filter);
+            dbLayerEvents.deleteEventsFromJobStream(filter);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();

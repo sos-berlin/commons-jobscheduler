@@ -4,20 +4,20 @@ public class JSEventKey {
 
     private String session;
     private String event;
-    private String workflow;
+    private String jobStream;
 
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof JSEventKey) {
             JSEventKey jsEventKey = (JSEventKey) obj;
-            return session.equals(jsEventKey.session) && event.equals(jsEventKey.event) && workflow.equals(jsEventKey.workflow);
+            return session.equals(jsEventKey.session) && event.equals(jsEventKey.event) && jobStream.equals(jsEventKey.jobStream);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (session + "." + event + "." + workflow).hashCode();
+        return (session + "." + event + "." + jobStream).hashCode();
     }
 
     public String getSession() {
@@ -37,13 +37,13 @@ public class JSEventKey {
     }
 
     
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
     
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
 }

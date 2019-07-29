@@ -8,6 +8,6 @@ public interface IJSCondition {
 
     public String getExpression();
     
-    public String getWorkflow();
+    public String getJobStream();
  
 }

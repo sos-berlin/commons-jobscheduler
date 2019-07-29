@@ -33,7 +33,7 @@ public class DBLayerInConditions {
         FilterInConditions filter = new FilterInConditions();
         filter.setJobSchedulerId("");
         filter.setJob("");
-        filter.setWorkflow("");
+        filter.setJobStream("");
         return filter;
     }
 
@@ -51,8 +51,8 @@ public class DBLayerInConditions {
             and = " and ";
         }
 
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            where += and + " i.workflow = :workflow";
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            where += and + " i.jobStream = :jobStream";
             and = " and ";
         }
 
@@ -67,8 +67,8 @@ public class DBLayerInConditions {
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());
         }
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            query.setParameter("workflow", filter.getWorkflow());
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            query.setParameter("jobStream", filter.getJobStream());
         }
 
         return query;
@@ -110,7 +110,7 @@ public class DBLayerInConditions {
                 dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
                 dbItemInCondition.setJob(jobInCondition.getJob());
                 dbItemInCondition.setSchedulerId(inConditions.getJobSchedulerId());
-                dbItemInCondition.setWorkflow(Paths.get(inCondition.getWorkflow()).getFileName().toString());
+                dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
                 sosHibernateSession.save(dbItemInCondition);
 
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);

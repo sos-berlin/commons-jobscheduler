@@ -7,7 +7,7 @@ public class FilterOutConditions {
 
     private String jobSchedulerId;
     private String job;
-    private String workflow;
+    private String jobStream;
     private List<String> events;
 
     public String getJobSchedulerId() {
@@ -26,12 +26,12 @@ public class FilterOutConditions {
         this.job = job;
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
     public void addEvent(String event) {

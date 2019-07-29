@@ -32,7 +32,7 @@ public class DBLayerOutConditions {
         FilterOutConditions filter = new FilterOutConditions();
         filter.setJobSchedulerId("");
         filter.setJob("");
-        filter.setWorkflow("");
+        filter.setJobStream("");
         return filter;
     }
 
@@ -50,8 +50,8 @@ public class DBLayerOutConditions {
             and = " and ";
         }
 
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            where += and + " o.workflow = :workflow";
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            where += and + " o.jobStream = :jobStream";
             and = " and ";
         }
 
@@ -71,8 +71,8 @@ public class DBLayerOutConditions {
             query.setParameter("job", filter.getJob());
         }
 
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            query.setParameter("workflow", filter.getWorkflow());
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            query.setParameter("jobStream", filter.getJobStream());
         }
 
         return query;
@@ -118,7 +118,7 @@ public class DBLayerOutConditions {
                 dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
                 dbItemOutCondition.setSchedulerId(outConditions.getJobSchedulerId());
-                dbItemOutCondition.setWorkflow(outCondition.getWorkflow());
+                dbItemOutCondition.setJobStream(outCondition.getJobStream());
                 sosHibernateSession.save(dbItemOutCondition);
                 Long newId = dbItemOutCondition.getId();
                 dbLayerEvents.updateEvents(oldId, newId);

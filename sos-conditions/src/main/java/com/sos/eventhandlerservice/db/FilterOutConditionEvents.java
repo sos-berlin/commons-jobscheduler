@@ -4,7 +4,7 @@ public class FilterOutConditionEvents {
 
     private Long outConditionId;
     private String event;
-    private String workflow;
+    private String jobStream;
     private String session;
     private String command;
 
@@ -24,12 +24,12 @@ public class FilterOutConditionEvents {
         this.event = event;
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
     public String getSession() {

@@ -4,7 +4,7 @@ public class FilterConsumedInConditions {
 
     private Long inConditionId;
     private String jobSchedulerIdId="";
-    private String workflow="";
+    private String jobStream="";
     private String job="";
     private String session;
 
@@ -24,12 +24,12 @@ public class FilterConsumedInConditions {
         this.session = session;
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
     

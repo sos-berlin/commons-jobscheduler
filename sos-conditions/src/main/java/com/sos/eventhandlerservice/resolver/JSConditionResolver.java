@@ -43,7 +43,7 @@ import com.sos.jitl.restclient.WebserviceCredentials;
 public class JSConditionResolver {
 
     private static final String JOB = "job";
-    private static final String JOB_CHAIN = "job_chain";
+    private static final String JOB_CHAIN = "jobchain";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSConditionResolver.class);
 
@@ -449,7 +449,7 @@ public class JSConditionResolver {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
                 }
                 jsEventKey.setSession(eventDate.getEventDate(date));
-                JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, jsCondition.getConditionWorkflow());
+                JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
                     expressionValue = expressionValue.replace(jsCondition.getConditonValue() + " ", "true ");
                 }
@@ -550,7 +550,7 @@ public class JSConditionResolver {
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expression = inCondition.getJob() + ":" + inCondition.getExpression();
-                if (filterConsumedInConditions.getWorkflow().equals(inCondition.getWorkflow()) && (filterConsumedInConditions.getJob().equals(
+                if (filterConsumedInConditions.getJobStream().equals(inCondition.getJobStream()) && (filterConsumedInConditions.getJob().equals(
                         inCondition.getJob()) || filterConsumedInConditions.getJob().isEmpty()) && inCondition.isConsumed()) {
                     LOGGER.debug(expression + " no longer consumed");
                     inCondition.setConsumed(false);
@@ -559,11 +559,11 @@ public class JSConditionResolver {
         }
     }
 
-    public void removeEventsFromWorkflow(FilterEvents filter) throws SOSHibernateException {
+    public void removeEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsFromWorkflow(filter);
+            dbLayerEvents.deleteEventsFromJobStream(filter);
             sosHibernateSession.commit();
 
             jsEvents = null;
@@ -581,7 +581,7 @@ public class JSConditionResolver {
         itemEvent.setEvent(filterEvents.getEvent());
         itemEvent.setOutConditionId(filterEvents.getOutConditionId());
         itemEvent.setSession(filterEvents.getSession());
-        itemEvent.setWorkflow(filterEvents.getWorkflow());
+        itemEvent.setJobStream(filterEvents.getJobStream());
         event.setItemEvent(itemEvent);
         jsEvents.addEvent(event);
 
@@ -617,8 +617,8 @@ public class JSConditionResolver {
 
     }
 
-    public Boolean eventExist(JSEventKey jsEventKey, String workflow) {
-        JSEvent jsEvent = jsEvents.getEventByWorkFlow(jsEventKey, workflow);
+    public Boolean eventExist(JSEventKey jsEventKey, String jobStream) {
+        JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jobStream);
         return jsEvent != null;
     }
 

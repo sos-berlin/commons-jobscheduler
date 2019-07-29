@@ -25,7 +25,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
     private String jobSchedulerId;
     private String job;
     private String expression;
-    private String workflow;
+    private String jobStream;
     private List<JSOutConditionEvent> listOfOutConditionEvents;
 
     public JSOutCondition() {
@@ -38,7 +38,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         this.jobSchedulerId = itemOutCondition.getJobSchedulerId();
         this.job = itemOutCondition.getJob();
         this.expression = itemOutCondition.getExpression();
-        this.workflow = itemOutCondition.getWorkflow();
+        this.jobStream = itemOutCondition.getJobStream();
     }
 
     public Long getId() {
@@ -114,7 +114,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                 itemEvent.setCreated(new Date());
                 itemEvent.setEvent(outConditionEvent.getEventValue());
                 itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
-                itemEvent.setWorkflow(this.workflow);
+                itemEvent.setJobStream(this.jobStream);
                 itemEvent.setSession(Constants.getSession());
                 JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);
                 jsEvents.addEvent(event);
@@ -126,21 +126,21 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     filterEvent.setEvent(jsCondition.getEventName());
                     EventDate eventDate = new EventDate();
                     filterEvent.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
-                    filterEvent.setWorkflow(jsCondition.getConditionWorkflow());
+                    filterEvent.setJobStream(jsCondition.getConditionJobStream());
 
                     deleteOutConditionEvent(sosHibernateSession, filterEvent);
                     JSEventKey eventKey = new JSEventKey();
                     eventKey.setEvent(filterEvent.getEvent());
                     eventKey.setSession(filterEvent.getSession());
-                    eventKey.setWorkflow(filterEvent.getWorkflow());
+                    eventKey.setJobStream(filterEvent.getJobStream());
                     jsEvents.removeEvent(eventKey);
                 }
             }
         }
     }
 
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
 }

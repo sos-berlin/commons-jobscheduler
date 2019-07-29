@@ -4,7 +4,7 @@ public class FilterEvents {
 
     private String event;
     private Long outConditionId;
-    private String workflow;
+    private String jobStream;
     private String session;
 
     public String getEvent() {
@@ -34,13 +34,13 @@ public class FilterEvents {
     }
 
     
-    public String getWorkflow() {
-        return workflow;
+    public String getJobStream() {
+        return jobStream;
     }
 
     
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setJobStream(String jobStream) {
+        this.jobStream = jobStream;
     }
 
     

@@ -4,16 +4,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.eventhandlerservice.classes.Constants;
-import com.sos.eventhandlerservice.db.DBItemEvent;
 import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
 import com.sos.exception.SOSException;
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.checkrunhistory.JobHistoryHelper;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;

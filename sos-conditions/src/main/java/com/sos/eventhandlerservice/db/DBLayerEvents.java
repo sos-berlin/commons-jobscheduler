@@ -27,7 +27,7 @@ public class DBLayerEvents {
         FilterEvents filter = new FilterEvents();
         filter.setEvent("");
         filter.setSession("");
-        filter.setWorkflow("");
+        filter.setJobStream("");
         return filter;
     }
 
@@ -45,8 +45,8 @@ public class DBLayerEvents {
             and = " and ";
         }
 
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            where += and + " workflow = :workflow";
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            where += and + " jobStream = :jobStream";
             and = " and ";
         }
 
@@ -68,8 +68,8 @@ public class DBLayerEvents {
         if (filter.getSession() != null && !"".equals(filter.getSession())) {
             query.setParameter("session", filter.getSession());
         }
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            query.setParameter("workflow", filter.getWorkflow());
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            query.setParameter("jobStream", filter.getJobStream());
         }
         if (filter.getOutConditionId() != null) {
             query.setParameter("outConditionId", filter.getOutConditionId());
@@ -104,18 +104,18 @@ public class DBLayerEvents {
         FilterEvents filter = new FilterEvents();
         filter.setEvent(itemEvent.getEvent());
         filter.setSession(itemEvent.getSession());
-        filter.setWorkflow(itemEvent.getWorkflow());
+        filter.setJobStream(itemEvent.getJobStream());
         delete(filter);
         sosHibernateSession.save(itemEvent);
     }
 
-    public int deleteEventsFromWorkflow(FilterEvents filter) throws SOSHibernateException {
+    public int deleteEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
 
         String select = "select o.id from " + DBItemEvents + " e, " + DBItemOutCondition
-                + " o where e.outConditionId = o.id and o.workflow=:workflow and e.session=:session";
+                + " o where e.outConditionId = o.id and o.jobStream=:jobStream and e.session=:session";
         String hql = "delete from " + DBItemEvents + " where outConditionId in ( " + select + ")";
         Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);
-        query.setParameter("workflow", filter.getWorkflow());
+        query.setParameter("jobStream", filter.getJobStream());
         query.setParameter("session", filter.getSession());
         int row = sosHibernateSession.executeUpdate(query);
         return row;

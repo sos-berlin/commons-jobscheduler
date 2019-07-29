@@ -1,9 +1,9 @@
 package com.sos.eventhandlerservice.resolver;
 
-import com.sos.eventhandlerservice.classes.Constants;
-import com.sos.eventhandlerservice.db.DBItemOutConditionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.eventhandlerservice.db.DBItemOutConditionEvent;
 
 public class JSOutConditionEvent {
 

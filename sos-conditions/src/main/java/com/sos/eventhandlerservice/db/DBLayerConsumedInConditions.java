@@ -56,8 +56,8 @@ public class DBLayerConsumedInConditions {
             where += and + " c.session = :session";
         }
 
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            where += and + " i.workflow = :workflow";
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            where += and + " i.jobStream = :jobStream";
         }
 
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
@@ -72,8 +72,8 @@ public class DBLayerConsumedInConditions {
         if (filter.getSession() != null && !"".equals(filter.getSession())) {
             query.setParameter("session", filter.getSession());
         }
-        if (filter.getWorkflow() != null && !"".equals(filter.getWorkflow())) {
-            query.setParameter("workflow", filter.getWorkflow());
+        if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
+            query.setParameter("jobStream", filter.getJobStream());
         }
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             query.setParameter("job", filter.getJob());

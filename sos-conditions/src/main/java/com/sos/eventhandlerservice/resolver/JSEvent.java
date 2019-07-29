@@ -12,7 +12,7 @@ public class JSEvent {
         JSEventKey jsEventKey = new JSEventKey();
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
-        jsEventKey.setWorkflow(itemEvent.getWorkflow());
+        jsEventKey.setJobStream(itemEvent.getJobStream());
         return jsEventKey;
     }
 
@@ -32,8 +32,8 @@ public class JSEvent {
         return itemEvent.getEvent();
     }
 
-    public String getWorkflow() {
-        return itemEvent.getWorkflow();
+    public String getJobStream() {
+        return itemEvent.getJobStream();
     }
 
     public Date getCreated() {
