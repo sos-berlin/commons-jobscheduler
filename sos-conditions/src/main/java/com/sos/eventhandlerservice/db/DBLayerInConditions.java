@@ -102,15 +102,16 @@ public class DBLayerInConditions {
         for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
             FilterInConditions filterInConditions = new FilterInConditions();
             filterInConditions.setJob(jobInCondition.getJob());
-            filterInConditions.setJobSchedulerId(inConditions.getJobSchedulerId());
+            filterInConditions.setJobSchedulerId(inConditions.getJobschedulerId());
             delete(filterInConditions);
 
             for (InCondition inCondition : jobInCondition.getInconditions()) {
                 DBItemInCondition dbItemInCondition = new DBItemInCondition();
                 dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
                 dbItemInCondition.setJob(jobInCondition.getJob());
-                dbItemInCondition.setSchedulerId(inConditions.getJobSchedulerId());
+                dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
                 dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
+                dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
                 sosHibernateSession.save(dbItemInCondition);
 
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);

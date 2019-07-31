@@ -108,7 +108,7 @@ public class DBLayerOutConditions {
 
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJob(jobOutCondition.getJob());
-            filterOutConditions.setJobSchedulerId(outConditions.getJobSchedulerId());
+            filterOutConditions.setJobSchedulerId(outConditions.getJobschedulerId());
             delete(filterOutConditions);
 
             for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
@@ -117,7 +117,7 @@ public class DBLayerOutConditions {
                 DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
                 dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
-                dbItemOutCondition.setSchedulerId(outConditions.getJobSchedulerId());
+                dbItemOutCondition.setSchedulerId(outConditions.getJobschedulerId());
                 dbItemOutCondition.setJobStream(outCondition.getJobStream());
                 sosHibernateSession.save(dbItemOutCondition);
                 Long newId = dbItemOutCondition.getId();

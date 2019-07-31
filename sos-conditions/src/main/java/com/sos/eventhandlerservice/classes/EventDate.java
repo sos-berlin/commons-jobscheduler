@@ -49,9 +49,9 @@ public class EventDate {
             return conditionEventDate;
         }
 
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        int year = calendar.get(Calendar.YEAR);
-        return String.valueOf(year) + "." + String.valueOf(dayOfYear);
+        int month = calendar.get(Calendar.MONTH)+1;
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        return String.valueOf(month) + "." + String.valueOf(dayOfMonth);
     }
 
     private Date addCalendar(Date date, Integer add, Integer c) {

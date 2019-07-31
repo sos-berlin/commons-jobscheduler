@@ -49,13 +49,17 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public String getExpression() {
-        return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") +  " ";
+        return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") + " ";
     }
 
     public String getJobStream() {
         return itemInCondition.getJobStream();
     }
-    
+
+    public boolean isMarkExpression() {
+        return itemInCondition.getMarkExpression();
+    }
+
     public void addCommand(JSInConditionCommand inConditionCommand) {
         listOfInConditionCommands.add(inConditionCommand);
     }
@@ -67,7 +71,9 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public void executeCommands(SOSHibernateSession sosHibernateSession, JobSchedulerRestApiClient jobSchedulerRestApiClient)
             throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException {
         LOGGER.debug("execute commands ------>");
-        this.markAsConsumed(sosHibernateSession);
+        if (this.isMarkExpression()) {
+            this.markAsConsumed(sosHibernateSession);
+        }
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             inConditionCommand.executeCommand(jobSchedulerRestApiClient, this);
         }
@@ -89,12 +95,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
     }
 
-    
     public boolean isConsumed() {
         return consumed;
     }
 
-    
     public void setConsumed(boolean consumed) {
         this.consumed = consumed;
     }
