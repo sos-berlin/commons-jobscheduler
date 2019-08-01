@@ -24,10 +24,12 @@ import com.sos.eventhandlerservice.db.DBItemInConditionWithCommand;
 import com.sos.eventhandlerservice.db.DBItemOutConditionWithEvent;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
+import com.sos.eventhandlerservice.db.DBLayerInConditionCommands;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
+import com.sos.eventhandlerservice.db.FilterInConditionCommands;
 import com.sos.eventhandlerservice.db.FilterInConditions;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSCondition;
@@ -155,7 +157,6 @@ public class JSConditionResolver {
             checkHistoryCacheRule.setValidateIfFalse(false);
             listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
 
-            
             checkHistoryCacheRule = new CheckHistoryCacheRule();
             checkHistoryCacheRule.setQueryString("lastCompletedRunEndedSuccessful");
             checkHistoryCacheRule.setValidateAlways(true);
@@ -347,7 +348,7 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob(),0);
+                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob(), 0);
                             break;
                         }
                         case JOB_CHAIN: {
@@ -371,7 +372,7 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob(),0);
+                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob(), 0);
                             break;
                         }
                         case JOB_CHAIN: {
@@ -629,9 +630,38 @@ public class JSConditionResolver {
             CheckHistoryValue validateResult = checkHistoryCondition.getCache(checkHistoryKey);
             if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
                     .getValidateResult()))) {
-                checkHistoryCondition.putCache(checkHistoryKey,null);
-                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath,taskReturnCode);
+                checkHistoryCondition.putCache(checkHistoryKey, null);
+                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath, taskReturnCode);
             }
         }
+    }
+
+    public void removeJob(String job) {
+        FilterInConditions filterInConditions = new FilterInConditions();
+        FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
+        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+        
+        filterConsumedInConditions.setJob(job);
+        filterInConditions.setJob(job);
+        filterInConditionCommands.setJob(job);
+
+        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+        DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
+        DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+
+        try {
+            dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
+            dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
+            dbLayerInConditions.delete(filterInConditions);
+        } catch (SOSHibernateException e1) {
+            LOGGER.warn("Could not delete jobs from EventHandler after deleting jobs from filesystem: " + e1.getMessage());
+        }
+
+        try {
+            reInit();
+        } catch (SOSHibernateException e) {
+            LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage());
+        }
+
     }
 }

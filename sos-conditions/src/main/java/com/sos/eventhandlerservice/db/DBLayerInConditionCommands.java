@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditionCommand;
@@ -15,6 +16,7 @@ public class DBLayerInConditionCommands {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerInConditionCommands.class);
     private static final String DBItemInConditionCommand = DBItemInConditionCommand.class.getSimpleName();
+    private static final String DBItemInCondition = DBItemInCondition.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerInConditionCommands(SOSHibernateSession session) {
@@ -32,6 +34,19 @@ public class DBLayerInConditionCommands {
         return filter;
     }
 
+    private String getDeleteWhere(FilterInConditionCommands filter) {
+        String where = "c.inConditionId = i.id ";
+        String and = " and ";
+
+
+        if (filter.getJob() != null && !"".equals(filter.getJob())) {
+            where += and + " i.job = :job";
+        }
+
+        where = " where " + where;
+        return where;
+    }    
+    
     private String getWhere(FilterInConditionCommands filter) {
         String where = "";
         String and = "";
@@ -64,6 +79,7 @@ public class DBLayerInConditionCommands {
         if (filter.getCommandParam() != null && !"".equals(filter.getCommandParam())) {
             query.setParameter("commandParam", filter.getCommandParam());
         }
+
         if (filter.getInConditionId() != null) {
             query.setParameter("inConditionId", filter.getInConditionId());
         }
@@ -91,6 +107,16 @@ public class DBLayerInConditionCommands {
         query = bindParameters(filterConditionCommands, query);
 
         row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
+
+    public int deleteCommandWithInConditions(FilterInConditionCommands filterConditionCommands) throws SOSHibernateException {
+        String select = "select i.id from " + DBItemInConditionCommand + " c, " + DBItemInCondition + " i " + getDeleteWhere(filterConditionCommands);
+
+        String hql = "delete from " + DBItemInConditionCommand + " where inConditionId in ( " + select + ")";
+        Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(hql);
+        bindParameters(filterConditionCommands, query);
+        int row = sosHibernateSession.executeUpdate(query);
         return row;
     }
 

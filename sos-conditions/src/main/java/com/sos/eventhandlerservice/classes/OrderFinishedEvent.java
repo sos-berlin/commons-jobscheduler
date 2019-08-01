@@ -21,7 +21,7 @@ public class OrderFinishedEvent {
         if (key != null) {
             String[] keys = key.split(",");
             this.jobChain = keys[0];
-            if (keys.length > 1) {
+            if (keys.length > 0) {
                 this.orderId = keys[1];
             }
         }

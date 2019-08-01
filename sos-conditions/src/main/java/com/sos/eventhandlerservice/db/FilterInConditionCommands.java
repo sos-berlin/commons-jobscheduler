@@ -5,6 +5,7 @@ public class FilterInConditionCommands {
     private Long inConditionId;
     private String command;
     private String commandParam;
+    private String job;
     
     public Long getInConditionId() {
         return inConditionId;
@@ -28,6 +29,16 @@ public class FilterInConditionCommands {
     
     public void setCommandParam(String commandParam) {
         this.commandParam = commandParam;
+    }
+
+    
+    public String getJob() {
+        return job;
+    }
+
+    
+    public void setJob(String job) {
+        this.job = job;
     }
     
 }

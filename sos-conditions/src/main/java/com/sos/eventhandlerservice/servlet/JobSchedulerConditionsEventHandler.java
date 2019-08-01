@@ -14,11 +14,15 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.classes.ConditionCustomEvent;
 import com.sos.eventhandlerservice.classes.Constants;
+import com.sos.eventhandlerservice.classes.FileBaseRemovedEvent;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.OrderFinishedEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
+import com.sos.eventhandlerservice.db.DBLayerInConditionCommands;
+import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
+import com.sos.eventhandlerservice.db.FilterInConditions;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.eventhandlerservice.resolver.JSEvent;
 import com.sos.eventhandlerservice.resolver.JSEvents;
@@ -74,7 +78,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             conditionResolver = new JSConditionResolver(reportingSession, f, this.getSettings());
             conditionResolver.init();
 
-            EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent };
+            EventType[] observedEventTypes = new EventType[] { EventType.FileBasedRemoved,EventType.TaskEnded, EventType.VariablesCustomEvent };
             start(observedEventTypes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,6 +137,12 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     switch (jobSchedulerEvent.getType()) {
 
+                    case "FileBaseRemoved":
+                        //Remove job from condition tables.
+                        FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
+                        conditionResolver.removeJob(fileBaseRemoveEvent.getJob());
+                          
+                        break;
                     case "OrderFinished":
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
                         conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain(),null);
