@@ -7,6 +7,7 @@ public class FilterOutConditionEvents {
     private String jobStream;
     private String session;
     private String command;
+    private String job;
 
     public Long getOutConditionId() {
         return outConditionId;
@@ -46,6 +47,16 @@ public class FilterOutConditionEvents {
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    
+    public String getJob() {
+        return job;
+    }
+
+    
+    public void setJob(String job) {
+        this.job = job;
     }
 
 }

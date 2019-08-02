@@ -15,6 +15,7 @@ public class DBLayerOutConditionEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerOutConditionEvents.class);
     private static final String DBItemOutConditionEvent = DBItemOutConditionEvent.class.getSimpleName();
+    private static final String DBItemOutCondition = DBItemOutCondition.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerOutConditionEvents(SOSHibernateSession session) {
@@ -56,6 +57,20 @@ public class DBLayerOutConditionEvents {
         return where;
     }
 
+    private String getDeleteWhere(FilterOutConditionEvents filter) {
+        String where = "c.outConditionId = i.id ";
+        String and = " and ";
+
+
+        if (filter.getJob() != null && !"".equals(filter.getJob())) {
+            where += and + " i.job = :job";
+        }
+
+        where = " where " + where;
+        return where;
+    }    
+  
+    
     private <T> Query<T> bindParameters(FilterOutConditionEvents filter, Query<T> query) {
         if (filter.getCommand() != null && !"".equals(filter.getCommand())) {
             query.setParameter("command", filter.getCommand());
@@ -65,6 +80,9 @@ public class DBLayerOutConditionEvents {
         }
         if (filter.getOutConditionId() != null) {
             query.setParameter("outConditionId", filter.getOutConditionId());
+        }
+        if (filter.getJob() != null) {
+            query.setParameter("job", filter.getJob());
         }
 
         return query;
@@ -92,6 +110,17 @@ public class DBLayerOutConditionEvents {
         row = sosHibernateSession.executeUpdate(query);
         return row;
     }
+    
+    public int deleteEventsWithOutConditions(FilterOutConditionEvents filterOutConditionEvents) throws SOSHibernateException {
+        String select = "select i.id from " + DBItemOutConditionEvent + " c, " + DBItemOutCondition + " i " + getDeleteWhere(filterOutConditionEvents);
+
+        String hql = "delete from " + DBItemOutConditionEvent + " where outConditionId in ( " + select + ")";
+        Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);
+        bindParameters(filterOutConditionEvents, query);
+        int row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
+
 
     public void deleteInsert(DBItemOutCondition dbItemOutCondition, OutCondition outCondition) throws SOSHibernateException {
         FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();

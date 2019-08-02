@@ -83,6 +83,9 @@ public class DBLayerInConditionCommands {
         if (filter.getInConditionId() != null) {
             query.setParameter("inConditionId", filter.getInConditionId());
         }
+        if (filter.getJob() != null) {
+            query.setParameter("job", filter.getJob());
+        }
 
         return query;
 

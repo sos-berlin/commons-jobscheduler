@@ -6,7 +6,8 @@ public class FilterEvents {
     private Long outConditionId;
     private String jobStream;
     private String session;
-
+    private String job;
+    
     public String getEvent() {
         return event;
     }
@@ -41,6 +42,16 @@ public class FilterEvents {
     
     public void setJobStream(String jobStream) {
         this.jobStream = jobStream;
+    }
+
+    
+    public String getJob() {
+        return job;
+    }
+
+    
+    public void setJob(String job) {
+        this.job = job;
     }
 
     

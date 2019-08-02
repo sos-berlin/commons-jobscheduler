@@ -1,13 +1,21 @@
 package com.sos.eventhandlerservice.resolver;
 
 import java.io.File;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +34,13 @@ import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.db.DBLayerEvents;
 import com.sos.eventhandlerservice.db.DBLayerInConditionCommands;
 import com.sos.eventhandlerservice.db.DBLayerInConditions;
+import com.sos.eventhandlerservice.db.DBLayerOutConditionEvents;
 import com.sos.eventhandlerservice.db.DBLayerOutConditions;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
 import com.sos.eventhandlerservice.db.FilterInConditionCommands;
 import com.sos.eventhandlerservice.db.FilterInConditions;
+import com.sos.eventhandlerservice.db.FilterOutConditionEvents;
 import com.sos.eventhandlerservice.db.FilterOutConditions;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSCondition;
 import com.sos.exception.SOSException;
@@ -117,7 +127,7 @@ public class JSConditionResolver {
     }
 
     public void init() throws SOSHibernateException {
-
+        synchronizeJobsWithFileSystem();
         if (jsJobInConditions == null) {
             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
             filterConsumedInConditions.setSession(Constants.getSession());
@@ -323,6 +333,66 @@ public class JSConditionResolver {
 
         initEvents();
         initCheckHistory();
+
+    }
+
+    private JsonObject jsonFromString(String jsonObjectStr) {
+        JsonReader jsonReader = Json.createReader(new StringReader(jsonObjectStr));
+        JsonObject object = jsonReader.readObject();
+        jsonReader.close();
+        return object;
+    }
+
+    private void synchronizeJobsWithFileSystem() {
+        LinkedHashSet<String> listOfJobSchedulerJobs = new LinkedHashSet<String>();
+        LinkedHashSet<String> listOfJobStreamJobs = new LinkedHashSet<String>();
+
+        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+        FilterInConditions filterInConditions = new FilterInConditions();
+        FilterOutConditions filterOutConditions = new FilterOutConditions();
+
+        try {
+            List<DBItemInConditionWithCommand> listOfInconditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
+            List<DBItemOutConditionWithEvent> listOfOutconditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+
+            listOfInconditions.forEach(item -> {
+                listOfJobStreamJobs.add(item.getDbItemInCondition().getJob());
+            });
+
+            listOfOutconditions.forEach(item -> {
+                listOfJobStreamJobs.add(item.getJob());
+            });
+
+            URL url;
+            url = new URL(settings.getJocUrl() + "/jobs");
+            String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"compact\":true,\"isOrderJob\":false,\"compactView\":true}";
+            LOGGER.debug(url.toString());
+            LOGGER.debug(body);
+            String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
+            JsonObject jsonJobs = jsonFromString(answer);
+            JsonArray jobs = jsonJobs.getJsonArray("jobs");
+            if (jobs != null && jobs.size() > 0) {
+                for (int i = 0; i < jobs.size(); i++) {
+                    JsonObject job = jobs.getJsonObject(i);
+                    if (job != null) {
+                        String jobName = job.getString("path");
+                        listOfJobSchedulerJobs.add(jobName);
+                    }
+                }
+            }
+
+            listOfJobStreamJobs.forEach(jobName -> {
+                if (!listOfJobSchedulerJobs.contains(jobName)) {
+                    removeJob(jobName);
+                }
+            });
+
+        } catch (MalformedURLException e) {
+            LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage());
+        } catch (SOSException e) {
+            LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage());
+        }
 
     }
 
@@ -551,8 +621,9 @@ public class JSConditionResolver {
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expression = inCondition.getJob() + ":" + inCondition.getExpression();
-                if (filterConsumedInConditions.getJobStream().equals(inCondition.getJobStream()) && (filterConsumedInConditions.getJob().equals(
-                        inCondition.getJob()) || filterConsumedInConditions.getJob().isEmpty()) && inCondition.isConsumed()) {
+                if ((filterConsumedInConditions.getJobStream().equals(inCondition.getJobStream()) || filterConsumedInConditions.getJobStream()
+                        .isEmpty()) && (filterConsumedInConditions.getJob().equals(inCondition.getJob()) || filterConsumedInConditions.getJob()
+                                .isEmpty()) && inCondition.isConsumed()) {
                     LOGGER.debug(expression + " no longer consumed");
                     inCondition.setConsumed(false);
                 }
@@ -640,7 +711,7 @@ public class JSConditionResolver {
         FilterInConditions filterInConditions = new FilterInConditions();
         FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
         FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-        
+
         filterConsumedInConditions.setJob(job);
         filterInConditions.setJob(job);
         filterInConditionCommands.setJob(job);
@@ -648,19 +719,44 @@ public class JSConditionResolver {
         DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
         DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
         DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-
         try {
-            dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
-            dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
-            dbLayerInConditions.delete(filterInConditions);
-        } catch (SOSHibernateException e1) {
-            LOGGER.warn("Could not delete jobs from EventHandler after deleting jobs from filesystem: " + e1.getMessage());
-        }
+            sosHibernateSession.beginTransaction();
+            try {
+                dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
+                dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
+                dbLayerInConditions.delete(filterInConditions);
+            } catch (SOSHibernateException e1) {
+                LOGGER.warn("Could not delete jobs from EventHandler In-Conditions after deleting jobs from filesystem: " + e1.getMessage());
+            }
 
-        try {
-            reInit();
-        } catch (SOSHibernateException e) {
-            LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage());
+            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+            DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
+            DBLayerEvents dbEvents = new DBLayerEvents(sosHibernateSession);
+            FilterOutConditions filterOutConditions = new FilterOutConditions();
+            FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();
+            FilterEvents filterEvents = new FilterEvents();
+            filterOutConditions.setJob(job);
+            filterOutConditionEvents.setJob(job);
+            filterEvents.setJob(job);
+
+            try {
+                dbLayerOutConditionEvents.deleteEventsWithOutConditions(filterOutConditionEvents);
+                dbEvents.deleteEventsWithOutConditions(filterEvents);
+                dbLayerOutConditions.delete(filterOutConditions);
+            } catch (SOSHibernateException e1) {
+                LOGGER.warn("Could not delete jobs from EventHandler Out-Conditions after deleting jobs from filesystem: " + e1.getMessage());
+            }
+            sosHibernateSession.commit();
+
+        } catch (SOSHibernateException e2) {
+            LOGGER.warn("Could not create transaction for deleting jobs from EventHandle after deleting jobs from filesystem: " + e2.getMessage());
+        } finally {
+            try {
+                sosHibernateSession.rollback();
+            } catch (SOSHibernateException e) {
+                LOGGER.warn("Could not rollback transaction for deleting jobs from EventHandle after deleting jobs from filesystem: " + e
+                        .getMessage());
+            }
         }
 
     }

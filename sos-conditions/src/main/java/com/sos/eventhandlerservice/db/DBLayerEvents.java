@@ -19,7 +19,7 @@ public class DBLayerEvents {
         this.sosHibernateSession = session;
     }
 
-    public DBItemEvent getEventsDbItem(final Long id) throws SOSHibernateException  {
+    public DBItemEvent getEventsDbItem(final Long id) throws SOSHibernateException {
         return (DBItemEvent) sosHibernateSession.get(DBItemEvent.class, id);
     }
 
@@ -61,6 +61,18 @@ public class DBLayerEvents {
         return where;
     }
 
+    private String getDeleteWhere(FilterEvents filter) {
+        String where = "c.outConditionId = i.id ";
+        String and = " and ";
+
+        if (filter.getJob() != null && !"".equals(filter.getJob())) {
+            where += and + " i.job = :job";
+        }
+
+        where = " where " + where;
+        return where;
+    }
+
     private <T> Query<T> bindParameters(FilterEvents filter, Query<T> query) {
         if (filter.getEvent() != null && !"".equals(filter.getEvent())) {
             query.setParameter("event", filter.getEvent());
@@ -70,6 +82,9 @@ public class DBLayerEvents {
         }
         if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
             query.setParameter("jobStream", filter.getJobStream());
+        }
+        if (filter.getJob() != null && !"".equals(filter.getJob())) {
+            query.setParameter("job", filter.getJob());
         }
         if (filter.getOutConditionId() != null) {
             query.setParameter("outConditionId", filter.getOutConditionId());
@@ -109,6 +124,15 @@ public class DBLayerEvents {
         sosHibernateSession.save(itemEvent);
     }
 
+    public int deleteEventsWithOutConditions(FilterEvents filterEvents) throws SOSHibernateException {
+        String select = "select i.id from " + DBItemEvents + " c, " + DBItemOutCondition + " i " + getDeleteWhere(filterEvents);
+        String hql = "delete from " + DBItemEvents + " where outConditionId in ( " + select + ")";
+        Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);
+        bindParameters(filterEvents, query);
+        int row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
+
     public int deleteEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
 
         String select = "select o.id from " + DBItemEvents + " e, " + DBItemOutCondition
@@ -121,7 +145,7 @@ public class DBLayerEvents {
         return row;
     }
 
-    public int updateEvents(Long oldId, Long newId) throws SOSHibernateException   {
+    public int updateEvents(Long oldId, Long newId) throws SOSHibernateException {
         String hql = "update " + DBItemEvents + " set outConditionId=" + newId + " where outConditionId=:oldId";
         int row = 0;
         Query<DBItemEvent> query = sosHibernateSession.createQuery(hql);

@@ -12,7 +12,6 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.model.conditions.InCondition;
 import com.sos.joc.model.conditions.InConditions;
 import com.sos.joc.model.conditions.JobInCondition;
-import com.sos.joc.model.job.JobPath;
 
 public class DBLayerInConditions {
 
@@ -21,9 +20,11 @@ public class DBLayerInConditions {
     private static final String DBItemInConditionCommand = DBItemInConditionCommand.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
+ 
     public DBLayerInConditions(SOSHibernateSession session) {
         this.sosHibernateSession = session;
     }
+
 
     public DBItemInCondition getConditionsDbItem(final Long id) throws Exception {
         return (DBItemInCondition) sosHibernateSession.get(DBItemInCondition.class, id);

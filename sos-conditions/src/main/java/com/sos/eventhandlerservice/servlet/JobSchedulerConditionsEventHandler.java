@@ -78,7 +78,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             conditionResolver = new JSConditionResolver(reportingSession, f, this.getSettings());
             conditionResolver.init();
 
-            EventType[] observedEventTypes = new EventType[] { EventType.FileBasedRemoved,EventType.TaskEnded, EventType.VariablesCustomEvent };
+            EventType[] observedEventTypes = new EventType[] { EventType.FileBasedRemoved, EventType.TaskEnded, EventType.VariablesCustomEvent };
             start(observedEventTypes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,22 +137,26 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     switch (jobSchedulerEvent.getType()) {
 
-                    case "FileBaseRemoved":
-                        //Remove job from condition tables.
+                    case "FileBasedRemoved":
+                        // Remove job from condition tables.
                         FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
                         conditionResolver.removeJob(fileBaseRemoveEvent.getJob());
-                          
+                        try {
+                            conditionResolver.reInit();
+                        } catch (SOSHibernateException e) {
+                            LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage());
+                        }
+
                         break;
                     case "OrderFinished":
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
-                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain(),null);
-                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")",null);
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain(), null);
+                        conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")", null);
                         break;
                     case "TaskEnded":
-                        
-                       
+
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(),taskEndEvent.getReturnCode());
+                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
                         JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit",
                                 taskEndEvent.getJobPath());
@@ -173,19 +177,19 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                             break;
                         case "StartConditionResolver":
                             resolveInConditions = true;
-                            break;                            
+                            break;
                         case "AddEvent":
                             filterEvents = new FilterEvents();
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setJobStream(customEvent.getJobStream());
                             filterEvents.setEvent(customEvent.getEvent());
                             try {
-                            filterEvents.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
-                            }   
-                            catch (NumberFormatException e) {
-                                LOGGER.warn("could not add event " + filterEvents.getEvent() + ": NumberFormatException with - " + filterEvents.getOutConditionId());
+                                filterEvents.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
+                            } catch (NumberFormatException e) {
+                                LOGGER.warn("could not add event " + filterEvents.getEvent() + ": NumberFormatException with - " + filterEvents
+                                        .getOutConditionId());
                             }
-                            
+
                             conditionResolver.addEvent(filterEvents);
                             break;
                         case "RemoveEvent":
@@ -205,7 +209,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                             filterConsumedInConditions.setJob(customEvent.getJob());
 
                             conditionResolver.removeConsumedInconditions(filterConsumedInConditions);
-                            
+
                             filterEvents = new FilterEvents();
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setJobStream(customEvent.getJobStream());
