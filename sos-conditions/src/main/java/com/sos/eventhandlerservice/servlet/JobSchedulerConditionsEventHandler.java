@@ -18,11 +18,8 @@ import com.sos.eventhandlerservice.classes.FileBaseRemovedEvent;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.OrderFinishedEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
-import com.sos.eventhandlerservice.db.DBLayerInConditionCommands;
-import com.sos.eventhandlerservice.db.DBLayerInConditions;
 import com.sos.eventhandlerservice.db.FilterConsumedInConditions;
 import com.sos.eventhandlerservice.db.FilterEvents;
-import com.sos.eventhandlerservice.db.FilterInConditions;
 import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.eventhandlerservice.resolver.JSEvent;
 import com.sos.eventhandlerservice.resolver.JSEvents;
@@ -36,7 +33,6 @@ import com.sos.jitl.classes.plugin.PluginMailer;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 
 public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventHandler {
 
@@ -158,7 +154,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), "scheduler_joc_cockpit",
+                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
                                 taskEndEvent.getJobPath());
                         for (JSEvent jsNewEvent : jsNewEvents.getListOfEvents().values()) {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
