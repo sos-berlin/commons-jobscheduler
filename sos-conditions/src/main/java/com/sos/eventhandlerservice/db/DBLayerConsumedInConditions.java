@@ -49,19 +49,18 @@ public class DBLayerConsumedInConditions {
     }
 
     private String getDeleteWhere(FilterConsumedInConditions filter) {
-        String where = "c.inConditionId = i.id ";
-        String and = " and ";
-
-        if (filter.getSession() != null && !"".equals(filter.getSession())) {
-            where += and + " c.session = :session";
-        }
+        String where = "";
+        String and = "";
 
         if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
-            where += and + " i.jobStream = :jobStream";
+            where += and + " jobStream = :jobStream";
+            and = " and ";
+
         }
 
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
-            where += and + " i.job = :job";
+            where += and + " job = :job";
+            and = " and ";
         }
 
         where = " where " + where;
@@ -125,7 +124,8 @@ public class DBLayerConsumedInConditions {
     }
 
     public int deleteConsumedInConditions(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
-        String select = "select i.id from " + DBItemConsumedInCondition + " c, " + DBItemInCondition + " i " + getDeleteWhere(
+        filterConsumedInConditions.setSession("");
+        String select = "select id from " +  DBItemInCondition + getDeleteWhere(
                 filterConsumedInConditions);
 
         String hql = "delete from " + DBItemConsumedInCondition + " where inConditionId in ( " + select + ")";

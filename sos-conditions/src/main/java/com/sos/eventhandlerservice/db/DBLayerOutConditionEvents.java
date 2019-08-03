@@ -58,12 +58,13 @@ public class DBLayerOutConditionEvents {
     }
 
     private String getDeleteWhere(FilterOutConditionEvents filter) {
-        String where = "c.outConditionId = i.id ";
-        String and = " and ";
+        String where = "";
+        String and = "";
 
 
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
-            where += and + " i.job = :job";
+            where += and + " job = :job";
+            and = " and ";
         }
 
         where = " where " + where;
@@ -112,7 +113,7 @@ public class DBLayerOutConditionEvents {
     }
     
     public int deleteEventsWithOutConditions(FilterOutConditionEvents filterOutConditionEvents) throws SOSHibernateException {
-        String select = "select i.id from " + DBItemOutConditionEvent + " c, " + DBItemOutCondition + " i " + getDeleteWhere(filterOutConditionEvents);
+        String select = "select id from " +  DBItemOutCondition + getDeleteWhere(filterOutConditionEvents);
 
         String hql = "delete from " + DBItemOutConditionEvent + " where outConditionId in ( " + select + ")";
         Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);

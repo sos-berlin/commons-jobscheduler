@@ -721,13 +721,13 @@ public class JSConditionResolver {
         DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
         try {
             sosHibernateSession.beginTransaction();
-            try {
-                dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
-                dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
-                dbLayerInConditions.delete(filterInConditions);
-            } catch (SOSHibernateException e1) {
-                LOGGER.warn("Could not delete jobs from EventHandler In-Conditions after deleting jobs from filesystem: " + e1.getMessage());
-            }
+            //try {
+               // dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
+                // dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
+                //dbLayerInConditions.delete(filterInConditions);
+          //  } catch (SOSHibernateException e1) {
+          //      LOGGER.warn("Could not delete jobs from EventHandler In-Conditions after deleting jobs from filesystem: " + e1.getMessage());
+           // }
 
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
@@ -739,13 +739,13 @@ public class JSConditionResolver {
             filterOutConditionEvents.setJob(job);
             filterEvents.setJob(job);
 
-            try {
-                dbLayerOutConditionEvents.deleteEventsWithOutConditions(filterOutConditionEvents);
-                dbEvents.deleteEventsWithOutConditions(filterEvents);
-                dbLayerOutConditions.delete(filterOutConditions);
-            } catch (SOSHibernateException e1) {
-                LOGGER.warn("Could not delete jobs from EventHandler Out-Conditions after deleting jobs from filesystem: " + e1.getMessage());
-            }
+          //  try {
+                // dbLayerOutConditionEvents.deleteEventsWithOutConditions(filterOutConditionEvents);
+                //dbEvents.deleteEventsWithOutConditions(filterEvents);
+                //dbLayerOutConditions.delete(filterOutConditions);
+          //  } catch (SOSHibernateException e1) {
+             //   LOGGER.warn("Could not delete jobs from EventHandler Out-Conditions after deleting jobs from filesystem: " + e1.getMessage());
+          //  }
             sosHibernateSession.commit();
 
         } catch (SOSHibernateException e2) {

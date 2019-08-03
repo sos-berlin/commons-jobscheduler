@@ -35,12 +35,13 @@ public class DBLayerInConditionCommands {
     }
 
     private String getDeleteWhere(FilterInConditionCommands filter) {
-        String where = "c.inConditionId = i.id ";
-        String and = " and ";
+        String where = "";
+        String and = "";
 
 
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
-            where += and + " i.job = :job";
+            where += and + " job = :job";
+            and = " and ";
         }
 
         where = " where " + where;
@@ -114,7 +115,7 @@ public class DBLayerInConditionCommands {
     }
 
     public int deleteCommandWithInConditions(FilterInConditionCommands filterConditionCommands) throws SOSHibernateException {
-        String select = "select i.id from " + DBItemInConditionCommand + " c, " + DBItemInCondition + " i " + getDeleteWhere(filterConditionCommands);
+        String select = "select id from " + DBItemInCondition + getDeleteWhere(filterConditionCommands);
 
         String hql = "delete from " + DBItemInConditionCommand + " where inConditionId in ( " + select + ")";
         Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(hql);
