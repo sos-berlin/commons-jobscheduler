@@ -22,10 +22,14 @@ public class SOSOptionJadeOperationTest {
     private static final Logger LOGGER = Logger.getLogger(SOSOptionJadeOperationTest.class); 
     private SOSOptionJadeOperation objOperation = null;
 
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
+
+    @Before
     public void setUp() throws Exception {
         objOperation = new SOSOptionJadeOperation(null, "operation", "operation", enuJadeOperations.undefined.getText(), enuJadeOperations.copy.getText(), true);
     }
-
 
     @Test
     public void testValueString() {

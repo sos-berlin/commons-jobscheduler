@@ -9,7 +9,8 @@ import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.exceptions.JocException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sos.util.SOSSerializerUtil;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class SOSDistributedSessionDAO extends CachingSessionDAO {
 	private static final String SHIRO_SESSION = "SHIRO_SESSION";
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSDistributedSessionDAO.class);
 	private HashMap<String, String> serializedSessions;
 
 	private void putSerializedSession(String sessionId, String sessionString) {
@@ -25,11 +27,22 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 		}
 		serializedSessions.put(sessionId, sessionString);
 	}
-	
+
+	private String getSessionId(Session session) {
+		if (session == null || session.getId() == null) {
+			return "";
+		} else {
+			return session.getId().toString();
+		}
+
+	}
+
 	private void copySessionToDb(Serializable sessionId, String session) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+			LOGGER.debug("SOSDistributedSessionDAO: copySessionToDb");
+
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
 
@@ -58,16 +71,26 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 				jocConfigurationDbItem.setId(id);
 			}
 			Globals.commit(sosHibernateSession);
-			sosHibernateSession.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+			sosHibernateSession = null;
 		}
 	}
 
 	private String readSessionFromDb(Serializable sessionId) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+
+			String sessionIdString = "";
+			if (sessionId != null) {
+				sessionIdString = sessionId.toString();
+			}
+			LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
+
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
@@ -92,11 +115,14 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 		} catch (JocException e) {
 			throw new RuntimeException(e);
+		} finally {
+			Globals.disconnect(sosHibernateSession);
 		}
 	}
 
 	@Override
 	protected Serializable doCreate(Session session) {
+		LOGGER.debug("SOSDistributedSessionDAO: doCreate Session ->" + getSessionId(session));
 		Serializable sessionId = generateSessionId(session);
 		assignSessionId(session, sessionId);
 		String sessionString = SOSSerializerUtil.object2toString(session);
@@ -107,9 +133,11 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 	@Override
 	protected void doUpdate(Session session) {
+		LOGGER.debug("SOSDistributedSessionDAO: doUpdate Session ->" + getSessionId(session));
 		if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
 			return;
 		}
+		LOGGER.debug("SOSDistributedSessionDAO: session is valid");
 		String sessionString = SOSSerializerUtil.object2toString(session);
 		putSerializedSession(session.getId().toString(), sessionString);
 		copySessionToDb(session.getId(), sessionString);
@@ -117,9 +145,11 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
 	@Override
 	protected void doDelete(Session session) {
+		SOSHibernateSession sosHibernateSession = null;
 		try {
-			SOSHibernateSession sosHibernateSession = Globals
-					.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+			LOGGER.debug("SOSDistributedSessionDAO: doDelete Session ->" + getSessionId(session));
+
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 			sosHibernateSession.setAutoCommit(false);
 			Globals.beginTransaction(sosHibernateSession);
 			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
@@ -134,24 +164,29 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 			throw new RuntimeException(e);
 		} catch (JocException e) {
 			throw new RuntimeException(e);
+		} finally {
+			Globals.disconnect(sosHibernateSession);
+
 		}
 	}
 
 	@Override
 	protected Session doReadSession(Serializable sessionId) {
 		if (serializedSessions == null) {
+			LOGGER.debug("SOSDistributedSessionDAO: doReadSession: initialize serializedSessions");
 			serializedSessions = new HashMap<String, String>();
 		}
 		String session = "";
-		if (serializedSessions.get(sessionId.toString()) != null) {
-			session = serializedSessions.get(sessionId.toString());
-		} else {
+		session = serializedSessions.get(sessionId.toString());
+		if (session == null) {
 			session = readSessionFromDb(sessionId);
 			serializedSessions.put(sessionId.toString(), session);
 		}
 
-		if (session.length() == 0)
+		if (session.length() == 0) {
+			LOGGER.debug("SOSDistributedSessionDAO: session is empty");
 			return null;
+		}
 		return (Session) SOSSerializerUtil.fromString(session);
 	}
 }

@@ -22,7 +22,7 @@ public class SOSProfileSection {
         SOSProfileEntry objPE = this.getEntry(pstrEntryName);
         if (objPE == null) {
             objPE = new SOSProfileEntry(pstrEntryName, pstrEntryValue);
-            Map m = this.getEntries();
+            Map<String, SOSProfileEntry> m = this.getEntries();
             m.put(pstrEntryName.toLowerCase(), objPE);
         } else {
             objPE.setValue(pstrEntryValue);
@@ -33,7 +33,7 @@ public class SOSProfileSection {
     public SOSProfileEntry deleteEntry(String pstrEntryName) {
         SOSProfileEntry objPE = this.getEntry(pstrEntryName);
         if (objPE != null) {
-            Map m = this.getEntries();
+            Map<String, SOSProfileEntry> m = this.getEntries();
             m.remove(pstrEntryName.toLowerCase());
         }
         return objPE;

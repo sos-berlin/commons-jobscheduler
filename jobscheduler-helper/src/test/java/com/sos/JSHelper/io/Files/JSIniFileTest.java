@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /** @author KB */
 public class JSIniFileTest {
 
-    private static final String conIniFileName = "R:/backup/sos/java/development/SOSDataExchange/examples/jade_settings.ini";
+    private static final String conIniFileName = "src/test/resources/jade_settings.ini";
     private static final Logger LOGGER = Logger.getLogger(JSIniFileTest.class);
     private JSIniFile objF = null;
 
@@ -88,12 +88,7 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
     }
 
-    @Test
-    public final void testProfileName() {
-        String strName = objF.strFileName;
-        assertTrue("name is identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
-    }
-
+ 
     @Test
     public final void testToString() {
         LOGGER.debug(objF.toString());

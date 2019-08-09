@@ -19,8 +19,6 @@ import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
 
-import sos.util.SOSString;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -29,9 +27,10 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
-import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.util.SOSString;
 
 /** @ressources webdavclient4j-core-0.92.jar
  * @author Robert Ehrlich */
@@ -735,12 +734,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

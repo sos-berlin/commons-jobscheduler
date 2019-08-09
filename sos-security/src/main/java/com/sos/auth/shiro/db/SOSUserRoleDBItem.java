@@ -20,12 +20,12 @@ public class SOSUserRoleDBItem extends DbItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public Long getId() {
         return id;
     }
 
-    @Column(name = "`ID`")
+    @Column(name = "[ID]")
     public void setId(Long id) {
         this.id = id;
     }
@@ -39,12 +39,12 @@ public class SOSUserRoleDBItem extends DbItem {
         this.sosUserPermissionDBItems = sosUserPermissionDBItems;
     }
 
-    @Column(name = "`SOS_USER_ROLE`", nullable = false)
+    @Column(name = "[SOS_USER_ROLE`", nullable = false)
     public void setSosUserRole(String sosUserRole) {
         this.sosUserRole = sosUserRole;
     }
 
-    @Column(name = "`SOS_USER_ROLE`", nullable = false)
+    @Column(name = "[SOS_USER_ROLE`", nullable = false)
     public String getSosUserRole() {
         return sosUserRole;
     }

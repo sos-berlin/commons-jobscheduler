@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -97,7 +98,7 @@ public class SOSHibernateFactory implements Serializable {
             return null;
         }
         try {
-            return ReflectionToStringBuilder.toString(o);
+            return ReflectionToStringBuilder.toString(o, ToStringStyle.SHORT_PREFIX_STYLE);
         } catch (Throwable t) {
         }
         return o.toString();
@@ -131,7 +132,9 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     public void close() {
-        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "close") : "");
+        if (isDebugEnabled) {
+            LOGGER.debug(SOSHibernate.getMethodName(logIdentifier, "close"));
+        }
         try {
             if (sessionFactory != null && !sessionFactory.isClosed()) {
                 sessionFactory.close();
@@ -432,7 +435,9 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void initConfiguration() throws SOSHibernateConfigurationException {
-        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "initConfiguration") : "");
+        if (isDebugEnabled) {
+            LOGGER.debug(SOSHibernate.getMethodName(logIdentifier, "initConfiguration"));
+        }
         configuration = new Configuration();
         setConfigurationClassMapping();
         setDefaultConfigurationProperties();
@@ -455,7 +460,9 @@ public class SOSHibernateFactory implements Serializable {
     }
 
     private void initSessionFactory() {
-        LOGGER.debug(isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "initSessionFactory") : "");
+        if (isDebugEnabled) {
+            LOGGER.debug(SOSHibernate.getMethodName(logIdentifier, "initSessionFactory"));
+        }
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
@@ -485,7 +492,9 @@ public class SOSHibernateFactory implements Serializable {
         if (classMapping != null) {
             String method = isDebugEnabled ? SOSHibernate.getMethodName(logIdentifier, "setConfigurationClassMapping") : "";
             for (Class<?> c : classMapping.getClasses()) {
-                LOGGER.debug(isDebugEnabled ? String.format("%s %s", method, c.getCanonicalName()) : "");
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("%s %s", method, c.getCanonicalName()));
+                }
                 configuration.addAnnotatedClass(c);
             }
         }
@@ -498,7 +507,9 @@ public class SOSHibernateFactory implements Serializable {
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
                 configuration.setProperty(key, value);
-                LOGGER.debug(isDebugEnabled ? String.format("%s %s=%s", method, key, value) : "");
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("%s %s=%s", method, key, value));
+                }
             }
             if (configuration.getProperty(SOSHibernate.HIBERNATE_PROPERTY_JDBC_FETCH_SIZE) != null) {
                 try {
@@ -520,7 +531,9 @@ public class SOSHibernateFactory implements Serializable {
             for (Map.Entry<?, ?> entry : defaultConfigurationProperties.entrySet()) {
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                LOGGER.trace(isTraceEnabled ? String.format("%s %s=%s", method, key, value) : "");
+                if (isTraceEnabled) {
+                    LOGGER.trace(String.format("%s %s=%s", method, key, value));
+                }
                 configuration.setProperty(key, value);
             }
         }

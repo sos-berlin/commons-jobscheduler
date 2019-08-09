@@ -235,14 +235,12 @@ public class Messages implements Serializable {
             }
             return strM;
         } catch (MissingFormatArgumentException e) {
-            strM =
-                    String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
-                            e.getFormatSpecifier());
+            strM = String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e
+                    .getFormatSpecifier());
             return strM;
         } catch (UnknownFormatConversionException e) {
-            strM =
-                    String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
-                            e.getConversion());
+            strM = String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e
+                    .getConversion());
             return strM;
         } catch (MissingResourceException e) {
             strM = String.format("%1$s (%2$s): %3$s", pstrKey, objCurrentLocale.getDisplayName(), strM);
@@ -256,10 +254,10 @@ public class Messages implements Serializable {
     public String getMsg(final String pstrKey, final Locale pobjLocale) {
         String strM = "";
         try {
-            if (objCurrentLocale.equals(pobjLocale)) {
-                objResource_Bundle = null;
+            if (!objCurrentLocale.equals(pobjLocale)) {
+                objCurrentLocale = pobjLocale;
+                objResource_Bundle = getBundle();
             }
-            objCurrentLocale = pobjLocale;
             strM = addKey(pstrKey, getString(pstrKey, objResource_Bundle));
         } catch (MissingResourceException e) {
             strM = '!' + pstrKey + '!';

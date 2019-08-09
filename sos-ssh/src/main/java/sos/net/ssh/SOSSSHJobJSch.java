@@ -21,6 +21,7 @@ import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -104,6 +105,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         boolean flgScriptFileCreated = false;
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
         String executedCommand = "";
+        ExecutorService executorService = null;
+        Future<Void> sendSignalExecution = null;
         try {
             if (!isConnected) {
                 this.connect();
@@ -153,9 +156,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    LOGGER.info(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
-                    ExecutorService executorService = Executors.newFixedThreadPool(2);
+                    executorService = Executors.newFixedThreadPool(2);
                     String completeCommand = null;
                     if (objOptions.autoDetectOS.value()) {
                         completeCommand = strCmd;
@@ -168,33 +171,37 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                     final String cmdToExecute = completeCommand;
                     Callable<Void> runCompleteCmd = new Callable<Void>() {
+
                         @Override
                         public Void call() throws Exception {
+                            LOGGER.debug("***** Command Execution started! *****");
                             if (objOptions.autoDetectOS.value()) {
                                 vfsHandler.executeCommand(cmdToExecute, envVars);
                             } else if (objOptions.postCommandDelete.getValue().contains("del")) {
                                 vfsHandler.executeCommand(cmdToExecute, envVars);
-                            }  else {
+                            } else {
                                 vfsHandler.executeCommand(cmdToExecute);
                             }
+                            LOGGER.debug("***** Command Execution finished! *****");
                             return null;
                         }
                     };
+                    
                     commandExecution = executorService.submit(runCompleteCmd);
                     Callable<Void> sendSignal = new Callable<Void>() {
+
                         @Override
                         public Void call() throws Exception {
                             Thread.sleep(1000);
-                            while(!commandExecution.isDone()) {
+                            while (!commandExecution.isDone()) {
                                 Thread.sleep(60000);
-                                ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("CONT");
+                                ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("CONT");
                             }
                             return null;
                         }
                     };
-                    @SuppressWarnings("unused")
-                    Future<Void> sendSignalExecution = executorService.submit(sendSignal);
-                    // wait until command execution is finished 
+                    sendSignalExecution = executorService.submit(sendSignal);
+                    // wait until command execution is finished
                     commandExecution.get();
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
@@ -226,8 +233,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
-                String strErrMsg =
-                        "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"";
+                String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"" + e.getMessage() + " " + e
+                        .getCause();
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
                         LOGGER.debug(this.stackTrace2String(e));
@@ -244,8 +251,22 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
             }
         } finally {
-            vfsHandler.getStdOut().setLength(0);
-            vfsHandler.getStdErr().setLength(0);
+            if (vfsHandler.getStdOut() != null) {
+                vfsHandler.getStdOut().setLength(0);
+            }
+            if (vfsHandler.getStdErr() != null) {
+                vfsHandler.getStdErr().setLength(0);
+            }
+            if (executorService != null) {
+                ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("KILL");
+                if (commandExecution != null) {
+                    commandExecution.cancel(true);
+                }
+                if (sendSignalExecution != null) {
+                    sendSignalExecution.cancel(true);
+                }
+                executorService.shutdownNow();
+            }
             if (keepConnected == false) {
                 disconnect();
             }
@@ -257,7 +278,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     public void disconnect() {
         if (isConnected) {
             try {
+                if (prePostCommandVFSHandler != null) {
+                    LOGGER.debug("***** prePostCommandVFSHandler disconnecting... *****");
+                    prePostCommandVFSHandler.closeConnection();
+                    LOGGER.debug("***** prePostCommandVFSHandler disconnected! *****");
+                }
+                LOGGER.debug("***** vfsHandler disconnecting... *****");
                 vfsHandler.closeConnection();
+                LOGGER.debug("***** vfsHandler disconnected! *****");
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -279,6 +307,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
+            alternateOptions.setWithoutSFTPChannel(true);
             vfsHandler.connect(alternateOptions);
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
@@ -300,14 +329,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     public String getPreCommand() {
         String delimiter;
         String preCommand = objOptions.getPreCommand().getValue();
-        if(flgIsWindowsShell) {
+        if (flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
-            if(objOptions.getPreCommand().isNotDirty()) {
+            if (objOptions.getPreCommand().isNotDirty()) {
                 preCommand = DEFAULT_WINDOWS_PRE_COMMAND;
             }
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
-            if(objOptions.getPreCommand().isNotDirty()) {
+            if (objOptions.getPreCommand().isNotDirty()) {
                 preCommand = DEFAULT_LINUX_PRE_COMMAND;
             }
         }
@@ -326,7 +355,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         strb.append(delimiter);
         return strb.toString();
     }
-    
+
     private void setReturnValuesEnvVar() {
         resolvedTempFileName = null;
         if (objOptions.tempDirectory.isDirty()) {
@@ -343,8 +372,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         }
     }
-    
-    private void setSOSVfsEnvs () {
+
+    private void setSOSVfsEnvs() {
         if (schedulerEnvVars != null) {
             for (Object key : schedulerEnvVars.keySet()) {
                 if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
@@ -370,7 +399,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         }
     }
-    
+
     private String resolveTempFileName(String tempDir, String filename) {
         if (flgIsWindowsShell) {
             return Paths.get(tempDir, filename).toString().replace('/', '\\');
@@ -378,10 +407,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             return Paths.get(tempDir, filename).toString().replace('\\', '/');
         }
     }
-    
+
     private String getEnvCommand() {
         String delimiter;
-        if(flgIsWindowsShell) {
+        if (flgIsWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
         } else {
             delimiter = DEFAULT_LINUX_DELIMITER;
@@ -404,12 +433,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     envVarValue = envVarValue.replaceAll("\"", "\\\"");
                     // do not wrap between ' because it would cause problems under windows,
                     // use the pre-command format instead
-//                    envVarValue = "'" + envVarValue + "'";
+                    // envVarValue = "'" + envVarValue + "'";
                     if (!flgIsWindowsShell) {
                         envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
                     }
-                    if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal)
-                            && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
+                    if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
                         sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
                         sb.append(delimiter);
                     }
@@ -455,8 +483,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
             if (prePostCommandVFSHandler.getExitCode() == 0) {
                 if (!prePostCommandVFSHandler.getStdOut().toString().isEmpty()) {
-                    BufferedReader reader = new BufferedReader(new StringReader(
-                            new String(prePostCommandVFSHandler.getStdOut())));
+                    BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
                     String line = null;
                     LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
                     while ((line = reader.readLine()) != null) {
@@ -491,6 +518,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         } catch (Exception e) {
             LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+        } finally {
+            try {
+                LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
+                prePostCommandVFSHandler.closeConnection();
+                LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -533,7 +570,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         }
     }
-    
+
     private void checkOsAndShell() throws SOSSSHAutoDetectionException {
         String cmdToExecute = "uname";
         LOGGER.info("*** Checking for remote Operating System and shell! ***");
@@ -551,13 +588,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             commandResult = vfsHandler.executePrivateCommand(cmdToExecute);
             if (commandResult.getExitCode() == 0) {
                 // command uname was execute successfully -> OS is Unix like
-                if (commandResult.getStdOut().toString().toLowerCase().contains("linux") ||
-                        commandResult.getStdOut().toString().toLowerCase().contains("darwin") || 
-                        commandResult.getStdOut().toString().toLowerCase().contains("aix") ||
-                        commandResult.getStdOut().toString().toLowerCase().contains("hp-ux") ||
-                        commandResult.getStdOut().toString().toLowerCase().contains("solaris") ||
-                        commandResult.getStdOut().toString().toLowerCase().contains("sunos") ||
-                        commandResult.getStdOut().toString().toLowerCase().contains("freebsd")) {
+                if (commandResult.getStdOut().toString().toLowerCase().contains("linux") || commandResult.getStdOut().toString().toLowerCase()
+                        .contains("darwin") || commandResult.getStdOut().toString().toLowerCase().contains("aix") || commandResult.getStdOut()
+                                .toString().toLowerCase().contains("hp-ux") || commandResult.getStdOut().toString().toLowerCase().contains("solaris")
+                        || commandResult.getStdOut().toString().toLowerCase().contains("sunos") || commandResult.getStdOut().toString().toLowerCase()
+                                .contains("freebsd")) {
                     if (forceAutoDetection) {
                         flgIsWindowsShell = false;
                     }
@@ -570,7 +605,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         flgIsWindowsShell = false;
                     }
                 } else {
-                    LOGGER.info("*** Command uname was executed successfully, but the remote OS was not determined, Unix like shell is assumed! ***");                    
+                    LOGGER.info("*** Command uname was executed successfully, but the remote OS was not determined, Unix like shell is assumed! ***");
                     if (forceAutoDetection) {
                         flgIsWindowsShell = false;
                     }
@@ -583,7 +618,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 LOGGER.info("*** execute Command uname failed with exit code 1 or 9009, remote OS is Windows with cmd shell! ***");
             } else if (commandResult.getExitCode() == 127) {
-                // call of uname under Windows OS  with CopSSH (cygwin) and target shell /bin/bash delivers exit code 127
+                // call of uname under Windows OS with CopSSH (cygwin) and target shell /bin/bash delivers exit code 127
                 // command uname is not installed by default through CopSSH installation
                 LOGGER.info("*** execute Command uname failed with exit code 127, remote OS is Windows with cygwin and shell is Unix like! ***");
                 if (forceAutoDetection) {

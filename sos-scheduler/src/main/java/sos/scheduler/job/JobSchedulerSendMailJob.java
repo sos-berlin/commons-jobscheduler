@@ -1,24 +1,24 @@
 package sos.scheduler.job;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import sos.net.SOSMailOrder;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
-import sos.util.SOSDate;
 import sos.textprocessor.SOSDocumentFactoryTextProcessor;
 import sos.textprocessor.SOSPlainTextProcessor;
 import sos.textprocessor.SOSTextProcessor;
+import sos.util.SOSDate;
 
 /** @author andreas pueschel */
 public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
 
-    protected ArrayList mailOrders = null;
-    protected Iterator mailOrderIterator = null;
+    protected List<String> mailOrders = null;
+    protected Iterator<String> mailOrderIterator = null;
     protected String encoding = "7bit";
     protected String charset = "iso-8859-1";
     protected String attachmentEncoding = "Base64";
@@ -68,7 +68,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
         int mailOrderId = 0;
         boolean rc = true;
         try {
-            mailOrderId = Integer.parseInt(this.mailOrderIterator.next().toString());
+            mailOrderId = Integer.parseInt(this.mailOrderIterator.next());
             SOSMailOrder mailOrder = new SOSMailOrder(this.sosMailSettings, this.getConnection());
           
             if (mailOrder.getHost() == null || mailOrder.getHost().isEmpty()) {

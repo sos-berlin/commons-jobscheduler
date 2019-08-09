@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import org.junit.Test;
 
 
-/** @author Uwe Risse */
 public class TestSOSShiroCurrentUserAnswer {
 
     private SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer;

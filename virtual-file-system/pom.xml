@@ -99,10 +99,15 @@
 			<artifactId>jzlib</artifactId>
         </dependency>
 
-        <dependency>
+        <!-- dependency>
             <groupId>jcifs</groupId>
             <artifactId>jcifs</artifactId>
-        </dependency>
+        </dependency-->
+        
+        <dependency>
+			<groupId>eu.agno3.jcifs</groupId>
+			<artifactId>jcifs-ng</artifactId>
+		</dependency>
 
         <!-- This is a replacement dependency for the jar file /SOS_LIB/commons-ssl.jar  		   -->
         <!-- which does not exist in any open accessible maven repository. 						   -->
@@ -126,12 +131,28 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
 
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.jurr.jsch</groupId>
+			<artifactId>jsch-111-bugfix</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>jsch-agent-proxy</groupId>
+            <artifactId>jsch-agent-proxy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.connector-factory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
         </dependency>
 
     </dependencies>

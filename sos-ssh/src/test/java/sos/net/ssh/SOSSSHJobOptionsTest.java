@@ -3,6 +3,7 @@ package sos.net.ssh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -13,7 +14,6 @@ import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.io.Files.JSXMLFile;
 
-/** @author KB */
 public class SOSSSHJobOptionsTest {
 
     private static final Logger LOGGER = Logger.getLogger(SOSSSHJobOptionsTest.class);
@@ -21,7 +21,7 @@ public class SOSSSHJobOptionsTest {
     private static final String USER = "user";
     private static final String AUTH_FILE = "auth_file";
     private static final String CLASSNAME = "SOSSSHJobOptionsTest";
-    private static final String KEE_PASS_DB_FILE_NAME = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
+    private static final String KEE_PASS_DB_FILE_NAME = "src/test/resources/keepassX-test.kdb";
 
 
     @Test
@@ -32,10 +32,12 @@ public class SOSSSHJobOptionsTest {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         objOptions.commandLineArgs(strCmdLineArgs);
         assertEquals(strParameterName, strParameterValue, objOptions.user.getValue());
-        String strTempFileName = "C:/temp/" + CLASSNAME + ".xml";
+        String strTempFileName = "src/test/resources/" + CLASSNAME + ".xml";
         JSXMLFile objXF = objOptions.toXMLFile(strTempFileName);
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
         objO2.loadXML(objXF);
+        File f = new File(strTempFileName);
+        f.delete();
         assertEquals(strParameterName, strParameterValue, objO2.user.getValue());
     }
 

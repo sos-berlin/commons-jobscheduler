@@ -20,14 +20,12 @@
     </scm>
 
     <modules>
-        <!--module>ftp-history</module-->
         <module>h2-connection</module>
         <module>hibernate-commons</module>
         <module>jobscheduler-helper</module>
         <module>jobscheduler-object-model</module>
-        <module>jobscheduler-web-services</module>
+        <!-- module>jobscheduler-web-services</module-->
         <module>jobscheduler-web-services-globals</module>
-        <module>logback-tools</module>
         <module>sos-net</module>
         <module>sos-dialog</module>
         <module>sos-scheduler</module>
@@ -35,6 +33,7 @@
         <module>sos-security</module>
         <module>sos-mail</module>
         <module>sos-ssh</module>
+        <module>sos-conditions</module>
     </modules>
 
 </project>

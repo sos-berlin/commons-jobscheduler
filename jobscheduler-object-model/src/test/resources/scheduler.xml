@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<spooler>
+
+		<config http_port="40444" mail_xslt_stylesheet="config/scheduler_mail.xsl" port="4444">
+		
+				<params>
+						<param name="scheduler.variable_name_prefix" value="SCHEDULER_PARAM_"/>
+						<param name="scheduler.order.keep_order_content_on_reschedule" value="false"/>
+						<param name="sos.use_notification" value="false"/>
+						<param name="global_test_var" value="def"/>
+
+				</params>
+			
+			
+				<security ignore_unknown_hosts="yes">
+						<allowed_host host="localhost" level="all"/>
+						<allowed_host host="LAPTOP-7RSACSCV" level="all"/>
+				</security>
+			
+			
+				<plugins>
+						<plugin java_class="com.sos.scheduler.engine.plugins.newwebservice.NewWebServicePlugin"/>
+						<plugin java_class="com.sos.scheduler.engine.plugins.nodeorder.NodeOrderPlugin"/>
+						<plugin java_class="com.sos.jitl.inventory.plugins.InitializeInventoryInstancePlugin"/>
+						<plugin java_class="com.sos.jitl.reporting.plugin.FactPlugin"/>
+				</plugins>
+			
+			
+				<process_classes>
+						<process_class max_processes="100"/>
+				</process_classes>
+
+		</config>
+
+</spooler>

@@ -425,7 +425,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                     if (!skipRenameTarget) {
                         objListItem.renameTargetFile();
                     }
-                    objListItem.createChecksumFile();
+                    objListItem.createTargetChecksumFile();
                     objListItem.renameSourceFile();
                     objListItem.executePostCommands();
                     if (objOptions.cumulateFiles.isTrue()) {
@@ -481,7 +481,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                             atomicFile.delete();
                         }
                         String strT = SOSVfs_D_212.params(atomicFileName);
-                        LOGGER.debug(strT);
+                        LOGGER.info(strT);
                         JADE_REPORT_LOGGER.info(strT);
                         entry.setAtomicFileName(EMPTY_STRING);
                         entry.setStatus(enuTransferStatus.setBack);
@@ -497,21 +497,21 @@ public class SOSFileList extends SOSVfsMessageCodes {
                             targetFile.delete();
                         }
                         msg = SOSVfs_D_212.params(targetFile.getName());
-                        LOGGER.debug(msg);
+                        LOGGER.info(msg);
                         JADE_REPORT_LOGGER.info(msg);
                         entry.setStatus(enuTransferStatus.setBack);
                     } catch (Exception e) {
                         LOGGER.error(e.toString());
                     }
                 }
-                if (entry.hasChecksumFile()) {
+                if (entry.hasTargetChecksumFile()) {
                     try {
-                        ISOSVirtualFile checksumFile = entry.getChecksumFile();
-                        if (checksumFile.fileExists()) {
-                            checksumFile.delete();
+                        ISOSVirtualFile targetChecksumFile = entry.getTargetChecksumFile();
+                        if (targetChecksumFile.fileExists()) {
+                            targetChecksumFile.delete();
                         }
-                        msg = SOSVfs_D_212.params(checksumFile.getName());
-                        LOGGER.debug(msg);
+                        msg = SOSVfs_D_212.params(targetChecksumFile.getName());
+                        LOGGER.info(msg);
                         JADE_REPORT_LOGGER.info(msg);
                     } catch (Exception e) {
                         LOGGER.error(e.toString());

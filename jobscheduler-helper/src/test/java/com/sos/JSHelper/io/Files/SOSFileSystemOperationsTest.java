@@ -71,7 +71,7 @@ public class SOSFileSystemOperationsTest {
 
     @Test
     public void resultListTest() throws Exception {
-        String file = "c:/temp";
+        String file = "src/test/resources";
         String fileSpec = "^.*\\.kb$";
         for (int j = 0; j < 10; j++) {
             JSFile objTestFile = new JSFile(file + "/test" + j + ".kb");

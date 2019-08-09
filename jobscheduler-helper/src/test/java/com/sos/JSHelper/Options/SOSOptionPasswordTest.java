@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
-/** @author KB */
 public class SOSOptionPasswordTest {
 
     private static final Logger LOGGER = Logger.getLogger(SOSOptionPasswordTest.class);
@@ -32,7 +31,13 @@ public class SOSOptionPasswordTest {
     }
 
     private String createTestFile() {
-        String strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
+        File f = new File("C:/Windows/system.ini");
+        String strFileName;
+        if (f.exists()){
+            strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
+        } else {
+            strFileName = System.getProperty("java.io.tmpdir") + "test.sh";
+        }
         JSFile objFile = new JSFile(strFileName);
         objFile.deleteOnExit();
         try {

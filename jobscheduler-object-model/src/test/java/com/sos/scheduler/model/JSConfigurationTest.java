@@ -24,7 +24,7 @@ public class JSConfigurationTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         LOGGER.debug("test start");
-        objFactory = new SchedulerObjectFactory("8of9.sos", 4210);
+        objFactory = new SchedulerObjectFactory("galadriel.sos", 4412);
         objFactory.initMarshaller(Spooler.class);
     }
 
@@ -39,7 +39,7 @@ public class JSConfigurationTest {
 
     private final void prepareFtpVfs() {
         objOptions = new SOSFTPOptions();
-        objOptions.host.setValue("8of9.sos");
+        objOptions.host.setValue("galadriel.sos");
         objOptions.user.setValue("sos");
         objOptions.password.setValue("sos");
         try {
@@ -53,19 +53,19 @@ public class JSConfigurationTest {
     }
 
     @Test
-    @Ignore("Test set to Ignore for later examination")
     public final void loadSchedulerXMLLocal() {
         prepareLocalVfs();
-        String strTestHotFolder = "Z:/8of9_buildjars_4210/config/scheduler.xml";
+        String strTestHotFolder = "src/test/resources/scheduler.xml";
         ISOSVirtualFile pobjVirtualFile = objFileSystemHandler.getFileHandle(strTestHotFolder);
         JSConfiguration objJSConf = objFactory.createJSConfiguration(pobjVirtualFile);
         LOGGER.info(objJSConf.toXMLString());
     }
 
     @Test
+    @Ignore("Test set to Ignore for later examination")
     public final void loadSchedulerXMLFTP() {
         prepareFtpVfs();
-        String strTestHotFolder = "/8of9_buildjars_4210/config/scheduler.xml";
+        String strTestHotFolder = "src/test/resources/scheduler.xml";
         ISOSVirtualFile pobjVirtualFile = objFileSystemHandler.getFileHandle(strTestHotFolder);
         JSConfiguration objJSConf = objFactory.createJSConfiguration(pobjVirtualFile);
         LOGGER.info(objJSConf.toXMLString());

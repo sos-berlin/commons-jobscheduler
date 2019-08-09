@@ -17,179 +17,222 @@ import org.slf4j.LoggerFactory;
 
 public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSLdapAuthorizingRealm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSLdapAuthorizingRealm.class);
 
-    private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
-    private SOSLdapAuthorizing authorizing;
-    private String searchBase;
-    private String groupSearchBase;
-    private Map<String, String> groupRolesMap;
-    private Map<String, String> permissions;
-    private String groupNameAttribute;
-    private String userNameAttribute;
-    private String getRolesFromLdap;
-    private String useStartTls;
-    private String groupSearchFilter;
-    private String userSearchFilter;
-    private String hostNameVerification;
-    private AuthenticationToken authcToken;
+	private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
+	private SOSLdapAuthorizing authorizing;
+	private String searchBase;
+	private String groupSearchBase;
+	private Map<String, String> groupRolesMap;
+	private Map<String, String> permissions;
+	private String groupNameAttribute;
+	private String userNameAttribute;
+	private String getRolesFromLdap;
+	private String useStartTls;
+	private String groupSearchFilter;
+	private String userSearchFilter;
+	private String hostNameVerification;
+	private String roleAssignmentFromIni;
+	private AuthenticationToken authcToken;
 
-    public boolean supports(AuthenticationToken token) {
-        setAuthorizing(new SOSLdapAuthorizing());
-        return true;
-    }
+	public boolean supports(AuthenticationToken token) {
+		if (token != null) {
+			setAuthorizing(new SOSLdapAuthorizing());
+			return true;
+		} else {
+			setAuthorizing(null);
+			return false;
+		}
+	}
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        SimpleAuthorizationInfo authzInfo = null;
-        LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
-        if (authorizing != null) {
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+		SimpleAuthorizationInfo authzInfo = null;
+		if (authcToken != null) {
+			if (authcToken.getPrincipal() == null) {
+				throw new RuntimeException("doGetAuthorizationInfo: authcToken.getPrincipal() is null");
+			}
+		} else {
+			return authzInfo;
+		}
 
-            authorizing.setAuthcToken(authcToken);
-            try {
-                authorizing.setSosLdapAuthorizingRealm(this);
-                authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-                
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (NamingException e) {
-                throw new RuntimeException(e);
-            }
-            
-            if (this.getCacheManager() == null && this.isCachingEnabled()) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'cacheManager'");
-            }
-            if (this.getSearchBase() == null && this.getUserSearchFilter() != null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.searchBase'");
-            }
-            if (this.getGroupSearchBase() == null && this.getGroupSearchFilter() != null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.groupSearchBase'");
-            }
-            if (this.getUserDnTemplate() == null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.userDnTemplate'");
-            }
-            if (this.getContextFactory() == null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.contextFactory.url'");
-            }
-            if (this.getRolePermissionResolver() == null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.rolePermissionResolver'");
-            }
-            if (this.getPermissionResolver() == null) {
-                throw new RuntimeException("LDAP configuration is not valid: Missing setting rolePermissionResolver'");
-            }
+		if (authorizing != null) {
 
-        }
-        return authzInfo;
-    }
+			LOGGER.debug("doGetAuthorizationInfo: " + authcToken.getPrincipal().toString());
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
-        this.authcToken = authcToken;
+			authorizing.setAuthcToken(authcToken);
+			try {
+				authorizing.setSosLdapAuthorizingRealm(this);
+				authzInfo = authorizing.setRoles(authzInfo, principalCollection);
 
-        return super.doGetAuthenticationInfo(authcToken);
-    }
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (NamingException e) {
+				throw new RuntimeException(e);
+			}
 
-    public void setAuthorizing(SOSLdapAuthorizing authorizing) {
-        this.authorizing = authorizing;
-    }
+			if (this.getCacheManager() == null && this.isCachingEnabled()) {
+				throw new RuntimeException("LDAP configuration is not valid: Missing setting 'cacheManager'");
+			}
+			if (this.getSearchBase() == null && this.getUserSearchFilter() != null) {
+				throw new RuntimeException("LDAP configuration is not valid: Missing setting 'ldapRealm.searchBase'");
+			}
+			if (this.getGroupSearchBase() == null && this.getGroupSearchFilter() != null) {
+				throw new RuntimeException(
+						"LDAP configuration is not valid: Missing setting 'ldapRealm.groupSearchBase'");
+			}
+			if (this.getUserDnTemplate() == null) {
+				throw new RuntimeException(
+						"LDAP configuration is not valid: Missing setting 'ldapRealm.userDnTemplate'");
+			}
+			if (this.getContextFactory() == null) {
+				throw new RuntimeException(
+						"LDAP configuration is not valid: Missing setting 'ldapRealm.contextFactory.url'");
+			}
+			if (this.getRolePermissionResolver() == null) {
+				throw new RuntimeException(
+						"LDAP configuration is not valid: Missing setting 'ldapRealm.rolePermissionResolver'");
+			}
+			if (this.getPermissionResolver() == null) {
+				throw new RuntimeException("LDAP configuration is not valid: Missing setting rolePermissionResolver'");
+			}
 
-    public void setSearchBase(String searchBase) {
-        this.searchBase = searchBase;
-    }
+		}
+		return authzInfo;
+	}
 
-    public void setGroupRolesMap(Map<String, String> groupRolesMap) {
-        this.groupRolesMap = groupRolesMap;
-    }
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken)
+			throws AuthenticationException {
+		this.authcToken = authcToken;
+		AuthenticationInfo authenticationInfo = null;
+		try {
+			authenticationInfo = super.doGetAuthenticationInfo(authcToken);
+			return super.doGetAuthenticationInfo(authcToken);
+		} catch (AuthenticationException e) {
+			LOGGER.info(e.getMessage());
+		}
+		return authenticationInfo;
+	}
 
-    public String getSearchBase() {
-        return searchBase;
-    }
+	public void setAuthorizing(SOSLdapAuthorizing authorizing) {
+		this.authorizing = authorizing;
+	}
 
-    public Map<String, String> getGroupRolesMap() {
-        return groupRolesMap;
-    }
+	public void setSearchBase(String searchBase) {
+		this.searchBase = searchBase;
+	}
 
-    public String getGroupNameAttribute() {
-        if (groupNameAttribute == null) {
-            return DEFAULT_GROUP_NAME_ATTRIBUTE;
-        } else {
-            return groupNameAttribute;
-        }
-    }
+	public void setGroupRolesMap(Map<String, String> groupRolesMap) {
+		this.groupRolesMap = groupRolesMap;
+	}
 
-    public void setGroupNameAttribute(String groupNameAttribute) {
-        this.groupNameAttribute = groupNameAttribute;
-    }
+	public String getSearchBase() {
+		return searchBase;
+	}
 
-    public String getUserNameAttribute() {
-        return userNameAttribute;
-    }
+	public Map<String, String> getGroupRolesMap() {
+		return groupRolesMap;
+	}
 
-    public void setUserNameAttribute(String userNameAttribute) {
-        this.userNameAttribute = userNameAttribute;
-    }
+	public String getGroupNameAttribute() {
+		if (groupNameAttribute == null) {
+			return DEFAULT_GROUP_NAME_ATTRIBUTE;
+		} else {
+			return groupNameAttribute;
+		}
+	}
 
-    public Map<String, String> getPermissions() {
-        return permissions;
-    }
+	public void setGroupNameAttribute(String groupNameAttribute) {
+		this.groupNameAttribute = groupNameAttribute;
+	}
 
-    public void setPermissions(Map<String, String> permissions) {
-        this.permissions = permissions;
-    }
+	public String getUserNameAttribute() {
+		return userNameAttribute;
+	}
 
-    public Object getLdapPrincipal(AuthenticationToken token) {
-        return super.getLdapPrincipal(token);
-    }
+	public void setUserNameAttribute(String userNameAttribute) {
+		this.userNameAttribute = userNameAttribute;
+	}
 
-    public String getUserSearchFilter() {
-        return userSearchFilter;
-    }
+	public Map<String, String> getPermissions() {
+		return permissions;
+	}
 
-    public void setUserSearchFilter(String userSearchFilter) {
-        this.userSearchFilter = userSearchFilter;
-    }
+	public void setPermissions(Map<String, String> permissions) {
+		this.permissions = permissions;
+	}
 
-    public void setGetRolesFromLdap(String getRolesFromLdap) {
-        this.getRolesFromLdap = getRolesFromLdap;
-    }
+	public Object getLdapPrincipal(AuthenticationToken token) {
+		return super.getLdapPrincipal(token);
+	}
 
-    public String getGetRolesFromLdap() {
-        if (getRolesFromLdap == null) {
-            getRolesFromLdap = "true";
-        }
-        return getRolesFromLdap;
-    }
+	public String getUserSearchFilter() {
+		return userSearchFilter;
+	}
 
-    public void setUseStartTls(String useStartTls) {
-        this.useStartTls = useStartTls;
-    }
+	public void setUserSearchFilter(String userSearchFilter) {
+		this.userSearchFilter = userSearchFilter;
+	}
 
-    public String getUseStartTls() {
-        return useStartTls;
-    }
+	public void setGetRolesFromLdap(String getRolesFromLdap) {
+		this.getRolesFromLdap = getRolesFromLdap;
+	}
 
-    public String getGroupSearchFilter() {
-        return groupSearchFilter;
-    }
+	public String getGetRolesFromLdap() {
+		return getRolesFromLdap;
+	}
 
-    public void setGroupSearchFilter(String groupSearchFilter) {
-        this.groupSearchFilter = groupSearchFilter;
-    }
+	public void setRoleAssignmentFromIni(String roleAssignmentFromIni) {
+		this.roleAssignmentFromIni = roleAssignmentFromIni;
+	}
 
-    public String getGroupSearchBase() {
-        return groupSearchBase;
-    }
+	public String getRoleAssignmentFromIni() {
+		return roleAssignmentFromIni;
+	}
 
-    public void setGroupSearchBase(String groupSearchBase) {
-        this.groupSearchBase = groupSearchBase;
-    }
+	public void setUseStartTls(String useStartTls) {
+		this.useStartTls = useStartTls;
+	}
 
-    public String getHostNameVerification() {
-        return hostNameVerification;
-    }
+	public String getUseStartTls() {
+		return useStartTls;
+	}
 
-    public void setHostNameVerification(String hostNameVerification) {
-        this.hostNameVerification = hostNameVerification;
-    }
+	public String getGroupSearchFilter() {
+		return groupSearchFilter;
+	}
+
+	public void setGroupSearchFilter(String groupSearchFilter) {
+		this.groupSearchFilter = groupSearchFilter;
+	}
+
+	public String getGroupSearchBase() {
+		return groupSearchBase;
+	}
+
+	public void setGroupSearchBase(String groupSearchBase) {
+		this.groupSearchBase = groupSearchBase;
+	}
+
+	public String getHostNameVerification() {
+		return hostNameVerification;
+	}
+
+	public void setHostNameVerification(String hostNameVerification) {
+		this.hostNameVerification = hostNameVerification;
+	}
+
+	public boolean isUseStartTls_() {
+		return "true".equalsIgnoreCase(useStartTls);
+	}
+
+	public boolean isGetRolesFromLdap_() {
+		return (getRolesFromLdap == null || "true".equalsIgnoreCase(getRolesFromLdap));
+	}
+
+	public boolean isRoleAssignmentFromIni_() {
+		return (roleAssignmentFromIni == null || "true".equalsIgnoreCase(roleAssignmentFromIni));
+	}
 
 }

@@ -259,7 +259,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     public void addValue(final String pstrValue4Matching) {
         if (lstMatchValues == null) {
-            lstMatchValues = new Vector();
+            lstMatchValues = new Vector<String>();
         }
         lstMatchValues.add(pstrValue4Matching);
     }

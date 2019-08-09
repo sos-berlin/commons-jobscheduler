@@ -10,12 +10,9 @@ public class SOSMailAttachment {
     private String encoding = "";
     private String charset = "";
     private File file = null;
-
     private String filename;
     private String fileExtension;
-
     private byte[] content;
-
     private String contentid;
 
     public SOSMailAttachment(SOSMail sosmail, File f) {

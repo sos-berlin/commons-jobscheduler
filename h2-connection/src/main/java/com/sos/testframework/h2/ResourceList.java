@@ -96,13 +96,13 @@ public class ResourceList {
     }
 
     public List<File> getFilelist() {
-        List fileList = new ArrayList<File>();
+        List<File> fileList = new ArrayList<File>();
         fileList.addAll(resources.values());
         return fileList;
     }
 
     public List<String> getClasslist() {
-        List classList = new ArrayList<File>();
+        List<String> classList = new ArrayList<String>();
         classList.addAll(resources.keySet());
         return classList;
     }

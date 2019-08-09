@@ -27,10 +27,10 @@ public class SOSOptionUrlTest {
 
     @Test
     public void testValueString3() {
-        objU.setValue("file:///c:/temp/JCLs");
-        new File("c:/temp/JCLs").mkdir();
-        assertEquals("folder name", "/c:/temp/JCLs", objU.getFolderName());
-        assertTrue("dir exists", new File(objU.getFolderName()).exists());
+        objU.setValue("file:///src/test/resources/JCLs");
+        new File("src/test/resources/JCLs").mkdir();
+        assertEquals("folder name", "/src/test/resources/JCLs", objU.getFolderName());
+        assertTrue("dir exists", new File("src/test/resources/JCLs").exists());
     }
 
     @Test

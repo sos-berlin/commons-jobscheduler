@@ -5,10 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -19,6 +20,7 @@ import sos.util.SOSString;
 /** @author andreas pueschel */
 public class JobSchedulerCheckSanity extends JobSchedulerJob {
 
+    @SuppressWarnings("unused")
     private Properties checkReferences = null;
     private boolean checkDiskSpace = true;
     private boolean checkDiskSpaceUser = true;
@@ -27,14 +29,15 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
     private long minMemorySize = 0;
     private int maxRetry = 20;
     private int maxRetryInterval = 14400;
-    private HashMap diskChecks;
-    private HashMap diskChecksUser;
-    private HashMap memChecks;
+    private Map<String, Long> diskChecks;
+    private Map<String, Long> diskChecksUser;
+    private Map<String, Long> memChecks;
     private Global hostware = null;
     private String subtype = "process";
     private String val = "0";
     private String refVal = "0";
 
+    @SuppressWarnings("unused")
     private class DiskCheck {
 
         public String location;
@@ -51,13 +54,12 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         if (!rc) {
             return false;
         }
-        ArrayList references = null;
         spooler_job.set_delay_after_error(1, maxRetryInterval);
         spooler_job.set_delay_after_error(maxRetry, "STOP");
         try {
-            diskChecks = new HashMap();
-            diskChecksUser = new HashMap();
-            memChecks = new HashMap();
+            diskChecks = new HashMap<String, Long>();
+            diskChecksUser = new HashMap<String, Long>();
+            memChecks = new HashMap<String, Long>();
             try {
                 spooler_log.debug3("Initializing hostware...");
                 hostware = new Global();
@@ -110,18 +112,18 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         }
         SOSString sosString = new SOSString();
         try {
-            ArrayList results =
+            List<Map<String, String>> results =
                     this.getConnection().getArray(
                             "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
                                     + "\"SPOOLER_ID\" IS NULL AND \"CATEGORY\"='disk_space'");
-            ArrayList results2 =
+            List<Map<String, String>> results2 =
                     this.getConnection().getArray(
                             "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE " + "\"SPOOLER_ID\"='" + spooler.id()
                                     + "' AND \"CATEGORY\"='disk_space' ");
             results.addAll(results2);
-            Iterator iter = results.iterator();
+            Iterator<Map<String, String>> iter = results.iterator();
             while (iter.hasNext()) {
-                HashMap row = (HashMap) iter.next();
+                Map<String, String> row = iter.next();
                 String location = sosString.parseToString(row, "subtype");
                 String sMinSpace = sosString.parseToString(row, "value");
                 Long minSpace = new Long(minDiskSpace);
@@ -146,7 +148,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
             results.addAll(results2);
             iter = results.iterator();
             while (iter.hasNext()) {
-                HashMap row = (HashMap) iter.next();
+                Map<String, String> row = iter.next();
                 String location = sosString.parseToString(row, "subtype");
                 String sMinSpace = sosString.parseToString(row, "value");
                 Long minSpace = new Long(minDiskSpace);
@@ -171,7 +173,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
             results.addAll(results2);
             iter = results.iterator();
             while (iter.hasNext()) {
-                HashMap row = (HashMap) iter.next();
+                Map<String, String> row = iter.next();
                 String type = sosString.parseToString(row, "subtype");
                 String sMinMem = sosString.parseToString(row, "value");
                 Long minMem = new Long(minMemorySize);
@@ -195,7 +197,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
             int dsuCounter = 0;
             SOSString sosString = new SOSString();
             Properties settings = getJobProperties();
-            Enumeration keys = settings.keys();
+            Enumeration<Object> keys = settings.keys();
             while (keys.hasMoreElements()) {
                 String key = sosString.parseToString(keys.nextElement());
                 if (key.startsWith("category_")) {
@@ -259,7 +261,6 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         try {
             int dsCounter = 0;
             int dsuCounter = 0;
-            SOSString sosString = new SOSString();
             Variable_set params = spooler_task.params();
             if (params.var("check_disk_space") != null && !params.var("check_disk_space").isEmpty()) {
                 String sCheckDiskSpace = params.var("check_disk_space");
@@ -347,7 +348,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         spooler_log.debug3("Checking diskspace...");
         String sUser = "";
         String historyKey = "disk_space";
-        Iterator iter = null;
+        Iterator<String> iter = null;
         if (user) {
             sUser = " for Scheduler user";
             historyKey = "disk_space_user";
@@ -362,9 +363,9 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 String location = sosString.parseToString(iter.next());
                 long minDS = 0;
                 if (user) {
-                    minDS = ((Long) diskChecksUser.get(location)).longValue();
+                    minDS = diskChecksUser.get(location);
                 } else {
-                    minDS = ((Long) diskChecks.get(location)).longValue();
+                    minDS = diskChecks.get(location);
                 }
                 spooler_log.info("Checking disk space on partition " + location + sUser);
                 subtype = location;
@@ -398,6 +399,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         }
     }
 
+    @SuppressWarnings("unused")
     private long getFreeSpaceOnWindows(String path) throws Exception {
         long bytesFree = -1;
         File script = new File(System.getProperty("java.io.tmpdir"), "sos_script.bat");
@@ -429,6 +431,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         return bytesFree;
     }
 
+    @SuppressWarnings("unused")
     private long getFreeSpaceOnUnix(String path) throws Exception {
         long bytesFree = -1;
         Process p = Runtime.getRuntime().exec("df -B 1 " + "/" + path);
@@ -463,7 +466,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         subtype = "mem";
         val = "0";
         refVal = "0";
-        Iterator iter = memChecks.keySet().iterator();
+        Iterator<String> iter = memChecks.keySet().iterator();
         try {
             while (iter.hasNext()) {
                 subtype = "mem";
@@ -473,7 +476,7 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 SOSString sosString = new SOSString();
                 String type = sosString.parseToString(iter.next());
                 subtype = type;
-                long minMem = ((Long) memChecks.get(type)).longValue();
+                long minMem = memChecks.get(type);
                 refVal = "" + minMem;
                 spooler_log.info("Checking free memory [" + type + "]...");
                 if ("jvm".equalsIgnoreCase(type)) {

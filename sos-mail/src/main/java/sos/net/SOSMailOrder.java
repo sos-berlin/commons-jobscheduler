@@ -7,17 +7,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSSettings;
-import sos.util.SOSClassUtil;
-import sos.util.SOSDate;
 import sos.textprocessor.SOSDocumentFactoryTextProcessor;
 import sos.textprocessor.SOSPlainTextProcessor;
 import sos.textprocessor.SOSTextProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import sos.util.SOSClassUtil;
+import sos.util.SOSDate;
 
 public class SOSMailOrder extends SOSMail {
 
@@ -41,7 +44,7 @@ public class SOSMailOrder extends SOSMail {
     private int bodyTemplateType;
     private int id = -1;
     private String modifiedBy = "SOSMailOrder";
-    private HashMap replacements = new HashMap();
+    private Map<String, String> replacements = new HashMap<String, String>();
     private int status = 0;
     private String statusText = null;
     private Date targeted = null;
@@ -97,7 +100,7 @@ public class SOSMailOrder extends SOSMail {
     }
 
     public void load(int id) throws Exception {
-        HashMap data = new HashMap();
+        Map<String, String> data = new HashMap<String, String>();
         try {
             data = sosConnection.getSingle("SELECT " + "\"MAILING_ID\", \"JOB_ID\", \"MESSAGE_ID\", \"TOPIC\", "
                 + "\"TOPIC_IDENTIFIER\", \"CLIENT_IDENTIFIER\", \"REFERENCE\", \"MAIL_FROM\", "
@@ -112,39 +115,39 @@ public class SOSMailOrder extends SOSMail {
             setMailingId(Integer.parseInt(data.get("mailing_id").toString()));
             setJobId(Integer.parseInt(data.get("job_id").toString()));
             if (data.get("message_id") != null) {
-                setMessageId(data.get("message_id").toString());
+                setMessageId(data.get("message_id"));
             }
             if (data.get("topic") != null) {
-                setTopic(data.get("topic").toString());
+                setTopic(data.get("topic"));
             }
             if (data.get("topic_identifier") != null) {
-                setTopicIdentifier(data.get("topic_identifier").toString());
+                setTopicIdentifier(data.get("topic_identifier"));
             }
             if (data.get("client_identifier") != null) {
-                setClientIdentifier(data.get("client_identifier").toString());
+                setClientIdentifier(data.get("client_identifier"));
             }
             if (data.get("reference") != null) {
-                setReference(data.get("reference").toString());
+                setReference(data.get("reference"));
             }
             if (data.get("mail_from") != null) {
-                setFrom(data.get("mail_from").toString());
+                setFrom(data.get("mail_from"));
             }
             if (data.get("from_name") != null) {
-                setFromName(data.get("from_name").toString());
+                setFromName(data.get("from_name"));
             }
             if (data.get("mail_to") != null) {
-                addRecipient(data.get("mail_to").toString());
+                addRecipient(data.get("mail_to"));
             }
             if (data.get("cc_to") != null) {
-                addCC(data.get("cc_to").toString());
+                addCC(data.get("cc_to"));
             }
             if (data.get("bcc_to") != null) {
-                addBCC(data.get("bcc_to").toString());
+                addBCC(data.get("bcc_to"));
             }
             if (data.get("reply_to") != null) {
-                setReplyTo(data.get("reply_to").toString());
+                setReplyTo(data.get("reply_to"));
             }
-            int priority = Integer.parseInt(data.get("priority").toString());
+            int priority = Integer.parseInt(data.get("priority"));
             switch (priority) {
             case PRIORITY_HIGHEST:
                 this.setPriorityHighest();
@@ -163,25 +166,25 @@ public class SOSMailOrder extends SOSMail {
                 break;
             }
             if (data.get("subject") != null) {
-                setSubject(data.get("subject").toString());
+                setSubject(data.get("subject"));
             }
             if (data.get("subject_template") != null) {
-                setSubjectTemplate(data.get("subject_template").toString());
+                setSubjectTemplate(data.get("subject_template"));
             }
             if (data.get("subject_template_type") != null) {
-                int tt = Integer.parseInt(data.get("subject_template_type").toString());
+                int tt = Integer.parseInt(data.get("subject_template_type"));
                 setSubjectTemplateType(tt);
             }
             if (data.get("body_template") != null) {
-                setBodyTemplate(data.get("body_template").toString());
+                setBodyTemplate(data.get("body_template"));
             }
             if (data.get("body_template_type") != null) {
-                int tt = Integer.parseInt(data.get("body_template_type").toString());
+                int tt = Integer.parseInt(data.get("body_template_type"));
                 setBodyTemplateType(tt);
             }
             clearReplacements();
-            if (data.get("replacements") != null && !data.get("replacements").toString().isEmpty()) {
-                String[] replacementList = data.get("replacements").toString().split("\\|");
+            if (data.get("replacements") != null && !data.get("replacements").isEmpty()) {
+                String[] replacementList = data.get("replacements").split("\\|");
                 for (int i = 0; i < replacementList.length; i++) {
                     String[] replacementEntry = replacementList[i].split("\\^");
                     if (replacementEntry.length == 2) {
@@ -189,30 +192,30 @@ public class SOSMailOrder extends SOSMail {
                     }
                 }
             }
-            if (data.get("language") != null && !data.get("language").toString().isEmpty()) {
-                setLanguage(data.get("language").toString());
+            if (data.get("language") != null && !data.get("language").isEmpty()) {
+                setLanguage(data.get("language"));
             }
-            if (data.get("charset") != null && !data.get("charset").toString().isEmpty()) {
-                setCharset(data.get("charset").toString());
+            if (data.get("charset") != null && !data.get("charset").isEmpty()) {
+                setCharset(data.get("charset"));
             }
-            if (data.get("encoding") != null && !data.get("encoding").toString().isEmpty()) {
-                setEncoding(data.get("encoding").toString());
+            if (data.get("encoding") != null && !data.get("encoding").isEmpty()) {
+                setEncoding(data.get("encoding"));
             }
-            if (data.get("content_type") != null && !data.get("content_type").toString().isEmpty()) {
-                setContentType(data.get("content_type").toString());
+            if (data.get("content_type") != null && !data.get("content_type").isEmpty()) {
+                setContentType(data.get("content_type"));
             }
             if (data.get("status") != null) {
-                int st = Integer.parseInt(data.get("status").toString());
+                int st = Integer.parseInt(data.get("status"));
                 setStatus(st);
             }
             if (data.get("status_text") != null) {
-                setStatusText(data.get("status_text").toString());
+                setStatusText(data.get("status_text"));
             }
-            if (data.get("targeted") != null && !data.get("targeted").toString().isEmpty()) {
-                setTargeted(SOSDate.getTime(data.get("targeted").toString()));
+            if (data.get("targeted") != null && !data.get("targeted").isEmpty()) {
+                setTargeted(SOSDate.getTime(data.get("targeted")));
             }
-            if (data.get("delivered") != null && !data.get("delivered").toString().isEmpty()) {
-                setDelivered(SOSDate.getTime(data.get("delivered").toString()));
+            if (data.get("delivered") != null && !data.get("delivered").isEmpty()) {
+                setDelivered(SOSDate.getTime(data.get("delivered")));
             }
             String body = sosConnection.getClob("SELECT \"BODY\" FROM " + SOSMail.tableMails + " WHERE \"ID\"=" + id);
             setBody(body);
@@ -224,26 +227,26 @@ public class SOSMailOrder extends SOSMail {
     }
 
     private void loadAttachments() throws Exception {
-        ArrayList data = new ArrayList();
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
         try {
             data = sosConnection.getArray("SELECT " + "\"FILENAME\", \"CHARSET\",  \"ENCODING\", \"CONTENT_TYPE\" " + "FROM " + SOSMail.tableMailAttachments
                     + " " + "WHERE \"ID\"=" + this.id);
             if (data != null) {
                 LOGGER.debug("Found " + data.size() + " attachments.");
-                Iterator iter = data.iterator();
+                Iterator<Map<String, String>> iter = data.iterator();
                 while (iter.hasNext()) {
-                    HashMap att = (HashMap) iter.next();
-                    String filename = att.get("filename").toString();
+                    Map<String, String> att = iter.next();
+                    String filename = att.get("filename");
                     File file = new File(filename);
                     SOSMailAttachment attachment = new SOSMailAttachment(this, file);
-                    if (att.get("charset") != null && !att.get("charset").toString().isEmpty()) {
-                        attachment.setCharset(att.get("charset").toString());
+                    if (att.get("charset") != null && !att.get("charset").isEmpty()) {
+                        attachment.setCharset(att.get("charset"));
                     }
-                    if (att.get("encoding") != null && !att.get("encoding").toString().isEmpty()) {
-                        attachment.setEncoding(att.get("encoding").toString());
+                    if (att.get("encoding") != null && !att.get("encoding").isEmpty()) {
+                        attachment.setEncoding(att.get("encoding"));
                     }
-                    if (att.get("content_type") != null && !att.get("content_type").toString().isEmpty()) {
-                        attachment.setContentType(att.get("content_type").toString());
+                    if (att.get("content_type") != null && !att.get("content_type").isEmpty()) {
+                        attachment.setContentType(att.get("content_type"));
                     }
                     addAttachment(attachment);
                 }
@@ -344,10 +347,10 @@ public class SOSMailOrder extends SOSMail {
 
     private void storeAttachments() throws Exception {
         sosConnection.execute("DELETE FROM " + SOSMail.tableMailAttachments + " WHERE \"ID\"=" + this.id);
-        Iterator iter = attachmentList.values().iterator();
+        Iterator<SOSMailAttachment> iter = attachmentList.values().iterator();
         try {
             while (iter.hasNext()) {
-                SOSMailAttachment attachment = (SOSMailAttachment) iter.next();
+                SOSMailAttachment attachment = iter.next();
                 String statement = "INSERT INTO " + tableMailAttachments + " (\"ID\", \"FILENAME\", \"CHARSET\", \"ENCODING\","
                                 + " \"CONTENT_TYPE\", \"CREATED\", \"CREATED_BY\", " + " \"MODIFIED\", \"MODIFIED_BY\") VALUES " + " (" + this.id
                                 + ", '" + attachment.getFile().getAbsolutePath() + "', " + "'" + attachment.getCharset() + "', " + "'"
@@ -594,10 +597,10 @@ public class SOSMailOrder extends SOSMail {
 
     protected String getReplacementsAsString() {
         String rc = "";
-        Iterator keys = replacements.keySet().iterator();
+        Iterator<String> keys = replacements.keySet().iterator();
         while (keys.hasNext()) {
-            String key = (String) keys.next();
-            rc += key + "^" + replacements.get(key).toString();
+            String key = keys.next();
+            rc += key + "^" + replacements.get(key);
             if (keys.hasNext()) {
                 rc += "|";
             }

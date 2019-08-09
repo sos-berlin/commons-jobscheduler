@@ -42,15 +42,15 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
     @Test
     public void testConnect() throws Exception {
-        objOptions.host.setValue("wilma.sos");
+        objOptions.host.setValue("192.11.0.116");
         objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
         setDynamicClassNameSource(objSource);
-        objSource.host.setValue("wilma.sos");
+        objSource.host.setValue("192.11.0.116");
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
-        objSource.user.setValue("kb");
+        objSource.user.setValue("test");
         objSource.protocol.setValue("sftp");
-        objSource.sshAuthMethod.isPassword(true);
+        objSource.sshAuthMethod.isPassword(false);
         objOptions.operation.setValue("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -119,11 +119,11 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
     @Test
     public void testConnectOpenSSH() throws Exception {
-        objOptions.host.setValue("wilma.sos");
+        objOptions.host.setValue("192.11.0.116");
         objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
         setDynamicClassNameSource(objSource);
-        objSource.host.setValue("wilma.sos");
+        objSource.host.setValue("192.11.0.116");
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         objSource.protocol.setValue("sftp");
         objSource.sshAuthMethod.isPassword(false);

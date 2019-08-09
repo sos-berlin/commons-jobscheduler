@@ -1,0 +1,124 @@
+package com.sos.eventhandlerservice.resolver;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class JSCondition {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSCondition.class);
+
+    private String conditionType;
+    private String conditionParam;
+    private String conditionJobStream;
+    private String conditionDate;
+    private String conditionValue;
+    private String conditionJob;
+    private String conditionJobChain;
+    private String conditionQuery;
+
+    public JSCondition(String condition) {
+        conditionType = getConditionType(condition);
+        conditionParam = getConditionTypeParam(condition);
+        conditionJobStream = getConditionJobStream(conditionParam);
+        conditionJob = getConditionJob(conditionParam);
+        conditionJobChain = getConditionJobChain(conditionParam);
+        conditionQuery = getConditionQuery(conditionParam);
+        conditionDate = getConditionDate(conditionParam);
+        conditionValue = condition;
+    }
+
+    private String getConditionDate(String conditionParam) {
+        if (conditionParam != null) {
+            String[] conditionParts = conditionParam.split("\\[");
+            if (conditionParts.length > 1) {
+                String s = conditionParts[1].trim();
+                s = s.replaceAll("]", "");
+                return s.trim();
+            }
+        }
+        return "today";
+
+    }
+
+    private String getConditionJob(String conditionParam) {
+        String s = "";
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.split("\\.")[0];
+        }
+        return s;
+    }
+    
+    private String getConditionJobChain(String conditionParam) {
+       return getConditionJob(conditionParam);
+    }
+
+    private String getConditionQuery(String conditionParam) {
+        String s = conditionParam;
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.split("\\.")[1];
+        }
+        return s;
+    }
+
+    private String getConditionType(String condition) {
+        String[] conditionParts = condition.split(":");
+        if (conditionParts.length == 1) {
+            return "event";
+        } else {
+            return conditionParts[0].replaceAll("_","").toLowerCase();
+        }
+    }
+
+    private String getConditionTypeParam(String condition) {
+        String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("job:", "").replaceFirst("jobchain:", "");
+        return s;
+    }
+
+    private String getConditionJobStream(String conditionParam) {
+        String s = "";
+        if (conditionParam.indexOf(".") >= 0) {
+            s = conditionParam.substring(0, conditionParam.indexOf("."));
+        }
+        return s;
+    }
+
+    public String getConditionType() {
+        return conditionType;
+    }
+
+    public String getConditionParam() {
+        return conditionParam;
+    }
+
+    public String getConditionJobStream() {
+        return conditionJobStream;
+    }
+
+    public String getConditionDate() {
+        return conditionDate;
+    }
+
+    public String getConditonValue() {
+        return conditionValue;
+    }
+
+    public String getConditionJob() {
+        return conditionJob;
+    }
+
+    public String getEventName() {
+        String event = conditionParam;
+        event = event.replace("[" + this.getConditionDate() + "]", "");
+        event = event.replace(this.getConditionJobStream() + ".", "");
+        return event;
+    }
+
+    public String getConditionQuery() {
+        return conditionQuery;
+    }
+
+    
+    public String getConditionJobChain() {
+        return conditionJobChain;
+    }
+}

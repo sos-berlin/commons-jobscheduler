@@ -13,7 +13,6 @@ import java.net.Proxy;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +49,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -671,8 +671,15 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return getFilenames(pathname, false);
     }
 
-    private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) {
-        return getFilenames(pstrPathName, flgRecurseSubFolders, true);
+    private Vector<String> getFilenames(final String pathName, final boolean recurseSubFolders) {
+        Vector<String> listOfFilenames = getFilenames(pathName, recurseSubFolders, true);
+
+        for (String currentFileName : listOfFilenames) {
+            SOSFileEntry sosFileEntry = new SOSFileEntry();
+            sosFileEntry.setFilename(currentFileName);
+            sosFileEntries.add(sosFileEntry);
+        }
+        return getFilenames(pathName, recurseSubFolders, true);
     }
 
     private Vector<String> getFilenames(final String path, final boolean withRecurseSubFolders, final boolean checkReplyCode) {
@@ -963,7 +970,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 }
             } else {
                 LOGGER.info(SOSVfs_D_132.params(strUserName));
-                throw new JobSchedulerException(SOSVfs_E_134.params("Login"));
+                throw new JobSchedulerException(SOSVfs_E_134.params("Login") + " code:" + objFTPReply.getCode() + " Message: " + objFTPReply
+                        .getMessages()[0]);
             }
         } catch (JobSchedulerException e) {
             throw e;
@@ -1414,12 +1422,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd, SOSVfsEnv env) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
