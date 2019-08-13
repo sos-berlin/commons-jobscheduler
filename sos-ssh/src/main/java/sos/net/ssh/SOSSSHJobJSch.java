@@ -16,12 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import sos.net.ssh.exceptions.SSHConnectionError;
-import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.net.ssh.exceptions.SSHMissingCommandError;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -31,6 +26,10 @@ import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.exception.SOSSSHAutoDetectionException;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.net.ssh.exceptions.SSHConnectionError;
+import sos.net.ssh.exceptions.SSHExecutionError;
+import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHJobJSch extends SOSSSHJob2 {
@@ -45,8 +44,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
     private static final String DEFAULT_WINDOWS_PRE_COMMAND = "set \"%s=%s\"";
     private static final String DEFAULT_LINUX_PRE_COMMAND = "export %s='%s'";
-    private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "type \"%s\"";
-    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "cat %s";
+    private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "if exist \"%s\" type \"%s\"";
+    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s&&cat %s";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "rm %s";
     private String tempFileName;
@@ -73,6 +72,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         try {
             if (!prePostCommandVFSHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
+                postAlternateOptions.setWithoutSFTPChannel(true);
                 postAlternateOptions.raiseExceptionOnError.value(false);
                 prePostCommandVFSHandler.connect(postAlternateOptions);
             }
@@ -192,9 +192,15 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
                         @Override
                         public Void call() throws Exception {
-                            Thread.sleep(1000);
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {}
                             while (!commandExecution.isDone()) {
-                                Thread.sleep(60000);
+                                for (int i = 0; i < 600; i++) {
+                                    try {
+                                        Thread.sleep(100);
+                                    } catch (InterruptedException e) {}
+                                }
                                 ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("CONT");
                             }
                             return null;
@@ -225,6 +231,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             LOGGER.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
+                    }
+                } finally {
+                    if (executorService != null) {
+                        if (commandExecution != null) {
+                            commandExecution.cancel(true);
+                        }
+                        if (sendSignalExecution != null) {
+                            sendSignalExecution.cancel(true);
+                        }
+                        executorService.shutdownNow();
                     }
                 }
             }
@@ -465,19 +481,23 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         if (objOptions.postCommandRead.isDirty()) {
             postCommandRead = String.format(objOptions.postCommandRead.getValue(), tmpFileName);
         } else {
-            if (flgIsWindowsShell) {
-                postCommandRead = String.format(DEFAULT_WINDOWS_POST_COMMAND_READ, tmpFileName);
-            } else {
-                postCommandRead = String.format(DEFAULT_LINUX_POST_COMMAND_READ, tmpFileName);
-            }
+            try {
+                if (flgIsWindowsShell) {
+                    postCommandRead = String.format(DEFAULT_WINDOWS_POST_COMMAND_READ, tmpFileName, tmpFileName);
+                } else {
+                    postCommandRead = String.format(DEFAULT_LINUX_POST_COMMAND_READ, tmpFileName, tmpFileName);
+                }
+            } catch (Exception e) {}
         }
         String stdErr = "";
-        if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
-            for (String tempFileName : tempFilesToDelete) {
-                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
-                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+//        try {
+            if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
+                for (String tempFileName : tempFilesToDelete) {
+                    ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
+                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+                }
             }
-        }
+//        } catch (Exception e) {}
         tempFilesToDelete = null;
         try {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
@@ -505,19 +525,21 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         }
                     }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
-                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
-                } else {
-                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
+//                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 }
+//                else {
+//                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
+//                }
             } else {
-                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
-                stdErr = prePostCommandVFSHandler.getStdErr().toString();
-                if (stdErr.length() > 0) {
-                    LOGGER.debug(stdErr);
-                }
+//                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
+//                stdErr = prePostCommandVFSHandler.getStdErr().toString();
+//                if (stdErr.length() > 0) {
+//                    LOGGER.debug(stdErr);
+//                }
+                
             }
         } catch (Exception e) {
-            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+//            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
         } finally {
             try {
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
@@ -526,6 +548,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            }
+            if (prePostCommandVFSHandler.isConnected()) {
+                try {
+                    prePostCommandVFSHandler.closeConnection();
+                    prePostCommandVFSHandler.closeSession();
+                } catch (Exception e) {}
             }
 
         }
@@ -545,6 +573,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
         alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
         alternateOptions.ignoreError.value(options.getIgnoreError().value());
+        alternateOptions.withoutSFTPChannel.value(true);
         return alternateOptions;
     }
 
