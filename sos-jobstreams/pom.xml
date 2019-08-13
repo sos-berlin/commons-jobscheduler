@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.sos-berlin.jobscheduler</groupId>
-	<artifactId>sos-conditions</artifactId>
+	<artifactId>sos-jobstreams</artifactId>
 	<name>${project.artifactId}</name>
 
 

@@ -3,6 +3,7 @@ package com.sos.eventhandlerservice.classes;
 import java.util.Calendar;
 
 import com.sos.hibernate.classes.ClassList;
+import com.sos.jitl.classes.event.EventHandlerSettings;
 
 public class Constants {
     
@@ -34,6 +35,9 @@ public class Constants {
     public static final String IN_CONDITION_COMMANDS_TABLE_SEQUENCE = "COND_IN_CONDITION_CMD_ID_SEQ";
     public static final String IN_CONDITION_COMMANDS_TABLE = "COND_IN_CONDITION_COMMANDS";
 
+    public static  EventHandlerSettings settings=null;
+
+    
     public static String getSession() {
         Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH)+1;

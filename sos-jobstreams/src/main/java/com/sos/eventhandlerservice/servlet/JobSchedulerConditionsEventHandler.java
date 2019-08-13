@@ -68,6 +68,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
         SOSHibernateSession reportingSession = null;
         try {
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
+            Constants.settings = getSettings();
 
             reportingSession = reportingFactory.openStatelessSession();
             File f = new File(getSettings().getConfigDirectory() + "/private/private.conf");

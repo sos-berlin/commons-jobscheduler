@@ -45,7 +45,7 @@ public class JSJobInConditions {
             if (jsInCondition == null) {
                 jsInCondition = new JSInCondition();
             }
-            JSInConditionCommand inConditionCommand = new JSInConditionCommand(settings);
+            JSInConditionCommand inConditionCommand = new JSInConditionCommand();
             inConditionCommand.setItemInConditionCommand(itemInConditionWithCommand.getDbItemInConditionCommand());
             jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
             jsInCondition.addCommand(inConditionCommand);
