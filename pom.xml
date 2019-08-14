@@ -33,7 +33,6 @@
         <module>sos-security</module>
         <module>sos-mail</module>
         <module>sos-ssh</module>
-        <module>sos-conditions</module>
     </modules>
 
 </project>
