@@ -560,12 +560,12 @@ public class SOSServicePermissionShiro {
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:runtime:execute:edit_xml");
 
 
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:view:status");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:view:graph");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:view:eventlist");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:change:conditions");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:change:events:add");
-            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:condition:change:events:remove");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:view:status");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:view:graph");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:view:eventlist");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:conditions");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:events:add");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobstream:change:events:remove");
 
             
             sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);

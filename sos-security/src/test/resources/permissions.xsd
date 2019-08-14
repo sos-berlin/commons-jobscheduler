@@ -563,7 +563,7 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="Condition">
+				<xs:element name="JobStreams">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="view">
