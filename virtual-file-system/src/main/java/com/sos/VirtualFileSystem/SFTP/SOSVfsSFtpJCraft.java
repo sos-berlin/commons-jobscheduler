@@ -17,19 +17,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
-import org.jurr.jsch.bugfix111.JSCH111BugFix;
 
-import sos.util.SOSString;
+import org.jurr.jsch.bugfix111.JSCH111BugFix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.jcraft.jsch.agentproxy.AgentProxyException;
-import com.jcraft.jsch.agentproxy.Connector;
-import com.jcraft.jsch.agentproxy.ConnectorFactory;
-import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
+import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.ProxyHTTP;
@@ -42,6 +39,10 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.UserInfo;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.Connector;
+import com.jcraft.jsch.agentproxy.ConnectorFactory;
+import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -59,8 +60,9 @@ import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import sos.util.SOSDate;
+import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
@@ -232,7 +234,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             for (String subFolder : objF.getSubFolderArrayReverse()) {
                 SftpATTRS attributes = getAttributes(subFolder);
                 if (attributes != null && attributes.isDir()) {
-                    LOGGER.debug(SOSVfs_E_180.params(subFolder));
+                    if (isDebugEnabled) {
+                        LOGGER.debug(SOSVfs_E_180.params(subFolder));
+                    }
                     break;
                 }
                 if (attributes != null && !attributes.isDir()) {
@@ -260,10 +264,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             SOSOptionFolderName objF = new SOSOptionFolderName(path);
             reply = "rmdir OK";
             for (String subfolder : objF.getSubFolderArrayReverse()) {
-                LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", subfolder)));
+                if (isDebugEnabled) {
+                    LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", subfolder)));
+                }
                 this.getClient().rmdir(subfolder);
                 reply = "rmdir OK";
-                LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", subfolder, getReplyString())));
+                if (isDebugEnabled) {
+                    LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", subfolder, getReplyString())));
+                }
             }
             logINFO(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
@@ -631,7 +639,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception ex) {
             throw new JobSchedulerException(SOSVfs_E_193.params("cwd", pathname), ex);
         } finally {
-            LOGGER.debug(SOSVfs_D_194.params(pathname, getReplyString()));
+            if (isDebugEnabled) {
+                LOGGER.debug(SOSVfs_D_194.params(pathname, getReplyString()));
+            }
         }
         return true;
     }
@@ -679,7 +689,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         String path = null;
         try {
             path = this.getClient().pwd();
-            LOGGER.debug(getHostID(SOSVfs_D_195.params(path)));
+            if (isDebugEnabled) {
+                LOGGER.debug(getHostID(SOSVfs_D_195.params(path)));
+            }
             logReply();
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_134.params("getCurrentPath"));
@@ -688,12 +700,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void usePublicKeyMethod() throws Exception {
-        String authMethod = "publickey";
+        String method = "usePublicKeyMethod";
         Object kd = connection2OptionsAlternate.keepass_database.value();
         Object ke = connection2OptionsAlternate.keepass_database_entry.value();
         if (authenticationOptions.isUseKeyAgent().isTrue()) {
-            Connector con = null;
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[%s]isUseKeyAgent", method));
+            }
 
+            Connector con = null;
             try {
                 ConnectorFactory cf = ConnectorFactory.getDefault();
                 con = cf.createConnector();
@@ -714,14 +729,22 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 if (authenticationFile.isNotEmpty()) {
                     try {
                         if (authenticationOptions.getPassphrase().isNotEmpty()) {
-                            LOGGER.debug(String.format("[%s]file=%s, passphrase=?", authMethod, authenticationOptions.getAuthFile().getValue()));
+                            if (isDebugEnabled) {
+                                LOGGER.debug(String.format("[%s]file=%s, passphrase=?", method, authenticationOptions.getAuthFile().getValue()));
+                            }
                             secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassphrase().getValue());
                         } else {
-                            LOGGER.debug(String.format("[%s]file=%s", authMethod, authenticationOptions.getAuthFile().getValue()));
+                            if (isDebugEnabled) {
+                                LOGGER.debug(String.format("[%s]file=%s", method, authenticationOptions.getAuthFile().getValue()));
+                            }
                             secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
                         }
                     } catch (JSchException e) {
-                        throw new Exception(String.format("[%s][%s]%s", authMethod, authenticationOptions.getAuthFile().getValue(), e.toString()), e);
+                        throw new Exception(String.format("[%s][%s]%s", method, authenticationOptions.getAuthFile().getValue(), e.toString()), e);
+                    }
+                } else {
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[%s]authFile is empty", method));
                     }
                 }
             } else {
@@ -732,14 +755,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX
                             + connection2OptionsAlternate.keepass_attachment_property_name.getValue();
                     if (authenticationOptions.getPassphrase().isNotEmpty()) {
-                        LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", authMethod, keePassPath));
+                        if (isDebugEnabled) {
+                            LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", method, keePassPath));
+                        }
                         secureChannel.addIdentity("yade", pr, (byte[]) null, authenticationOptions.getPassphrase().getValue().getBytes());
                     } else {
-                        LOGGER.debug(String.format("[%s][keepass]attachment=%s", authMethod, keePassPath));
+                        if (isDebugEnabled) {
+                            LOGGER.debug(String.format("[%s][keepass]attachment=%s", method, keePassPath));
+                        }
                         secureChannel.addIdentity("yade", pr, (byte[]) null, (byte[]) null);
                     }
                 } catch (Exception e) {
-                    throw new Exception(String.format("[%s][keepass]%s", authMethod, e.toString()), e);
+                    throw new Exception(String.format("[%s][keepass]%s", method, e.toString()), e);
                 }
             }
         }
@@ -751,6 +778,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void useKeyboardInteractive() throws Exception {
+        if (isDebugEnabled) {
+            LOGGER.debug("useKeyboardInteractive");
+        }
         Object ui = connection2OptionsAlternate.user_info.value();
         if (ui == null) {
             if (isDebugEnabled) {
@@ -763,7 +793,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private String usePreferredAuthentications(final String debugKey, final String preferredAuthentications) throws Exception {
         if (isDebugEnabled) {
-            LOGGER.debug(String.format("[%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
+            LOGGER.debug(String.format("[usePreferredAuthentications][%s]preferredAuthentications=%s", debugKey, preferredAuthentications));
         }
         try {
             usePublicKeyMethod();
@@ -781,7 +811,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private String useRequiredAuthentications(final String requiredAuthentications) throws Exception {
         String preferredAuthentications = requiredAuthentications;
         if (isDebugEnabled) {
-            LOGGER.debug(String.format("[required_authentications]preferredAuthentications=%s", preferredAuthentications));
+            LOGGER.debug(String.format("[useRequiredAuthentications]preferredAuthentications=%s", preferredAuthentications));
         }
         connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
@@ -816,9 +846,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 preferredAuthentications = usePreferredAuthentications("password,publickey", "password,publickey");
             } else {
                 preferredAuthentications = authenticationOptions.getAuthMethod().getValue();
-                if (isDebugEnabled) {
-                    LOGGER.debug(String.format("preferredAuthentications=%s", preferredAuthentications));
-                }
                 if (authenticationOptions.getAuthMethod().isPublicKey()) {
                     usePublicKeyMethod();
                 } else if (authenticationOptions.getAuthMethod().isPassword()) {
@@ -835,8 +862,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             setConfigFromFiles();
 
             if (isDebugEnabled) {
-                LOGGER.debug(String.format("[sshSession]Timeout=%s ms, ServerAliveInterval=%s ms, ServerAliveCountMax=%s", sshSession.getTimeout(),
-                        sshSession.getServerAliveInterval(), sshSession.getServerAliveCountMax()));
+                LOGGER.debug(String.format(
+                        "[sshSession]Timeout=%s ms, ServerAliveInterval=%s ms, ServerAliveCountMax=%s, preferredAuthentications=%s", sshSession
+                                .getTimeout(), sshSession.getServerAliveInterval(), sshSession.getServerAliveCountMax(), preferredAuthentications));
             }
 
             sshSession.connect();
@@ -856,7 +884,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         String sai = connection2OptionsAlternate.server_alive_interval.getValue();
         if (!SOSString.isEmpty(sai)) {
             try {
-                sshSession.setServerAliveInterval(resolve2Milliseconds(sai));
+                sshSession.setServerAliveInterval(SOSDate.resolveAge("ms", sai).intValue());
                 String sacm = connection2OptionsAlternate.server_alive_count_max.getValue();
                 if (!SOSString.isEmpty(sacm)) {
                     sshSession.setServerAliveCountMax(Integer.parseInt(sacm));
@@ -865,38 +893,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 LOGGER.warn(String.format("[setServerAlive]%s", ex.toString()), ex);
             }
         }
-    }
-
-    private int resolve2Milliseconds(String val) throws Exception {
-        if (!SOSString.isEmpty(val)) {
-            val = val.trim();
-            int mills = 0;
-            String[] arr = val.split(" ");
-            for (String s : arr) {
-                s = s.trim().toLowerCase();
-                if (!SOSString.isEmpty(s)) {
-                    String sub = s;
-                    try {
-                        if (s.endsWith("h")) {
-                            sub = s.substring(0, s.length() - 1);
-                            mills += 1_000 * 60 * 60 * Long.parseLong(sub);
-                        } else if (s.endsWith("m")) {
-                            sub = s.substring(0, s.length() - 1);
-                            mills += 1_000 * 60 * Long.parseLong(sub);
-                        } else if (s.endsWith("s")) {
-                            sub = s.substring(0, s.length() - 1);
-                            mills += 1_000 * Long.parseLong(sub);
-                        } else {
-                            mills += Long.parseLong(sub);
-                        }
-                    } catch (Exception ex) {
-                        throw new Exception(String.format("invalid integer value = %s (%s) : %s", sub, s, ex.toString()));
-                    }
-                }
-            }
-            return mills;
-        }
-        return 0;
     }
 
     private void setConfigFromFiles() {
