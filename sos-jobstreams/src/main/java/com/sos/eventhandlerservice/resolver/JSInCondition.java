@@ -1,30 +1,20 @@
 package com.sos.eventhandlerservice.resolver;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.eventhandlerservice.classes.Constants;
-import com.sos.eventhandlerservice.classes.JobStartCommand;
 import com.sos.eventhandlerservice.db.DBItemConsumedInCondition;
 import com.sos.eventhandlerservice.db.DBItemInCondition;
-import com.sos.eventhandlerservice.db.DBItemInConditionCommand;
 import com.sos.eventhandlerservice.db.DBLayerConsumedInConditions;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSCondition;
 import com.sos.eventhandlerservice.resolver.interfaces.IJSJobConditionKey;
-import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
-import com.sos.jitl.restclient.JobSchedulerRestApiClient;
-import com.sos.joc.model.conditions.InCondition;
-import com.sos.joc.model.conditions.InConditionCommand;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 

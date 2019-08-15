@@ -156,6 +156,7 @@ public class JSConditionResolver {
 			}
 			jsJobInConditions = new JSJobInConditions(settings);
 			jsJobInConditions.setListOfJobInConditions(listOfInConditions);
+			LOGGER.debug(listOfInConditions.size() + " in-conditions found");
 
 		}
 
@@ -166,6 +167,7 @@ public class JSConditionResolver {
 					.getOutConditionsList(filterOutConditions, 0);
 			jsJobOutConditions = new JSJobOutConditions();
 			jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+			LOGGER.debug(listOfOutConditions.size() + " out-conditions found");
 		}
 
 		if (listOfCheckHistoryChacheRules == null) {
@@ -416,6 +418,8 @@ public class JSConditionResolver {
 			DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
 			List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
 			jsEvents.setListOfEvents(listOfEvents);
+			LOGGER.debug(listOfEvents.size() + " events found");
+
 		}
 	}
 
@@ -581,7 +585,7 @@ public class JSConditionResolver {
 	public void executeCommands(JSInCondition inCondition) throws UnsupportedEncodingException, MalformedURLException,
 			InterruptedException, SOSException, URISyntaxException {
 
-		LOGGER.debug("execute commands ------>");
+		LOGGER.trace("execute commands ------>");
 		if (inCondition.isMarkExpression()) {
 			inCondition.markAsConsumed(sosHibernateSession);
 		}
@@ -626,15 +630,15 @@ public class JSConditionResolver {
 			for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
 				String expression = outCondition.getJob() + ":" + outCondition.getExpression();
 
-				LOGGER.debug("---OutCondition: " + expression);
+				LOGGER.trace("---OutCondition: " + expression);
 				if (validate(taskReturnCode, outCondition)) {
-					LOGGER.debug("create events ------>");
+					LOGGER.trace("create events ------>");
 					outCondition.storeOutConditionEvents(sosHibernateSession, newJsEvents);
 
 				} else {
-					LOGGER.debug(expression + "-->false");
+					LOGGER.trace(expression + "-->false");
 				}
-				LOGGER.debug("");
+				LOGGER.trace("");
 			}
 		}
 		jsEvents.addAll(newJsEvents.getListOfEvents());
@@ -646,13 +650,13 @@ public class JSConditionResolver {
 			for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
 				String expression = outCondition.getJob() + ":" + outCondition.getExpression();
 
-				LOGGER.debug("---OutCondition: " + expression);
+				LOGGER.trace("---OutCondition: " + expression);
 				if (validate(null, outCondition)) {
-					LOGGER.debug(expression + "-->true");
+					LOGGER.trace(expression + "-->true");
 				} else {
-					LOGGER.debug(expression + "-->false");
+					LOGGER.trace(expression + "-->false");
 				}
-				LOGGER.debug("");
+				LOGGER.trace("");
 			}
 		}
 	}
@@ -683,7 +687,7 @@ public class JSConditionResolver {
 						&& (filterConsumedInConditions.getJob().equals(inCondition.getJob())
 								|| filterConsumedInConditions.getJob().isEmpty())
 						&& inCondition.isConsumed()) {
-					LOGGER.debug(expression + " no longer consumed");
+					LOGGER.trace(expression + " no longer consumed");
 					inCondition.setConsumed(false);
 				}
 			}
@@ -715,6 +719,8 @@ public class JSConditionResolver {
 		itemEvent.setJobStream(filterEvents.getJobStream());
 		event.setItemEvent(itemEvent);
 		jsEvents.addEvent(event);
+		LOGGER.debug(filterEvents.getEvent() + " added");
+
 
 		try {
 			DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);

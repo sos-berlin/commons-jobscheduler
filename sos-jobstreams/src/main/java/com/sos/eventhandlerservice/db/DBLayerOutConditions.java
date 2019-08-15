@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.joc.model.conditions.JobOutCondition;
-import com.sos.joc.model.conditions.OutCondition;
-import com.sos.joc.model.conditions.OutConditions;
+import com.sos.joc.model.jobstreams.JobOutCondition;
+import com.sos.joc.model.jobstreams.OutCondition;
+import com.sos.joc.model.jobstreams.OutConditions;
 
 public class DBLayerOutConditions {
 

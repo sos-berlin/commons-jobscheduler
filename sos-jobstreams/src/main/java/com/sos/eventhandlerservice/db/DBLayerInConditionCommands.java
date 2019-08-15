@@ -8,9 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.joc.model.conditions.InCondition;
-import com.sos.joc.model.conditions.InConditionCommand;
-import com.sos.joc.model.conditions.InConditions;
+import com.sos.joc.model.jobstreams.InCondition;
+import com.sos.joc.model.jobstreams.InConditionCommand;
 
 public class DBLayerInConditionCommands {
 

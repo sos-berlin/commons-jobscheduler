@@ -134,7 +134,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
                     switch (jobSchedulerEvent.getType()) {
 
-                    case "FileBasedRemoved":
+                    case "FileBasedRemoved_deactivated":
                         // Remove job from condition tables.
                         FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
                         conditionResolver.removeJob(fileBaseRemoveEvent.getJob());
@@ -234,7 +234,6 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             e.printStackTrace();
             LOGGER.error(String.format("%s: %s", method, e.toString()), e);
         }
-
         wait(waitInterval);
 
     }
