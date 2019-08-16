@@ -91,6 +91,18 @@ public class DBLayerOutConditions {
         return sosHibernateSession.getResultList(query);
     }
 
+    public List<DBItemOutCondition> getSimpleOutConditionsList(FilterOutConditions filter, final int limit) throws SOSHibernateException {
+        String q = " from " + DBItemOutCondition + " o " + getWhere(filter);
+        LOGGER.debug("OutConditions sql: " + q);
+        Query<DBItemOutCondition> query = sosHibernateSession.createQuery(q);
+        query = bindParameters(filter, query);
+
+        if (limit > 0) {
+            query.setMaxResults(limit);
+        }
+        return sosHibernateSession.getResultList(query);
+    }
+
     public int delete(FilterOutConditions filterOutConditions) throws SOSHibernateException {
         String hql = "delete from " + DBItemOutCondition + " o " + getWhere(filterOutConditions);
         int row = 0;

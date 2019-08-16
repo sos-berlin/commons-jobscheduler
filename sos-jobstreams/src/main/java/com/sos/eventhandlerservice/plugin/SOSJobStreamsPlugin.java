@@ -9,12 +9,12 @@ import com.sos.scheduler.engine.kernel.Scheduler;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.scheduler.engine.kernel.variable.VariableSet;
 
-public class SOSConditionsPlugin extends JobSchedulerEventPlugin {
+public class SOSJobStreamsPlugin extends JobSchedulerEventPlugin {
 
     private final JobSchedulerConditionsEventHandler eventHandler;
 
     @Inject
-    public SOSConditionsPlugin(Scheduler scheduler, SchedulerXmlCommandExecutor xmlCommandExecutor, VariableSet variables, EventPublisher eventBus) {
+    public SOSJobStreamsPlugin(Scheduler scheduler, SchedulerXmlCommandExecutor xmlCommandExecutor, VariableSet variables, EventPublisher eventBus) {
         super(scheduler, xmlCommandExecutor, variables);
         setIdentifier("conditions");
 
