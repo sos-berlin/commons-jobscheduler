@@ -564,35 +564,6 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="JobStream">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="view">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="status" type="xs:boolean"/>
-										<xs:element name="graph" type="xs:boolean"/>
-										<xs:element name="eventlist" type="xs:boolean"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="change">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="conditions" type="xs:boolean"/>
-										<xs:element name="events">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="add" type="xs:boolean"/>
-													<xs:element name="remove" type="xs:boolean"/>
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
