@@ -114,6 +114,7 @@ public class DBLayerOutConditions {
     }
 
     public void deleteInsert(OutConditions outConditions) throws SOSHibernateException {
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         for (JobOutCondition jobOutCondition : outConditions.getJobsOutconditions()) {
@@ -121,6 +122,8 @@ public class DBLayerOutConditions {
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJob(jobOutCondition.getJob());
             filterOutConditions.setJobSchedulerId(outConditions.getJobschedulerId());
+
+            List<DBItemOutCondition> listOfOutConditions = dbLayerOutConditions.getSimpleOutConditionsList(filterOutConditions, 0);
             delete(filterOutConditions);
 
             for (OutCondition outCondition : jobOutCondition.getOutconditions()) {
@@ -137,7 +140,17 @@ public class DBLayerOutConditions {
                 dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
 
             }
+            for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
+                FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();
+                filterOutConditionEvents.setOutConditionId(dbItemOutCondition.getId());
+                dbLayerOutConditionEvents.delete(filterOutConditionEvents);
+
+                FilterEvents filterEvents = new FilterEvents();
+                filterEvents.setOutConditionId(dbItemOutCondition.getId());
+                dbLayerEvents.delete(filterEvents);
+            }
         }
+
     }
 
 }

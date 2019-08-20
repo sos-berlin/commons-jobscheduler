@@ -114,7 +114,7 @@ public class DBLayerConsumedInConditions {
         return sosHibernateSession.getResultList(query);
     }
 
-    private int delete(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
+    public int delete(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
         String hql = "delete from " + DBItemConsumedInCondition + getWhere(filterConsumedInConditions);
         Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(hql);
         query = bindParameters(filterConsumedInConditions, query);

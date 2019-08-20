@@ -1,6 +1,8 @@
-package com.sos.eventhandlerservice.servlet;
+package com.sos.eventhandlerservice.plugin;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.List;
@@ -14,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.eventhandlerservice.classes.ConditionCustomEvent;
 import com.sos.eventhandlerservice.classes.Constants;
-import com.sos.eventhandlerservice.classes.FileBaseRemovedEvent;
+import com.sos.eventhandlerservice.classes.DurationCalculator;
 import com.sos.eventhandlerservice.classes.JobSchedulerEvent;
 import com.sos.eventhandlerservice.classes.OrderFinishedEvent;
 import com.sos.eventhandlerservice.classes.TaskEndEvent;
@@ -24,6 +26,7 @@ import com.sos.eventhandlerservice.resolver.JSConditionResolver;
 import com.sos.eventhandlerservice.resolver.JSEvent;
 import com.sos.eventhandlerservice.resolver.JSEvents;
 import com.sos.eventhandlerservice.resolver.JSInCondition;
+import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -34,14 +37,17 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
-public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventHandler {
+public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerConditionsEventHandler.class);
-    public static final String CUSTOM_EVENT_KEY = JobSchedulerConditionsEventHandler.class.getSimpleName();;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJobStreamsEventHandler.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+    public static final String CUSTOM_EVENT_KEY = JobSchedulerJobStreamsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
+
     private int waitInterval = 2;
     private String session;
     JSConditionResolver conditionResolver;
+    boolean initExecuted = false;
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated
@@ -51,11 +57,11 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
         incondition
     }
 
-    public JobSchedulerConditionsEventHandler() {
+    public JobSchedulerJobStreamsEventHandler() {
         super();
     }
 
-    public JobSchedulerConditionsEventHandler(SchedulerXmlCommandExecutor xmlCommandExecutor, EventPublisher eventBus) {
+    public JobSchedulerJobStreamsEventHandler(SchedulerXmlCommandExecutor xmlCommandExecutor, EventPublisher eventBus) {
         super(xmlCommandExecutor, eventBus);
     }
 
@@ -66,26 +72,44 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
         String method = "onActivate";
         session = Constants.getSession();
         SOSHibernateSession reportingSession = null;
+
         try {
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
             Constants.settings = getSettings();
 
-            reportingSession = reportingFactory.openStatelessSession();
-            File f = new File(getSettings().getConfigDirectory() + "/private/private.conf");
-            conditionResolver = new JSConditionResolver(reportingSession, f, this.getSettings());
-            conditionResolver.init();
+            initEventHandler(reportingSession);
 
-            EventType[] observedEventTypes = new EventType[] { EventType.FileBasedRemoved, EventType.TaskEnded, EventType.VariablesCustomEvent };
-            start(observedEventTypes);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error(String.format("%s: %s", method, e.toString()), e);
+            mailer.sendOnError("JobSchedulerConditionsEventHandler", method, e);
+            LOGGER.error("%s: %s", method, e.toString(), e);
         } finally {
             if (reportingSession != null) {
                 reportingSession.close();
             }
-            wait(waitInterval);
         }
+
+        EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent, EventType.OrderFinished };
+        start(observedEventTypes);
+    }
+
+    private File getPrivateConf() {
+        return new File(getSettings().getConfigDirectory() + "/private/private.conf");
+    }
+
+    private void initConditionResolver(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
+            URISyntaxException {
+        conditionResolver = new JSConditionResolver(jobStreamSession, getPrivateConf(), this.getSettings());
+        if (conditionResolver != null) {
+            conditionResolver.init();
+        }
+    }
+
+    private void initEventHandler(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
+            URISyntaxException {
+        jobStreamSession = reportingFactory.openStatelessSession();
+        initConditionResolver(jobStreamSession);
+        initExecuted = true;
+
     }
 
     @Override
@@ -112,37 +136,57 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
     private void execute(boolean onNonEmptyEvent, Long eventId, JsonArray events) {
         String method = "execute";
-        LOGGER.debug(String.format("%s: onNonEmptyEvent=%s, eventId=%s", method, onNonEmptyEvent, eventId));
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("%s: onNonEmptyEvent=%s, eventId=%s", method, onNonEmptyEvent, eventId));
+        }
         boolean resolveInConditions = false;
 
-        if (!Constants.getSession().equals(this.session)) {
-            try {
-                this.session = Constants.getSession();
-                conditionResolver.reInit();
-            } catch (SOSHibernateException e) {
-                LOGGER.error(e.getMessage(), e);
-                throw new RuntimeException(e);
-            }
-        }
+        SOSHibernateSession sosHibernateSession = null;
 
         try {
+
+            sosHibernateSession = reportingFactory.openStatelessSession();
+            if (conditionResolver == null) {
+                initConditionResolver(sosHibernateSession);
+            }
+            if (conditionResolver == null) {
+                throw new Exception("could not init the conditionResolver");
+            }
+            conditionResolver.setReportingSession(sosHibernateSession);
+
+            if (!initExecuted) {
+
+                initEventHandler(sosHibernateSession);
+            }
+
+            if (!Constants.getSession().equals(this.session)) {
+                try {
+
+                    this.session = Constants.getSession();
+                    conditionResolver.reInit();
+
+                } catch (SOSHibernateException e) {
+                    LOGGER.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
+            }
+
             for (JsonValue entry : events) {
                 if (entry != null) {
-                    LOGGER.debug(entry.toString());
+                    if (isDebugEnabled) {
+                        LOGGER.debug(entry.toString());
+                    }
                     JobSchedulerEvent jobSchedulerEvent = new JobSchedulerEvent((JsonObject) entry);
                     FilterEvents filterEvents = null;
 
                     switch (jobSchedulerEvent.getType()) {
 
                     case "FileBasedRemoved_deactivated":
-                        // Remove job from condition tables.
-                        FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
-                        conditionResolver.removeJob(fileBaseRemoveEvent.getJob());
-                        try {
-                            conditionResolver.reInit();
-                        } catch (SOSHibernateException e) {
-                            LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage());
-                        }
+                        /*
+                         * Remove job from condition tables. FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
+                         * conditionResolver.removeJob(fileBaseRemoveEvent.getJob()); try { conditionResolver.reInit(); } catch (SOSHibernateException e) {
+                         * LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage()); }
+                         */
 
                         break;
                     case "OrderFinished":
@@ -220,19 +264,22 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
             }
             if (resolveInConditions) {
 
-                final long timeStart = System.currentTimeMillis();
+                DurationCalculator duration = new DurationCalculator();
                 List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
                 for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                     publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
                 }
-                final long timeEnd = System.currentTimeMillis();
-                LOGGER.debug("Resolving all InConditions: " + (timeEnd - timeStart) + " ms.");
+                if (isDebugEnabled) {
+                    duration.end("Resolving all InConditions: ");
+                }
             }
-        } catch (
-
-        Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            this.getMailer().sendOnError("JobSchedulerConditionsEventHandler", method, e);
             LOGGER.error(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
         wait(waitInterval);
 
@@ -247,7 +294,7 @@ public class JobSchedulerConditionsEventHandler extends JobSchedulerPluginEventH
 
     private void createReportingFactory(Path configFile) throws Exception {
         reportingFactory = new SOSHibernateFactory(configFile);
-        reportingFactory.setIdentifier("reporting");
+        reportingFactory.setIdentifier(getIdentifier());
         reportingFactory.setAutoCommit(false);
         reportingFactory.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         reportingFactory.addClassMapping(DBLayer.getReportingClassMapping());

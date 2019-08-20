@@ -112,12 +112,16 @@ public class DBLayerInConditions {
 	}
 
 	public void deleteInsert(InConditions inConditions) throws SOSHibernateException {
-		DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
+        DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
+        DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
 		for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
-			FilterInConditions filterInConditions = new FilterInConditions();
-			filterInConditions.setJob(jobInCondition.getJob());
-			filterInConditions.setJobSchedulerId(inConditions.getJobschedulerId());
-			delete(filterInConditions);
+	        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+	        FilterInConditions filterInConditions = new FilterInConditions();
+	        filterInConditions.setJob(jobInCondition.getJob());
+	        filterInConditions.setJobSchedulerId(inConditions.getJobschedulerId());
+	        List<DBItemInCondition> listOfInCondititinos = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
+	        
+	        delete(filterInConditions);
 
 			for (InCondition inCondition : jobInCondition.getInconditions()) {
 				DBItemInCondition dbItemInCondition = new DBItemInCondition();
@@ -130,6 +134,17 @@ public class DBLayerInConditions {
 
 				dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
 			}
+			
+			for (DBItemInCondition dbItemInCondition: listOfInCondititinos) {
+			    FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
+		        filterInConditionCommands.setInConditionId(dbItemInCondition.getId());
+		        dbLayerInConditionCommands.delete(filterInConditionCommands);	
+		        
+		        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+		        filterConsumedInConditions.setInConditionId(dbItemInCondition.getId());
+		        dbLayerConsumedInConditions.delete(filterConsumedInConditions);
+		     }
+			
 		}
 	}
 

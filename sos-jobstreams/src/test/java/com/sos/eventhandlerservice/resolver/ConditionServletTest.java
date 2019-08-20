@@ -9,7 +9,7 @@ import javax.servlet.ServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.eventhandlerservice.servlet.JobSchedulerConditionsEventHandler;
+import com.sos.eventhandlerservice.plugin.JobSchedulerJobStreamsEventHandler;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 import com.sos.jitl.classes.plugin.PluginMailer;
 
@@ -29,16 +29,23 @@ public class ConditionServletTest {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setHttpHost(host);
         settings.setHttpPort(port);
+
         settings.setHibernateConfigurationReporting(hibernateFile);
         settings.setConfigDirectory(Paths.get("src/test/resources/config"));
         settings.setSchedulerId("scheduler_joc_cockpit");
         settings.setJocUrl("http://localhost:4446");
 
-        JobSchedulerConditionsEventHandler eventHandler = new JobSchedulerConditionsEventHandler();
+        JobSchedulerJobStreamsEventHandler eventHandler = new JobSchedulerJobStreamsEventHandler();
         eventHandler.setIdentifier("JobSchedulerConditions");
         try {
             eventHandler.onPrepare(settings);
-            PluginMailer mailer = new PluginMailer(eventHandler.getIdentifier(), new HashMap<>());
+            HashMap<String,String>mailSettings = new HashMap<String,String>();
+            mailSettings.put("to","uwe.risse@sos-berlin.com");
+            mailSettings.put("smtp","mail.sos-berlin.com");
+            mailSettings.put("from","jobstream@sos-berlin.com");
+            mailSettings.put("mail_on_error","1");
+            mailSettings.put("mail.smtp.port","25");
+            PluginMailer mailer = new PluginMailer(eventHandler.getIdentifier(), mailSettings);
             eventHandler.onActivate(mailer);
         } catch (Exception e) {
             throw e;
