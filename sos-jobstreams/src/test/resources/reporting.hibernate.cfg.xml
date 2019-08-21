@@ -21,3 +21,4 @@
   <property name="hibernate.c3p0.acquireRetryAttempts">1</property>
  </session-factory>
 </hibernate-configuration>
+ 
