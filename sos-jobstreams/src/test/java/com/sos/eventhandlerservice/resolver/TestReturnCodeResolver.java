@@ -53,7 +53,7 @@ public class TestReturnCodeResolver {
         assertEquals("testResolveReturnCode14", true, b);
         b = jsReturnCodeResolver.resolve(1, "2-5,-4"); 
         assertEquals("testResolveReturnCode15", true, b);
-        b = jsReturnCodeResolver.resolve(1, "2-a,-4"); 
+        b = jsReturnCodeResolver.resolve(1, "2-3,-4"); 
         assertEquals("testResolveReturnCode16", true, b);
     }
 

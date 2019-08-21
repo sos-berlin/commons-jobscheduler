@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.eventhandlerservice.classes.Constants;
@@ -47,6 +48,7 @@ public class TestEvents {
     }
 
     @Test
+    @Ignore
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
         File f = new File("src/test/resources/config/private/private.conf");
         EventHandlerSettings settings = new EventHandlerSettings();
