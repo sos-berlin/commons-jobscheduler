@@ -68,6 +68,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     @Override
     public void onActivate(PluginMailer mailer) {
         LOGGER.debug("onActivate Plugin");
+        LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir")); 
+                
         super.onActivate(mailer);
 
         String method = "onActivate";
@@ -95,16 +97,11 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
         start(observedEventTypes);
     }
 
-    private File getPrivateConf() {
-        String filename = getSettings().getConfigDirectory() + "/private/private.conf";
-        LOGGER.debug("private.conf: " + filename);
-        return new File(filename);
-    }
-
+   
     private void initConditionResolver(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
             URISyntaxException {
         LOGGER.debug("initConditionResolver");
-        conditionResolver = new JSConditionResolver(jobStreamSession, getPrivateConf(), this.getSettings());
+        conditionResolver = new JSConditionResolver(jobStreamSession, this.getXmlCommandExecutor(), this.getSettings());
         if (conditionResolver != null) {
             conditionResolver.init();
         }
@@ -170,6 +167,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
             }
 
             conditionResolver.setReportingSession(sosHibernateSession);
+            
             LOGGER.debug("Session: " + this.session);
 
             if (!Constants.getSession().equals(this.session)) {

@@ -1,28 +1,11 @@
 package com.sos.jobstreams.resolver;
 
-import java.io.File;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jobstreams.classes.Constants;
-import com.sos.jobstreams.classes.JobStartCommand;
 import com.sos.jobstreams.db.DBItemInConditionCommand;
-import com.sos.exception.SOSException;
-import com.sos.jitl.checkrunhistory.JobHistoryHelper;
-import com.sos.jitl.restclient.AccessTokenProvider;
-import com.sos.jitl.restclient.JobSchedulerRestApiClient;
-import com.sos.jitl.restclient.WebserviceCredentials;
+import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
+import com.sos.xml.XMLBuilder;
 
 public class JSInConditionCommand {
 
@@ -53,99 +36,46 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private JsonObject jsonFromString(String jsonObjectStr) {
-        JsonReader jsonReader = Json.createReader(new StringReader(jsonObjectStr));
-        JsonObject object = jsonReader.readObject();
-        jsonReader.close();
-        return object;
-    }
+    private String buildJobStartXml(JSInCondition inCondition) {
+        XMLBuilder xml = new XMLBuilder("start_job");
 
-    private String checkAnswer(String answer) {
-        JsonObject executeAnswer = jsonFromString(answer);
-        if ((executeAnswer.get("isPermitted") != null && !executeAnswer.getBoolean("isPermitted")) || (executeAnswer.get("isAuthenticated") != null
-                && !executeAnswer.getBoolean("isAuthenticated"))) {
-            return executeAnswer.get("message").toString();
+        xml.addAttribute("job", inCondition.getNormalizedJob()).addAttribute("force", "yes");
+        if (getCommandParam() == null || getCommandParam().isEmpty()) {
+            xml.addAttribute("at", "now");
         } else {
-            return "";
+            xml.addAttribute("at", getCommandParam());
+
         }
+        return xml.asXML();
+    }
+
+    private void startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
+
+        String jobXml = buildJobStartXml(inCondition);
+        String answer = "";
+        LOGGER.trace("JSInConditionCommand:startJob:" + jobXml);
+        if (schedulerXmlCommandExecutor != null) {
+            answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+        } else {
+            LOGGER.debug("Start job: " + inCondition.getNormalizedJob());
+        }
+        LOGGER.trace(answer);
 
     }
 
-    private void startJobs(JobSchedulerRestApiClient jobSchedulerRestApiClient, File privateConf, List<JobStartCommand> listOfJobsToStart)
-            throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException, MalformedURLException {
+    public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
 
-        URL url = new URL(Constants.settings.getJocUrl() + "/jobs/start");
-        String jobArray = "";
-
-        for (JobStartCommand jobStartCommand : listOfJobsToStart) {
-            jobArray = jobArray + String.format("{\"job\":\"%s\",\"at\":\"%s\"}", jobStartCommand.getJob(), jobStartCommand.getCommandParam()) + ",";
-        }
-        jobArray = jobArray.substring(0, jobArray.length() - 1);
-
-        String body = "{\"jobs\":[" + jobArray + "],\"jobschedulerId\":\"" + Constants.settings.getSchedulerId() + "\",\"auditLog\":{}}";
-        
-        LOGGER.trace(url.toString());
-        LOGGER.trace("JSInConditionCommand:startJobs" +  body);
-
-        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
-        LOGGER.trace(answer);
-        
-        String message = checkAnswer(answer);
-        if (!message.isEmpty()) {
-
-            LOGGER.warn(message);
-            LOGGER.warn("try again....");
-            
-            AccessTokenProvider accessTokenProvider = new AccessTokenProvider(privateConf.getAbsolutePath());
-            WebserviceCredentials webserviceCredentials = accessTokenProvider.getAccessToken(null);
-            if (webserviceCredentials != null) {
-                LOGGER.info("Trying retry login");
-                jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
-                answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
-                message = checkAnswer(answer);
-                if (!message.isEmpty()) {
-                    LOGGER.info("Retry login failed");
-                    LOGGER.info(message);
-                }else {
-                    LOGGER.info(".... successful login");
-                }
-            }
-        }
-
-        LOGGER.trace(answer);
-    }
-
-    public void executeCommand(JobSchedulerRestApiClient jobSchedulerRestApiClient, File privateConf, List<JobStartCommand> listOfJobsToStart)
-            throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException {
-        
         String command = getCommand();
         String commandParam = getCommandParam();
-        LOGGER.debug("execution command: " + command + " + commandParam");
-        
+        LOGGER.debug("execution command: " + command + " " + commandParam);
+
         if ("writelog".equalsIgnoreCase(command)) {
             LOGGER.info(commandParam);
         }
-        if ("startjobs".equalsIgnoreCase(command)) {
-            startJobs(jobSchedulerRestApiClient, privateConf, listOfJobsToStart);
+        if ("startjob".equalsIgnoreCase(command)) {
+            startJob(schedulerXmlCommandExecutor, inCondition);
         }
-        if ("addorder".equalsIgnoreCase(command)) {
-            addOrder(jobSchedulerRestApiClient, privateConf, commandParam);
-        }
-    }
 
-    private void addOrder(JobSchedulerRestApiClient jobSchedulerRestApiClient, File privateConf, String commandParam) throws MalformedURLException,
-            SOSException {
-        URL url = new URL(Constants.settings.getJocUrl() + "/orders/add");
-        JobHistoryHelper jobHistoryHelper = new JobHistoryHelper();
-        String orderId = jobHistoryHelper.getOrderId(commandParam);
-        String jobChain = jobHistoryHelper.getJobChainName(commandParam);
-
-        String body = "{\"jobschedulerId\":\"" + Constants.settings.getSchedulerId() + "\",\"orders\":[{\"jobChain\":\"" + jobChain
-                + "\",\"orderId\":\"" + orderId + "\",\"at\":\"now\"}],\"auditLog\":{}}";
-        LOGGER.debug(url.toString());
-        LOGGER.debug(body);
-        String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
-        LOGGER.trace(answer);
     }
 
     public void setCommand(String command) {

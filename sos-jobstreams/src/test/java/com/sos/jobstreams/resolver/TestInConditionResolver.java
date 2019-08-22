@@ -50,13 +50,11 @@ public class TestInConditionResolver {
 
     
     @Test
-    @Ignore
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
-        File f = new File("src/test/resources/config/private/private.conf");
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setJocUrl("http://localhost:4446");
         settings.setSchedulerId("scheduler_joc_cockpit");
-        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),f,settings);
+        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);
         conditionResolver.init();
         conditionResolver.resolveInConditions();
         conditionResolver.resolveOutConditions();

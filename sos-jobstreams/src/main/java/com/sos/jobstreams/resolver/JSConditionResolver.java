@@ -1,25 +1,23 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.File;
-import java.io.StringReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventing.evaluate.BooleanExp;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
 import com.sos.jobstreams.classes.CheckHistoryCondition;
 import com.sos.jobstreams.classes.CheckHistoryKey;
@@ -46,56 +44,32 @@ import com.sos.jobstreams.db.FilterInConditions;
 import com.sos.jobstreams.db.FilterOutConditionEvents;
 import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.exception.SOSException;
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
-import com.sos.jitl.eventing.evaluate.BooleanExp;
-import com.sos.jitl.restclient.AccessTokenProvider;
-import com.sos.jitl.restclient.JobSchedulerRestApiClient;
-import com.sos.jitl.restclient.WebserviceCredentials;
+import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JSConditionResolver {
 
     private static final String JOB = "job";
     private static final String JOB_CHAIN = "jobchain";
-    private static final int JOB_START_BUFFER_SIZE = 30;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JSConditionResolver.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
-
     private JSJobInConditions jsJobInConditions;
     private JSJobOutConditions jsJobOutConditions;
     private JSEvents jsEvents;
     private SOSHibernateSession sosHibernateSession;
     private BooleanExp booleanExpression;
-    private JobSchedulerRestApiClient jobSchedulerRestApiClient;
     private EventHandlerSettings settings;
     private CheckHistoryCondition checkHistoryCondition;
     private List<CheckHistoryCacheRule> listOfCheckHistoryChacheRules;
-    private List<JobStartCommand> listOfCommandsToExecute;
+    private SchedulerXmlCommandExecutor schedulerXmlCommandExecutor;
+    private String workingDirectory = "";
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, File privateConf, EventHandlerSettings settings)
-            throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException {
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
+            EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException {
         super();
+        this.schedulerXmlCommandExecutor = schedulerXmlCommandExecutor;
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
         this.settings = settings;
-
-        LOGGER.debug("getAccesToken....");
-        AccessTokenProvider accessTokenProvider = new AccessTokenProvider(privateConf.getAbsolutePath());
-        WebserviceCredentials webserviceCredentials = accessTokenProvider.getAccessToken(null);
-        this.settings.setJocUrl(accessTokenProvider.getJocUrl());
-
-        jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
-        jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
-        jobSchedulerRestApiClient.addHeader("Accept", "application/json");
-        if (webserviceCredentials != null) {
-            LOGGER.debug("...." + webserviceCredentials.getAccessToken());
-            jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", webserviceCredentials.getAccessToken());
-        } else {
-            LOGGER.warn("Could not create AccessToken");
-        }
         checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
@@ -105,17 +79,7 @@ public class JSConditionResolver {
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
         this.settings = new EventHandlerSettings();
-        this.settings.setJocUrl(jocUrl);
-
-        jobSchedulerRestApiClient = new JobSchedulerRestApiClient();
-        jobSchedulerRestApiClient.addHeader("Content-Type", "application/json");
-        jobSchedulerRestApiClient.addHeader("Accept", "application/json");
-        jobSchedulerRestApiClient.addHeader("X-ACCESS-TOKEN", accessToken);
         checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
-    }
-
-    private File getPrivateConf() {
-        return new File(settings.getConfigDirectory() + "/private/private.conf");
     }
 
     public void reInit() throws SOSHibernateException {
@@ -131,8 +95,6 @@ public class JSConditionResolver {
         // synchronizeJobsWithFileSystem();
 
         DurationCalculator duration = new DurationCalculator();
-
-        this.listOfCommandsToExecute = new ArrayList<JobStartCommand>();
 
         if (jsJobInConditions == null) {
             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
@@ -353,64 +315,24 @@ public class JSConditionResolver {
 
     }
 
-    private JsonObject jsonFromString(String jsonObjectStr) {
-        JsonReader jsonReader = Json.createReader(new StringReader(jsonObjectStr));
-        JsonObject object = jsonReader.readObject();
-        jsonReader.close();
-        return object;
-    }
-
     private void synchronizeJobsWithFileSystem() {
-        LinkedHashSet<String> listOfJobSchedulerJobs = new LinkedHashSet<String>();
-        LinkedHashSet<String> listOfJobStreamJobs = new LinkedHashSet<String>();
-
-        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-        FilterInConditions filterInConditions = new FilterInConditions();
-        FilterOutConditions filterOutConditions = new FilterOutConditions();
-
-        try {
-            List<DBItemInConditionWithCommand> listOfInconditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
-            List<DBItemOutConditionWithEvent> listOfOutconditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-
-            listOfInconditions.forEach(item -> {
-                listOfJobStreamJobs.add(item.getDbItemInCondition().getJob());
-            });
-
-            listOfOutconditions.forEach(item -> {
-                listOfJobStreamJobs.add(item.getJob());
-            });
-
-            URL url;
-            url = new URL(settings.getJocUrl() + "/jobs");
-            String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() + "\",\"compact\":true,\"isOrderJob\":false,\"compactView\":true}";
-            LOGGER.debug(url.toString());
-            LOGGER.debug(body);
-            String answer = jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body);
-            JsonObject jsonJobs = jsonFromString(answer);
-            JsonArray jobs = jsonJobs.getJsonArray("jobs");
-            if (jobs != null && jobs.size() > 0) {
-                for (int i = 0; i < jobs.size(); i++) {
-                    JsonObject job = jobs.getJsonObject(i);
-                    if (job != null) {
-                        String jobName = job.getString("path");
-                        listOfJobSchedulerJobs.add(jobName);
-                    }
-                }
-            }
-
-            listOfJobStreamJobs.forEach(jobName -> {
-                if (!listOfJobSchedulerJobs.contains(jobName)) {
-                    removeJob(jobName);
-                }
-            });
-
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage());
-        } catch (SOSException e) {
-            LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage());
-        }
-
+        /*
+         * LinkedHashSet<String> listOfJobSchedulerJobs = new LinkedHashSet<String>(); LinkedHashSet<String> listOfJobStreamJobs = new LinkedHashSet<String>();
+         * DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession); DBLayerOutConditions dbLayerOutConditions = new
+         * DBLayerOutConditions(sosHibernateSession); FilterInConditions filterInConditions = new FilterInConditions(); FilterOutConditions filterOutConditions
+         * = new FilterOutConditions(); try { List<DBItemInConditionWithCommand> listOfInconditions =
+         * dbLayerInConditions.getInConditionsList(filterInConditions, 0); List<DBItemOutConditionWithEvent> listOfOutconditions =
+         * dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0); listOfInconditions.forEach(item -> {
+         * listOfJobStreamJobs.add(item.getDbItemInCondition().getJob()); }); listOfOutconditions.forEach(item -> { listOfJobStreamJobs.add(item.getJob()); });
+         * URL url; url = new URL(settings.getJocUrl() + "/jobs"); String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() +
+         * "\",\"compact\":true,\"isOrderJob\":false,\"compactView\":true}"; LOGGER.debug(url.toString()); LOGGER.debug(body); String answer =
+         * jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body); JsonObject jsonJobs = jsonFromString(answer); JsonArray jobs =
+         * jsonJobs.getJsonArray("jobs"); if (jobs != null && jobs.size() > 0) { for (int i = 0; i < jobs.size(); i++) { JsonObject job = jobs.getJsonObject(i);
+         * if (job != null) { String jobName = job.getString("path"); listOfJobSchedulerJobs.add(jobName); } } } listOfJobStreamJobs.forEach(jobName -> { if
+         * (!listOfJobSchedulerJobs.contains(jobName)) { removeJob(jobName); } }); } catch (MalformedURLException e) {
+         * LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage()); } catch (SOSException e) {
+         * LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage()); }
+         */
     }
 
     public void initEvents() throws SOSHibernateException {
@@ -484,8 +406,8 @@ public class JSConditionResolver {
         LOGGER.trace("JSConditionResolve::validate");
         for (JSCondition jsCondition : listOfConditions) {
             LOGGER.trace("JSConditionResolve::validate --> " + jsCondition.getConditionType());
-
             switch (jsCondition.getConditionType()) {
+            case "rc":
             case "returncode": {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
@@ -495,8 +417,19 @@ public class JSConditionResolver {
                 break;
             }
             case "fileexist": {
-                File f = new File(jsCondition.getConditionParam());
+                File f = null;
+                if (workingDirectory.isEmpty() || jsCondition.getConditionParam().startsWith("/")) {
+                    f = new File(jsCondition.getConditionParam());
+                } else {
+                    f = new File(workingDirectory, jsCondition.getConditionParam());
+                }
+                try {
+                    LOGGER.debug("check file: " + f.getCanonicalPath());
+                } catch (IOException e) {
+                    LOGGER.warn("Can not debug the path of the file.");
+                }
                 if (f.exists()) {
+                    LOGGER.debug("file exists");
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ", "true ");
                 }
 
@@ -572,8 +505,7 @@ public class JSConditionResolver {
 
                     LOGGER.trace("---InCondition: " + expression);
                     if (validate(null, inCondition)) {
-                        this.executeCommands(inCondition);
-                        listOfValidatedInconditions.add(inCondition);
+                        inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
                     } else {
                         LOGGER.trace(expression + "-->false");
                     }
@@ -583,45 +515,7 @@ public class JSConditionResolver {
                 LOGGER.trace("");
             }
         }
-        this.flushCommands(jobSchedulerRestApiClient);
         return listOfValidatedInconditions;
-    }
-
-    public void executeCommands(JSInCondition inCondition) throws UnsupportedEncodingException, MalformedURLException, InterruptedException,
-            SOSException, URISyntaxException {
-
-        LOGGER.trace("execute commands ------>");
-        if (inCondition.isMarkExpression()) {
-            inCondition.markAsConsumed(sosHibernateSession);
-        }
-
-        for (JSInConditionCommand inConditionCommand : inCondition.getListOfInConditionCommand()) {
-            if ("startjob".equals(inConditionCommand.getCommand())) {
-                JobStartCommand jobStartCommand = new JobStartCommand();
-                jobStartCommand.setJob(inCondition.getJob());
-                jobStartCommand.setCommandParam(inConditionCommand.getCommandParam());
-                listOfCommandsToExecute.add(jobStartCommand);
-                if (listOfCommandsToExecute.size() > JOB_START_BUFFER_SIZE) {
-                    this.flushCommands(jobSchedulerRestApiClient);
-                }
-            } else {
-                inConditionCommand.executeCommand(jobSchedulerRestApiClient, getPrivateConf(), null);
-            }
-        }
-    }
-
-    public void flushCommands(JobSchedulerRestApiClient jobSchedulerRestApiClient) throws UnsupportedEncodingException, MalformedURLException,
-            InterruptedException, SOSException, URISyntaxException {
-        LOGGER.debug("JSConditionResolve::flushCommands");
-        if (this.listOfCommandsToExecute.size() > 0) {
-            JSInConditionCommand inConditionCommand = new JSInConditionCommand();
-            inConditionCommand.setCommand("startjobs");
-            inConditionCommand.setCommandParam("now");
-
-            inConditionCommand.executeCommand(jobSchedulerRestApiClient, getPrivateConf(), listOfCommandsToExecute);
-            this.listOfCommandsToExecute = new ArrayList<JobStartCommand>();
-        }
-
     }
 
     public JSEvents resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
@@ -836,5 +730,10 @@ public class JSConditionResolver {
 
     public void setReportingSession(SOSHibernateSession reportingSession) {
         this.sosHibernateSession = reportingSession;
+    }
+
+    public void setWorkingDirectory(String workingDirectory) {
+        this.workingDirectory = workingDirectory;
+
     }
 }

@@ -2,13 +2,15 @@ package com.sos.jobstreams.classes;
 
 public class JobStartCommand {
 	private String job;
+    private String commandParam;
 
+	
 	public String getJob() {
 		return job;
 	}
 
 	public void setJob(String job) {
-		this.job = job;
+		this.job = normalizePath(job);
 	}
 
 	public String getCommandParam() {
@@ -23,6 +25,13 @@ public class JobStartCommand {
 		}
 	}
 
-	private String commandParam;
+	
+	 
+    private String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+    }
 
 }

@@ -76,7 +76,7 @@ public class JSCondition {
 	}
 
 	private String getConditionTypeParam(String condition) {
-		String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "")
+		String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("rc", "")
 				.replaceFirst("job:", "").replaceFirst("jobchain:", "");
 		return s;
 	}
