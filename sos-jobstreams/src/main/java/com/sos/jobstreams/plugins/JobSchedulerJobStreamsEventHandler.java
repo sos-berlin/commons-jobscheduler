@@ -68,8 +68,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     @Override
     public void onActivate(PluginMailer mailer) {
         LOGGER.debug("onActivate Plugin");
-        LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir")); 
-                
+        LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
+
         super.onActivate(mailer);
 
         String method = "onActivate";
@@ -97,7 +97,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
         start(observedEventTypes);
     }
 
-   
     private void initConditionResolver(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
             URISyntaxException {
         LOGGER.debug("initConditionResolver");
@@ -167,7 +166,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
             }
 
             conditionResolver.setReportingSession(sosHibernateSession);
-            
+
             LOGGER.debug("Session: " + this.session);
 
             if (!Constants.getSession().equals(this.session)) {

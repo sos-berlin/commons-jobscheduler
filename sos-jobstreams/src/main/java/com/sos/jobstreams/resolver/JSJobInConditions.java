@@ -9,13 +9,10 @@ import com.sos.jitl.classes.event.EventHandlerSettings;
 
 public class JSJobInConditions {
 
-    private EventHandlerSettings settings;
-
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
 
     public JSJobInConditions(EventHandlerSettings settings) {
         super();
-        this.settings = settings;
         this.listOfJobInConditions = new HashMap<JSJobConditionKey, JSInConditions>();
     }
 

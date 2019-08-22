@@ -3,7 +3,7 @@ package com.sos.jobstreams.classes;
 import javax.json.JsonObject;
 
 public class OrderFinishedEvent {
-    //{ "nodeId": "success", "TYPE": "OrderFinished", "key": "/job_chain1,start", "eventId": 1563800477875000 },
+    // { "nodeId": "success", "TYPE": "OrderFinished", "key": "/job_chain1,start", "eventId": 1563800477875000 },
 
     private String nodeId;
     private String type;
@@ -28,36 +28,28 @@ public class OrderFinishedEvent {
         this.eventId = entry.getInt("eventId");
     }
 
-    
     public String getNodeId() {
         return nodeId;
     }
 
-    
     public String getType() {
         return type;
     }
 
-    
     public String getKey() {
         return key;
     }
 
-    
     public String getJobChain() {
         return jobChain;
     }
 
-    
     public String getOrderId() {
         return orderId;
     }
 
-    
     public Integer getEventId() {
         return eventId;
     }
-
-   
 
 }

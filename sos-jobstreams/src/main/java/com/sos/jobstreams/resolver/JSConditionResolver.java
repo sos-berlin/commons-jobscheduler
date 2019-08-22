@@ -25,7 +25,6 @@ import com.sos.jobstreams.classes.CheckHistoryValue;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.EventDate;
-import com.sos.jobstreams.classes.JobStartCommand;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBItemInCondition;
@@ -406,6 +405,7 @@ public class JSConditionResolver {
         LOGGER.trace("JSConditionResolve::validate");
         for (JSCondition jsCondition : listOfConditions) {
             LOGGER.trace("JSConditionResolve::validate --> " + jsCondition.getConditionType());
+
             switch (jsCondition.getConditionType()) {
             case "rc":
             case "returncode": {

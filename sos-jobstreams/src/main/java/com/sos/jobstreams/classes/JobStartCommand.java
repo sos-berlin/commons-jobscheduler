@@ -25,8 +25,6 @@ public class JobStartCommand {
 		}
 	}
 
-	
-	 
     private String normalizePath(String path) {
         if (path == null) {
             return null;

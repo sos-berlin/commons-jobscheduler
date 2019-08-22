@@ -6,7 +6,7 @@ import com.sos.hibernate.classes.ClassList;
 import com.sos.jitl.classes.event.EventHandlerSettings;
 
 public class Constants {
-    
+
     public static enum OutConditionEventCommand {
         create, delete
     }
@@ -35,12 +35,11 @@ public class Constants {
     public static final String IN_CONDITION_COMMANDS_TABLE_SEQUENCE = "JSTREAM_IN_COND_CMD_ID_SEQ";
     public static final String IN_CONDITION_COMMANDS_TABLE = "JSTREAM_IN_CONDITION_COMMANDS";
 
-    public static  EventHandlerSettings settings=null;
+    public static EventHandlerSettings settings = null;
 
-    
     public static String getSession() {
         Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH)+1;
+        int month = calendar.get(Calendar.MONTH) + 1;
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         return String.valueOf(month) + "." + String.valueOf(dayOfMonth);
     }
