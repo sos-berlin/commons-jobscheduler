@@ -63,7 +63,7 @@ public class JSConditionResolver {
     private String workingDirectory = "";
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
-            EventHandlerSettings settings) throws UnsupportedEncodingException, InterruptedException, SOSException, URISyntaxException {
+            EventHandlerSettings settings) {
         super();
         this.schedulerXmlCommandExecutor = schedulerXmlCommandExecutor;
         booleanExpression = new BooleanExp("");
@@ -72,12 +72,12 @@ public class JSConditionResolver {
         checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String accessToken, String jocUrl) throws UnsupportedEncodingException,
-            InterruptedException, SOSException, URISyntaxException {
+    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String schedulerId) {
         super();
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
         this.settings = new EventHandlerSettings();
+        settings.setSchedulerId(schedulerId);
         checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
     }
 
@@ -97,6 +97,7 @@ public class JSConditionResolver {
 
         if (jsJobInConditions == null) {
             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+            filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
             filterConsumedInConditions.setSession(Constants.getSession());
             DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
@@ -107,6 +108,7 @@ public class JSConditionResolver {
             }
 
             FilterInConditions filterInConditions = new FilterInConditions();
+            filterInConditions.setJobSchedulerId(settings.getSchedulerId());
 
             DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
             List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
@@ -125,6 +127,7 @@ public class JSConditionResolver {
 
         if (jsJobOutConditions == null) {
             FilterOutConditions filterOutConditions = new FilterOutConditions();
+            filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
             List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
             jsJobOutConditions = new JSJobOutConditions();
@@ -300,7 +303,6 @@ public class JSConditionResolver {
             checkHistoryCacheRule.setValidateAlways(false);
             checkHistoryCacheRule.setValidateIfFalse(true);
             listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
         }
 
         initEvents();
@@ -339,6 +341,7 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSchedulerId(settings.getSchedulerId());
             // filterEvents.setSession(Constants.getSession());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);

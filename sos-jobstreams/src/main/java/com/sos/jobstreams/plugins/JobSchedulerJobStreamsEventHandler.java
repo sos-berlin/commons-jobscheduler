@@ -1,6 +1,5 @@
 package com.sos.jobstreams.plugins;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -14,6 +13,14 @@ import javax.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.classes.event.JobSchedulerEvent.EventType;
+import com.sos.jitl.classes.event.JobSchedulerPluginEventHandler;
+import com.sos.jitl.classes.plugin.PluginMailer;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
@@ -26,14 +33,6 @@ import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSEvent;
 import com.sos.jobstreams.resolver.JSEvents;
 import com.sos.jobstreams.resolver.JSInCondition;
-import com.sos.exception.SOSException;
-import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.JobSchedulerEvent.EventType;
-import com.sos.jitl.classes.event.JobSchedulerPluginEventHandler;
-import com.sos.jitl.classes.plugin.PluginMailer;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -47,7 +46,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     private int waitInterval = 2;
     private String session;
     JSConditionResolver conditionResolver;
-    boolean initExecuted = false;
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated
@@ -74,45 +72,30 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
 
         String method = "onActivate";
         session = Constants.getSession();
-        SOSHibernateSession reportingSession = null;
+        SOSHibernateSession sosHibernateSession = null;
 
         try {
             LOGGER.debug("onActivate createReportingFactory");
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
             Constants.settings = getSettings();
+            sosHibernateSession = reportingFactory.openStatelessSession();
 
+            conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
+            conditionResolver.init();
             LOGGER.debug("onActivate initEventHandler");
-            initEventHandler(reportingSession);
 
         } catch (Exception e) {
+            conditionResolver = null;
             mailer.sendOnError("JobSchedulerConditionsEventHandler", method, e);
             LOGGER.error("%s: %s", method, e.toString(), e);
         } finally {
-            if (reportingSession != null) {
-                reportingSession.close();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
             }
         }
 
         EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent, EventType.OrderFinished };
         start(observedEventTypes);
-    }
-
-    private void initConditionResolver(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
-            URISyntaxException {
-        LOGGER.debug("initConditionResolver");
-        conditionResolver = new JSConditionResolver(jobStreamSession, this.getXmlCommandExecutor(), this.getSettings());
-        if (conditionResolver != null) {
-            conditionResolver.init();
-        }
-    }
-
-    private void initEventHandler(SOSHibernateSession jobStreamSession) throws UnsupportedEncodingException, InterruptedException, SOSException,
-            URISyntaxException {
-        LOGGER.debug("initEventHandler");
-        jobStreamSession = reportingFactory.openStatelessSession();
-        initConditionResolver(jobStreamSession);
-        initExecuted = true;
-
     }
 
     @Override
@@ -154,18 +137,12 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
 
             sosHibernateSession = reportingFactory.openStatelessSession();
 
-            if (!initExecuted) {
-                initEventHandler(sosHibernateSession);
-            }
-
             if (conditionResolver == null) {
-                initConditionResolver(sosHibernateSession);
+                conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
+                conditionResolver.init();
+            } else {
+                conditionResolver.setReportingSession(sosHibernateSession);
             }
-            if (conditionResolver == null) {
-                throw new Exception("could not init the conditionResolver");
-            }
-
-            conditionResolver.setReportingSession(sosHibernateSession);
 
             LOGGER.debug("Session: " + this.session);
 
@@ -235,6 +212,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "AddEvent --> " + customEvent.getEvent());
                             filterEvents = new FilterEvents();
+                            filterEvents.setSchedulerId(super.getSettings().getSchedulerId());
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setJobStream(customEvent.getJobStream());
                             filterEvents.setEvent(customEvent.getEvent());
@@ -251,6 +229,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "RemoveEvent -->" + customEvent.getEvent());
                             filterEvents = new FilterEvents();
 
+                            filterEvents.setSchedulerId(super.getSettings().getSchedulerId());
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setEvent(customEvent.getEvent());
                             conditionResolver.removeEvent(filterEvents);
@@ -268,6 +247,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             conditionResolver.removeConsumedInconditions(filterConsumedInConditions);
 
                             filterEvents = new FilterEvents();
+                            filterEvents.setSchedulerId(getSettings().getSchedulerId());
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setJobStream(customEvent.getJobStream());
                             conditionResolver.removeEventsFromJobStream(filterEvents);

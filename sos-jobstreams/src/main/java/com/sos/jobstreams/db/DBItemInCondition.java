@@ -1,5 +1,7 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
+
 import javax.persistence.*;
 
 import org.hibernate.annotations.Type;
@@ -19,6 +21,7 @@ public class DBItemInCondition implements IJSJobConditionKey {
     private String expression;
     private Boolean markExpression;
     private String jobStream;
+    private Date created;
 
     public DBItemInCondition() {
 
@@ -81,6 +84,17 @@ public class DBItemInCondition implements IJSJobConditionKey {
 
     public void setJobStream(String jobStream) {
         this.jobStream = jobStream;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "[CREATED]", nullable = false)
+    public Date getCreated() {
+        return created;
+    }
+
+    @Column(name = "[CREATED]", nullable = false)
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     @Override

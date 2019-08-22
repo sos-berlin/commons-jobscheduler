@@ -125,6 +125,8 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     FilterEvents filterEvent = new FilterEvents();
                     filterEvent.setEvent(jsCondition.getEventName());
                     EventDate eventDate = new EventDate();
+
+                    filterEvent.setSchedulerId(jobSchedulerId);
                     filterEvent.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
                     filterEvent.setJobStream(jsCondition.getConditionJobStream());
 

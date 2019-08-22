@@ -1,5 +1,6 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.query.Query;
@@ -134,6 +135,7 @@ public class DBLayerOutConditions {
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
                 dbItemOutCondition.setSchedulerId(outConditions.getJobschedulerId());
                 dbItemOutCondition.setJobStream(outCondition.getJobStream());
+                dbItemOutCondition.setCreated(new Date());
                 sosHibernateSession.save(dbItemOutCondition);
                 Long newId = dbItemOutCondition.getId();
                 dbLayerEvents.updateEvents(oldId, newId);
@@ -146,6 +148,7 @@ public class DBLayerOutConditions {
                 dbLayerOutConditionEvents.delete(filterOutConditionEvents);
 
                 FilterEvents filterEvents = new FilterEvents();
+                filterEvents.setSchedulerId(outConditions.getJobschedulerId());
                 filterEvents.setOutConditionId(dbItemOutCondition.getId());
                 dbLayerEvents.delete(filterEvents);
             }

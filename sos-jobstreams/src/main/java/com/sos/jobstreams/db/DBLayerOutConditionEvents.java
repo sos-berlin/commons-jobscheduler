@@ -1,5 +1,6 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.query.Query;
@@ -90,7 +91,7 @@ public class DBLayerOutConditionEvents {
 
     }
 
-    public List<DBItemOutConditionEvent> getOutConditionEventsList(FilterOutConditionEvents filter, final int limit) throws SOSHibernateException {
+    public List<DBItemOutConditionEvent> getOutConditionEventsList_______(FilterOutConditionEvents filter, final int limit) throws SOSHibernateException {
         String q = " from " + DBItemOutConditionEvent + getWhere(filter);
         LOGGER.debug("OutConditionEvents sql: " + q);
         Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(q);
@@ -132,6 +133,7 @@ public class DBLayerOutConditionEvents {
             dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
             dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
             dbItemOutConditionEvent.setCommand(outConditionEvent.getCommand());
+            dbItemOutConditionEvent.setCreated(new Date());
 
             sosHibernateSession.save(dbItemOutConditionEvent);
         }

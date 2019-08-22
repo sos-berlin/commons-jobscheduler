@@ -1,5 +1,7 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
+
 import javax.persistence.*;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.Constants.OutConditionEventCommand;
@@ -14,6 +16,7 @@ public class DBItemOutConditionEvent {
     private Long outConditionId;
     private String event;
     private String command;
+    private Date created;
 
     public DBItemOutConditionEvent() {
 
@@ -49,7 +52,7 @@ public class DBItemOutConditionEvent {
     public void setEvent(String event) {
         this.event = event;
     }
-    
+
     @Column(name = "[COMMAND]", nullable = false)
     public String getCommand() {
         return command;
@@ -58,15 +61,26 @@ public class DBItemOutConditionEvent {
     public void setCommand(String command) {
         this.command = command;
     }
-    
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "[CREATED]", nullable = false)
+    public Date getCreated() {
+        return created;
+    }
+
+    @Column(name = "[CREATED]", nullable = false)
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
     @Transient
     public boolean isDelete() {
         return command != null && OutConditionEventCommand.delete.name().equalsIgnoreCase(command);
     }
-    
+
     @Transient
     public boolean isCreate() {
         return command == null || OutConditionEventCommand.create.name().equalsIgnoreCase(command);
     }
-    
+
 }

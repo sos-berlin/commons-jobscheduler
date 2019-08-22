@@ -1,6 +1,7 @@
 package com.sos.jobstreams.db;
 
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.query.Query;
@@ -130,6 +131,7 @@ public class DBLayerInConditions {
 				dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
 				dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
 				dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
+				dbItemInCondition.setCreated(new Date());
 				sosHibernateSession.save(dbItemInCondition);
 
 				dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
@@ -138,11 +140,11 @@ public class DBLayerInConditions {
 			for (DBItemInCondition dbItemInCondition: listOfInCondititinos) {
 			    FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
 		        filterInConditionCommands.setInConditionId(dbItemInCondition.getId());
-		        dbLayerInConditionCommands.delete(filterInConditionCommands);	
+		        dbLayerInConditionCommands.deleteByInConditionId(filterInConditionCommands);	
 		        
 		        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
 		        filterConsumedInConditions.setInConditionId(dbItemInCondition.getId());
-		        dbLayerConsumedInConditions.delete(filterConsumedInConditions);
+		        dbLayerConsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
 		     }
 			
 		}

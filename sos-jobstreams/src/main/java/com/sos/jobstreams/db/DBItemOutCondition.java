@@ -2,6 +2,7 @@ package com.sos.jobstreams.db;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import javax.persistence.*;
 import com.sos.jobstreams.classes.Constants;
@@ -18,6 +19,7 @@ public class DBItemOutCondition implements IJSJobConditionKey {
     private String job;
     private String expression;
     private String jobStream;
+    private Date created;
 
     public DBItemOutCondition() {
 
@@ -70,6 +72,17 @@ public class DBItemOutCondition implements IJSJobConditionKey {
 
     public void setJobStream(String jobStream) {
         this.jobStream = jobStream;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "[CREATED]", nullable = false)
+    public Date getCreated() {
+        return created;
+    }
+
+    @Column(name = "[CREATED]", nullable = false)
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     @Transient

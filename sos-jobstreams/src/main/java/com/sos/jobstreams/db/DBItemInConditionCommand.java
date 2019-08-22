@@ -1,5 +1,7 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
+
 import javax.persistence.*;
 import com.sos.jobstreams.classes.Constants;
 
@@ -13,6 +15,7 @@ public class DBItemInConditionCommand {
     private Long inConditionId;
     private String command;
     private String commandParam;
+    private Date created;
 
     public DBItemInConditionCommand() {
 
@@ -58,4 +61,14 @@ public class DBItemInConditionCommand {
         this.commandParam = commandParam;
     }
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "[CREATED]", nullable = false)
+    public Date getCreated() {
+        return created;
+    }
+
+    @Column(name = "[CREATED]", nullable = false)
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 }

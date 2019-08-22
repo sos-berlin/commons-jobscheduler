@@ -1,5 +1,6 @@
 package com.sos.jobstreams.db;
 
+import java.util.Date;
 import java.util.List;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ public class DBLayerInConditionCommands {
 
     }
 
-    public List<DBItemInConditionCommand> getInConditionCommandsList(FilterInConditionCommands filter, final int limit) throws SOSHibernateException {
+    public List<DBItemInConditionCommand> getInConditionCommandsList______(FilterInConditionCommands filter, final int limit) throws SOSHibernateException {
         String q = " from " + DBItemInConditionCommand + getWhere(filter);
         LOGGER.debug("InConditionCommands sql: " + q);
         Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(q);
@@ -103,7 +104,7 @@ public class DBLayerInConditionCommands {
         return sosHibernateSession.getResultList(query);
     }
 
-    public int delete(FilterInConditionCommands filterConditionCommands) throws SOSHibernateException {
+    public int deleteByInConditionId(FilterInConditionCommands filterConditionCommands) throws SOSHibernateException {
         String hql = "delete from " + DBItemInConditionCommand + " i " + getWhere(filterConditionCommands);
         int row = 0;
         Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(hql);
@@ -126,12 +127,13 @@ public class DBLayerInConditionCommands {
     public void deleteInsert(DBItemInCondition dbItemInCondition, InCondition inCondition) throws SOSHibernateException {
         FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
         filterInConditionCommands.setInConditionId(inCondition.getId());
-        delete(filterInConditionCommands);
+        deleteByInConditionId(filterInConditionCommands);
         for (InConditionCommand inConditionCommand : inCondition.getInconditionCommands()) {
             DBItemInConditionCommand dbItemInConditionCommand = new DBItemInConditionCommand();
             dbItemInConditionCommand.setInConditionId(dbItemInCondition.getId());
             dbItemInConditionCommand.setCommand(inConditionCommand.getCommand());
             dbItemInConditionCommand.setCommandParam(inConditionCommand.getCommandParam());
+            dbItemInConditionCommand.setCreated(new Date());
             sosHibernateSession.save(dbItemInConditionCommand);
         }
 

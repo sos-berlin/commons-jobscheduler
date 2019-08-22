@@ -35,6 +35,7 @@ public class DBItemEvent {
         this.id = id;
     }
 
+    
     @Column(name = "[SESSION]", nullable = false)
     public String getSession() {
         return session;
