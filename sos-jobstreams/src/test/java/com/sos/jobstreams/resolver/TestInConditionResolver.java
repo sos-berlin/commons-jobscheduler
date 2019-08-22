@@ -50,6 +50,7 @@ public class TestInConditionResolver {
 
     
     @Test
+    @Ignore
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setJocUrl("http://localhost:4446");
@@ -61,6 +62,7 @@ public class TestInConditionResolver {
     }
 
     @Test
+    @Ignore
     public void testEventList() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setJocUrl("http://localhost:4446");
