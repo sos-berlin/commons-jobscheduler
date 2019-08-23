@@ -56,10 +56,14 @@ public class DBLayerConsumedInConditions {
         String where = "";
         String and = "";
 
+        if (filter.getJobSchedulerId() != null && !"".equals(filter.getJobSchedulerId())) {
+            where += and + " schedulerId = :schedulerId";
+            and = " and ";
+        }
+
         if (filter.getJobStream() != null && !"".equals(filter.getJobStream())) {
             where += and + " jobStream = :jobStream";
             and = " and ";
-
         }
 
         if (filter.getJob() != null && !"".equals(filter.getJob())) {

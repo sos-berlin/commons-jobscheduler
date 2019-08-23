@@ -136,13 +136,8 @@ public class DBLayerEvents {
 
     }
 
-    public void store(DBItemEvent itemEvent) throws SOSHibernateException {
-        FilterEvents filter = new FilterEvents();
-        filter.setOutConditionId(itemEvent.getOutConditionId());
-        filter.setEvent(itemEvent.getEvent());
-        filter.setSession(itemEvent.getSession());
-        filter.setJobStream(itemEvent.getJobStream());
-        delete(filter);
+    public void store(DBItemEvent itemEvent,FilterEvents filterEvents) throws SOSHibernateException {
+        delete(filterEvents);
         sosHibernateSession.save(itemEvent);
     }
 

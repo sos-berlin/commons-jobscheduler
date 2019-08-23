@@ -3,7 +3,7 @@ package com.sos.jobstreams.db;
 public class FilterConsumedInConditions {
 
     private Long inConditionId;
-    private String jobSchedulerIdId="";
+    private String jobSchedulerId="";
     private String jobStream="";
     private String job="";
     private String session;
@@ -44,12 +44,12 @@ public class FilterConsumedInConditions {
 
     
     public String getJobSchedulerId() {
-        return jobSchedulerIdId;
+        return jobSchedulerId;
     }
 
     
     public void setJobSchedulerId(String jobSchedulerId) {
-        this.jobSchedulerIdId = jobSchedulerId;
+        this.jobSchedulerId = jobSchedulerId;
     }
 
 }

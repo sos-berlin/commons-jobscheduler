@@ -628,7 +628,7 @@ public class JSConditionResolver {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(itemEvent);
+            dbLayerEvents.store(itemEvent,filterEvents);
             sosHibernateSession.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

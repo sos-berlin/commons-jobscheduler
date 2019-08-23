@@ -63,7 +63,12 @@ public class TestEventsDb {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(itemEvent);
+            FilterEvents filter = new FilterEvents();
+            filter.setOutConditionId(itemEvent.getOutConditionId());
+            filter.setEvent(itemEvent.getEvent());
+            filter.setSession(itemEvent.getSession());
+            filter.setJobStream(itemEvent.getJobStream());
+            dbLayerEvents.store(itemEvent,filter);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();
