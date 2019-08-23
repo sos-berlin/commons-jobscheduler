@@ -126,7 +126,11 @@ public class DBLayerInConditions {
 
 			for (InCondition inCondition : jobInCondition.getInconditions()) {
 				DBItemInCondition dbItemInCondition = new DBItemInCondition();
-				dbItemInCondition.setExpression(inCondition.getConditionExpression().getExpression());
+				String expression = inCondition.getConditionExpression().getExpression();
+				if (expression == null || expression.isEmpty()) {
+				    expression = "false";
+				} 
+				dbItemInCondition.setExpression(expression);
 				dbItemInCondition.setJob(jobInCondition.getJob());
 				dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
 				dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());

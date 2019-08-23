@@ -29,7 +29,11 @@ public class JSInConditionCommand {
     }
 
     public String getCommand() {
-        return itemInConditionCommand.getCommand().replaceAll("_", "").toLowerCase();
+        if (itemInConditionCommand.getCommand() != null) {
+            return itemInConditionCommand.getCommand().replaceAll("_", "").toLowerCase();
+        } else {
+            return "***";
+        }
     }
 
     public String getCommandParam() {

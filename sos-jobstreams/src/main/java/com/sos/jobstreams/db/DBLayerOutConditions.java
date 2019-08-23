@@ -131,7 +131,11 @@ public class DBLayerOutConditions {
                 Long oldId = outCondition.getId();
 
                 DBItemOutCondition dbItemOutCondition = new DBItemOutCondition();
-                dbItemOutCondition.setExpression(outCondition.getConditionExpression().getExpression());
+                String expression = outCondition.getConditionExpression().getExpression();
+                if (expression == null || expression.isEmpty()) {
+                    expression = "false";
+                } 
+                dbItemOutCondition.setExpression(expression);
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
                 dbItemOutCondition.setSchedulerId(outConditions.getJobschedulerId());
                 dbItemOutCondition.setJobStream(outCondition.getJobStream());

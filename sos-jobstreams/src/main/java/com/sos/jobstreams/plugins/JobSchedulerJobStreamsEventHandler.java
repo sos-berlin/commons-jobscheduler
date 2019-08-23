@@ -222,6 +222,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             }
 
                             conditionResolver.addEvent(filterEvents);
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
+
                             break;
                         case "RemoveEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "RemoveEvent -->" + customEvent.getEvent());
@@ -231,6 +233,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setEvent(customEvent.getEvent());
                             conditionResolver.removeEvent(filterEvents);
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), customEvent.getEvent());
+
                             break;
 
                         case "ResetConditionResolver":
