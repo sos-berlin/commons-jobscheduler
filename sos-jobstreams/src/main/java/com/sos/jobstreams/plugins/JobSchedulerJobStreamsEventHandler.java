@@ -80,6 +80,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.init();
             LOGGER.debug("onActivate initEventHandler");
+            LOGGER.debug("Session: " + this.session);
+
 
         } catch (Exception e) {
             conditionResolver = null;
@@ -141,7 +143,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                 conditionResolver.setReportingSession(sosHibernateSession);
             }
 
-            LOGGER.debug("Session: " + this.session);
 
             if (!Constants.getSession().equals(this.session)) {
                 try {

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -425,8 +427,9 @@ public class JSConditionResolver {
                 break;
             }
             case "fileexist": {
+                Path p = Paths.get(jsCondition.getConditionParam());
                 File f = null;
-                if (workingDirectory.isEmpty() || jsCondition.getConditionParam().startsWith("/")) {
+                if (p.isAbsolute()) {
                     f = new File(jsCondition.getConditionParam());
                 } else {
                     f = new File(workingDirectory, jsCondition.getConditionParam());
@@ -437,8 +440,10 @@ public class JSConditionResolver {
                     LOGGER.warn("Can not debug the path of the file.");
                 }
                 if (f.exists()) {
-                    LOGGER.debug("file exists");
+                    LOGGER.debug("file " + jsCondition.getConditionParam() +  " exists");
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ", "true ");
+                }else {
+                    LOGGER.debug("file " + jsCondition.getConditionParam() + " does not exist");
                 }
 
                 break;
@@ -519,6 +524,7 @@ public class JSConditionResolver {
 
                         LOGGER.trace("---InCondition expression is: " + expression);
                         if (validate(null, inCondition)) {
+                            listOfValidatedInconditions.add(inCondition);
                             inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
                         } else {
                             LOGGER.trace(expression + "evaluated to --> false");
@@ -644,7 +650,6 @@ public class JSConditionResolver {
 
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.setAutoCommit(false);
             sosHibernateSession.beginTransaction();
             dbLayerEvents.store(itemEvent, filterEvents);
             sosHibernateSession.commit();
@@ -658,8 +663,6 @@ public class JSConditionResolver {
     public void removeEvent(FilterEvents filterEvents) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::removeEvent --> " + filterEvents.getJobStream() + "." + filterEvents.getEvent());
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-
-        sosHibernateSession.setAutoCommit(false);
 
         try {
             sosHibernateSession.beginTransaction();
