@@ -147,6 +147,16 @@ public class DBLayerConsumedInConditions {
         int row = sosHibernateSession.executeUpdate(query);
         return row;
     }
+    
+       public int updateConsumedInCondition(Long oldId, Long newId) throws SOSHibernateException {
+        String hql = "update " + DBItemConsumedInCondition + " set inConditionId=" + newId + " where inConditionId=:oldId";
+        int row = 0;
+        Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(hql);
+        query.setParameter("oldId", oldId);
+
+        row = sosHibernateSession.executeUpdate(query);
+        return row;
+    }
 
     public void deleteInsert(DBItemConsumedInCondition dbItemConsumedInCondition) throws SOSHibernateException {
         FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();

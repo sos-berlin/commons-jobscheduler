@@ -133,7 +133,7 @@ public class DBLayerInConditions {
 				dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
 				dbItemInCondition.setCreated(new Date());
 				sosHibernateSession.save(dbItemInCondition);
-
+				dbLayerConsumedInConditions.updateConsumedInCondition(inCondition.getId(),dbItemInCondition.getId());
 				dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
 			}
 			

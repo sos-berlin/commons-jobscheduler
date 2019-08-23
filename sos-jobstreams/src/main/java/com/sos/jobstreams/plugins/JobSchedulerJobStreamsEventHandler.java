@@ -1,7 +1,5 @@
 package com.sos.jobstreams.plugins;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.List;
@@ -13,7 +11,6 @@ import javax.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -184,7 +181,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                         break;
                     case "TaskEnded":
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId());
+                        LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
                         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
                         JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
@@ -254,7 +251,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
 
                             break;
                         }
-                        break;
+                        default: LOGGER.debug(jobSchedulerEvent.getType() + " skipped");
                     }
                 }
             }

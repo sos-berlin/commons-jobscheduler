@@ -109,6 +109,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public void executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws SOSHibernateException {
         LOGGER.trace("execute commands ------>");
         if (this.isMarkExpression()) {
+            LOGGER.trace(this.getExpression() + " now marked as consumed");
             this.markAsConsumed(sosHibernateSession);
         }
 

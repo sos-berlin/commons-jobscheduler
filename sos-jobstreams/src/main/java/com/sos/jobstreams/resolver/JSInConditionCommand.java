@@ -53,7 +53,7 @@ public class JSInConditionCommand {
 
         String jobXml = buildJobStartXml(inCondition);
         String answer = "";
-        LOGGER.trace("JSInConditionCommand:startJob:" + jobXml);
+        LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
         if (schedulerXmlCommandExecutor != null) {
             answer = schedulerXmlCommandExecutor.executeXml(jobXml);
         } else {
@@ -73,6 +73,7 @@ public class JSInConditionCommand {
             LOGGER.info(commandParam);
         }
         if ("startjob".equalsIgnoreCase(command)) {
+            LOGGER.debug("....starting job:" + inCondition.getJob());
             startJob(schedulerXmlCommandExecutor, inCondition);
         }
 
