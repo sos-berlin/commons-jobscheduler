@@ -31,14 +31,14 @@ public class CreateTestRecords {
 	}
 
 	public void generateInConditions() {
-		String stmt1 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_1','performance_%s','performance','1');";
-		String stmt2 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_2','performance_%s','ev_job_w%s_1[today]  ','1');";
-		String stmt3 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_3','performance_%s','ev_job_w%s_1[today]','1');";
-		String stmt4 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','ev_job_w%s_2[today] and ev_job_w%s_3[today]','1');";
-		String stmt5 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_5','performance_%s','ev_job_w%s_1[today] and ev_job_w%s_4[today]','1');";
-		String stmt6 = "Insert into SCHEDULER.COND_IN_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_error','performance_%s','ev_job_w%s_4_error','1');";
-		String stmt7 = "Insert into SCHEDULER.COND_IN_CONDITION_COMMANDS (ID,IN_CONDITION_ID,COMMAND,COMMAND_PARAM) values ('%s','%s','startjob','now');";
-		String stmt8 = "Insert into SCHEDULER.COND_IN_CONDITION_COMMANDS (ID,IN_CONDITION_ID,COMMAND,COMMAND_PARAM) values ('%s','%s','writelog','finished');";
+		String stmt1 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_1','performance_%s','performance','1');";
+		String stmt2 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_2','performance_%s','ev_job_w%s_1[today]  ','1');";
+		String stmt3 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_3','performance_%s','ev_job_w%s_1[today]','1');";
+		String stmt4 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','ev_job_w%s_2[today] and ev_job_w%s_3[today]','1');";
+		String stmt5 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_5','performance_%s','ev_job_w%s_1[today] and ev_job_w%s_4[today]','1');";
+		String stmt6 = "Insert into SCHEDULER.JSTREAM_IN_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION,MARK_EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_error','performance_%s','ev_job_w%s_4_error','1');";
+		String stmt7 = "Insert into SCHEDULER.JSTREAM_IN_CONDITION_COMMANDS (CREATED,ID,IN_CONDITION_ID,COMMAND,COMMAND_PARAM) values (sysdate,'%s','%s','startjob','now');";
+		String stmt8 = "Insert into SCHEDULER.JSTREAM_IN_CONDITION_COMMANDS (CREATED,ID,IN_CONDITION_ID,COMMAND,COMMAND_PARAM) values (sysdate,'%s','%s','writelog','finished');";
 
 		int id = 600;
 		int idCommand = 600;
@@ -92,14 +92,14 @@ public class CreateTestRecords {
 	}
 
 	public void generateOutConditions() {
-		String stmt1 = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_1','performance_%s','returncode:0');";
-		String stmt2 = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_2','performance_%s','returncode:0');";
-		String stmt3 = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_3','performance_%s','returncode:0');";
-		String stmt4a = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','returncode:0');";
-		String stmt4b = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','returncode:1-');";
-		String stmt5 = "Insert into SCHEDULER.COND_OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_5','performance_%s','returncode:0');";
-		String stmt6 = "Insert into SCHEDULER.COND__OUT_CONDITIONS (ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values ('%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_error','performance_%s','returncode:0');";
-		String stmt7 = "Insert into SCHEDULER.COND_OUT_CONDITION_EVENTS (ID,OUT_CONDITION_ID,EVENT,COMMAND) values ('%s','%s','ev_job_w%s_%s','create');";
+		String stmt1 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_1','performance_%s','returncode:0');";
+		String stmt2 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_2','performance_%s','returncode:0');";
+		String stmt3 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_3','performance_%s','returncode:0');";
+		String stmt4a = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','returncode:0');";
+		String stmt4b = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_4','performance_%s','returncode:1-');";
+		String stmt5 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_5','performance_%s','returncode:0');";
+		String stmt6 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITIONS (CREATED,ID,SCHEDULER_ID,JOB,JOBSTREAM,EXPRESSION) values (sysdate,'%s','scheduler_joc_cockpit','/job_streams/performance/w%s/job_error','performance_%s','returncode:0');";
+		String stmt7 = "Insert into SCHEDULER.JSTREAM_OUT_CONDITION_EVENTS (CREATED,ID,OUT_CONDITION_ID,EVENT,COMMAND) values (sysdate,'%s','%s','ev_job_w%s_%s','create');";
 
 		int id = 600;
 		int idCommand = 600;

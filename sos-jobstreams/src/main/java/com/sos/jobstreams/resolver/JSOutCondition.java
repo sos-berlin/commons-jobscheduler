@@ -82,7 +82,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             filter.setEvent(itemEvent.getEvent());
             filter.setSession(itemEvent.getSession());
             filter.setJobStream(itemEvent.getJobStream());
-            dbLayerEvents.store(itemEvent,filter);
+            dbLayerEvents.store(itemEvent, filter);
             sosHibernateSession.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -110,10 +110,10 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public void storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents) throws SOSHibernateException {
+    public void storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsAddEvents, JSEvents jsRemoveEvents)
+            throws SOSHibernateException {
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
             sosHibernateSession.setAutoCommit(false);
-
 
             if (outConditionEvent.isCreateCommand()) {
                 DBItemEvent itemEvent = new DBItemEvent();
@@ -124,6 +124,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                 itemEvent.setSession(Constants.getSession());
                 JSEvent event = storeOutConditionEvent(sosHibernateSession, itemEvent);
                 jsEvents.addEvent(event);
+                jsAddEvents.addEvent(event);
             } else {
                 if (outConditionEvent.isDeleteCommand()) {
                     JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
@@ -141,6 +142,8 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     eventKey.setEvent(filterEvent.getEvent());
                     eventKey.setSession(filterEvent.getSession());
                     eventKey.setJobStream(filterEvent.getJobStream());
+                    JSEvent event = jsEvents.getEvent(eventKey);
+                    jsRemoveEvents.addEvent(event);
                     jsEvents.removeEvent(eventKey);
                 }
             }

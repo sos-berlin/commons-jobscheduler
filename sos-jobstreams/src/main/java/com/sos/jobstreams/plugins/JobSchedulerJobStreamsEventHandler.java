@@ -45,7 +45,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     JSConditionResolver conditionResolver;
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated
+        InconditionValidated, EventCreated ,EventRemoved
     }
 
     public static enum CustomEventTypeValue {
@@ -185,11 +185,14 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
                         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-                        JSEvents jsNewEvents = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
+                         conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
                                 taskEndEvent.getJobPath());
-                        for (JSEvent jsNewEvent : jsNewEvents.getListOfEvents().values()) {
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
-                        }
+                         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
+                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                         }
+                         for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
+                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+                         }
                         resolveInConditions = true;
                         break;
 
@@ -233,7 +236,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             filterEvents.setSession(customEvent.getSession());
                             filterEvents.setEvent(customEvent.getEvent());
                             conditionResolver.removeEvent(filterEvents);
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), customEvent.getEvent());
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
                             break;
 

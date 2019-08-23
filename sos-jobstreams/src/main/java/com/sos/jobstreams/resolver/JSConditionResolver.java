@@ -64,7 +64,9 @@ public class JSConditionResolver {
     private List<CheckHistoryCacheRule> listOfCheckHistoryChacheRules;
     private SchedulerXmlCommandExecutor schedulerXmlCommandExecutor;
     private String workingDirectory = "";
-
+    private JSEvents newJsEvents = new JSEvents();
+    private JSEvents removeJsEvents = new JSEvents();
+    
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
             EventHandlerSettings settings) {
         super();
@@ -539,10 +541,11 @@ public class JSConditionResolver {
         return listOfValidatedInconditions;
     }
 
-    public JSEvents resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
+    public void resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::resolveOutConditions for job:" + job);
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
-        JSEvents newJsEvents = new JSEvents();
+        this.newJsEvents = new JSEvents();
+        this.removeJsEvents = new JSEvents();
         jobConditionKey.setJob(job);
         jobConditionKey.setJobSchedulerId(jobSchedulerId);
         JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
@@ -556,8 +559,8 @@ public class JSConditionResolver {
 
                     LOGGER.trace("---OutCondition: " + expression);
                     if (validate(taskReturnCode, outCondition)) {
-                        LOGGER.trace("create events ------>");
-                        outCondition.storeOutConditionEvents(sosHibernateSession, newJsEvents);
+                        LOGGER.trace("create/remove events ------>");
+                        outCondition.storeOutConditionEvents(sosHibernateSession,jsEvents, newJsEvents,removeJsEvents);
 
                     } else {
                         LOGGER.trace(expression + "-->false");
@@ -568,9 +571,7 @@ public class JSConditionResolver {
                 LOGGER.debug("No out conditions for job: " + job + " found. Nothing to do");
             }
         }
-        jsEvents.addAll(newJsEvents.getListOfEvents());
-        return newJsEvents;
-    }
+     }
 
     public void resolveOutConditions() {
         for (JSOutConditions jobOutConditions : jsJobOutConditions.getListOfJobOutConditions().values()) {
@@ -760,5 +761,15 @@ public class JSConditionResolver {
     public void setWorkingDirectory(String workingDirectory) {
         this.workingDirectory = workingDirectory;
 
+    }
+
+    
+    public JSEvents getNewJsEvents() {
+        return newJsEvents;
+    }
+
+    
+    public JSEvents getRemoveJsEvents() {
+        return removeJsEvents;
     }
 }
