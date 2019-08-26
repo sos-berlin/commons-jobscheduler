@@ -107,7 +107,7 @@ public class TestEventsDb {
             filter.setJobStream("test");
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsFromJobStream(filter);
+            dbLayerEvents.deleteEventsWithOutConditions(filter);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();

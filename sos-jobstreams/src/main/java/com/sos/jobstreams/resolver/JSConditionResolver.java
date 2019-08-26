@@ -429,12 +429,14 @@ public class JSConditionResolver {
                 break;
             }
             case "fileexist": {
-                Path p = Paths.get(jsCondition.getConditionParam());
+                String fileName = jsCondition.getConditionParam().replace('"',' ').trim();
+                fileName = fileName.replaceAll("%20"," ");
+                Path p = Paths.get(fileName);
                 File f = null;
                 if (p.isAbsolute()) {
-                    f = new File(jsCondition.getConditionParam());
+                    f = new File(fileName);
                 } else {
-                    f = new File(workingDirectory, jsCondition.getConditionParam());
+                    f = new File(workingDirectory, fileName);
                 }
                 try {
                     LOGGER.debug("check file: " + f.getCanonicalPath());
@@ -492,7 +494,9 @@ public class JSConditionResolver {
                 jsEventKey.setSession(eventDate.getEventDate(date));
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
-                    expressionValue = expressionValue.replace(jsCondition.getConditonValue() + " ", "true ");
+                    expressionValue = expressionValue.replaceAll("\\(","###(###").replaceAll("\\)","###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ","###|||###").replaceAll("not ", "###!!!###");
+                    expressionValue = expressionValue.replace(jsCondition.getConditonValue(), "true");
+                    expressionValue = expressionValue.replaceAll("\\#\\#\\#\\(\\#\\#\\#","(").replaceAll("\\#\\##\\)\\#\\#\\#",")").replaceAll("\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#"," or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
                 }
 
                 break;
@@ -625,7 +629,7 @@ public class JSConditionResolver {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsFromJobStream(filter);
+            dbLayerEvents.deleteEventsWithOutConditions(filter);
             sosHibernateSession.commit();
 
             jsEvents = null;

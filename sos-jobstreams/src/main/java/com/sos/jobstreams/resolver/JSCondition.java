@@ -76,9 +76,16 @@ public class JSCondition {
 	}
 
 	private String getConditionTypeParam(String condition) {
-		String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("rc:", "")
-				.replaceFirst("job:", "").replaceFirst("jobchain:", "");
-		return s;
+	    String[] s = condition.split(":");
+	    if (s.length > 1) {
+	        String type = condition.replaceAll(s[0] + ":","");
+	        return type;
+	    }else {
+	        return s[0];
+	    }
+ 		//String s = condition.replaceFirst("event:", "").replaceFirst("fileexist:", "").replaceFirst("returncode:", "").replaceFirst("rc:", "")
+		//		.replaceFirst("job:", "").replaceFirst("jobchain:", "");
+		// return s;
 	}
 
 	private String getConditionJobStream(String conditionParam) {

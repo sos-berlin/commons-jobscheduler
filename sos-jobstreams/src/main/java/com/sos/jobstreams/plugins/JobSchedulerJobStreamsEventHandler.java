@@ -64,6 +64,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     public void onActivate(PluginMailer mailer) {
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
+        
 
         super.onActivate(mailer);
 
@@ -78,6 +79,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
             sosHibernateSession = reportingFactory.openStatelessSession();
 
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
+            conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
             conditionResolver.init();
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
@@ -254,11 +256,13 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             filterEvents = new FilterEvents();
                             filterEvents.setSchedulerId(getSettings().getSchedulerId());
                             filterEvents.setSession(customEvent.getSession());
+                            filterEvents.setJob(customEvent.getJob());
                             filterEvents.setJobStream(customEvent.getJobStream());
                             conditionResolver.removeEventsFromJobStream(filterEvents);
 
                             break;
                         }
+                        break;
                         default: LOGGER.debug(jobSchedulerEvent.getType() + " skipped");
                     }
                 }

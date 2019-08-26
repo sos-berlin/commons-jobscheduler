@@ -43,32 +43,34 @@ public class CheckHistoryCondition {
         } else {
             taskReturnCode = null;
         }
+        HistoryHelper jobHistoryHelper = new HistoryHelper();
+        
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
+        String method = jobHistoryHelper.getMethodName(query);
+        if ("rc".equalsIgnoreCase(method)) {
+            method = "returncode";
+        }
 
         CheckHistoryValue validateResult = null;
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, job, jsCondition.getConditionQuery().toLowerCase());
-        if (jsCondition.getConditionJob().isEmpty() && taskReturnCode != null && "returncode".equalsIgnoreCase(jsCondition.getConditionQuery())) {
-            // will never come from cache
+        if (jsCondition.getConditionJob().isEmpty() && taskReturnCode != null && ("returncode".equals(method) )) {
         } else {
             validateResult = getCache(checkHistoryKey);
         }
         if (validateResult == null) {
             JobSchedulerHistoryInfo jobHistoryInfo = jobHistory.getJobInfo(job);
-            if ("returncode".equalsIgnoreCase(jsCondition.getConditionQuery())) {
+            if ("returncode".equals(method)) {
                 if (taskReturnCode == null) {
                     taskReturnCode = jobHistoryInfo.getLastCompleted().executionResult;
                 }
-                HistoryHelper jobHistoryHelper = new HistoryHelper();
                 String returnCode = jobHistoryHelper.getParameter(query);
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
             } else {
                 validateResult = new CheckHistoryValue(jobHistoryInfo.queryHistory(query), jsCondition);
             }
-            if ((jsCondition.getConditionJob().isEmpty() && taskReturnCode != null && "returncode".equalsIgnoreCase(jsCondition
-                    .getConditionQuery()))) {
-                // returncode of the actual job will not be cached as returncode is availabe with the JobScheduler event.
-            } else {
+            if ((jsCondition.getConditionJob().isEmpty() && taskReturnCode != null) || "returncode".equalsIgnoreCase(method)) {
+             } else {
                 putCache(checkHistoryKey, validateResult);
             }
         }
