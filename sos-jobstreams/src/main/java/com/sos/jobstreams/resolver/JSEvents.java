@@ -1,14 +1,17 @@
 package com.sos.jobstreams.resolver;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jobstreams.db.DBItemEvent;
+import com.sos.jobstreams.db.DBLayerEvents;
 
 public class JSEvents {
 
-    Map<JSEventKey, JSEvent> listOfEvents;
+    private Map<JSEventKey, JSEvent> listOfEvents;
 
     public JSEvents() {
         super();
@@ -62,5 +65,32 @@ public class JSEvents {
             return getEvent(jsEventKey);
         }
         return null;
+    }
+
+    public void storeQueuedEvents(DBLayerEvents dbLayerEvents) throws SOSHibernateException {
+        for (JSEvent jsEvent : listOfEvents.values()) {
+            if (!jsEvent.isStoredInDatabase()) {
+                DBItemEvent itemEvent = new DBItemEvent();
+                itemEvent.setCreated(new Date());
+                itemEvent.setEvent(jsEvent.getEvent());
+                itemEvent.setJobStream(jsEvent.getJobStream());
+                itemEvent.setOutConditionId(jsEvent.getOutConditionId());
+                itemEvent.setSession(jsEvent.getSession());
+                dbLayerEvents.store(itemEvent, null);
+                jsEvent.setStoredInDatabase(true);
+            }
+        }
+
+    }
+
+    public Map<JSEventKey, JSEvent> getListOfQueuedEvents() {
+        Map<JSEventKey, JSEvent> l = new HashMap<JSEventKey, JSEvent>();
+
+        listOfEvents.forEach((jsEventKey, jsEvent) -> {
+            if (jsEvent.isStoredInDatabase()) {
+                l.put(jsEventKey, jsEvent);
+            }
+        });
+        return l;
     }
 }

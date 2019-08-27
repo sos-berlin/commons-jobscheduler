@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class JSConditionResolver {
     private String workingDirectory = "";
     private JSEvents newJsEvents = new JSEvents();
     private JSEvents removeJsEvents = new JSEvents();
-    
+
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
             EventHandlerSettings settings) {
         super();
@@ -74,7 +75,7 @@ public class JSConditionResolver {
         booleanExpression = new BooleanExp("");
         this.sosHibernateSession = sosHibernateSession;
         this.settings = settings;
-        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
+        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
     }
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, String schedulerId) {
@@ -83,19 +84,26 @@ public class JSConditionResolver {
         this.sosHibernateSession = sosHibernateSession;
         this.settings = new EventHandlerSettings();
         settings.setSchedulerId(schedulerId);
-        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
+        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
     }
 
     public void reInit() throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
         jsJobOutConditions = null;
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+        sosHibernateSession.beginTransaction();
+        jsEvents.storeQueuedEvents(dbLayerEvents);
+        sosHibernateSession.commit();
+
+        Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
+
         jsEvents = null;
-        checkHistoryCondition = new CheckHistoryCondition(sosHibernateSession, settings.getSchedulerId());
-        this.init();
+        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
+        this.init(listOfQueuedEvents);
     }
 
-    public void init() throws SOSHibernateException {
+    public void init(Map<JSEventKey, JSEvent> listOfQueuedEvents) throws SOSHibernateException {
         // synchronizeJobsWithFileSystem();
 
         DurationCalculator duration = new DurationCalculator();
@@ -314,7 +322,7 @@ public class JSConditionResolver {
             listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
         }
 
-        initEvents();
+        initEvents(listOfQueuedEvents);
         initCheckHistory();
         if (isDebugEnabled) {
             duration.end("Init JobStreams condition model ");
@@ -345,16 +353,21 @@ public class JSConditionResolver {
          */
     }
 
-    public void initEvents() throws SOSHibernateException {
+    public void initEvents(Map<JSEventKey, JSEvent> listOfQueuedEvents) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::initEvents");
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
             filterEvents.setSchedulerId(settings.getSchedulerId());
-            // filterEvents.setSession(Constants.getSession());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
+            if (listOfQueuedEvents != null && listOfQueuedEvents.size() > 0) {
+                jsEvents.addAll(listOfQueuedEvents);
+                if (isDebugEnabled) {
+                    LOGGER.debug(listOfQueuedEvents.size() + " added to event list from event queue with not stored events.");
+                }
+            }
         }
     }
 
@@ -370,11 +383,11 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, inCondition.getJob(), 0);
+                            checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, inCondition.getJob(), 0);
                             break;
                         }
                         case JOB_CHAIN: {
-                            checkHistoryCondition.validateJobChain(jsCondition);
+                            checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition);
                             break;
                         }
                         }
@@ -394,11 +407,11 @@ public class JSConditionResolver {
                     try {
                         switch (jsCondition.getConditionType()) {
                         case JOB: {
-                            checkHistoryCondition.validateJob(jsCondition, outCondition.getJob(), 0);
+                            checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, outCondition.getJob(), 0);
                             break;
                         }
                         case JOB_CHAIN: {
-                            checkHistoryCondition.validateJobChain(jsCondition);
+                            checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition);
                             break;
                         }
                         }
@@ -429,8 +442,8 @@ public class JSConditionResolver {
                 break;
             }
             case "fileexist": {
-                String fileName = jsCondition.getConditionParam().replace('"',' ').trim();
-                fileName = fileName.replaceAll("%20"," ");
+                String fileName = jsCondition.getConditionParam().replace('"', ' ').trim();
+                fileName = fileName.replaceAll("%20", " ");
                 Path p = Paths.get(fileName);
                 File f = null;
                 if (p.isAbsolute()) {
@@ -444,9 +457,9 @@ public class JSConditionResolver {
                     LOGGER.warn("Can not debug the path of the file.");
                 }
                 if (f.exists()) {
-                    LOGGER.debug("file " + jsCondition.getConditionParam() +  " exists");
+                    LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
                     expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ", "true ");
-                }else {
+                } else {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " does not exist");
                 }
 
@@ -454,7 +467,7 @@ public class JSConditionResolver {
             }
             case JOB: {
                 try {
-                    if (checkHistoryCondition.validateJob(jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
+                    if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
                                 "true ");
                     }
@@ -465,7 +478,7 @@ public class JSConditionResolver {
             }
             case JOB_CHAIN: {
                 try {
-                    if (checkHistoryCondition.validateJobChain(jsCondition).getValidateResult()) {
+                    if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
                         expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
                                 "true ");
                     }
@@ -494,9 +507,12 @@ public class JSConditionResolver {
                 jsEventKey.setSession(eventDate.getEventDate(date));
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
-                    expressionValue = expressionValue.replaceAll("\\(","###(###").replaceAll("\\)","###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ","###|||###").replaceAll("not ", "###!!!###");
+                    expressionValue = expressionValue.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###")
+                            .replaceAll(" or ", "###|||###").replaceAll("not ", "###!!!###");
                     expressionValue = expressionValue.replace(jsCondition.getConditonValue(), "true");
-                    expressionValue = expressionValue.replaceAll("\\#\\#\\#\\(\\#\\#\\#","(").replaceAll("\\#\\##\\)\\#\\#\\#",")").replaceAll("\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#"," or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
+                    expressionValue = expressionValue.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll(
+                            "\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll(
+                                    "\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
                 }
 
                 break;
@@ -564,7 +580,7 @@ public class JSConditionResolver {
                     LOGGER.trace("---OutCondition: " + expression);
                     if (validate(taskReturnCode, outCondition)) {
                         LOGGER.trace("create/remove events ------>");
-                        outCondition.storeOutConditionEvents(sosHibernateSession,jsEvents, newJsEvents,removeJsEvents);
+                        outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
 
                     } else {
                         LOGGER.trace(expression + "-->false");
@@ -575,7 +591,7 @@ public class JSConditionResolver {
                 LOGGER.debug("No out conditions for job: " + job + " found. Nothing to do");
             }
         }
-     }
+    }
 
     public void resolveOutConditions() {
         for (JSOutConditions jobOutConditions : jsJobOutConditions.getListOfJobOutConditions().values()) {
@@ -629,12 +645,19 @@ public class JSConditionResolver {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
+            jsEvents.storeQueuedEvents(dbLayerEvents);
+
             dbLayerEvents.deleteEventsWithOutConditions(filter);
             sosHibernateSession.commit();
 
+            Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
+
             jsEvents = null;
-            initEvents();
-        } catch (Exception e) {
+
+            initEvents(listOfQueuedEvents);
+        } catch (
+
+        Exception e) {
             LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
@@ -671,6 +694,7 @@ public class JSConditionResolver {
 
         try {
             sosHibernateSession.beginTransaction();
+            jsEvents.storeQueuedEvents(dbLayerEvents);
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();
         } catch (Exception e) {
@@ -678,8 +702,10 @@ public class JSConditionResolver {
             sosHibernateSession.rollback();
         }
 
+        Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
+
         jsEvents = null;
-        initEvents();
+        initEvents(listOfQueuedEvents);
         LOGGER.debug(filterEvents.getEvent() + " removed");
 
     }
@@ -697,7 +723,7 @@ public class JSConditionResolver {
             if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
                     .getValidateResult()))) {
                 checkHistoryCondition.putCache(checkHistoryKey, null);
-                checkHistoryCondition.validateJob(validateResult.getJsCondition(), jobPath, taskReturnCode);
+                checkHistoryCondition.validateJob(sosHibernateSession, validateResult.getJsCondition(), jobPath, taskReturnCode);
             }
         }
     }
@@ -767,12 +793,10 @@ public class JSConditionResolver {
 
     }
 
-    
     public JSEvents getNewJsEvents() {
         return newJsEvents;
     }
 
-    
     public JSEvents getRemoveJsEvents() {
         return removeJsEvents;
     }

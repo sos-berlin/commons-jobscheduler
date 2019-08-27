@@ -84,8 +84,10 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             filter.setJobStream(itemEvent.getJobStream());
             dbLayerEvents.store(itemEvent, filter);
             sosHibernateSession.commit();
+            event.setStoredInDatabase(true);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+            event.setStoredInDatabase(false);
             sosHibernateSession.rollback();
         }
         return event;

@@ -23,26 +23,27 @@ public class CheckHistoryCondition {
 
     private Map<CheckHistoryKey, CheckHistoryValue> checkHistoryCache;
 
-    public CheckHistoryCondition(SOSHibernateSession sosHibernateSession, String schedulerId) {
+    public CheckHistoryCondition(String schedulerId) {
         super();
-        HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
         WebserviceCredentials webserviceCredentials = new WebserviceCredentials();
         webserviceCredentials.setSchedulerId(schedulerId);
 
         jobHistory = new com.sos.jitl.checkhistory.JobHistory("", webserviceCredentials);
-        jobHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
         jobChainHistory = new com.sos.jitl.checkhistory.JobChainHistory("", webserviceCredentials);
-        jobChainHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
         checkHistoryCache = new HashMap<CheckHistoryKey, CheckHistoryValue>();
     }
 
-    public CheckHistoryValue validateJob(JSCondition jsCondition, String conditionJob, Integer taskReturnCode) throws Exception {
+    public CheckHistoryValue validateJob(SOSHibernateSession sosHibernateSession, JSCondition jsCondition, String conditionJob, Integer taskReturnCode) throws Exception {
         String job = jsCondition.getConditionJob();
         if (job.isEmpty()) {
             job = conditionJob;
         } else {
             taskReturnCode = null;
         }
+        
+        HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
+        jobHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
+
         HistoryHelper jobHistoryHelper = new HistoryHelper();
         
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
@@ -77,13 +78,15 @@ public class CheckHistoryCondition {
         return validateResult;
     }
 
-    public CheckHistoryValue validateJobChain(JSCondition jsCondition) throws Exception {
+    public CheckHistoryValue validateJobChain(SOSHibernateSession sosHibernateSession,JSCondition jsCondition) throws Exception {
         String jobChain = jsCondition.getConditionJobChain();
         jobChain = jobChain.replace('[', '(').replace(']', ')');
 
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB_CHAIN, jobChain, jsCondition.getConditionQuery().toLowerCase());
         CheckHistoryValue validateResult = checkHistoryCache.get(checkHistoryKey);
         if (validateResult == null) {
+            HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
+            jobChainHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
             JobSchedulerHistoryInfo jobChainHistoryInfo = jobChainHistory.getJobChainInfo(jobChain);
             validateResult = new CheckHistoryValue(jobChainHistoryInfo.queryHistory(jsCondition.getConditionQuery()), jsCondition);
             checkHistoryCache.put(checkHistoryKey, validateResult);

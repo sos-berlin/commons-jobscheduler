@@ -135,7 +135,7 @@ public class DBLayerEvents {
         filter.setSchedulerId("");
         String select = "select id from " + DBItemOutCondition + " where schedulerId = :schedulerId";
         String hql = "delete from " + DBItemEvents + " e " + getWhere(filter) + " and e.outConditionId in ( " + select + ")";
- 
+
         int row = 0;
         Query<DBItemEvent> query = sosHibernateSession.createQuery(hql);
         filter.setSchedulerId(schedulerId);
@@ -146,8 +146,10 @@ public class DBLayerEvents {
 
     }
 
-    public void store(DBItemEvent itemEvent,FilterEvents filterEvents) throws SOSHibernateException {
-        delete(filterEvents);
+    public void store(DBItemEvent itemEvent, FilterEvents filterEvents) throws SOSHibernateException {
+        if (filterEvents != null) {
+            delete(filterEvents);
+        }
         sosHibernateSession.save(itemEvent);
     }
 
@@ -160,8 +162,6 @@ public class DBLayerEvents {
         int row = sosHibernateSession.executeUpdate(query);
         return row;
     }
-
-    
 
     public int updateEvents(Long oldId, Long newId) throws SOSHibernateException {
         String hql = "update " + DBItemEvents + " set outConditionId=" + newId + " where outConditionId=:oldId";
