@@ -13,9 +13,13 @@ import com.sos.jitl.checkhistory.JobHistory;
 import com.sos.jitl.checkhistory.JobSchedulerHistoryInfo;
 import com.sos.jitl.checkhistory.classes.HistoryDatabaseExecuter;
 import com.sos.jitl.restclient.WebserviceCredentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CheckHistoryCondition {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckHistoryCondition.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private static final String JOB_CHAIN = "job_chain";
     private static final String JOB = "job";
     private JobHistory jobHistory;
@@ -33,19 +37,20 @@ public class CheckHistoryCondition {
         checkHistoryCache = new HashMap<CheckHistoryKey, CheckHistoryValue>();
     }
 
-    public CheckHistoryValue validateJob(SOSHibernateSession sosHibernateSession, JSCondition jsCondition, String conditionJob, Integer taskReturnCode) throws Exception {
+    public CheckHistoryValue validateJob(SOSHibernateSession sosHibernateSession, JSCondition jsCondition, String conditionJob,
+            Integer taskReturnCode) throws Exception {
         String job = jsCondition.getConditionJob();
         if (job.isEmpty()) {
             job = conditionJob;
         } else {
             taskReturnCode = null;
         }
-        
+
         HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
         jobHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
 
         HistoryHelper jobHistoryHelper = new HistoryHelper();
-        
+
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
         String method = jobHistoryHelper.getMethodName(query);
         if ("rc".equalsIgnoreCase(method)) {
@@ -54,7 +59,7 @@ public class CheckHistoryCondition {
 
         CheckHistoryValue validateResult = null;
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, job, jsCondition.getConditionQuery().toLowerCase());
-        if (jsCondition.getConditionJob().isEmpty() && taskReturnCode != null && ("returncode".equals(method) )) {
+        if (jsCondition.getConditionJob().isEmpty() && taskReturnCode != null && ("returncode".equals(method))) {
         } else {
             validateResult = getCache(checkHistoryKey);
         }
@@ -68,17 +73,23 @@ public class CheckHistoryCondition {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
             } else {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("validating job %s with: %s ", job, query));
+                }
                 validateResult = new CheckHistoryValue(jobHistoryInfo.queryHistory(query), jsCondition);
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("validating result",validateResult.getValidateResult()));
+                }
             }
             if ((jsCondition.getConditionJob().isEmpty() && taskReturnCode != null) || "returncode".equalsIgnoreCase(method)) {
-             } else {
+            } else {
                 putCache(checkHistoryKey, validateResult);
             }
         }
         return validateResult;
     }
 
-    public CheckHistoryValue validateJobChain(SOSHibernateSession sosHibernateSession,JSCondition jsCondition) throws Exception {
+    public CheckHistoryValue validateJobChain(SOSHibernateSession sosHibernateSession, JSCondition jsCondition) throws Exception {
         String jobChain = jsCondition.getConditionJobChain();
         jobChain = jobChain.replace('[', '(').replace(']', ')');
 
@@ -88,7 +99,14 @@ public class CheckHistoryCondition {
             HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
             jobChainHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
             JobSchedulerHistoryInfo jobChainHistoryInfo = jobChainHistory.getJobChainInfo(jobChain);
-            validateResult = new CheckHistoryValue(jobChainHistoryInfo.queryHistory(jsCondition.getConditionQuery()), jsCondition);
+            String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("validating job chain %s with: %s ", jobChain, query));
+            }
+            validateResult = new CheckHistoryValue(jobChainHistoryInfo.queryHistory(query), jsCondition);
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("validating result",validateResult.getValidateResult()));
+            }
             checkHistoryCache.put(checkHistoryKey, validateResult);
         }
         return validateResult;

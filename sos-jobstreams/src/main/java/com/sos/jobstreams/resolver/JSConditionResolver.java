@@ -405,7 +405,7 @@ public class JSConditionResolver {
                 List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
                 for (JSCondition jsCondition : listOfConditions) {
                     try {
-                        switch (jsCondition.getConditionType()) {
+                        switch (jsCondition.getConditionType().toLowerCase()) {
                         case JOB: {
                             checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, outCondition.getJob(), 0);
                             break;
@@ -423,6 +423,18 @@ public class JSConditionResolver {
         }
     }
 
+    private String expressionPrepare(String e) {
+        return e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ", "###|||###")
+                .replaceAll("not ", "###!!!###");
+    }
+
+    private String expressionBack(String e) {
+         return e.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll(
+                 "\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll(
+                         "\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
+
+     }
+
     public boolean validate(Integer taskReturnCode, IJSCondition condition) {
         String expressionValue = condition.getExpression() + " ";
         JSConditions jsConditions = new JSConditions();
@@ -436,7 +448,10 @@ public class JSConditionResolver {
             case "returncode": {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
-                    expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ", "true ");
+                    expressionValue = this.expressionPrepare(expressionValue);
+                    //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
+                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    expressionValue = this.expressionBack(expressionValue);
                 }
 
                 break;
@@ -458,7 +473,10 @@ public class JSConditionResolver {
                 }
                 if (f.exists()) {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
-                    expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ", "true ");
+                    expressionValue = this.expressionPrepare(expressionValue);
+                    //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
+                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    expressionValue = this.expressionBack(expressionValue);
                 } else {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " does not exist");
                 }
@@ -468,8 +486,11 @@ public class JSConditionResolver {
             case JOB: {
                 try {
                     if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
-                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
-                                "true ");
+                        expressionValue = this.expressionPrepare(expressionValue);
+                        //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(),                                "true");
+                        expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                        expressionValue = this.expressionBack(expressionValue);
+
                     }
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
@@ -479,8 +500,12 @@ public class JSConditionResolver {
             case JOB_CHAIN: {
                 try {
                     if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
-                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam() + " ",
-                                "true ");
+                        expressionValue = this.expressionPrepare(expressionValue);
+                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(),
+                                "true");
+                        expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                        expressionValue = this.expressionBack(expressionValue);
+
                     }
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
@@ -507,12 +532,9 @@ public class JSConditionResolver {
                 jsEventKey.setSession(eventDate.getEventDate(date));
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
-                    expressionValue = expressionValue.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###")
-                            .replaceAll(" or ", "###|||###").replaceAll("not ", "###!!!###");
-                    expressionValue = expressionValue.replace(jsCondition.getConditonValue(), "true");
-                    expressionValue = expressionValue.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll(
-                            "\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll(
-                                    "\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
+                    expressionValue = this.expressionPrepare(expressionValue);
+                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    expressionValue = this.expressionBack(expressionValue);
                 }
 
                 break;

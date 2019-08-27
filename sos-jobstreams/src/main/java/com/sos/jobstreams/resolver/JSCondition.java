@@ -7,7 +7,7 @@ public class JSCondition {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JSCondition.class);
 
-	private String conditionType;
+    private String conditionType;
 	private String conditionParam;
 	private String conditionJobStream;
 	private String conditionDate;
@@ -78,8 +78,8 @@ public class JSCondition {
 	private String getConditionTypeParam(String condition) {
 	    String[] s = condition.split(":");
 	    if (s.length > 1) {
-	        String type = condition.replaceAll(s[0] + ":","");
-	        return type;
+	        String param = condition.replaceAll(s[0] + ":","");
+	        return param;
 	    }else {
 	        return s[0];
 	    }
@@ -122,7 +122,7 @@ public class JSCondition {
 		return conditionDate;
 	}
 
-	public String getConditonValue() {
+	public String getConditionValue() {
 		return conditionValue;
 	}
 
