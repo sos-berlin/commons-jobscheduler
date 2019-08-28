@@ -16,6 +16,7 @@ import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateLockAcquisitionException;
 
 import sos.util.SOSString;
@@ -42,6 +43,17 @@ public class SOSHibernate {
                 return (SOSHibernateLockAcquisitionException) e;
             } else if (e instanceof LockAcquisitionException) {
                 return (LockAcquisitionException) e;
+            }
+            e = e.getCause();
+        }
+        return null;
+    }
+
+    public static Exception findInvalidSessionException(Exception cause) {
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof SOSHibernateInvalidSessionException) {
+                return (SOSHibernateInvalidSessionException) e;
             }
             e = e.getCause();
         }
