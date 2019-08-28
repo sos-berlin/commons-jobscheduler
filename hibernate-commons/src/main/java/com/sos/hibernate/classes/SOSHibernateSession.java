@@ -316,7 +316,9 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
-        debugObject("delete", item, null);
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, "delete"), SOSHibernate.toString(item)));
+        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -885,7 +887,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
-        debugObject("refresh", item, "entityName=" + entityName);
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -901,6 +902,9 @@ public class SOSHibernateSession implements Serializable {
                 } else {
                     session.refresh(entityName, item);
                 }
+            }
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, "refresh"), SOSHibernate.toString(item)));
             }
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateObjectOperationException(e, item));
@@ -949,7 +953,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
-        debugObject("save", item, null);
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -958,6 +961,9 @@ public class SOSHibernateSession implements Serializable {
                 Session session = ((Session) currentSession);
                 session.save(item);
                 session.flush();
+            }
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, "save"), SOSHibernate.toString(item)));
             }
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateObjectOperationException(e, item));
@@ -990,17 +996,25 @@ public class SOSHibernateSession implements Serializable {
                 }
                 Object dbItem = get(item.getClass(), (Serializable) id);
                 if (dbItem == null) {
-                    debugObject(method, item, "insert");
                     session.insert(item);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, method + " insert"), SOSHibernate.toString(
+                                item)));
+                    }
                 } else {
-                    debugObject(method, item, "update");
                     session.update(item);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, method + " update"), SOSHibernate.toString(
+                                item)));
+                    }
                 }
             } else {
-                debugObject(method, item, null);
                 Session session = ((Session) currentSession);
                 session.saveOrUpdate(item);
                 session.flush();
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, method), SOSHibernate.toString(item)));
+                }
             }
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateObjectOperationException(e, item));
@@ -1095,7 +1109,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new SOSHibernateInvalidSessionException("currentSession is NULL");
         }
-        debugObject("update", item, null);
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -1104,6 +1117,9 @@ public class SOSHibernateSession implements Serializable {
                 Session session = ((Session) currentSession);
                 session.update(item);
                 session.flush();
+            }
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("%s%s", SOSHibernate.getMethodName(logIdentifier, "update"), SOSHibernate.toString(item)));
             }
         } catch (IllegalStateException e) {
             throwException(e, new SOSHibernateObjectOperationException(e, item));
@@ -1264,19 +1280,6 @@ public class SOSHibernateSession implements Serializable {
                     sb.append("]");
                 }
             }
-            if (infos != null) {
-                sb.append(infos);
-            }
-            LOGGER.debug(sb.toString());
-        }
-    }
-
-    private void debugObject(String method, Object item, String infos) {
-        if (isDebugEnabled) {
-            StringBuilder sb = new StringBuilder(SOSHibernate.getMethodName(logIdentifier, method));
-            sb.append("[");
-            sb.append(SOSHibernateFactory.toString(item));
-            sb.append("]");
             if (infos != null) {
                 sb.append(infos);
             }
