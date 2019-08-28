@@ -80,7 +80,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
 
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
-            conditionResolver.init(null);
+            conditionResolver.init();
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -140,7 +140,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
 
             if (conditionResolver == null) {
                 conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
-                conditionResolver.init(null);
+                conditionResolver.init();
             } else {
                 conditionResolver.setReportingSession(sosHibernateSession);
             }

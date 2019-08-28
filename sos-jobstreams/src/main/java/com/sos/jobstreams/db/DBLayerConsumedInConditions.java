@@ -99,8 +99,7 @@ public class DBLayerConsumedInConditions {
             throws SOSHibernateException {
 
         String q = "select c from " + DBItemInCondition + " i, " + DBItemConsumedInCondition + " c " + getWhere(filter) + " and i.id=c.inConditionId";
-        LOGGER.debug("ConsumedInConditions sql: " + q);
-        
+      
         Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 
@@ -115,7 +114,6 @@ public class DBLayerConsumedInConditions {
 
         String q = "select c from " + DBItemConsumedInCondition + " c, " + DBItemInCondition
                 + " i where i.schedulerId=:schedulerId and c.inConditionId = i.id and c.session=:session and i.job=:job";
-        LOGGER.debug("ConsumedInConditions sql: " + q);
         Query<DBItemConsumedInCondition> query = sosHibernateSession.createQuery(q);
         query.setParameter("schedulerId", filter.getJobSchedulerId());
         query.setParameter("session", filter.getSession());

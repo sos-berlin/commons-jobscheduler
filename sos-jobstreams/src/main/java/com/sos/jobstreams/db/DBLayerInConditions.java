@@ -79,7 +79,6 @@ public class DBLayerInConditions {
 		String q = "select new com.sos.jobstreams.db.DBItemInConditionWithCommand(i,c) from "
 				+ DBItemInCondition + " i, " + DBItemInConditionCommand + " c " + getWhere(filter)
 				+ " and i.id=c.inConditionId";
-		LOGGER.debug("InConditions sql: " + q);
 		Query<DBItemInConditionWithCommand> query = sosHibernateSession.createQuery(q);
 		query = bindParameters(filter, query);
 
@@ -92,7 +91,6 @@ public class DBLayerInConditions {
 	public List<DBItemInCondition> getSimpleInConditionsList(FilterInConditions filter, final int limit)
 			throws SOSHibernateException {
 		String q = "  from " + DBItemInCondition + " i  " + getWhere(filter);
-		LOGGER.debug("InConditions sql: " + q);
 		Query<DBItemInCondition> query = sosHibernateSession.createQuery(q);
 		query = bindParameters(filter, query);
 

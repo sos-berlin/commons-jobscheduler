@@ -82,7 +82,6 @@ public class DBLayerOutConditions {
     public List<DBItemOutConditionWithEvent> getOutConditionsList(FilterOutConditions filter, final int limit) throws SOSHibernateException {
         String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, "
                 + DBItemOutConditionEvent + " e " + getWhere(filter) + " and o.id=e.outConditionId";
-        LOGGER.debug("OutConditions sql: " + q);
         Query<DBItemOutConditionWithEvent> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 
@@ -94,7 +93,6 @@ public class DBLayerOutConditions {
 
     public List<DBItemOutCondition> getSimpleOutConditionsList(FilterOutConditions filter, final int limit) throws SOSHibernateException {
         String q = " from " + DBItemOutCondition + " o " + getWhere(filter);
-        LOGGER.debug("OutConditions sql: " + q);
         Query<DBItemOutCondition> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 

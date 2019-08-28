@@ -44,8 +44,10 @@
 
 
 		<dependency>
-			<groupId>com.sos-berlin.jobscheduler.engine</groupId>
+			<groupId>com.sos-berlin.jobscheduler.engine</groupId>		
 			<artifactId>engine-kernel</artifactId>
+			<scope>provided</scope>
+			
 		</dependency>
 
 

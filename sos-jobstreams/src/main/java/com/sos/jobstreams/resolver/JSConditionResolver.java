@@ -48,6 +48,8 @@ import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import sos.util.SOSString;
+
 public class JSConditionResolver {
 
     private static final String JOB = "job";
@@ -91,19 +93,15 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
         jsJobOutConditions = null;
-        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         sosHibernateSession.beginTransaction();
-        jsEvents.storeQueuedEvents(dbLayerEvents);
         sosHibernateSession.commit();
-
-        Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
 
         jsEvents = null;
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
-        this.init(listOfQueuedEvents);
+        this.init();
     }
 
-    public void init(Map<JSEventKey, JSEvent> listOfQueuedEvents) throws SOSHibernateException {
+    public void init() throws SOSHibernateException {
         // synchronizeJobsWithFileSystem();
 
         DurationCalculator duration = new DurationCalculator();
@@ -322,7 +320,7 @@ public class JSConditionResolver {
             listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
         }
 
-        initEvents(listOfQueuedEvents);
+        initEvents();
         initCheckHistory();
         if (isDebugEnabled) {
             duration.end("Init JobStreams condition model ");
@@ -353,7 +351,7 @@ public class JSConditionResolver {
          */
     }
 
-    public void initEvents(Map<JSEventKey, JSEvent> listOfQueuedEvents) throws SOSHibernateException {
+    public void initEvents() throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::initEvents");
         if (jsEvents == null) {
             jsEvents = new JSEvents();
@@ -362,12 +360,6 @@ public class JSConditionResolver {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
-            if (listOfQueuedEvents != null && listOfQueuedEvents.size() > 0) {
-                jsEvents.addAll(listOfQueuedEvents);
-                if (isDebugEnabled) {
-                    LOGGER.debug(listOfQueuedEvents.size() + " added to event list from event queue with not stored events.");
-                }
-            }
         }
     }
 
@@ -429,11 +421,10 @@ public class JSConditionResolver {
     }
 
     private String expressionBack(String e) {
-         return e.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll(
-                 "\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ").replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll(
-                         "\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
+        return e.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll("\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ")
+                .replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
 
-     }
+    }
 
     public boolean validate(Integer taskReturnCode, IJSCondition condition) {
         String expressionValue = condition.getExpression() + " ";
@@ -449,7 +440,6 @@ public class JSConditionResolver {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
                     expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
                     expressionValue = this.expressionBack(expressionValue);
                 }
@@ -474,7 +464,6 @@ public class JSConditionResolver {
                 if (f.exists()) {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
                     expressionValue = this.expressionPrepare(expressionValue);
-                    //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(), "true");
                     expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
                     expressionValue = this.expressionBack(expressionValue);
                 } else {
@@ -487,7 +476,6 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        //expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(),                                "true");
                         expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
                         expressionValue = this.expressionBack(expressionValue);
 
@@ -501,8 +489,6 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        expressionValue = expressionValue.replace(jsCondition.getConditionType() + ":" + jsCondition.getConditionParam(),
-                                "true");
                         expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
                         expressionValue = this.expressionBack(expressionValue);
 
@@ -563,20 +549,29 @@ public class JSConditionResolver {
             LOGGER.debug("JSConditionResolve::resolveInConditions");
             for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
                 for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                    String logPrompt = "";
+                    if (isTraceEnabled) {
+                        logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream() + " Expression: " + inCondition
+                                .getExpression();
+                    }
                     if (!inCondition.isConsumed()) {
-                        String expression = inCondition.getJob() + ":" + inCondition.getExpression();
 
-                        LOGGER.trace("---InCondition expression is: " + expression);
+                        if (isTraceEnabled) {
+                            LOGGER.trace("---InCondition is: " + SOSString.toString(inCondition));
+                        }
                         if (validate(null, inCondition)) {
                             listOfValidatedInconditions.add(inCondition);
                             inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
                         } else {
-                            LOGGER.trace(expression + "evaluated to --> false");
+                            if (isTraceEnabled) {
+                                LOGGER.trace(logPrompt + " evaluated to --> false");
+                            }
                         }
                     } else {
-                        LOGGER.trace(inCondition.getExpression() + "-->already consumed");
+                        if (isTraceEnabled) {
+                            LOGGER.trace(logPrompt + "-->already consumed");
+                        }
                     }
-                    LOGGER.trace("");
                 }
             }
         }
@@ -667,16 +662,13 @@ public class JSConditionResolver {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            jsEvents.storeQueuedEvents(dbLayerEvents);
 
             dbLayerEvents.deleteEventsWithOutConditions(filter);
             sosHibernateSession.commit();
 
-            Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
-
             jsEvents = null;
 
-            initEvents(listOfQueuedEvents);
+            initEvents();
         } catch (
 
         Exception e) {
@@ -716,7 +708,6 @@ public class JSConditionResolver {
 
         try {
             sosHibernateSession.beginTransaction();
-            jsEvents.storeQueuedEvents(dbLayerEvents);
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();
         } catch (Exception e) {
@@ -724,10 +715,8 @@ public class JSConditionResolver {
             sosHibernateSession.rollback();
         }
 
-        Map<JSEventKey, JSEvent> listOfQueuedEvents = jsEvents.getListOfQueuedEvents();
-
         jsEvents = null;
-        initEvents(listOfQueuedEvents);
+        initEvents();
         LOGGER.debug(filterEvents.getEvent() + " removed");
 
     }
@@ -739,13 +728,17 @@ public class JSConditionResolver {
 
     public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception {
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
-        for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
-            checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
-            CheckHistoryValue validateResult = checkHistoryCondition.getCache(checkHistoryKey);
-            if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse() && !validateResult
-                    .getValidateResult()))) {
-                checkHistoryCondition.putCache(checkHistoryKey, null);
-                checkHistoryCondition.validateJob(sosHibernateSession, validateResult.getJsCondition(), jobPath, taskReturnCode);
+        if (listOfCheckHistoryChacheRules == null) {
+            LOGGER.warn("History not initialized");
+        } else {
+            for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
+                checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
+                CheckHistoryValue validateResult = checkHistoryCondition.getCache(checkHistoryKey);
+                if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse()
+                        && !validateResult.getValidateResult()))) {
+                    checkHistoryCondition.putCache(checkHistoryKey, null);
+                    checkHistoryCondition.validateJob(sosHibernateSession, validateResult.getJsCondition(), jobPath, taskReturnCode);
+                }
             }
         }
     }

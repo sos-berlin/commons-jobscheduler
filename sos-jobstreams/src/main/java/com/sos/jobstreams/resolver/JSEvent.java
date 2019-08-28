@@ -7,8 +7,6 @@ import com.sos.jobstreams.db.DBItemEvent;
 public class JSEvent {
 
     DBItemEvent itemEvent;
-    boolean storedInDatabase;
-
     
     public JSEventKey getKey() {
         JSEventKey jsEventKey = new JSEventKey();
@@ -19,7 +17,6 @@ public class JSEvent {
     }
 
     public void setItemEvent(DBItemEvent itemEvent) {
-        this.storedInDatabase = true;
         this.itemEvent = itemEvent;
     }
 
@@ -41,14 +38,6 @@ public class JSEvent {
 
     public Date getCreated() {
         return itemEvent.getCreated();
-    }
-
-    public boolean isStoredInDatabase() {
-        return storedInDatabase;
-    }
-    
-    public void setStoredInDatabase(boolean storedInDatabase) {
-        this.storedInDatabase = storedInDatabase;
     }
     
     public long getOutConditionId() {

@@ -94,7 +94,6 @@ public class DBLayerInConditionCommands {
 
     public List<DBItemInConditionCommand> getInConditionCommandsList______(FilterInConditionCommands filter, final int limit) throws SOSHibernateException {
         String q = " from " + DBItemInConditionCommand + getWhere(filter);
-        LOGGER.debug("InConditionCommands sql: " + q);
         Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 

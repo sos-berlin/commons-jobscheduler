@@ -53,7 +53,7 @@ public class TestEvents {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings );
-        expressionResolver.init(null);
+        expressionResolver.init();
         expressionResolver.resolveInConditions();
     }
 

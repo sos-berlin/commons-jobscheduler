@@ -55,7 +55,7 @@ public class TestInConditionResolver {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);
-        conditionResolver.init(null);
+        conditionResolver.init();
         conditionResolver.resolveInConditions();
       //  conditionResolver.resolveOutConditions();
     }
@@ -66,7 +66,7 @@ public class TestInConditionResolver {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);
-        conditionResolver.initEvents(null);
+        conditionResolver.initEvents();
     }
 
 }
