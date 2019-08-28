@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-import javax.servlet.ServletException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +52,7 @@ public class ConditionServletTest {
         try {
         } catch (Exception e) {
             LOGGER.error(String.format("[%s]%s", METHOD, e.toString()), e);
-            throw new ServletException(String.format("[%s]%s", METHOD, e.toString()), e);
+            throw new Exception(String.format("[%s]%s", METHOD, e.toString()), e);
         }
     }
 
