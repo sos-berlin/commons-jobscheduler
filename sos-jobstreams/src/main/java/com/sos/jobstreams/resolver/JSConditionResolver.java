@@ -658,7 +658,7 @@ public class JSConditionResolver {
     }
 
     public void removeEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeConsumedInconditions --> " + filter.getJobStream() + "." + filter.getJob());
+        LOGGER.debug("JSConditionResolve::removeEventsFromJobStream --> " + filter.getJobStream() + "." + filter.getJob());
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
