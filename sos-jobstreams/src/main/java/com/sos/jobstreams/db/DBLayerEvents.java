@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jobstreams.resolver.JSEvent;
 
 public class DBLayerEvents {
 
@@ -145,11 +146,15 @@ public class DBLayerEvents {
 
     }
 
-    public void store(DBItemEvent itemEvent, FilterEvents filterEvents) throws SOSHibernateException {
-        if (filterEvents != null) {
-            delete(filterEvents);
-        }
-        sosHibernateSession.save(itemEvent);
+    public void store(JSEvent event) throws SOSHibernateException {
+        FilterEvents filterEvents = new FilterEvents();
+        filterEvents.setEvent(event.getEvent());
+        filterEvents.setJobStream(event.getJobStream());
+        filterEvents.setOutConditionId(event.getOutConditionId());
+        filterEvents.setSession(event.getSession());
+        filterEvents.setSchedulerId(event.getSchedulerId());
+        delete(filterEvents);
+        sosHibernateSession.save(event.getItemEvent());
     }
 
     public int deleteEventsWithOutConditions(FilterEvents filterEvents) throws SOSHibernateException {

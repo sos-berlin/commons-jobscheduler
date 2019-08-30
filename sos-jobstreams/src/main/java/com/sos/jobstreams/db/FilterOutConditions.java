@@ -1,14 +1,16 @@
 package com.sos.jobstreams.db;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.sos.jobstreams.resolver.JSEventKey;
 
 public class FilterOutConditions {
 
     private String jobSchedulerId;
     private String job;
     private String jobStream;
-    private List<String> events;
+    private Set<JSEventKey> events;
 
     public String getJobSchedulerId() {
         return jobSchedulerId;
@@ -34,16 +36,15 @@ public class FilterOutConditions {
         this.jobStream = jobStream;
     }
 
-    public void addEvent(String event) {
+    public void addEvent(JSEventKey event) {
         if (events == null) {
-            events = new ArrayList<String>();
+            events = new HashSet<JSEventKey>();
         }
-        if (!events.contains(event)) {
-            events.add(event);
-        }
+        event.setSession("");
+        events.add(event);
     }
 
-    public List<String> getListOfEvents() {
+    public Set<JSEventKey> getListOfEvents() {
         return events;
     }
 }

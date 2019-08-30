@@ -123,6 +123,7 @@ public class DBLayerInConditions {
 	        delete(filterInConditions);
 
 			for (InCondition inCondition : jobInCondition.getInconditions()) {
+			    Long oldId = inCondition.getId();
 				DBItemInCondition dbItemInCondition = new DBItemInCondition();
 				String expression = inCondition.getConditionExpression().getExpression();
 				if (expression == null || expression.isEmpty()) {
@@ -135,8 +136,9 @@ public class DBLayerInConditions {
 				dbItemInCondition.setMarkExpression(inCondition.getMarkExpression());
 				dbItemInCondition.setCreated(new Date());
 				sosHibernateSession.save(dbItemInCondition);
-				dbLayerConsumedInConditions.updateConsumedInCondition(inCondition.getId(),dbItemInCondition.getId());
-				dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
+                dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
+				Long newId = dbItemInCondition.getId();
+				dbLayerConsumedInConditions.updateConsumedInCondition(oldId,newId);
 			}
 			
 			for (DBItemInCondition dbItemInCondition: listOfInCondititinos) {

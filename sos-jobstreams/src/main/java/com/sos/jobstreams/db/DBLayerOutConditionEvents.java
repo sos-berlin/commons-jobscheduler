@@ -1,7 +1,6 @@
 package com.sos.jobstreams.db;
 
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ public class DBLayerOutConditionEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBLayerOutConditionEvents.class);
     private static final String DBItemOutConditionEvent = DBItemOutConditionEvent.class.getSimpleName();
-    private static final String DBItemOutCondition = DBItemOutCondition.class.getSimpleName();
     private final SOSHibernateSession sosHibernateSession;
 
     public DBLayerOutConditionEvents(SOSHibernateSession session) {
@@ -58,21 +56,6 @@ public class DBLayerOutConditionEvents {
         return where;
     }
 
-    private String getDeleteWhere(FilterOutConditionEvents filter) {
-        String where = "";
-        String and = "";
-
-
-        if (filter.getJob() != null && !"".equals(filter.getJob())) {
-            where += and + " job = :job";
-            and = " and ";
-        }
-
-        where = " where " + where;
-        return where;
-    }    
-  
-    
     private <T> Query<T> bindParameters(FilterOutConditionEvents filter, Query<T> query) {
         if (filter.getCommand() != null && !"".equals(filter.getCommand())) {
             query.setParameter("command", filter.getCommand());
@@ -91,17 +74,6 @@ public class DBLayerOutConditionEvents {
 
     }
 
-    public List<DBItemOutConditionEvent> getOutConditionEventsList_______(FilterOutConditionEvents filter, final int limit) throws SOSHibernateException {
-        String q = " from " + DBItemOutConditionEvent + getWhere(filter);
-        Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(q);
-        query = bindParameters(filter, query);
-
-        if (limit > 0) {
-            query.setMaxResults(limit);
-        }
-        return sosHibernateSession.getResultList(query);
-    }
-
     public int delete(FilterOutConditionEvents filterConditionEvents) throws SOSHibernateException {
         String hql = "delete from " + DBItemOutConditionEvent + " i " + getWhere(filterConditionEvents);
         int row = 0;
@@ -111,17 +83,6 @@ public class DBLayerOutConditionEvents {
         row = sosHibernateSession.executeUpdate(query);
         return row;
     }
-    
-    public int deleteEventsWithOutConditions(FilterOutConditionEvents filterOutConditionEvents) throws SOSHibernateException {
-        String select = "select id from " +  DBItemOutCondition + getDeleteWhere(filterOutConditionEvents);
-
-        String hql = "delete from " + DBItemOutConditionEvent + " where outConditionId in ( " + select + ")";
-        Query<DBItemOutConditionEvent> query = sosHibernateSession.createQuery(hql);
-        bindParameters(filterOutConditionEvents, query);
-        int row = sosHibernateSession.executeUpdate(query);
-        return row;
-    }
-
 
     public void deleteInsert(DBItemOutCondition dbItemOutCondition, OutCondition outCondition) throws SOSHibernateException {
         FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();
@@ -137,4 +98,5 @@ public class DBLayerOutConditionEvents {
             sosHibernateSession.save(dbItemOutConditionEvent);
         }
     }
+
 }

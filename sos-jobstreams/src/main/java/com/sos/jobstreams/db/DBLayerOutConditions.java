@@ -2,14 +2,15 @@ package com.sos.jobstreams.db;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jobstreams.resolver.JSEventKey;
 import com.sos.joc.model.jobstreams.JobOutCondition;
 import com.sos.joc.model.jobstreams.OutCondition;
 import com.sos.joc.model.jobstreams.OutConditions;
@@ -37,6 +38,22 @@ public class DBLayerOutConditions {
         return filter;
     }
 
+    public String getEventListSql(Set<JSEventKey> list) {
+        StringBuilder sql = new StringBuilder();
+
+        for (JSEventKey s : list) {
+            if (s.getJobStream().isEmpty()) {
+                sql.append("e.event = " + "'" + s.getEvent() + "'").append(" or ");
+            } else {
+                sql.append("(e.event = " + "'" + s.getEvent() + "'").append(" and ").append("o.jobStream = " + "'" + s.getJobStream() + "')").append(
+                        " or ");
+            }
+        }
+        sql.append("1=0");
+
+        return " (" + sql.toString() + ") ";
+    }
+
     private String getWhere(FilterOutConditions filter) {
         String where = "";
         String and = "";
@@ -57,7 +74,7 @@ public class DBLayerOutConditions {
         }
 
         if (filter.getListOfEvents() != null && filter.getListOfEvents().size() > 0) {
-            where += and + SearchStringHelper.getStringListPathSql(filter.getListOfEvents(), "e.event");
+            where += and + getEventListSql(filter.getListOfEvents());
         }
 
         where = "where 1=1 " + and + where;
@@ -80,8 +97,8 @@ public class DBLayerOutConditions {
     }
 
     public List<DBItemOutConditionWithEvent> getOutConditionsList(FilterOutConditions filter, final int limit) throws SOSHibernateException {
-        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, "
-                + DBItemOutConditionEvent + " e " + getWhere(filter) + " and o.id=e.outConditionId";
+        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemOutConditionEvent
+                + " e " + getWhere(filter) + " and o.id=e.outConditionId";
         Query<DBItemOutConditionWithEvent> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 
@@ -132,17 +149,16 @@ public class DBLayerOutConditions {
                 String expression = outCondition.getConditionExpression().getExpression();
                 if (expression == null || expression.isEmpty()) {
                     expression = "false";
-                } 
+                }
                 dbItemOutCondition.setExpression(expression);
                 dbItemOutCondition.setJob(jobOutCondition.getJob());
                 dbItemOutCondition.setSchedulerId(outConditions.getJobschedulerId());
                 dbItemOutCondition.setJobStream(outCondition.getJobStream());
                 dbItemOutCondition.setCreated(new Date());
                 sosHibernateSession.save(dbItemOutCondition);
+                dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
                 Long newId = dbItemOutCondition.getId();
                 dbLayerEvents.updateEvents(oldId, newId);
-                dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
-
             }
             for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
                 FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();

@@ -53,22 +53,17 @@ public class TestEventsDb {
         SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
         sosHibernateSession.setAutoCommit(false);
 
-        DBItemEvent itemEvent = new DBItemEvent();
         JSEvent event = new JSEvent();
-        itemEvent.setCreated(new Date());
-        itemEvent.setEvent("test");
-        itemEvent.setSession("now");
-        event.setItemEvent(itemEvent);
 
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            FilterEvents filter = new FilterEvents();
-            filter.setOutConditionId(itemEvent.getOutConditionId());
-            filter.setEvent(itemEvent.getEvent());
-            filter.setSession(itemEvent.getSession());
-            filter.setJobStream(itemEvent.getJobStream());
-            dbLayerEvents.store(itemEvent,filter);
+
+            event.setCreated(new Date());
+            event.setEvent("test");
+            event.setSession("08.22");
+            event.setJobStream("myStream");
+
+            dbLayerEvents.store(event);
             sosHibernateSession.commit();
         } catch (Exception e) {
             sosHibernateSession.rollback();

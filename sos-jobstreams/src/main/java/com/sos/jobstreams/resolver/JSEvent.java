@@ -6,14 +6,30 @@ import com.sos.jobstreams.db.DBItemEvent;
 
 public class JSEvent {
 
-    DBItemEvent itemEvent;
     
+    
+    public DBItemEvent getItemEvent() {
+        return itemEvent;
+    }
+
+    public String getSchedulerId() {
+        return schedulerId;
+    }
+
+    DBItemEvent itemEvent;
+    private String schedulerId;
+
     public JSEventKey getKey() {
         JSEventKey jsEventKey = new JSEventKey();
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
         jsEventKey.setJobStream(itemEvent.getJobStream());
         return jsEventKey;
+    }
+
+    public JSEvent() {
+        super();
+        itemEvent = new DBItemEvent();
     }
 
     public void setItemEvent(DBItemEvent itemEvent) {
@@ -39,9 +55,33 @@ public class JSEvent {
     public Date getCreated() {
         return itemEvent.getCreated();
     }
-    
+
     public long getOutConditionId() {
         return itemEvent.getOutConditionId();
+    }
+
+    public void setCreated(Date created) {
+        itemEvent.setCreated(created);
+    }
+
+    public void setEvent(String event) {
+        itemEvent.setEvent(event);
+    }
+
+    public void setSession(String session) {
+        itemEvent.setSession(session);
+    }
+
+    public void setJobStream(String jobStream) {
+        itemEvent.setJobStream(jobStream);
+    }
+
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
+    }
+
+    public void setOutConditionId(Long outConditionId) {
+        itemEvent.setOutConditionId(outConditionId);
     }
 
 }

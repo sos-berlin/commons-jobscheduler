@@ -76,15 +76,18 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         boolean ok = false;
 
         try {
+
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            JSEvent event = new JSEvent();
+            event.setCreated(new Date());
+            event.setEvent(itemEvent.getEvent());
+            event.setSession(itemEvent.getSession());
+            event.setJobStream(itemEvent.getJobStream());
+            event.setSchedulerId(this.jobSchedulerId);
+            event.setOutConditionId(itemEvent.getOutConditionId());
+
             sosHibernateSession.beginTransaction();
-            FilterEvents filter = new FilterEvents();
-            filter.setSchedulerId(this.jobSchedulerId);
-            filter.setOutConditionId(itemEvent.getOutConditionId());
-            filter.setEvent(itemEvent.getEvent());
-            filter.setSession(itemEvent.getSession());
-            filter.setJobStream(itemEvent.getJobStream());
-            dbLayerEvents.store(itemEvent, filter);
+            dbLayerEvents.store(event);
             sosHibernateSession.commit();
             ok = true;
         } catch (Exception e) {
@@ -113,7 +116,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
-        
+
         return ok;
 
     }

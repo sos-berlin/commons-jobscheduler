@@ -2,6 +2,7 @@ package com.sos.jobstreams.plugins;
 
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.util.Date;
 import java.util.List;
 
 import javax.json.JsonArray;
@@ -24,6 +25,7 @@ import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.JobSchedulerEvent;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.TaskEndEvent;
+import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jobstreams.db.FilterEvents;
 import com.sos.jobstreams.resolver.JSConditionResolver;
@@ -45,7 +47,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     JSConditionResolver conditionResolver;
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated ,EventRemoved
+        InconditionValidated, EventCreated, EventRemoved
     }
 
     public static enum CustomEventTypeValue {
@@ -64,7 +66,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     public void onActivate(PluginMailer mailer) {
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
-        
 
         super.onActivate(mailer);
 
@@ -83,7 +84,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
             conditionResolver.init();
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
-
 
         } catch (Exception e) {
             conditionResolver = null;
@@ -145,7 +145,6 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                 conditionResolver.setReportingSession(sosHibernateSession);
             }
 
-
             if (!Constants.getSession().equals(this.session)) {
                 try {
                     this.session = Constants.getSession();
@@ -167,15 +166,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                     FilterEvents filterEvents = null;
 
                     switch (jobSchedulerEvent.getType()) {
-
-                    case "FileBasedRemoved_deactivated":
-                        /*
-                         * Remove job from condition tables. FileBaseRemovedEvent fileBaseRemoveEvent = new FileBaseRemovedEvent((JsonObject) entry);
-                         * conditionResolver.removeJob(fileBaseRemoveEvent.getJob()); try { conditionResolver.reInit(); } catch (SOSHibernateException e) {
-                         * LOGGER.warn("Could not reeint EventHandler after deleting jobs: " + e.getMessage()); }
-                         */
-
-                        break;
+                  
                     case "OrderFinished":
                         LOGGER.debug("OrderFinished event to be executed");
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
@@ -187,14 +178,14 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
                         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-                         conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
-                                taskEndEvent.getJobPath());
-                         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
-                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
-                         }
-                         for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
-                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
-                         }
+                        conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
+                                .getJobPath());
+                        for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                        }
+                        for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+                        }
                         resolveInConditions = true;
                         break;
 
@@ -214,30 +205,35 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             break;
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "AddEvent --> " + customEvent.getEvent());
-                            filterEvents = new FilterEvents();
-                            filterEvents.setSchedulerId(super.getSettings().getSchedulerId());
-                            filterEvents.setSession(customEvent.getSession());
-                            filterEvents.setJobStream(customEvent.getJobStream());
-                            filterEvents.setEvent(customEvent.getEvent());
+
+                            JSEvent event = new JSEvent();
+                            event.setCreated(new Date());
+                            event.setEvent(customEvent.getEvent());
+                            event.setSession(customEvent.getSession());
+                            event.setJobStream(customEvent.getJobStream());
+                            event.setSchedulerId(super.getSettings().getSchedulerId());
+
                             try {
-                                filterEvents.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
+                                event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
                             } catch (NumberFormatException e) {
-                                LOGGER.warn("could not add event " + filterEvents.getEvent() + ": NumberFormatException with -> " + filterEvents
+                                LOGGER.warn("could not add event " + event.getEvent() + ": NumberFormatException with -> " + event
                                         .getOutConditionId());
                             }
 
-                            conditionResolver.addEvent(filterEvents);
+                            conditionResolver.addEvent(event);
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
 
                             break;
                         case "RemoveEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "RemoveEvent -->" + customEvent.getEvent());
-                            filterEvents = new FilterEvents();
 
-                            filterEvents.setSchedulerId(super.getSettings().getSchedulerId());
-                            filterEvents.setSession(customEvent.getSession());
-                            filterEvents.setEvent(customEvent.getEvent());
-                            conditionResolver.removeEvent(filterEvents);
+                            event = new JSEvent();
+                            event.setCreated(new Date());
+                            event.setEvent(customEvent.getEvent());
+                            event.setSession(customEvent.getSession());
+                            event.setSchedulerId(super.getSettings().getSchedulerId());
+
+                            conditionResolver.removeEvent(event);
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
                             break;
@@ -263,7 +259,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
                             break;
                         }
                         break;
-                        default: LOGGER.debug(jobSchedulerEvent.getType() + " skipped");
+                    default:
+                        LOGGER.debug(jobSchedulerEvent.getType() + " skipped");
                     }
                 }
             }

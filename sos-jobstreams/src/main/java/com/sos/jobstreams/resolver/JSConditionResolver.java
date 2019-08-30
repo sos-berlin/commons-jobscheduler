@@ -8,10 +8,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +33,11 @@ import com.sos.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jobstreams.db.DBLayerEvents;
-import com.sos.jobstreams.db.DBLayerInConditionCommands;
 import com.sos.jobstreams.db.DBLayerInConditions;
-import com.sos.jobstreams.db.DBLayerOutConditionEvents;
 import com.sos.jobstreams.db.DBLayerOutConditions;
 import com.sos.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jobstreams.db.FilterEvents;
-import com.sos.jobstreams.db.FilterInConditionCommands;
 import com.sos.jobstreams.db.FilterInConditions;
-import com.sos.jobstreams.db.FilterOutConditionEvents;
 import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
@@ -102,8 +96,8 @@ public class JSConditionResolver {
     }
 
     public void init() throws SOSHibernateException {
-        // synchronizeJobsWithFileSystem();
 
+        LOGGER.debug("JSConditionResolver::Init");
         DurationCalculator duration = new DurationCalculator();
 
         if (jsJobInConditions == null) {
@@ -331,26 +325,7 @@ public class JSConditionResolver {
 
     }
 
-    private void synchronizeJobsWithFileSystem() {
-        /*
-         * LinkedHashSet<String> listOfJobSchedulerJobs = new LinkedHashSet<String>(); LinkedHashSet<String> listOfJobStreamJobs = new LinkedHashSet<String>();
-         * DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession); DBLayerOutConditions dbLayerOutConditions = new
-         * DBLayerOutConditions(sosHibernateSession); FilterInConditions filterInConditions = new FilterInConditions(); FilterOutConditions filterOutConditions
-         * = new FilterOutConditions(); try { List<DBItemInConditionWithCommand> listOfInconditions =
-         * dbLayerInConditions.getInConditionsList(filterInConditions, 0); List<DBItemOutConditionWithEvent> listOfOutconditions =
-         * dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0); listOfInconditions.forEach(item -> {
-         * listOfJobStreamJobs.add(item.getDbItemInCondition().getJob()); }); listOfOutconditions.forEach(item -> { listOfJobStreamJobs.add(item.getJob()); });
-         * URL url; url = new URL(settings.getJocUrl() + "/jobs"); String body = "{\"jobschedulerId\":\"" + settings.getSchedulerId() +
-         * "\",\"compact\":true,\"isOrderJob\":false,\"compactView\":true}"; LOGGER.debug(url.toString()); LOGGER.debug(body); String answer =
-         * jobSchedulerRestApiClient.executeRestServiceCommand("post", url, body); JsonObject jsonJobs = jsonFromString(answer); JsonArray jobs =
-         * jsonJobs.getJsonArray("jobs"); if (jobs != null && jobs.size() > 0) { for (int i = 0; i < jobs.size(); i++) { JsonObject job = jobs.getJsonObject(i);
-         * if (job != null) { String jobName = job.getString("path"); listOfJobSchedulerJobs.add(jobName); } } } listOfJobStreamJobs.forEach(jobName -> { if
-         * (!listOfJobSchedulerJobs.contains(jobName)) { removeJob(jobName); } }); } catch (MalformedURLException e) {
-         * LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage()); } catch (SOSException e) {
-         * LOGGER.warn("Could not synchronize database with filesystem: " + e.getMessage()); }
-         */
-    }
-
+ 
     public void initEvents() throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::initEvents");
         if (jsEvents == null) {
@@ -610,22 +585,6 @@ public class JSConditionResolver {
         }
     }
 
-    public void resolveOutConditions() {
-        for (JSOutConditions jobOutConditions : jsJobOutConditions.getListOfJobOutConditions().values()) {
-            for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
-                String expression = outCondition.getJob() + ":" + outCondition.getExpression();
-
-                LOGGER.trace("---OutCondition: " + expression);
-                if (validate(null, outCondition)) {
-                    LOGGER.trace(expression + "-->true");
-                } else {
-                    LOGGER.trace(expression + "-->false");
-                }
-                LOGGER.trace("");
-            }
-        }
-    }
-
     public BooleanExp getBooleanExpression() {
         return booleanExpression;
     }
@@ -662,12 +621,10 @@ public class JSConditionResolver {
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-
             dbLayerEvents.deleteEventsWithOutConditions(filter);
             sosHibernateSession.commit();
 
             jsEvents = null;
-
             initEvents();
         } catch (
 
@@ -677,37 +634,35 @@ public class JSConditionResolver {
         }
     }
 
-    public void addEvent(FilterEvents filterEvents) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::addEvent --> " + filterEvents.getJobStream() + "." + filterEvents.getEvent());
-        JSEvent event = new JSEvent();
-        DBItemEvent itemEvent = new DBItemEvent();
-        itemEvent.setCreated(new Date());
-        itemEvent.setEvent(filterEvents.getEvent());
-        itemEvent.setOutConditionId(filterEvents.getOutConditionId());
-        itemEvent.setSession(filterEvents.getSession());
-        itemEvent.setJobStream(filterEvents.getJobStream());
-        event.setItemEvent(itemEvent);
+    public void addEvent(JSEvent event) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolve::addEvent --> " + event.getJobStream() + "." + event.getEvent());
+
         jsEvents.addEvent(event);
-        LOGGER.debug(filterEvents.getEvent() + " added");
+        LOGGER.debug(event.getEvent() + " added");
 
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(itemEvent, filterEvents);
+            dbLayerEvents.store(event);
             sosHibernateSession.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             sosHibernateSession.rollback();
         }
-        LOGGER.debug(filterEvents.getEvent() + " added in database");
+        LOGGER.debug(event.getEvent() + " added in database");
     }
 
-    public void removeEvent(FilterEvents filterEvents) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeEvent --> " + filterEvents.getJobStream() + "." + filterEvents.getEvent());
+    public void removeEvent(JSEvent event) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getJobStream() + "." + event.getEvent());
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
 
         try {
             sosHibernateSession.beginTransaction();
+            FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSchedulerId(event.getSchedulerId());
+            filterEvents.setEvent(event.getEvent());
+            filterEvents.setSession(event.getSession());
+
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();
         } catch (Exception e) {
@@ -717,7 +672,7 @@ public class JSConditionResolver {
 
         jsEvents = null;
         initEvents();
-        LOGGER.debug(filterEvents.getEvent() + " removed");
+        LOGGER.debug(event.getEvent() + " removed");
 
     }
 
@@ -741,62 +696,6 @@ public class JSConditionResolver {
                 }
             }
         }
-    }
-
-    public void removeJob(String job) {
-        FilterInConditions filterInConditions = new FilterInConditions();
-        FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
-        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-
-        filterConsumedInConditions.setJob(job);
-        filterInConditions.setJob(job);
-        filterInConditionCommands.setJob(job);
-
-        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-        DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
-        DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-        try {
-            sosHibernateSession.beginTransaction();
-            // try {
-            // dbLayerInConditionCommands.deleteCommandWithInConditions(filterInConditionCommands);
-            // dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
-            // dbLayerInConditions.delete(filterInConditions);
-            // } catch (SOSHibernateException e1) {
-            // LOGGER.warn("Could not delete jobs from EventHandler In-Conditions after
-            // deleting jobs from filesystem: " + e1.getMessage());
-            // }
-
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            DBLayerOutConditionEvents dbLayerOutConditionEvents = new DBLayerOutConditionEvents(sosHibernateSession);
-            DBLayerEvents dbEvents = new DBLayerEvents(sosHibernateSession);
-            FilterOutConditions filterOutConditions = new FilterOutConditions();
-            FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();
-            FilterEvents filterEvents = new FilterEvents();
-            filterOutConditions.setJob(job);
-            filterOutConditionEvents.setJob(job);
-            filterEvents.setJob(job);
-
-            // try {
-            // dbLayerOutConditionEvents.deleteEventsWithOutConditions(filterOutConditionEvents);
-            // dbEvents.deleteEventsWithOutConditions(filterEvents);
-            // dbLayerOutConditions.delete(filterOutConditions);
-            // } catch (SOSHibernateException e1) {
-            // LOGGER.warn("Could not delete jobs from EventHandler Out-Conditions after
-            // deleting jobs from filesystem: " + e1.getMessage());
-            // }
-            sosHibernateSession.commit();
-
-        } catch (SOSHibernateException e2) {
-            LOGGER.warn("Could not create transaction for deleting jobs from EventHandle after deleting jobs from filesystem: " + e2.getMessage());
-        } finally {
-            try {
-                sosHibernateSession.rollback();
-            } catch (SOSHibernateException e) {
-                LOGGER.warn("Could not rollback transaction for deleting jobs from EventHandle after deleting jobs from filesystem: " + e
-                        .getMessage());
-            }
-        }
-
     }
 
     public void setReportingSession(SOSHibernateSession reportingSession) {
