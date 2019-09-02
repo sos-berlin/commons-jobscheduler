@@ -31,9 +31,4 @@ public class JobStreamsPlugin extends LoopEventHandlerPlugin {
         super.onActivate(eventHandler);
     }
 
-    @Override
-    public void close() {
-        super.close(eventHandler);
-    }
-
 }
