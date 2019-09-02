@@ -2,12 +2,29 @@ package com.sos.jobstreams.resolver;
 
 import java.util.Date;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jobstreams.db.DBItemEvent;
+import com.sos.jobstreams.db.DBLayerEvents;
+import com.sos.jobstreams.db.FilterEvents;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sos.util.SOSString;
 
 public class JSEvent {
 
-    
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSConditionResolver.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+
+    public boolean isDbError() {
+        return dbError;
+    }
+
+    DBItemEvent itemEvent;
+    private String schedulerId;
+    private boolean dbError;
+
     public DBItemEvent getItemEvent() {
         return itemEvent;
     }
@@ -15,9 +32,6 @@ public class JSEvent {
     public String getSchedulerId() {
         return schedulerId;
     }
-
-    DBItemEvent itemEvent;
-    private String schedulerId;
 
     public JSEventKey getKey() {
         JSEventKey jsEventKey = new JSEventKey();
@@ -84,4 +98,48 @@ public class JSEvent {
         itemEvent.setOutConditionId(outConditionId);
     }
 
+    public void store(SOSHibernateSession sosHibernateSession) {
+        dbError = false;
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+        try {
+            sosHibernateSession.beginTransaction();
+            dbLayerEvents.store(this);
+            sosHibernateSession.commit();
+        } catch (SOSHibernateException e) {
+            dbError = true;
+            try {
+                sosHibernateSession.rollback();
+            } catch (SOSHibernateException e1) {
+                LOGGER.warn("Could not rollback the transaction while storing an event");
+            }
+            if (isDebugEnabled) {
+                LOGGER.debug("Could not store event: " + SOSString.toString(this));
+            }
+        }
+    }
+
+    public void deleteEvent(SOSHibernateSession sosHibernateSession) {
+        dbError = false;
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+
+        try {
+            sosHibernateSession.beginTransaction();
+            FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSchedulerId(this.getSchedulerId());
+            filterEvents.setEvent(this.getEvent());
+            filterEvents.setSession(this.getSession());
+
+            dbLayerEvents.delete(filterEvents);
+            sosHibernateSession.commit();
+
+        } catch (SOSHibernateException e) {
+            dbError = true;
+            LOGGER.error(e.getMessage(), e);
+            try {
+                sosHibernateSession.rollback();
+            } catch (SOSHibernateException e1) {
+                LOGGER.warn("Could not rollback the transaction while storing an event");
+            }
+        }
+    }
 }

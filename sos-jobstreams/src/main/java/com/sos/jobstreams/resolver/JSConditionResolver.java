@@ -325,7 +325,6 @@ public class JSConditionResolver {
 
     }
 
- 
     public void initEvents() throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::initEvents");
         if (jsEvents == null) {
@@ -573,7 +572,6 @@ public class JSConditionResolver {
                     if (validate(taskReturnCode, outCondition)) {
                         LOGGER.trace("create/remove events ------>");
                         outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
-
                     } else {
                         LOGGER.trace(expression + "-->false");
                     }
@@ -636,44 +634,20 @@ public class JSConditionResolver {
 
     public void addEvent(JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::addEvent --> " + event.getJobStream() + "." + event.getEvent());
-
+        this.newJsEvents = new JSEvents();
+        event.store(sosHibernateSession);
         jsEvents.addEvent(event);
+        newJsEvents.addEvent(event);
         LOGGER.debug(event.getEvent() + " added");
-
-        try {
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(event);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-        LOGGER.debug(event.getEvent() + " added in database");
     }
 
     public void removeEvent(JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getJobStream() + "." + event.getEvent());
-        DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-
-        try {
-            sosHibernateSession.beginTransaction();
-            FilterEvents filterEvents = new FilterEvents();
-            filterEvents.setSchedulerId(event.getSchedulerId());
-            filterEvents.setEvent(event.getEvent());
-            filterEvents.setSession(event.getSession());
-
-            dbLayerEvents.delete(filterEvents);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-
-        jsEvents = null;
-        initEvents();
+        this.removeJsEvents = new JSEvents();
+        removeJsEvents.addEvent(event);
+        event.deleteEvent(sosHibernateSession);
+        jsEvents.removeEvent(event);
         LOGGER.debug(event.getEvent() + " removed");
-
     }
 
     public Boolean eventExist(JSEventKey jsEventKey, String jobStream) {

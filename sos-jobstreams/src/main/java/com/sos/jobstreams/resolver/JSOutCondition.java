@@ -3,8 +3,12 @@ package com.sos.jobstreams.resolver;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.db.DBItemEvent;
@@ -15,12 +19,6 @@ import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
 
 import sos.util.SOSString;
-
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
@@ -69,58 +67,6 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public boolean storeOutConditionEvent(SOSHibernateSession sosHibernateSession, DBItemEvent itemEvent) throws SOSHibernateException {
-        sosHibernateSession.setAutoCommit(false);
-
-        LOGGER.debug("create event ------>" + SOSString.toString(itemEvent));
-        boolean ok = false;
-
-        try {
-
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            JSEvent event = new JSEvent();
-            event.setCreated(new Date());
-            event.setEvent(itemEvent.getEvent());
-            event.setSession(itemEvent.getSession());
-            event.setJobStream(itemEvent.getJobStream());
-            event.setSchedulerId(this.jobSchedulerId);
-            event.setOutConditionId(itemEvent.getOutConditionId());
-
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.store(event);
-            sosHibernateSession.commit();
-            ok = true;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            LOGGER.debug("event " + itemEvent.getEvent() + " added to EventQueue");
-            sosHibernateSession.rollback();
-        }
-        return ok;
-
-    }
-
-    public boolean deleteOutConditionEvent(SOSHibernateSession sosHibernateSession, FilterEvents filter) throws SOSHibernateException {
-        sosHibernateSession.setAutoCommit(false);
-
-        LOGGER.debug("delete event ------>" + SOSString.toString(filter));
-        boolean ok = false;
-        try {
-
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.delete(filter);
-            sosHibernateSession.commit();
-            ok = true;
-
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-
-        return ok;
-
-    }
-
     public void storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsAddEvents, JSEvents jsRemoveEvents)
             throws SOSHibernateException {
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
@@ -134,32 +80,22 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setSession(Constants.getSession());
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
+            event.setSchedulerId(jobSchedulerId);
 
             if (outConditionEvent.isCreateCommand()) {
-                boolean ok = storeOutConditionEvent(sosHibernateSession, itemEvent);
                 jsEvents.addEvent(event);
                 jsAddEvents.addEvent(event);
+                event.store(sosHibernateSession);
             } else {
                 if (outConditionEvent.isDeleteCommand()) {
                     JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
-
-                    FilterEvents filterEvent = new FilterEvents();
-                    filterEvent.setEvent(jsCondition.getEventName());
                     EventDate eventDate = new EventDate();
-                    filterEvent.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
-
-                    filterEvent.setSchedulerId(jobSchedulerId);
-                    filterEvent.setJobStream(jsCondition.getConditionJobStream());
-
-                    boolean ok = deleteOutConditionEvent(sosHibernateSession, filterEvent);
-
-                    JSEventKey eventKey = new JSEventKey();
-                    eventKey.setEvent(filterEvent.getEvent());
-                    eventKey.setSession(filterEvent.getSession());
-                    eventKey.setJobStream(filterEvent.getJobStream());
-                    event = jsEvents.getEvent(eventKey);
+                    event.setEvent(jsCondition.getEventName());
+                    event.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
+                    event.setJobStream(jsCondition.getConditionJobStream());
+                    event.deleteEvent(sosHibernateSession);
+                    jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);
-                    jsEvents.removeEvent(eventKey);
                 }
             }
         }

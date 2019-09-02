@@ -24,13 +24,12 @@ import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.JobSchedulerEvent;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
+import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.TaskEndEvent;
-import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jobstreams.db.FilterEvents;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSEvent;
-import com.sos.jobstreams.resolver.JSEvents;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
@@ -41,6 +40,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     public static final String CUSTOM_EVENT_KEY = JobSchedulerJobStreamsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
+    private QueuedEvents queuedEvents = new QueuedEvents();
 
     private int waitInterval = 2;
     private String session;
@@ -82,6 +82,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
             conditionResolver.init();
+            queuedEvents = new QueuedEvents();
+            
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -179,6 +181,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
                                 .getJobPath());
+                        queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
+                        queuedEvents.handleAddEventlistBuffer(conditionResolver.getRemoveJsEvents());
+
                         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
                         }
@@ -221,6 +226,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             conditionResolver.addEvent(event);
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
+                            queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
 
                             break;
                         case "RemoveEvent":
@@ -233,6 +239,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setSchedulerId(super.getSettings().getSchedulerId());
 
                             conditionResolver.removeEvent(event);
+                            queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
                             break;

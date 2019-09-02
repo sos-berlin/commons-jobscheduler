@@ -64,5 +64,15 @@ public class JSEvents {
         return null;
     }
 
+    public void removeEvent(JSEvent event) {
+        JSEventKey jsEventKey = new JSEventKey();
+        jsEventKey.setEvent(event.getEvent());
+        jsEventKey.setJobStream(event.getJobStream());
+        jsEventKey.setSession(event.getSession());
+        this.removeEvent(jsEventKey);
+        jsEventKey.setSession("*");
+        this.removeEvent(jsEventKey);
+    }
+
    
 }
