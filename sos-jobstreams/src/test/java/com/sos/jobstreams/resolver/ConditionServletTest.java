@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jobstreams.plugins.JobSchedulerJobStreamsEventHandler;
-import com.sos.jitl.classes.event.EventHandlerSettings;
-import com.sos.jitl.classes.plugin.PluginMailer;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.eventhandler.plugin.notifier.Mailer;
 
 public class ConditionServletTest {
 
@@ -43,7 +43,7 @@ public class ConditionServletTest {
             mailSettings.put("from","jobstream@sos-berlin.com");
             mailSettings.put("mail_on_error","1");
             mailSettings.put("mail.smtp.port","25");
-            PluginMailer mailer = new PluginMailer(eventHandler.getIdentifier(), mailSettings);
+            Mailer mailer = new Mailer(eventHandler.getIdentifier(), mailSettings);
             eventHandler.onActivate(mailer);
         } catch (Exception e) {
             throw e;

@@ -18,7 +18,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.reporting.db.DBLayer;
  
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
-import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 
 public class JSJobInConditions {
 

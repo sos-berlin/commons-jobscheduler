@@ -3,7 +3,7 @@ package com.sos.jobstreams.classes;
 import java.util.Calendar;
 
 import com.sos.hibernate.classes.ClassList;
-import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 
 public class Constants {
 

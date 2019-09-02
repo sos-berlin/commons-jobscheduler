@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.EventHandlerSettings;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
 import com.sos.jobstreams.classes.CheckHistoryCondition;

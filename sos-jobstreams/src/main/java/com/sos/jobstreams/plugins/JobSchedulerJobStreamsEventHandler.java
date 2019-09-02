@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.classes.event.JobSchedulerEvent.EventType;
-import com.sos.jitl.classes.event.JobSchedulerPluginEventHandler;
-import com.sos.jitl.classes.plugin.PluginMailer;
+import com.sos.jitl.eventhandler.EventMeta.EventType;
+import com.sos.jitl.eventhandler.handler.LoopEventHandler;
+import com.sos.jitl.eventhandler.plugin.notifier.Mailer;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
 import com.sos.jobstreams.classes.Constants;
@@ -35,7 +35,7 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
-public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventHandler {
+public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJobStreamsEventHandler.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
@@ -63,7 +63,7 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     }
 
     @Override
-    public void onActivate(PluginMailer mailer) {
+    public void onActivate(Mailer mailer) {
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
 
@@ -118,9 +118,8 @@ public class JobSchedulerJobStreamsEventHandler extends JobSchedulerPluginEventH
     }
 
     @Override
-    public void onEnded() {
+    public void onProcessingEnd(Long eventId) {
         LOGGER.debug("Shutdown plugin");
-        closeRestApiClient();
         closeReportingFactory();
         LOGGER.debug("Plugin closed");
     }

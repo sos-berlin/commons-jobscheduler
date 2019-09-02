@@ -2,13 +2,13 @@ package com.sos.jobstreams.plugins;
 
 import javax.inject.Inject;
 
-import com.sos.jitl.classes.plugin.JobSchedulerEventPlugin;
+import com.sos.jitl.eventhandler.plugin.LoopEventHandlerPlugin;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.Scheduler;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.scheduler.engine.kernel.variable.VariableSet;
 
-public class JobStreamsPlugin extends JobSchedulerEventPlugin {
+public class JobStreamsPlugin extends LoopEventHandlerPlugin {
 
     private final JobSchedulerJobStreamsEventHandler eventHandler;
 
@@ -28,12 +28,12 @@ public class JobStreamsPlugin extends JobSchedulerEventPlugin {
 
     @Override
     public void onActivate() {
-        super.executeOnActivate(eventHandler);
+        super.onActivate(eventHandler);
     }
 
     @Override
     public void close() {
-        super.executeClose(eventHandler);
+        super.close(eventHandler);
     }
 
 }
