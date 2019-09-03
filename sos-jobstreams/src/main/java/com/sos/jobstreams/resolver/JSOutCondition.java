@@ -67,8 +67,9 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public void storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsAddEvents, JSEvents jsRemoveEvents)
+    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsAddEvents, JSEvents jsRemoveEvents)
             throws SOSHibernateException {
+        boolean change = false;
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
             sosHibernateSession.setAutoCommit(false);
 
@@ -86,6 +87,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                 jsEvents.addEvent(event);
                 jsAddEvents.addEvent(event);
                 event.store(sosHibernateSession);
+                change = true;
             } else {
                 if (outConditionEvent.isDeleteCommand()) {
                     JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
@@ -96,9 +98,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     event.deleteEvent(sosHibernateSession);
                     jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);
+                    change = true;
                 }
             }
         }
+        return change;
     }
 
     public String getJobStream() {

@@ -552,8 +552,9 @@ public class JSConditionResolver {
         return listOfValidatedInconditions;
     }
 
-    public void resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
+    public boolean resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::resolveOutConditions for job:" + job);
+        boolean change = false;
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         this.newJsEvents = new JSEvents();
         this.removeJsEvents = new JSEvents();
@@ -571,7 +572,7 @@ public class JSConditionResolver {
                     LOGGER.trace("---OutCondition: " + expression);
                     if (validate(taskReturnCode, outCondition)) {
                         LOGGER.trace("create/remove events ------>");
-                        outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
+                        change = outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
                     } else {
                         LOGGER.trace(expression + "-->false");
                     }
@@ -581,6 +582,7 @@ public class JSConditionResolver {
                 LOGGER.debug("No out conditions for job: " + job + " found. Nothing to do");
             }
         }
+        return change;
     }
 
     public BooleanExp getBooleanExpression() {

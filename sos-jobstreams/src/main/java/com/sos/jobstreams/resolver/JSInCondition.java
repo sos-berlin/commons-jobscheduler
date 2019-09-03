@@ -1,112 +1,134 @@
 package com.sos.jobstreams.resolver;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSInvalidDataException;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jobstreams.classes.Constants;
+import com.sos.jobstreams.classes.JobStreamCalendar;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemInCondition;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
+import com.sos.jobstreams.db.FilterCalendarUsage;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
-	private DBItemInCondition itemInCondition;
-	private List<JSInConditionCommand> listOfInConditionCommands;
-	private boolean consumed;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
+    private DBItemInCondition itemInCondition;
+    private List<JSInConditionCommand> listOfInConditionCommands;
+    private boolean consumed;
     private String normalizedJob;
+    private Set<LocalDateTime> listOfDates;
 
-	public JSInCondition() {
-		super();
-		this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
-	}
+    public JSInCondition() {
+        super();
+        this.listOfDates = new HashSet<LocalDateTime>();
+        this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
+    }
 
-	
-	   private String normalizePath(String path) {
-	        if (path == null) {
-	            return null;
-	        }
-	        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
-	    }
-	   
-	public void setItemInCondition(DBItemInCondition itemInCondition) {
-		this.itemInCondition = itemInCondition;
-		this.normalizedJob  = normalizePath(itemInCondition.getJob());
-	}
+    private String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+    }
 
-	public Long getId() {
-		return itemInCondition.getId();
-	}
+    public void setItemInCondition(DBItemInCondition itemInCondition) {
+        this.itemInCondition = itemInCondition;
+        this.normalizedJob = normalizePath(itemInCondition.getJob());
+    }
 
-	
+    public Long getId() {
+        return itemInCondition.getId();
+    }
+
     public String getNormalizedJob() {
         return normalizedJob;
     }
 
-
     public String getJobSchedulerId() {
-		return itemInCondition.getSchedulerId();
-	}
+        return itemInCondition.getSchedulerId();
+    }
 
-	public String getJob() {
-		return itemInCondition.getJob();
-	}
+    public String getJob() {
+        return itemInCondition.getJob();
+    }
 
-	public String getExpression() {
-		return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") + " ";
-	}
+    public String getExpression() {
+        return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") + " ";
+    }
 
-	public String getJobStream() {
-		return itemInCondition.getJobStream();
-	}
+    public String getJobStream() {
+        return itemInCondition.getJobStream();
+    }
 
-	public boolean isMarkExpression() {
-		return itemInCondition.getMarkExpression();
-	}
+    public boolean isMarkExpression() {
+        return itemInCondition.getMarkExpression();
+    }
 
-	public void addCommand(JSInConditionCommand inConditionCommand) {
-		listOfInConditionCommands.add(inConditionCommand);
-	}
+    public void addCommand(JSInConditionCommand inConditionCommand) {
+        listOfInConditionCommands.add(inConditionCommand);
+    }
 
-	public List<JSInConditionCommand> getListOfInConditionCommand() {
-		return listOfInConditionCommands;
-	}
+    public List<JSInConditionCommand> getListOfInConditionCommand() {
+        return listOfInConditionCommands;
+    }
 
-	protected void markAsConsumed(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-		this.consumed = true;
-		DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
-		dbItemConsumedInCondition.setCreated(new Date());
-		dbItemConsumedInCondition.setInConditionId(this.getId());
-		dbItemConsumedInCondition.setSession(Constants.getSession());
-		try {
-			DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(
-					sosHibernateSession);
-			sosHibernateSession.beginTransaction();
-			dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
-			sosHibernateSession.commit();
-		} catch (Exception e) {
-			sosHibernateSession.rollback();
-		}
-	}
+    protected void markAsConsumed(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        this.consumed = true;
+        DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
+        dbItemConsumedInCondition.setCreated(new Date());
+        dbItemConsumedInCondition.setInConditionId(this.getId());
+        dbItemConsumedInCondition.setSession(Constants.getSession());
+        try {
+            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+            sosHibernateSession.beginTransaction();
+            dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+    }
 
-	public boolean isConsumed() {
-		return consumed;
-	}
+    public boolean isConsumed() {
+        return consumed;
+    }
 
-	public void setConsumed(boolean consumed) {
-		this.consumed = consumed;
-	}
+    public void setConsumed(boolean consumed) {
+        this.consumed = consumed;
+    }
 
-    public void executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws SOSHibernateException {
+    public void setListOfDates(String schedulerId) throws JsonParseException, JsonMappingException, SOSHibernateException, SOSMissingDataException,
+            SOSInvalidDataException, IOException, ParseException {
+        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
+        filterCalendarUsage.setPath(normalizedJob);
+        filterCalendarUsage.setSchedulerId(schedulerId);
+        JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
+        Set<LocalDateTime> l = jobStreamCalendar.getListOfDates(filterCalendarUsage);
+        this.listOfDates.addAll(l);
+
+    }
+
+    public void executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
+            throws SOSHibernateException {
         LOGGER.trace("execute commands ------>");
         if (this.isMarkExpression()) {
             LOGGER.trace(this.getExpression() + " now marked as consumed");
@@ -115,7 +137,20 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
-        }        
+        }
+    }
+
+    public boolean isStartToday() {
+        if (this.listOfDates.isEmpty()) {
+            return true;
+        }
+        for (LocalDateTime d : listOfDates) {
+            if (HistoryHelper.isToday(d)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

@@ -74,5 +74,10 @@ public class JSEvents {
         this.removeEvent(jsEventKey);
     }
 
+    public boolean isEmpty() {
+        return listOfEvents.size() == 0;
+        
+    }
+
    
 }

@@ -47,7 +47,7 @@ public class JSJobInConditions {
             jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
-            addInCondition(jsInCondition);
+             addInCondition(jsInCondition);
         }
     }
 

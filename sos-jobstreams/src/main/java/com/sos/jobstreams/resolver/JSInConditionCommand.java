@@ -1,5 +1,8 @@
 package com.sos.jobstreams.resolver;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +43,41 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
+    private Map<String, String> getMapOfAttributes(String commandParam) {
+
+        Map<String, String> listOfAttributes = new HashMap<String, String>();
+        if (commandParam == null || commandParam.isEmpty()) {
+            listOfAttributes.put("at", "now");
+        } else {
+            String name = "";
+            String value = "";
+            String[] attributes = commandParam.split(",");
+            for (int i = 0; i < attributes.length; i++) {
+                String attribute = attributes[i];
+                String[] parts = attribute.split("=");
+                if (parts.length == 1) {
+                    value = parts[0];
+                    name = "at";
+                } else if (parts.length == 2) {
+                    value = parts[1];
+                    name = parts[0];
+                }
+                listOfAttributes.put(name, value);
+            }
+        }
+        return listOfAttributes;
+    }
+    
+    public Map<String,String> testGetMapOfAttributes(String commandParam) {
+        return getMapOfAttributes(commandParam);
+    }
+
     private String buildJobStartXml(JSInCondition inCondition) {
         XMLBuilder xml = new XMLBuilder("start_job");
 
-        xml.addAttribute("job", inCondition.getNormalizedJob()).addAttribute("force", "yes");
-        if (getCommandParam() == null || getCommandParam().isEmpty()) {
-            xml.addAttribute("at", "now");
-        } else {
-            xml.addAttribute("at", getCommandParam());
-
-        }
+        xml.addAttribute("job", inCondition.getNormalizedJob()).addAttribute("force", "no");
+        Map<String, String> listOfAttributes = getMapOfAttributes(getCommandParam());
+        listOfAttributes.forEach((name,value)->xml.addAttribute(name, value));
         return xml.asXML();
     }
 
@@ -57,11 +85,15 @@ public class JSInConditionCommand {
 
         String jobXml = buildJobStartXml(inCondition);
         String answer = "";
+        String job = inCondition.getNormalizedJob();
+        if (inCondition.isStartToday()) {
         LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
         if (schedulerXmlCommandExecutor != null) {
             answer = schedulerXmlCommandExecutor.executeXml(jobXml);
         } else {
-            LOGGER.debug("Start job: " + inCondition.getNormalizedJob());
+            LOGGER.debug("Start job: " + job);
+        }}else {
+            LOGGER.debug("Job " + job + " will not be started today");
         }
         LOGGER.trace(answer);
 

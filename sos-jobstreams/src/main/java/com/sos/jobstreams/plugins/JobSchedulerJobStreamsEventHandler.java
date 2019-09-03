@@ -40,7 +40,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     public static final String CUSTOM_EVENT_KEY = JobSchedulerJobStreamsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
-    private QueuedEvents queuedEvents = new QueuedEvents();
+    private QueuedEvents addQueuedEvents;
+    private QueuedEvents delQueuedEvents;
 
     private int waitInterval = 2;
     private String session;
@@ -56,10 +57,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public JobSchedulerJobStreamsEventHandler() {
         super();
+        addQueuedEvents = new QueuedEvents();
+        delQueuedEvents = new QueuedEvents();
     }
 
     public JobSchedulerJobStreamsEventHandler(SchedulerXmlCommandExecutor xmlCommandExecutor, EventPublisher eventBus) {
         super(xmlCommandExecutor, eventBus);
+        addQueuedEvents = new QueuedEvents();
+        delQueuedEvents = new QueuedEvents();
     }
 
     @Override
@@ -82,8 +87,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
             conditionResolver.init();
-            queuedEvents = new QueuedEvents();
-            
+
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -167,7 +171,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     FilterEvents filterEvents = null;
 
                     switch (jobSchedulerEvent.getType()) {
-                  
+
                     case "OrderFinished":
                         LOGGER.debug("OrderFinished event to be executed");
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
@@ -179,16 +183,25 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
                         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-                        conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
-                                .getJobPath());
-                        queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
-                        queuedEvents.handleAddEventlistBuffer(conditionResolver.getRemoveJsEvents());
+                        boolean change = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
+                                taskEndEvent.getJobPath());
 
                         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
                         }
                         for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+                        }
+                        if (change) {
+                            addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
+                            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+                                this.addQueuedEvents.storetoDb(sosHibernateSession);
+                            }
+                            delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
+                            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
+                                this.addQueuedEvents.deleteFromDb(sosHibernateSession);
+                            }
+
                         }
                         resolveInConditions = true;
                         break;
@@ -226,7 +239,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             conditionResolver.addEvent(event);
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
-                            queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
+                            addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
+                            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+                                this.addQueuedEvents.storetoDb(sosHibernateSession);
+                            }
 
                             break;
                         case "RemoveEvent":
@@ -239,7 +255,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setSchedulerId(super.getSettings().getSchedulerId());
 
                             conditionResolver.removeEvent(event);
-                            queuedEvents.handleAddEventlistBuffer(conditionResolver.getNewJsEvents());
+                            delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
+                            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
+                                this.addQueuedEvents.deleteFromDb(sosHibernateSession);
+                            }
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
                             break;
