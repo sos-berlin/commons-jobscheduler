@@ -2,6 +2,7 @@ package com.sos.jobstreams.classes;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -25,16 +26,15 @@ import com.sos.joc.model.calendar.Dates;
 
 public class JobStreamCalendar {
 
-    public Set<LocalDateTime> getListOfDates(FilterCalendarUsage filterCalendarUsage) throws JsonParseException, JsonMappingException, IOException,
-            SOSHibernateException, SOSMissingDataException, SOSInvalidDataException, ParseException {
-        SOSHibernateSession connection = null;
+    public Set<LocalDate> getListOfDates(SOSHibernateSession sosHibernateSession, FilterCalendarUsage filterCalendarUsage)
+            throws SOSHibernateException, JsonParseException, JsonMappingException, IOException, SOSMissingDataException, SOSInvalidDataException {
 
         Dates dates = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Set<LocalDateTime> listOfDates = new HashSet<LocalDateTime>();
+        Set<LocalDate> listOfDates = new HashSet<LocalDate>();
         FrequencyResolver fr = new FrequencyResolver();
 
-        DBLayerCalendars dbLayer = new DBLayerCalendars(connection);
+        DBLayerCalendars dbLayer = new DBLayerCalendars(sosHibernateSession);
 
         List<DBItemInventoryClusterCalendar> listOfCalendars = dbLayer.getCalendar(filterCalendarUsage, 0);
         for (DBItemInventoryClusterCalendar item : listOfCalendars) {
@@ -42,7 +42,7 @@ public class JobStreamCalendar {
             calendarFilter.setCalendar(new ObjectMapper().readValue(item.getConfiguration(), Calendar.class));
             dates = fr.resolve(calendarFilter);
             for (String d : dates.getDates())
-                listOfDates.add(LocalDateTime.parse(d, formatter));
+                listOfDates.add(LocalDate.parse(d, formatter));
         }
         return listOfDates;
 

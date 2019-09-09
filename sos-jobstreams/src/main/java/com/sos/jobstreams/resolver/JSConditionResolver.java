@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSException;
+import com.sos.exception.SOSInvalidDataException;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
@@ -130,8 +135,8 @@ public class JSConditionResolver {
                 }
             }
             jsJobInConditions = new JSJobInConditions(settings);
-            jsJobInConditions.setListOfJobInConditions(listOfInConditions);
-
+            jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
+ 
         }
 
         if (jsJobOutConditions == null) {
@@ -534,8 +539,8 @@ public class JSConditionResolver {
                             LOGGER.trace("---InCondition is: " + SOSString.toString(inCondition));
                         }
                         if (validate(null, inCondition)) {
-                            listOfValidatedInconditions.add(inCondition);
                             inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
+                            listOfValidatedInconditions.add(inCondition);
                         } else {
                             if (isTraceEnabled) {
                                 LOGGER.trace(logPrompt + " evaluated to --> false");
@@ -685,6 +690,11 @@ public class JSConditionResolver {
 
     public JSEvents getNewJsEvents() {
         return newJsEvents;
+    }
+
+    
+    public JSEvents getJsEvents() {
+        return jsEvents;
     }
 
     public JSEvents getRemoveJsEvents() {

@@ -14,6 +14,7 @@ public class JSInConditionCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInConditionCommand.class);
     private DBItemInConditionCommand itemInConditionCommand;
+    private boolean executed;
 
     public JSInConditionCommand() {
         super();
@@ -67,8 +68,8 @@ public class JSInConditionCommand {
         }
         return listOfAttributes;
     }
-    
-    public Map<String,String> testGetMapOfAttributes(String commandParam) {
+
+    public Map<String, String> testGetMapOfAttributes(String commandParam) {
         return getMapOfAttributes(commandParam);
     }
 
@@ -77,7 +78,7 @@ public class JSInConditionCommand {
 
         xml.addAttribute("job", inCondition.getNormalizedJob()).addAttribute("force", "no");
         Map<String, String> listOfAttributes = getMapOfAttributes(getCommandParam());
-        listOfAttributes.forEach((name,value)->xml.addAttribute(name, value));
+        listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
         return xml.asXML();
     }
 
@@ -87,13 +88,16 @@ public class JSInConditionCommand {
         String answer = "";
         String job = inCondition.getNormalizedJob();
         if (inCondition.isStartToday()) {
-        LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
-        if (schedulerXmlCommandExecutor != null) {
-            answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+            LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
+            if (schedulerXmlCommandExecutor != null) {
+                answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+            } else {
+                LOGGER.debug("Start job: " + job);
+            }
+            executed = true;
         } else {
-            LOGGER.debug("Start job: " + job);
-        }}else {
             LOGGER.debug("Job " + job + " will not be started today");
+            executed = false;
         }
         LOGGER.trace(answer);
 
@@ -101,18 +105,19 @@ public class JSInConditionCommand {
 
     public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
 
+        boolean started = true;
         String command = getCommand();
         String commandParam = getCommandParam();
         LOGGER.debug("execution command: " + command + " " + commandParam);
 
         if ("writelog".equalsIgnoreCase(command)) {
             LOGGER.info(commandParam);
+            executed = true;
         }
         if ("startjob".equalsIgnoreCase(command)) {
             LOGGER.debug("....starting job:" + inCondition.getJob());
             startJob(schedulerXmlCommandExecutor, inCondition);
         }
-
     }
 
     public void setCommand(String command) {
@@ -130,4 +135,12 @@ public class JSInConditionCommand {
 
     }
 
+    public boolean isExecuted() {
+        return executed;
+    }
+
+    
+    public void setExecuted(boolean executed) {
+        this.executed = executed;
+    }
 }

@@ -1,18 +1,28 @@
 package com.sos.jobstreams.resolver;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSInvalidDataException;
+import com.sos.exception.SOSMissingDataException;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 
 public class JSJobInConditions {
 
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
+    private EventHandlerSettings settings;
 
     public JSJobInConditions(EventHandlerSettings settings) {
         super();
+        this.settings = settings;
         this.listOfJobInConditions = new HashMap<JSJobConditionKey, JSInConditions>();
     }
 
@@ -31,7 +41,7 @@ public class JSJobInConditions {
         return this.listOfJobInConditions.get(jobConditionKey);
     }
 
-    public void setListOfJobInConditions(List<DBItemInConditionWithCommand> listOfInConditions) {
+    public void setListOfJobInConditions(SOSHibernateSession sosHibernateSession, List<DBItemInConditionWithCommand> listOfInConditions){
         for (DBItemInConditionWithCommand itemInConditionWithCommand : listOfInConditions) {
             JSInCondition jsInCondition = null;
             JSJobConditionKey jobConditionKey = new JSJobConditionKey(itemInConditionWithCommand);
@@ -47,7 +57,8 @@ public class JSJobInConditions {
             jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
-             addInCondition(jsInCondition);
+            jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
+            addInCondition(jsInCondition);
         }
     }
 

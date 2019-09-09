@@ -31,6 +31,7 @@ import com.sos.jobstreams.db.FilterEvents;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSEvent;
 import com.sos.jobstreams.resolver.JSInCondition;
+import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -130,6 +131,32 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("Plugin closed");
     }
 
+    private void performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
+        LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
+        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
+
+        boolean change = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
+                .getJobPath());
+
+        for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
+            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+        }
+        for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
+            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+        }
+        if (change) {
+            addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
+            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+                this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
+            }
+            delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
+            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
+                this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
+            }
+
+        }
+    }
+
     private void execute(boolean onNonEmptyEvent, Long eventId, JsonArray events) {
         String method = "execute";
         if (isDebugEnabled) {
@@ -180,29 +207,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         break;
                     case "TaskEnded":
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
-                        conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
-
-                        boolean change = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(),
-                                taskEndEvent.getJobPath());
-
-                        for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
-                        }
-                        for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
-                        }
-                        if (change) {
-                            addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
-                            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
-                                this.addQueuedEvents.storetoDb(sosHibernateSession);
-                            }
-                            delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
-                            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
-                                this.addQueuedEvents.deleteFromDb(sosHibernateSession);
-                            }
-
-                        }
+                        performTaskEnd(sosHibernateSession, taskEndEvent);
                         resolveInConditions = true;
                         break;
 
@@ -241,7 +246,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
                             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
                             if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
-                                this.addQueuedEvents.storetoDb(sosHibernateSession);
+                                this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
                             }
 
                             break;
@@ -257,7 +262,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             conditionResolver.removeEvent(event);
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
                             if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
-                                this.addQueuedEvents.deleteFromDb(sosHibernateSession);
+                                this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
                             }
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
@@ -299,6 +304,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
                 for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                     publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
+                    for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                        if (!inConditionCommand.isExecuted()) {
+                            TaskEndEvent taskEndEvent = new TaskEndEvent();
+                            taskEndEvent.setJobPath(jsInCondition.getJob());
+                            taskEndEvent.setReturnCode(0);
+                            taskEndEvent.setTaskId("");
+                            LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
+                            inConditionCommand.setExecuted(true);
+                            performTaskEnd(sosHibernateSession, taskEndEvent);
+                        }
+                    }
                 }
                 if (isDebugEnabled & duration != null) {
                     duration.end("Resolving all InConditions: ");

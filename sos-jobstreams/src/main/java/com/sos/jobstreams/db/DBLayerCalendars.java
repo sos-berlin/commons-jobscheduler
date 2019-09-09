@@ -46,8 +46,8 @@ public class DBLayerCalendars extends DBLayer {
     }
 
     public List<DBItemInventoryClusterCalendar> getCalendar(FilterCalendarUsage filter, final int limit) throws SOSHibernateException {
-        String q = "select c from " + DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE + " u " + DBITEM_CLUSTER_CALENDARS + " c " + getWhere(filter)
-                + " c.id=u.calendarId ";
+        String q = "select c from " + DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE + " u, " + DBITEM_CLUSTER_CALENDARS + " c " + getWhere(filter)
+                + " and  c.id=u.calendarId ";
         Query<DBItemInventoryClusterCalendar> query = super.getSession().createQuery(q);
         query = bindParameters(filter, query);
 

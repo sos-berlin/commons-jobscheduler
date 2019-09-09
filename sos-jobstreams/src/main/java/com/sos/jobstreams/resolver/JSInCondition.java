@@ -2,6 +2,7 @@ package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +30,8 @@ import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import sos.util.SOSString;
+
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
@@ -36,11 +39,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private List<JSInConditionCommand> listOfInConditionCommands;
     private boolean consumed;
     private String normalizedJob;
-    private Set<LocalDateTime> listOfDates;
+    private Set<LocalDate> listOfDates;
 
     public JSInCondition() {
         super();
-        this.listOfDates = new HashSet<LocalDateTime>();
+        this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
 
@@ -116,14 +119,19 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         this.consumed = consumed;
     }
 
-    public void setListOfDates(String schedulerId) throws JsonParseException, JsonMappingException, SOSHibernateException, SOSMissingDataException,
-            SOSInvalidDataException, IOException, ParseException {
+    public void setListOfDates(SOSHibernateSession sosHibernateSession, String schedulerId) {
         FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
         filterCalendarUsage.setPath(normalizedJob);
         filterCalendarUsage.setSchedulerId(schedulerId);
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
-        Set<LocalDateTime> l = jobStreamCalendar.getListOfDates(filterCalendarUsage);
-        this.listOfDates.addAll(l);
+        Set<LocalDate> l;
+
+        try {
+            l = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
+            this.listOfDates.addAll(l);
+        } catch (SOSHibernateException | SOSMissingDataException | SOSInvalidDataException | IOException e) {
+            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+        }
 
     }
 
@@ -144,7 +152,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         if (this.listOfDates.isEmpty()) {
             return true;
         }
-        for (LocalDateTime d : listOfDates) {
+        for (LocalDate d : listOfDates) {
             if (HistoryHelper.isToday(d)) {
                 return true;
             }
