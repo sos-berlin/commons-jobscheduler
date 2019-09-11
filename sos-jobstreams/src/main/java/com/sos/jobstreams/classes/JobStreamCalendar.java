@@ -44,7 +44,11 @@ public class JobStreamCalendar {
             for (String d : dates.getDates())
                 listOfDates.add(LocalDate.parse(d, formatter));
         }
-        return listOfDates;
+        if (listOfCalendars.size() == 0) {
+            return null;
+        } else {
+            return listOfDates;
+        }
 
     }
 

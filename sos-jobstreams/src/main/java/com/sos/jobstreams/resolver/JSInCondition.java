@@ -1,9 +1,7 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -13,8 +11,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSInvalidDataException;
 import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -40,9 +36,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private boolean consumed;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
+    private boolean haveCalendars;
 
     public JSInCondition() {
         super();
+        haveCalendars = false;
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -128,7 +126,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
         try {
             l = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
-            this.listOfDates.addAll(l);
+            if (l == null) {
+                haveCalendars = false;
+            } else {
+                this.listOfDates.addAll(l);
+            }
         } catch (SOSHibernateException | SOSMissingDataException | SOSInvalidDataException | IOException e) {
             LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
         }
@@ -149,7 +151,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public boolean isStartToday() {
-        if (this.listOfDates.isEmpty()) {
+        if (!haveCalendars) {
             return true;
         }
         for (LocalDate d : listOfDates) {
