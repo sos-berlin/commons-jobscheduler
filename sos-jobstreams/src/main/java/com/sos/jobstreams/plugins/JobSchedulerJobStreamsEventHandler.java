@@ -304,15 +304,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
                 for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                     publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
-                    for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
-                        if (!inConditionCommand.isExecuted()) {
-                            TaskEndEvent taskEndEvent = new TaskEndEvent();
-                            taskEndEvent.setJobPath(jsInCondition.getJob());
-                            taskEndEvent.setReturnCode(0);
-                            taskEndEvent.setTaskId("");
-                            LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
-                            inConditionCommand.setExecuted(true);
-                            performTaskEnd(sosHibernateSession, taskEndEvent);
+                    if (!jsInCondition.isSkipOutCondition()) {
+                        for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                            if (!inConditionCommand.isExecuted()) {
+                                TaskEndEvent taskEndEvent = new TaskEndEvent();
+                                taskEndEvent.setJobPath(jsInCondition.getJob());
+                                taskEndEvent.setReturnCode(0);
+                                taskEndEvent.setTaskId("");
+                                LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
+                                inConditionCommand.setExecuted(true);
+                                performTaskEnd(sosHibernateSession, taskEndEvent);
+                            }
                         }
                     }
                 }

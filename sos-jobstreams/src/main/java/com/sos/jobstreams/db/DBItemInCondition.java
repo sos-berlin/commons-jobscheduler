@@ -20,6 +20,7 @@ public class DBItemInCondition implements IJSJobConditionKey {
     private String job;
     private String expression;
     private Boolean markExpression;
+    private Boolean skipOutCondition;
     private String jobStream;
     private Date created;
 
@@ -56,6 +57,16 @@ public class DBItemInCondition implements IJSJobConditionKey {
 
     public void setJob(String job) {
         this.job = job;
+    }
+
+    @Column(name = "[SKIP_NOT_IN_PERIOD_OUT_COND]", nullable = false)
+    @Type(type = "numeric_boolean")
+    public Boolean getSkipOutCondition() {
+        return this.skipOutCondition;
+    }
+
+    public void setSkipOutCondition(Boolean skipOutCondition) {
+        this.skipOutCondition = skipOutCondition;
     }
 
     @Column(name = "[MARK_EXPRESSION]", nullable = false)

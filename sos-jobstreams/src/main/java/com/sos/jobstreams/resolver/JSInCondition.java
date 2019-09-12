@@ -85,6 +85,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return itemInCondition.getMarkExpression();
     }
 
+    public boolean isSkipOutCondition() {
+        return itemInCondition.getSkipOutCondition();
+    }
+
     public void addCommand(JSInConditionCommand inConditionCommand) {
         listOfInConditionCommands.add(inConditionCommand);
     }

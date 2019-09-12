@@ -105,7 +105,6 @@ public class JSInConditionCommand {
 
     public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
 
-        boolean started = true;
         String command = getCommand();
         String commandParam = getCommandParam();
         LOGGER.debug("execution command: " + command + " " + commandParam);
@@ -139,7 +138,6 @@ public class JSInConditionCommand {
         return executed;
     }
 
-    
     public void setExecuted(boolean executed) {
         this.executed = executed;
     }
