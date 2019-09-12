@@ -41,6 +41,10 @@ import sos.util.SOSString;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSFileListEntry.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+    private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
+    private static final Logger JADE_REPORT_LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
     private static final String FIELD_JUMP_USER = "jump_user";
     private static final String FIELD_JUMP_PROTOCOL = "jump_protocol";
     private static final String FIELD_JUMP_PORT = "jump_port";
@@ -70,8 +74,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private static final String FIELD_TRANSFER_END = "transfer_end";
     private static final String FIELD_MANDATOR = "mandator";
     private static final String FIELD_GUID = "guid";
-    private static final Logger LOGGER = Logger.getLogger(SOSFileListEntry.class);
-    private static final Logger JADE_REPORT_LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
     private final String guid = UUID.randomUUID().toString();
     private ISOSVirtualFile fleSourceFile = null;
     private String strSourceFileName = null;
@@ -805,7 +807,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 String sourceFileName = new File(strSourceFileName).getName();
                 String sourceParent = strSourceFileName.substring(0, strSourceFileName.length() - sourceFileName.length());
                 String newSourceFileName = sourceOptions.replacing.doReplace(sourceFileName, replaceWith).replace('\\', '/');
-                if (!newSourceFileName.equals(sourceFileName)) {
+                boolean equals = newSourceFileName.equals(sourceFileName);
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[replaceWath=%s][replaceWith=%s][source=%s][new=%s]equals=%s", sourceOptions.replacing.getValue(),
+                            replaceWith, sourceFileName, newSourceFileName, equals));
+                }
+                if (!equals) {
                     String sourceDir = addFileSeparator(sourceOptions.directory.getValue()).replace('\\', '/');
                     if (objOptions.recursive.value()) {
                         String subDirs = sourceParent.substring(sourceDir.length());
@@ -817,8 +824,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     newSourceFileName = resolveDotsInPath(newSourceFileName);
                     if (!strSourceFileName.equals(newSourceFileName)) {
                         strRenamedSourceFileName = newSourceFileName;
+
+                        if (isDebugEnabled) {
+                            LOGGER.debug(String.format("RenamedSourceFileName=%s", strRenamedSourceFileName));
+                        }
                     }
                 }
+
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
@@ -939,6 +951,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private void renameSourceFile(final ISOSVirtualFile sourceFile) {
         if (strRenamedSourceFileName != null) {
             try {
+
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[renameSourceFile][%s][%s]", sourceFile.getName(), strRenamedSourceFileName));
+                }
+
                 ISOSVirtualFile renamedSourceFile = objDataSourceClient.getFileHandle(strRenamedSourceFileName);
                 if (renamedSourceFile.fileExists()) {
                     renamedSourceFile.delete();
@@ -977,7 +994,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private void renameTargetFile(ISOSVirtualFile targetFile) {
         String newFileName = targetFile.getName();
         newFileName = resolveDotsInPath(newFileName);
-        if (!fileNamesAreEqual(objTargetTransferFile.getName(), newFileName, false)) {
+        boolean equals = fileNamesAreEqual(objTargetTransferFile.getName(), newFileName, false);
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[renameTargetFile][%s][%s]equals=%s", objTargetTransferFile.getName(), newFileName, equals));
+        }
+        if (!equals) {
             try {
                 if (objOptions.overwriteFiles.isTrue() && targetFile.fileExists()) {
                     setTargetFileAlreadyExists(true);
@@ -995,6 +1016,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private String replaceVariables(final String value) {
+        if (isTraceEnabled) {
+            LOGGER.trace(String.format("[replaceVariables]%s", value));
+        }
         EntryPaths targetFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir.getValue(),
                 strTargetFileName)));
         EntryPaths targetTransferFile = new EntryPaths(objOptions.targetDir.getValue(), resolveDotsInPath(makeFullPathName(objOptions.targetDir

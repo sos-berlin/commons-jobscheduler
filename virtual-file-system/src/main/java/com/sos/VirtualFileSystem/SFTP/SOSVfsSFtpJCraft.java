@@ -302,7 +302,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         try {
             attributes = this.getClient().stat(filename);
         } catch (Exception e) {
-            //
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[getAttributes][%s]%s", filename, e.toString()), e);
+            }
         }
         return attributes;
     }
