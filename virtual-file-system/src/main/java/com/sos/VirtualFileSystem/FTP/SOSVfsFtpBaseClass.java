@@ -10,6 +10,7 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -439,8 +440,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             LOGGER.debug(SOSVfs_D_127.params(strT));
             x = cd(strT);
             logReply();
+        } catch (SocketException e) {
+            raiseException(e, getHostID(SOSVfs_E_0105.params("doCD")));
         } catch (IOException e) {
-            //
+            LOGGER.debug(e.toString(), e);
         }
         return x;
     }

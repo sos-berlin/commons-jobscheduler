@@ -264,6 +264,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
         objFileListEntries = new Vector<>();
     }
 
+    public void resetTransferCountersCounted() {
+        transferCountersCounted = false;
+    }
+
+    public void resetNoOfZeroByteSizeFiles() {
+        lngNoOfZeroByteSizeFiles = 0;
+    }
+
     public SOSFileListEntry add(final SOSFileListEntry pobjFileListEntry) {
         if (objFileListEntries == null) {
             objFileListEntries = new Vector<>();
@@ -565,6 +573,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
                     }
                 }
                 if (allFilesAreEmpty) {
+                    for (SOSFileListEntry entry : getList()) {
+                        entry.setTransferStatus(enuTransferStatus.transfer_aborted);
+                    }
                     throw new JobSchedulerException("All files have zero byte size, transfer aborted");
                 }
             }
