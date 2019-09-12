@@ -139,8 +139,8 @@ public class DBLayerInConditions {
 				dbItemInCondition.setJob(jobInCondition.getJob());
 				dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
 				dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
-                dbItemInCondition.setMarkExpression(getBoolean(inCondition.getMarkExpression(),true);
-                dbItemInCondition.setSkipOutCondition(getBoolean(inCondition.getSkipOutCondition(),false);
+                dbItemInCondition.setMarkExpression(getBoolean(inCondition.getMarkExpression(),true));
+                dbItemInCondition.setSkipOutCondition(getBoolean(inCondition.getSkipOutCondition(),false));
 				dbItemInCondition.setCreated(new Date());
 				sosHibernateSession.save(dbItemInCondition);
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
