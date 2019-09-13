@@ -1666,7 +1666,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    public long getSourceFileModificationdateTime() {
+    public long getSourceFileModificationDateTime() {
         return sourceFileModificationDateTime;
     }
 
