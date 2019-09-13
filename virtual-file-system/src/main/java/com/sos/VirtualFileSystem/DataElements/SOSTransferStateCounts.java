@@ -5,41 +5,56 @@ public class SOSTransferStateCounts {
     private long success = 0L;
     private long failed = 0L;
     private long skipped = 0L;
-    private long zerobytes = 0L;
 
-    public long getSuccessTransfers() {
+    private long successZeroBytes = 0L;// TransferZeroBytes=true
+    private long abortedZeroBytes = 0L;// TransferZeroBytes=false|strict
+    private long skippedZeroBytes = 0L;// TransferZeroBytes=relaxed
+
+    public long getSuccess() {
         return success;
     }
 
-    public void setSuccessTransfers(long success) {
-        this.success = success;
+    public void setSuccess(long val) {
+        success = val;
     }
 
-    public long getFailedTranfers() {
+    public long getFailed() {
         return failed;
     }
 
-    public void setFailedTransfers(long failed) {
-        this.failed = failed;
+    public void setFailed(long val) {
+        failed = val;
     }
 
-    public long getSkippedTransfers() {
+    public long getSkipped() {
         return skipped;
     }
 
-    public void setSkippedTransfers(long skipped) {
-        this.skipped = skipped;
+    public void setSkipped(long val) {
+        skipped = val;
     }
 
-    public long getZeroBytesTransfers() {
-        return zerobytes;
+    public long getSuccessZeroBytes() {
+        return successZeroBytes;
     }
 
-    public void setZeroBytesTransfers(long zerobytes) {
-        this.zerobytes = zerobytes;
+    public void setSuccessZeroBytes(long val) {
+        successZeroBytes = val;
     }
 
-    public SOSTransferStateCounts() {
-        //
+    public long getAbortedZeroBytes() {
+        return abortedZeroBytes;
+    }
+
+    public void setAbortedZeroBytes(long val) {
+        abortedZeroBytes = val;
+    }
+
+    public long getSkippedZeroBytes() {
+        return skippedZeroBytes;
+    }
+
+    public void setSkippedZeroBytes(long val) {
+        skippedZeroBytes = val;
     }
 }
