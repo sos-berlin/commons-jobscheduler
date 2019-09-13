@@ -23,7 +23,7 @@ public class QueuedEvents extends JSEvents {
         for (JSEvent jsEvent : jsEvents.getListOfEvents().values()) {
             if (jsEvent.isDbError()) {
                 if (isTraceEnabled) {
-                    LOGGER.trace("Adding event into queued events: " + SOSString.toString(jsEvent));
+                    LOGGER.trace("Adding event into queued events: " + jsEvent.toStr());
                 }
                 super.addEvent(jsEvent);
             }
@@ -36,36 +36,41 @@ public class QueuedEvents extends JSEvents {
 
     public void storetoDb(SOSHibernateSession sosHibernateSession, JSEvents jsEvents) {
         LOGGER.debug("Store queued events to db");
+        boolean dbError = false;
         for (JSEvent jsEvent : super.getListOfEvents().values()) {
             if (jsEvents.getEvent(jsEvent.getKey()) != null) {
                 if (isTraceEnabled) {
-                    LOGGER.trace("store queued event to db:" + SOSString.toString(jsEvent));
+                    LOGGER.trace("store queued event to db:" + jsEvent.toStr());
                 }
-                jsEvent.store(sosHibernateSession);
+                dbError = dbError || jsEvent.store(sosHibernateSession);
             } else {
                 if (isTraceEnabled) {
-                    LOGGER.trace("store queued event will not be stored to db as not existing in actual list of events:" + SOSString.toString(
-                            jsEvent));
+                    LOGGER.trace("storequeued event will not be stored to db as not existing in actual list of events:" + jsEvent.toStr());
                 }
             }
-            super.removeEvent(jsEvent);
+        }
+        if (!dbError) {
+            super.newList();
         }
     }
 
     public void deleteFromDb(SOSHibernateSession sosHibernateSession, JSEvents jsEvents) {
         LOGGER.debug("Delete queued events from db");
+        boolean dbError = false;
         for (JSEvent jsEvent : super.getListOfEvents().values()) {
             if (jsEvents.getEvent(jsEvent.getKey()) == null) {
                 if (isTraceEnabled) {
-                    LOGGER.trace("delete queued event from db: " + SOSString.toString(jsEvent));
-                    jsEvent.deleteEvent(sosHibernateSession);
+                    LOGGER.trace("delete queued event from db: " + jsEvent.toStr());
+                    dbError = dbError || jsEvent.deleteEvent(sosHibernateSession);
                 } else {
                     if (isTraceEnabled) {
-                        LOGGER.trace("delete queued event will not be deleted from db as existing in actual list of events:" + SOSString.toString(
-                                jsEvent));
+                        LOGGER.trace("deletequeued event will not be deleted from db as existing in actual list of events:" + jsEvent.toStr());
                     }
                 }
             }
+        }
+        if (!dbError) {
+            super.newList();
         }
     }
 }

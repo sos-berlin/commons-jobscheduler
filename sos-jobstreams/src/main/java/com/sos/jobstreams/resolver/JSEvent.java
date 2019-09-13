@@ -98,7 +98,7 @@ public class JSEvent {
         itemEvent.setOutConditionId(outConditionId);
     }
 
-    public void store(SOSHibernateSession sosHibernateSession) {
+    public boolean store(SOSHibernateSession sosHibernateSession) {
         dbError = false;
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         try {
@@ -113,12 +113,13 @@ public class JSEvent {
                 LOGGER.warn("Could not rollback the transaction while storing an event");
             }
             if (isDebugEnabled) {
-                LOGGER.debug("Could not store event: " + SOSString.toString(this));
+                LOGGER.debug("Could not store event: " + this.getEvent() + ":" + SOSString.toString(this));
             }
         }
+        return dbError;
     }
 
-    public void deleteEvent(SOSHibernateSession sosHibernateSession) {
+    public boolean deleteEvent(SOSHibernateSession sosHibernateSession) {
         dbError = false;
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
 
@@ -140,6 +141,14 @@ public class JSEvent {
             } catch (SOSHibernateException e1) {
                 LOGGER.warn("Could not rollback the transaction while storing an event");
             }
+            if (isDebugEnabled) {
+                LOGGER.debug("Could not delete event: " + this.getEvent() + ":" + SOSString.toString(this));
+            }
         }
+        return dbError;
+    }
+
+    public String toStr() {
+        return this.getEvent() + "::" + SOSString.toString(this);
     }
 }

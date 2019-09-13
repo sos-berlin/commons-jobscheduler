@@ -135,7 +135,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-        boolean change = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
+        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
                 .getJobPath());
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
@@ -144,16 +144,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
         }
-        if (change) {
+        if (!conditionResolver.getNewJsEvents().isEmpty() || !conditionResolver.getRemoveJsEvents().isEmpty() ) {
+            boolean reinint = false;
             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
-            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+            if (dbChange && !this.addQueuedEvents.isEmpty()) {
                 this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
+                reinint = true;
             }
             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
-            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
+            if (dbChange && !this.delQueuedEvents.isEmpty()) {
                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
+                reinint = true;
             }
-
+            if (reinint) {
+                conditionResolver.reInitConsumedInConditions();
+            }
         }
     }
 
@@ -245,8 +250,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             conditionResolver.addEvent(event);
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
                             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
-                            if (conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+                            if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
                                 this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
+                                conditionResolver.reInitConsumedInConditions();
                             }
 
                             break;
@@ -261,8 +267,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             conditionResolver.removeEvent(event);
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
-                            if (conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
+                            if (!conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
                                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
+                                conditionResolver.reInitConsumedInConditions();
                             }
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), customEvent.getEvent());
 
@@ -285,7 +292,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             filterEvents.setJob(customEvent.getJob());
                             filterEvents.setJobStream(customEvent.getJobStream());
                             conditionResolver.removeEventsFromJobStream(filterEvents);
-
                             break;
                         }
                         break;

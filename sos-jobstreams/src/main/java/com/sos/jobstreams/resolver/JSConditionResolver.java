@@ -7,21 +7,18 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSException;
-import com.sos.exception.SOSInvalidDataException;
-import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.agentbatchinstaller.model.installations.Globals;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
@@ -46,8 +43,6 @@ import com.sos.jobstreams.db.FilterInConditions;
 import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
-
-import sos.util.SOSString;
 
 public class JSConditionResolver {
 
@@ -127,7 +122,7 @@ public class JSConditionResolver {
                 if (inInCondition != null) {
                     boolean isConsumed = (mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null);
                     if (isTraceEnabled) {
-                        LOGGER.trace(inInCondition.getExpression() + " in " + inInCondition.getJob() + " is set to:" + isConsumed);
+                        LOGGER.trace("Expression " + inInCondition.getExpression() + " in " + inInCondition.getJob() + " is set to consumed=" + isConsumed);
                     }
                     dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
                 } else {
@@ -136,7 +131,7 @@ public class JSConditionResolver {
             }
             jsJobInConditions = new JSJobInConditions(settings);
             jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
- 
+
         }
 
         if (jsJobOutConditions == null) {
@@ -323,8 +318,8 @@ public class JSConditionResolver {
         initCheckHistory();
         if (isDebugEnabled) {
             duration.end("Init JobStreams condition model ");
-            LOGGER.debug("In-Conditions: " + jsJobInConditions.getListOfJobInConditions().size());
-            LOGGER.debug("Out-Conditions: " + jsJobOutConditions.getListOfJobOutConditions().size());
+            LOGGER.debug("In Conditions: " + jsJobInConditions.getListOfJobInConditions().size());
+            LOGGER.debug("Out Conditions: " + jsJobOutConditions.getListOfJobOutConditions().size());
             LOGGER.debug("Events: " + jsEvents.getListOfEvents().size());
         }
 
@@ -340,6 +335,48 @@ public class JSConditionResolver {
             List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
+    }
+
+    public void reInitConsumedInConditions() throws SOSHibernateException {
+        
+        LOGGER.debug("JSConditionResolver::reInitConsumedInConditions");
+        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+        filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
+        filterConsumedInConditions.setSession(Constants.getSession());
+        DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+
+        List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
+                filterConsumedInConditions, 0);
+        HashMap<Long, DBItemConsumedInCondition> mapOfConsumedInCondition = new HashMap<Long, DBItemConsumedInCondition>();
+        for (DBItemConsumedInCondition dbItemConsumedInCondition : listOfConsumedInConditions) {
+            mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), dbItemConsumedInCondition);
+        }
+
+        sosHibernateSession.beginTransaction();
+        for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+            for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                if (inCondition.isConsumed() && mapOfConsumedInCondition.get(inCondition.getId()) == null) {
+                    DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
+                    dbItemConsumedInCondition.setCreated(new Date());
+                    dbItemConsumedInCondition.setInConditionId(inCondition.getId());
+                    dbItemConsumedInCondition.setSession(Constants.getSession());
+                    dbLayerCoumsumedInConditions.store(dbItemConsumedInCondition);
+                    if (isTraceEnabled) {
+                        LOGGER.trace(String.format("Consumed In Condition stored %s", inCondition.toStr()));
+                    }
+
+                }
+                if (!inCondition.isConsumed() && mapOfConsumedInCondition.get(inCondition.getId()) != null) {
+                    filterConsumedInConditions.setInConditionId(inCondition.getId());
+                    dbLayerCoumsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
+                    if (isTraceEnabled) {
+                        LOGGER.trace(String.format("Consumed In Condition deleted %s", inCondition.toStr()));
+                    }
+                }
+            }
+
+        }
+        sosHibernateSession.commit();
     }
 
     public void initCheckHistory() throws SOSHibernateException {
@@ -363,7 +400,7 @@ public class JSConditionResolver {
                         }
                         }
                     } catch (Exception e) {
-                        LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + inCondition.getJob());
+                        LOGGER.warn("Could not validate expression:" + expressionValue + " in In Condition of job " + inCondition.getJob());
                     }
                 }
             }
@@ -387,7 +424,7 @@ public class JSConditionResolver {
                         }
                         }
                     } catch (Exception e) {
-                        LOGGER.warn("Could not validate expression:" + expressionValue + " in in-condition of job " + outCondition.getJob());
+                        LOGGER.warn("Could not validate expression:" + expressionValue + " in In Condition of job " + outCondition.getJob());
                     }
                 }
             }
@@ -512,7 +549,7 @@ public class JSConditionResolver {
         LOGGER.trace(condition.getExpression() + " after replacement  -->  " + expressionValue);
         booleanExpression.setBoolExp(expressionValue);
         boolean evaluatedExpression = booleanExpression.evaluateExpression();
-        LOGGER.trace(condition.getExpression() + "evaluated to: " + evaluatedExpression);
+        LOGGER.trace(condition.getExpression() + " evaluated to: " + evaluatedExpression);
         return evaluatedExpression;
     }
 
@@ -536,7 +573,7 @@ public class JSConditionResolver {
                     if (!inCondition.isConsumed()) {
 
                         if (isTraceEnabled) {
-                            LOGGER.trace("---InCondition is: " + SOSString.toString(inCondition));
+                            LOGGER.trace("---InCondition is: " + inCondition.toStr());
                         }
                         if (validate(null, inCondition)) {
                             inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
@@ -548,7 +585,7 @@ public class JSConditionResolver {
                         }
                     } else {
                         if (isTraceEnabled) {
-                            LOGGER.trace(logPrompt + "-->already consumed");
+                            LOGGER.trace(logPrompt + "--> already consumed");
                         }
                     }
                 }
@@ -559,7 +596,7 @@ public class JSConditionResolver {
 
     public boolean resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::resolveOutConditions for job:" + job);
-        boolean change = false;
+        boolean dbChange = false;
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         this.newJsEvents = new JSEvents();
         this.removeJsEvents = new JSEvents();
@@ -577,17 +614,17 @@ public class JSConditionResolver {
                     LOGGER.trace("---OutCondition: " + expression);
                     if (validate(taskReturnCode, outCondition)) {
                         LOGGER.trace("create/remove events ------>");
-                        change = outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
+                        dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
                     } else {
                         LOGGER.trace(expression + "-->false");
                     }
                     LOGGER.trace("");
                 }
             } else {
-                LOGGER.debug("No out conditions for job: " + job + " found. Nothing to do");
+                LOGGER.debug("No out conditions for job " + job + " found. Nothing to do");
             }
         }
-        return change;
+        return dbChange;
     }
 
     public BooleanExp getBooleanExpression() {
@@ -651,8 +688,8 @@ public class JSConditionResolver {
     public void removeEvent(JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getJobStream() + "." + event.getEvent());
         this.removeJsEvents = new JSEvents();
-        removeJsEvents.addEvent(event);
         event.deleteEvent(sosHibernateSession);
+        removeJsEvents.addEvent(event);
         jsEvents.removeEvent(event);
         LOGGER.debug(event.getEvent() + " removed");
     }
@@ -692,7 +729,6 @@ public class JSConditionResolver {
         return newJsEvents;
     }
 
-    
     public JSEvents getJsEvents() {
         return jsEvents;
     }
@@ -700,4 +736,5 @@ public class JSConditionResolver {
     public JSEvents getRemoveJsEvents() {
         return removeJsEvents;
     }
+
 }

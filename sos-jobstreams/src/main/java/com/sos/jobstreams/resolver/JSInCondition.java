@@ -133,6 +133,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
             if (l == null) {
                 haveCalendars = false;
             } else {
+                haveCalendars = true;
                 this.listOfDates.addAll(l);
             }
         } catch (SOSHibernateException | SOSMissingDataException | SOSInvalidDataException | IOException e) {
@@ -145,7 +146,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
             throws SOSHibernateException {
         LOGGER.trace("execute commands ------>");
         if (this.isMarkExpression()) {
-            LOGGER.trace(this.getExpression() + " now marked as consumed");
+            LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
             this.markAsConsumed(sosHibernateSession);
         }
 
@@ -165,6 +166,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
 
         return false;
+    }
+    
+    public String toStr() {
+        return this.getExpression() + "::" + SOSString.toString(this);
     }
 
 }

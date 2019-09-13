@@ -74,10 +74,15 @@ public class JSEvents {
         this.removeEvent(jsEventKey);
     }
 
+    public void newList() {
+        this.listOfEvents = new HashMap<JSEventKey, JSEvent>(); 
+    }
+    
     public boolean isEmpty() {
         return listOfEvents.size() == 0;
         
     }
 
+ 
    
 }

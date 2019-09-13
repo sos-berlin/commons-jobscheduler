@@ -67,9 +67,9 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsAddEvents, JSEvents jsRemoveEvents)
+    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsNewEvents, JSEvents jsRemoveEvents)
             throws SOSHibernateException {
-        boolean change = false;
+        boolean dbChange = false;
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
             sosHibernateSession.setAutoCommit(false);
 
@@ -78,6 +78,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setEvent(outConditionEvent.getEventValue());
             itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
             itemEvent.setJobStream(this.jobStream);
+            
             itemEvent.setSession(Constants.getSession());
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
@@ -85,9 +86,8 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
             if (outConditionEvent.isCreateCommand()) {
                 jsEvents.addEvent(event);
-                jsAddEvents.addEvent(event);
-                event.store(sosHibernateSession);
-                change = true;
+                jsNewEvents.addEvent(event);
+                dbChange = !event.store(sosHibernateSession);
             } else {
                 if (outConditionEvent.isDeleteCommand()) {
                     JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
@@ -95,14 +95,13 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     event.setEvent(jsCondition.getEventName());
                     event.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
                     event.setJobStream(jsCondition.getConditionJobStream());
-                    event.deleteEvent(sosHibernateSession);
                     jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);
-                    change = true;
+                    dbChange = !event.deleteEvent(sosHibernateSession);
                 }
             }
         }
-        return change;
+        return dbChange;
     }
 
     public String getJobStream() {

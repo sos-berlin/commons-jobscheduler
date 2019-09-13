@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jobstreams.resolver.JSInCondition;
 
 public class DBLayerConsumedInConditions {
 
@@ -161,6 +162,12 @@ public class DBLayerConsumedInConditions {
         filterConsumedInConditions.setSession(dbItemConsumedInCondition.getSession());
         filterConsumedInConditions.setInConditionId(dbItemConsumedInCondition.getInConditionId());
         deleteByInConditionId(filterConsumedInConditions);
+        sosHibernateSession.save(dbItemConsumedInCondition);
+    }
+
+   
+
+    public void store(DBItemConsumedInCondition dbItemConsumedInCondition) throws SOSHibernateException {
         sosHibernateSession.save(dbItemConsumedInCondition);
     }
 

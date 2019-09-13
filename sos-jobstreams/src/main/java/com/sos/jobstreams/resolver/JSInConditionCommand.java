@@ -63,7 +63,7 @@ public class JSInConditionCommand {
                     value = parts[1];
                     name = parts[0];
                 }
-                listOfAttributes.put(name, value);
+                listOfAttributes.put(name.trim(), value);
             }
         }
         return listOfAttributes;
@@ -76,8 +76,12 @@ public class JSInConditionCommand {
     private String buildJobStartXml(JSInCondition inCondition) {
         XMLBuilder xml = new XMLBuilder("start_job");
 
-        xml.addAttribute("job", inCondition.getNormalizedJob()).addAttribute("force", "no");
+        xml.addAttribute("job", inCondition.getNormalizedJob());
         Map<String, String> listOfAttributes = getMapOfAttributes(getCommandParam());
+
+        if (listOfAttributes.get("force") == null) {
+            listOfAttributes.put("force", "no");
+        }
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
         return xml.asXML();
     }
