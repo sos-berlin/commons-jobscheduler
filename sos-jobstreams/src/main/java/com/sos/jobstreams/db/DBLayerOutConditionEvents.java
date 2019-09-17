@@ -87,7 +87,9 @@ public class DBLayerOutConditionEvents {
     public void deleteInsert(DBItemOutCondition dbItemOutCondition, OutCondition outCondition) throws SOSHibernateException {
         FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();
         filterOutConditionEvents.setOutConditionId(outCondition.getId());
-        delete(filterOutConditionEvents);
+        if (outCondition.getId() != null) {
+            delete(filterOutConditionEvents);
+        }
         for (OutConditionEvent outConditionEvent : outCondition.getOutconditionEvents()) {
             DBItemOutConditionEvent dbItemOutConditionEvent = new DBItemOutConditionEvent();
             dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
@@ -97,6 +99,7 @@ public class DBLayerOutConditionEvents {
 
             sosHibernateSession.save(dbItemOutConditionEvent);
         }
+
     }
 
 }

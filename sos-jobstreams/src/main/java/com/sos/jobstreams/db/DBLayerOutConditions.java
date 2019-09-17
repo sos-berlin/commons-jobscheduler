@@ -158,7 +158,9 @@ public class DBLayerOutConditions {
                 sosHibernateSession.save(dbItemOutCondition);
                 dbLayerOutConditionEvents.deleteInsert(dbItemOutCondition, outCondition);
                 Long newId = dbItemOutCondition.getId();
-                dbLayerEvents.updateEvents(oldId, newId);
+                if (oldId != null) {
+                    dbLayerEvents.updateEvents(oldId, newId);
+                }
             }
             for (DBItemOutCondition dbItemOutCondition : listOfOutConditions) {
                 FilterOutConditionEvents filterOutConditionEvents = new FilterOutConditionEvents();

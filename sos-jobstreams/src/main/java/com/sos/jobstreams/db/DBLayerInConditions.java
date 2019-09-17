@@ -145,9 +145,12 @@ public class DBLayerInConditions {
 				sosHibernateSession.save(dbItemInCondition);
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
 				Long newId = dbItemInCondition.getId();
-				dbLayerConsumedInConditions.updateConsumedInCondition(oldId,newId);
+				if (oldId != null) {
+				    dbLayerConsumedInConditions.updateConsumedInCondition(oldId,newId);
+				}
 			}
 			
+			 
 			for (DBItemInCondition dbItemInCondition: listOfInCondititinos) {
 			    FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
 		        filterInConditionCommands.setInConditionId(dbItemInCondition.getId());

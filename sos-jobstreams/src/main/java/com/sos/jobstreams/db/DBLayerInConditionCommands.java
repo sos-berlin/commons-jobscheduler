@@ -38,7 +38,6 @@ public class DBLayerInConditionCommands {
         String where = "";
         String and = "";
 
-
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             where += and + " job = :job";
             and = " and ";
@@ -46,8 +45,8 @@ public class DBLayerInConditionCommands {
 
         where = " where " + where;
         return where;
-    }    
-    
+    }
+
     private String getWhere(FilterInConditionCommands filter) {
         String where = "";
         String and = "";
@@ -92,7 +91,8 @@ public class DBLayerInConditionCommands {
 
     }
 
-    public List<DBItemInConditionCommand> getInConditionCommandsList______(FilterInConditionCommands filter, final int limit) throws SOSHibernateException {
+    public List<DBItemInConditionCommand> getInConditionCommandsList______(FilterInConditionCommands filter, final int limit)
+            throws SOSHibernateException {
         String q = " from " + DBItemInConditionCommand + getWhere(filter);
         Query<DBItemInConditionCommand> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
@@ -126,7 +126,9 @@ public class DBLayerInConditionCommands {
     public void deleteInsert(DBItemInCondition dbItemInCondition, InCondition inCondition) throws SOSHibernateException {
         FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
         filterInConditionCommands.setInConditionId(inCondition.getId());
-        deleteByInConditionId(filterInConditionCommands);
+        if (inCondition.getId() != null) {
+            deleteByInConditionId(filterInConditionCommands);
+        }
         for (InConditionCommand inConditionCommand : inCondition.getInconditionCommands()) {
             DBItemInConditionCommand dbItemInConditionCommand = new DBItemInConditionCommand();
             dbItemInConditionCommand.setInConditionId(dbItemInCondition.getId());
@@ -137,7 +139,5 @@ public class DBLayerInConditionCommands {
         }
 
     }
-
-   
 
 }
