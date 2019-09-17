@@ -144,7 +144,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
         }
-        if (!conditionResolver.getNewJsEvents().isEmpty() || !conditionResolver.getRemoveJsEvents().isEmpty() ) {
+        if (!conditionResolver.getNewJsEvents().isEmpty() || !conditionResolver.getRemoveJsEvents().isEmpty()) {
             boolean reinint = false;
             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
             if (dbChange && !this.addQueuedEvents.isEmpty()) {
@@ -177,7 +177,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             if (conditionResolver == null) {
                 conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
-                conditionResolver.init();
+                try {
+                    conditionResolver.init();
+                } catch (Exception e) {
+                    conditionResolver = null;
+                    throw e;
+                }
             } else {
                 conditionResolver.setReportingSession(sosHibernateSession);
             }
@@ -189,7 +194,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     conditionResolver.reInit();
 
                 } catch (SOSHibernateException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    conditionResolver = null;
+                    this.getMailer().sendOnError("JobSchedulerConditionsEventHandler", method, e);
+                    LOGGER.error("%s: %s", method, e.toString(), e);
                     throw new RuntimeException(e);
                 }
             }

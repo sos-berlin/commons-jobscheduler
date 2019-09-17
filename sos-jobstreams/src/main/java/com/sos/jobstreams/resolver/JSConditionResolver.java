@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.agentbatchinstaller.model.installations.Globals;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
+import com.sos.jobstreams.classes.CheckHistoryCacheRules;
 import com.sos.jobstreams.classes.CheckHistoryCondition;
 import com.sos.jobstreams.classes.CheckHistoryKey;
 import com.sos.jobstreams.classes.CheckHistoryValue;
@@ -58,7 +58,7 @@ public class JSConditionResolver {
     private BooleanExp booleanExpression;
     private EventHandlerSettings settings;
     private CheckHistoryCondition checkHistoryCondition;
-    private List<CheckHistoryCacheRule> listOfCheckHistoryChacheRules;
+    private CheckHistoryCacheRules listOfCheckHistoryChacheRules;
     private SchedulerXmlCommandExecutor schedulerXmlCommandExecutor;
     private String workingDirectory = "";
     private JSEvents newJsEvents = new JSEvents();
@@ -144,174 +144,8 @@ public class JSConditionResolver {
         }
 
         if (listOfCheckHistoryChacheRules == null) {
-            listOfCheckHistoryChacheRules = new ArrayList<CheckHistoryCacheRule>();
-            CheckHistoryCacheRule checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("returnCode");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedSuccessful");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedWithError");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedTodaySuccessful");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedTodayWithError");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedRunEndedWithError");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedIsEndedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedSuccessulIsEndedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedWithErrorIsEndedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedIsStartedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedSuccessfulIsStartedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("lastCompletedWithErrorIsStartedBefore");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedToday");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedTodayCompletedSuccessful");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedTodayCompletedWithError");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedTodayCompleted");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("prev");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("prevSuccessful");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("prevError");
-            checkHistoryCacheRule.setValidateAlways(true);
-            checkHistoryCacheRule.setValidateIfFalse(false);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedToday");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedTodaySuccessfully");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedTodayWithError");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedWithErrorAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isCompletedSuccessfulAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedWithErrorAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
-
-            checkHistoryCacheRule = new CheckHistoryCacheRule();
-            checkHistoryCacheRule.setQueryString("isStartedSuccessfulAfter");
-            checkHistoryCacheRule.setValidateAlways(false);
-            checkHistoryCacheRule.setValidateIfFalse(true);
-            listOfCheckHistoryChacheRules.add(checkHistoryCacheRule);
+            listOfCheckHistoryChacheRules = new CheckHistoryCacheRules();
+            listOfCheckHistoryChacheRules.initCacheRules();
         }
 
         initEvents();
@@ -704,7 +538,7 @@ public class JSConditionResolver {
         if (listOfCheckHistoryChacheRules == null) {
             LOGGER.warn("History not initialized");
         } else {
-            for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules) {
+            for (CheckHistoryCacheRule checkHistoryCacheRule : listOfCheckHistoryChacheRules.getListOfCheckHistoryChacheRules()) {
                 checkHistoryKey.setQuery(checkHistoryCacheRule.getQueryString());
                 CheckHistoryValue validateResult = checkHistoryCondition.getCache(checkHistoryKey);
                 if (validateResult != null && ((checkHistoryCacheRule.isValidateAlways()) || (checkHistoryCacheRule.isValidateIfFalse()
