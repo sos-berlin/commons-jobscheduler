@@ -703,7 +703,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         String method = "usePublicKeyMethod";
         Object kd = connection2OptionsAlternate.keepass_database.value();
         Object ke = connection2OptionsAlternate.keepass_database_entry.value();
-        if (authenticationOptions.isUseKeyAgent().isTrue()) {
+        if (connection2OptionsAlternate.useKeyAgent.isTrue()) {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("[%s]isUseKeyAgent", method));
             }
