@@ -72,7 +72,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         try {
             if (!prePostCommandVFSHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.setWithoutSFTPChannel(true);
                 postAlternateOptions.raiseExceptionOnError.value(false);
                 prePostCommandVFSHandler.connect(postAlternateOptions);
             }
@@ -323,7 +322,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            alternateOptions.setWithoutSFTPChannel(true);
             vfsHandler.connect(alternateOptions);
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
@@ -573,7 +571,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
         alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
         alternateOptions.ignoreError.value(options.getIgnoreError().value());
-        alternateOptions.withoutSFTPChannel.value(true);
+        if (objOptions.commandScriptFile.isNotEmpty() && objOptions.commandScriptFile.isDirty()) {
+            alternateOptions.withoutSFTPChannel.value(false);
+        } else {
+            alternateOptions.withoutSFTPChannel.value(true);
+        }
         return alternateOptions;
     }
 
