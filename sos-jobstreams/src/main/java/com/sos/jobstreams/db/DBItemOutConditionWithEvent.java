@@ -2,14 +2,14 @@ package com.sos.jobstreams.db;
 
 import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
 
-public class DBItemOutConditionWithConfiguredEvent implements IJSJobConditionKey {
+public class DBItemOutConditionWithEvent implements IJSJobConditionKey {
 
     private DBItemOutCondition dbItemOutCondition;
-    private DBItemOutConditionEvent dbItemOutConditionEvent;
+    private DBItemEvent dbItemEvent;
 
-    public DBItemOutConditionWithConfiguredEvent(DBItemOutCondition dbItemOutCondition, DBItemOutConditionEvent dbItemOutConditionEvent) {
+    public DBItemOutConditionWithEvent(DBItemOutCondition dbItemOutCondition, DBItemEvent dbItemEvent) {
         this.dbItemOutCondition = dbItemOutCondition;
-        this.dbItemOutConditionEvent = dbItemOutConditionEvent;
+        this.dbItemEvent = dbItemEvent;
     }
 
     public DBItemOutCondition getDbItemOutCondition() {
@@ -20,12 +20,12 @@ public class DBItemOutConditionWithConfiguredEvent implements IJSJobConditionKey
         this.dbItemOutCondition = dbItemOutCondition;
     }
 
-    public DBItemOutConditionEvent getDbItemOutConditionEvent() {
-        return dbItemOutConditionEvent;
+    public DBItemEvent getDbItemEvent() {
+        return dbItemEvent;
     }
 
-    public void setDbItemOutConditionEvent(DBItemOutConditionEvent dbItemOutConditionEvent) {
-        this.dbItemOutConditionEvent = dbItemOutConditionEvent;
+    public void setDbItemEvent(DBItemEvent dbItemEvent) {
+        this.dbItemEvent = dbItemEvent;
     }
 
     @Override

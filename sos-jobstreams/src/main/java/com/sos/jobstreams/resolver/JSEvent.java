@@ -17,10 +17,6 @@ public class JSEvent {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSConditionResolver.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
-    public boolean isDbError() {
-        return dbError;
-    }
-
     DBItemEvent itemEvent;
     private String schedulerId;
     private boolean dbError;
@@ -48,6 +44,10 @@ public class JSEvent {
 
     public void setItemEvent(DBItemEvent itemEvent) {
         this.itemEvent = itemEvent;
+    }
+    
+    public Boolean isGlobal() {
+        return itemEvent.getGlobalEvent();
     }
 
     public Long getId() {
@@ -147,7 +147,11 @@ public class JSEvent {
         }
         return dbError;
     }
-
+    
+    public boolean isDbError() {
+        return dbError;
+    }
+    
     public String toStr() {
         return this.getEvent() + "::" + SOSString.toString(this);
     }

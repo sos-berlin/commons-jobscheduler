@@ -117,10 +117,10 @@ public class DBLayerEvents {
         return query;
     }
 
-    public List<DBItemEvent> getEventsList(FilterEvents filter, final int limit) throws SOSHibernateException {
-        String q = "select e from " + DBItemOutCondition + " o, " + DBItemEvents + " e " + getWhere(filter) + " and o.id=e.outConditionId";
+    public List<DBItemOutConditionWithEvent> getEventsList(FilterEvents filter, final int limit) throws SOSHibernateException {
+        String q = "select new DBItemOutConditionWithEvent(e,o) from " + DBItemOutCondition + " o, " + DBItemEvents + " e " + getWhere(filter) + " and o.id=e.outConditionId";
 
-        Query<DBItemEvent> query = sosHibernateSession.createQuery(q);
+        Query<DBItemOutConditionWithEvent> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 
         if (limit > 0) {

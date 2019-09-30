@@ -32,6 +32,7 @@ import com.sos.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBItemInCondition;
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jobstreams.db.DBLayerEvents;
@@ -138,7 +139,7 @@ public class JSConditionResolver {
             FilterOutConditions filterOutConditions = new FilterOutConditions();
             filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
             DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            List<DBItemOutConditionWithEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+            List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
             jsJobOutConditions = new JSJobOutConditions();
             jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
         }
@@ -164,9 +165,8 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
-            filterEvents.setSchedulerId(settings.getSchedulerId());
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            List<DBItemEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+            List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
     }
@@ -348,6 +348,7 @@ public class JSConditionResolver {
                 }
                 break;
             }
+            case "global": 
             case "event": {
                 String event = jsCondition.getEventName();
 

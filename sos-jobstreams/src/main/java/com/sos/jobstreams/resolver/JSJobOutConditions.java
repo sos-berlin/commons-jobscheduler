@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 
 public class JSJobOutConditions {
 
@@ -30,8 +30,8 @@ public class JSJobOutConditions {
         return this.listOfJobOutConditions.get(jobConditionKey);
     }
 
-    public void setListOfJobOutConditions(List<DBItemOutConditionWithEvent> listOfOutConditions) {
-        for (DBItemOutConditionWithEvent itemOutConditionWithEvent : listOfOutConditions) {
+    public void setListOfJobOutConditions(List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions) {
+        for (DBItemOutConditionWithConfiguredEvent itemOutConditionWithEvent : listOfOutConditions) {
             JSOutCondition jsOutCondition=null;
             JSJobConditionKey jobConditionKey = new JSJobConditionKey(itemOutConditionWithEvent);
             JSOutConditions outConditions = listOfJobOutConditions.get(jobConditionKey);

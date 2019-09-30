@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.sos.jobstreams.db.DBItemEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
+import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 
 public class JSEvents {
 
@@ -31,10 +33,11 @@ public class JSEvents {
         return this.listOfEvents.get(eventKey);
     }
 
-    public void setListOfEvents(List<DBItemEvent> listOfEvents) {
-        for (DBItemEvent itemEvent : listOfEvents) {
+    public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
+        for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
             JSEvent jsEvent = new JSEvent();
-            jsEvent.setItemEvent(itemEvent);
+            jsEvent.setItemEvent(itemEvent.getDbItemEvent());
+            jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
             addEvent(jsEvent);
         }
     }
