@@ -11,6 +11,9 @@ public class JSEventKey {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof JSEventKey) {
             JSEventKey jsEventKey = (JSEventKey) obj;
+            if (session==null || event==null || jobStream == null || schedulerId == null) {
+                System.out.println("Häh?");
+            }
             return session.equals(jsEventKey.session) && event.equals(jsEventKey.event) && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
         }
         return false;

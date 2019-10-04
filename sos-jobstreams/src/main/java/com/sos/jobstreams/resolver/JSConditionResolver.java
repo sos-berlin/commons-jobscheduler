@@ -367,6 +367,7 @@ public class JSConditionResolver {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
                 }
                 jsEventKey.setSession(eventDate.getEventDate(date));
+                jsEventKey.setSchedulerId(settings.getSchedulerId());
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);

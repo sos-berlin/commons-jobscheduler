@@ -96,7 +96,7 @@ public class JSInConditionCommand {
             if (schedulerXmlCommandExecutor != null) {
                 answer = schedulerXmlCommandExecutor.executeXml(jobXml);
             } else {
-                LOGGER.debug("Start job: " + job);
+                LOGGER.debug("Start job will be ignored as running in debug  mode.: " + job);
             }
             executed = true;
         } else {

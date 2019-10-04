@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sos.jobstreams.db.DBItemEvent;
-import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
+import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
+
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 
 public class JSEvents {
@@ -72,6 +72,7 @@ public class JSEvents {
         jsEventKey.setEvent(event.getEvent());
         jsEventKey.setJobStream(event.getJobStream());
         jsEventKey.setSession(event.getSession());
+        jsEventKey.setSchedulerId(event.getSchedulerId());
         this.removeEvent(jsEventKey);
         jsEventKey.setSession("*");
         this.removeEvent(jsEventKey);

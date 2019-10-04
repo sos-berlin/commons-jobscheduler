@@ -34,6 +34,7 @@ public class JSEvent {
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
         jsEventKey.setJobStream(itemEvent.getJobStream());
+        jsEventKey.setSchedulerId(schedulerId);
         return jsEventKey;
     }
 
@@ -103,6 +104,7 @@ public class JSEvent {
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         try {
             sosHibernateSession.beginTransaction();
+            this.itemEvent.setGlobalEvent(false);
             dbLayerEvents.store(this);
             sosHibernateSession.commit();
         } catch (SOSHibernateException e) {
@@ -113,7 +115,7 @@ public class JSEvent {
                 LOGGER.warn("Could not rollback the transaction while storing an event");
             }
             if (isDebugEnabled) {
-                LOGGER.debug("Could not store event: " + this.getEvent() + ":" + SOSString.toString(this));
+                LOGGER.debug("Could not store event: " + this.getEvent() + ":" + SOSString.toString(this) + " " + e.getMessage());
             }
         }
         return dbError;

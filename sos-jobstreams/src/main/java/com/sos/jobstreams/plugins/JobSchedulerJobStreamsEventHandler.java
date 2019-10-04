@@ -246,7 +246,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setSession(customEvent.getSession());
                             event.setJobStream(customEvent.getJobStream());
                             event.setSchedulerId(super.getSettings().getSchedulerId());
-
+ 
                             try {
                                 event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
                             } catch (NumberFormatException e) {
