@@ -95,10 +95,10 @@ public class DBLayerOutConditionEvents {
             dbItemOutConditionEvent.setOutConditionId(dbItemOutCondition.getId());
             dbItemOutConditionEvent.setEvent(outConditionEvent.getEvent());
             dbItemOutConditionEvent.setCommand(outConditionEvent.getCommand());
-            if (outConditionEvent.getGlobal() == null) {
-                outConditionEvent.setGlobal(false);
+            if (outConditionEvent.getGlobalEvent() == null) {
+                outConditionEvent.setGlobalEvent(false);
             }
-            dbItemOutConditionEvent.setGlobalEvent(outConditionEvent.getGlobal());
+            dbItemOutConditionEvent.setGlobalEvent(outConditionEvent.getGlobalEvent());
             dbItemOutConditionEvent.setCreated(new Date());
 
             sosHibernateSession.save(dbItemOutConditionEvent);
