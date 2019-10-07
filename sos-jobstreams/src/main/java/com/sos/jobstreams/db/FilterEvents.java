@@ -3,6 +3,7 @@ package com.sos.jobstreams.db;
 public class FilterEvents {
 
     private String event;
+    private Boolean globalEvent=false;
     private Long outConditionId;
     private String jobStream;
     private String session;
@@ -56,6 +57,22 @@ public class FilterEvents {
 
     public void setSchedulerId(String schedulerId) {
         this.schedulerId = schedulerId;
+    }
+
+    public Boolean getGlobalEvent() {
+        return globalEvent;
+    }
+
+    public void setGlobalEvent(Boolean globalEvent) {
+        this.globalEvent = globalEvent;
+    }
+
+    public String getGlobalEventAsString() {
+        if (globalEvent) {
+            return "true";
+        } else {
+            return "false";
+        }
     }
 
 }

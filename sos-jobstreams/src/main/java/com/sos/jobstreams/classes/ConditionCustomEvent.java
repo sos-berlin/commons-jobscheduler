@@ -8,6 +8,7 @@ public class ConditionCustomEvent {
     private String type;
     private String session;
     private String event;
+    private boolean globalEvent;
     private String outConditionId;
     private String source;
     private String jobStream;
@@ -27,6 +28,7 @@ public class ConditionCustomEvent {
             this.source = variables.getString("source", "");
             this.jobStream = variables.getString("jobStream", "");
             this.job = variables.getString("job", "");
+            this.globalEvent = "true".equals(variables.getString("globalEvent","false"));
             this.outConditionId = variables.getString("outConditionId", "");
         }
         this.eventId = entry.getInt("eventId");
@@ -62,6 +64,10 @@ public class ConditionCustomEvent {
 
     public String getEvent() {
         return event;
+    }
+
+    public boolean isGlobalEvent() {
+        return globalEvent;
     }
 
     

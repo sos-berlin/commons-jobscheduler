@@ -51,6 +51,11 @@ public class DBLayerEvents {
             and = " and ";
         }
 
+        if (filter.getGlobalEvent() != null) {
+            where += and + " e.globalEvent = :globalEvent";
+            and = " and ";
+        }
+
         if (filter.getJob() != null && !"".equals(filter.getJob())) {
             where += and + " o.job = :job";
             and = " and ";
@@ -99,6 +104,9 @@ public class DBLayerEvents {
         if (filter.getEvent() != null && !"".equals(filter.getEvent())) {
             query.setParameter("event", filter.getEvent());
         }
+        if (filter.getGlobalEvent() != null) {
+            query.setParameter("globalEvent", filter.getGlobalEvent());
+        }
         if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
             query.setParameter("schedulerId", filter.getSchedulerId());
         }
@@ -118,7 +126,8 @@ public class DBLayerEvents {
     }
 
     public List<DBItemOutConditionWithEvent> getEventsList(FilterEvents filter, final int limit) throws SOSHibernateException {
-        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemEvents + " e " + getWhere(filter) + " and o.id=e.outConditionId";
+        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemEvents + " e "
+                + getWhere(filter) + " and o.id=e.outConditionId";
 
         Query<DBItemOutConditionWithEvent> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
@@ -131,14 +140,17 @@ public class DBLayerEvents {
 
     public Integer delete(FilterEvents filter) throws SOSHibernateException {
 
-        String schedulerId = filter.getSchedulerId();
-        filter.setSchedulerId("");
-        String select = "select id from " + DBItemOutCondition + " where schedulerId = :schedulerId";
-        String hql = "delete from " + DBItemEvents + " e " + getWhere(filter) + " and e.outConditionId in ( " + select + ")";
-
         int row = 0;
+        String hql = "";
+
+        if (filter.getGlobalEvent()) {
+            filter.setSchedulerId("");
+            hql = "delete from " + DBItemEvents + " e " + getWhere(filter);
+        } else {
+            String select = "select id from " + DBItemOutCondition + " where schedulerId = :schedulerId";
+            hql = "delete from " + DBItemEvents + " e " + getWhere(filter) + " and e.outConditionId in ( " + select + ")";
+        }
         Query<DBItemEvent> query = sosHibernateSession.createQuery(hql);
-        filter.setSchedulerId(schedulerId);
         query = bindParameters(filter, query);
 
         row = sosHibernateSession.executeUpdate(query);
@@ -153,6 +165,7 @@ public class DBLayerEvents {
         filterEvents.setOutConditionId(event.getOutConditionId());
         filterEvents.setSession(event.getSession());
         filterEvents.setSchedulerId(event.getSchedulerId());
+        filterEvents.setGlobalEvent(event.isGlobal());
         delete(filterEvents);
         sosHibernateSession.save(event.getItemEvent());
     }

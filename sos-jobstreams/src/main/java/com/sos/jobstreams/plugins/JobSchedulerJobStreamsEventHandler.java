@@ -246,6 +246,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setSession(customEvent.getSession());
                             event.setJobStream(customEvent.getJobStream());
                             event.setSchedulerId(super.getSettings().getSchedulerId());
+                            event.setGlobalEvent(customEvent.isGlobalEvent());
  
                             try {
                                 event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
@@ -271,6 +272,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setEvent(customEvent.getEvent());
                             event.setSession(customEvent.getSession());
                             event.setSchedulerId(super.getSettings().getSchedulerId());
+                            event.setGlobalEvent(customEvent.isGlobalEvent());
 
                             conditionResolver.removeEvent(event);
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());

@@ -47,4 +47,8 @@ public class JSOutConditionEvent {
     public boolean isDeleteCommand() {
         return itemOutConditionEvent.isDelete();
     }
+
+    public boolean isGlobal() {
+        return itemOutConditionEvent.getGlobalEvent();
+    }
 }

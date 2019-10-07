@@ -83,6 +83,10 @@ public class JSEvent {
         itemEvent.setEvent(event);
     }
 
+    public void setGlobalEvent(boolean globalEvent) {
+        itemEvent.setGlobalEvent(globalEvent);
+    }
+
     public void setSession(String session) {
         itemEvent.setSession(session);
     }
@@ -104,7 +108,6 @@ public class JSEvent {
         DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
         try {
             sosHibernateSession.beginTransaction();
-            this.itemEvent.setGlobalEvent(false);
             dbLayerEvents.store(this);
             sosHibernateSession.commit();
         } catch (SOSHibernateException e) {
@@ -131,6 +134,7 @@ public class JSEvent {
             filterEvents.setSchedulerId(this.getSchedulerId());
             filterEvents.setEvent(this.getEvent());
             filterEvents.setSession(this.getSession());
+            filterEvents.setGlobalEvent(this.isGlobal());
 
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();

@@ -3,6 +3,9 @@ package com.sos.jobstreams.db;
 import java.util.Date;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.Type;
+
 import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.Constants.OutConditionEventCommand;
 
@@ -16,6 +19,7 @@ public class DBItemOutConditionEvent {
     private Long outConditionId;
     private String event;
     private String command;
+    private Boolean globalEvent;
     private Date created;
 
     public DBItemOutConditionEvent() {
@@ -62,6 +66,16 @@ public class DBItemOutConditionEvent {
         this.command = command;
     }
 
+    @Column(name = "[GLOBAL_EVENT]", nullable = false)
+    @Type(type = "numeric_boolean")
+    public Boolean getGlobalEvent() {
+        return this.globalEvent;
+    }
+
+    public void setGlobalEvent(Boolean globalEvent) {
+        this.globalEvent = globalEvent;
+    }
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "[CREATED]", nullable = false)
     public Date getCreated() {
