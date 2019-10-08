@@ -79,11 +79,10 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setOutConditionId(outConditionEvent.getOutConditionId());
             itemEvent.setJobStream(this.jobStream);
             itemEvent.setGlobalEvent(outConditionEvent.isGlobal());
-            
+
             itemEvent.setSession(Constants.getSession());
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
-            event.setSchedulerId(jobSchedulerId);
 
             if (outConditionEvent.isCreateCommand()) {
                 jsEvents.addEvent(event);

@@ -19,6 +19,7 @@ public class JSJobInConditions {
 
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
     private EventHandlerSettings settings;
+    private Boolean haveGlobalConditions = false;
 
     public JSJobInConditions(EventHandlerSettings settings) {
         super();
@@ -32,8 +33,7 @@ public class JSJobInConditions {
         if (jsInConditions == null) {
             jsInConditions = new JSInConditions();
         }
-
-        jsInConditions.addInCondition(inCondition);
+        this.haveGlobalConditions = this.haveGlobalConditions || inCondition.getExpression().contains("global:");      
         listOfJobInConditions.put(jobConditionKey, jsInConditions);
     }
 
@@ -41,7 +41,7 @@ public class JSJobInConditions {
         return this.listOfJobInConditions.get(jobConditionKey);
     }
 
-    public void setListOfJobInConditions(SOSHibernateSession sosHibernateSession, List<DBItemInConditionWithCommand> listOfInConditions){
+    public void setListOfJobInConditions(SOSHibernateSession sosHibernateSession, List<DBItemInConditionWithCommand> listOfInConditions) {
         for (DBItemInConditionWithCommand itemInConditionWithCommand : listOfInConditions) {
             JSInCondition jsInCondition = null;
             JSJobConditionKey jobConditionKey = new JSJobConditionKey(itemInConditionWithCommand);
@@ -64,6 +64,11 @@ public class JSJobInConditions {
 
     public Map<JSJobConditionKey, JSInConditions> getListOfJobInConditions() {
         return listOfJobInConditions;
+    }
+
+    
+    public Boolean getHaveGlobalConditions() {
+        return haveGlobalConditions;
     }
 
 }

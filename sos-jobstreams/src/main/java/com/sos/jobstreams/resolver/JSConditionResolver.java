@@ -29,7 +29,6 @@ import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.db.DBItemConsumedInCondition;
-import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBItemInCondition;
 import com.sos.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
@@ -88,12 +87,25 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
         jsJobOutConditions = null;
-        sosHibernateSession.beginTransaction();
-        sosHibernateSession.commit();
+//        sosHibernateSession.beginTransaction();
+//        sosHibernateSession.commit();
 
         jsEvents = null;
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
         this.init();
+    }
+    
+    public void reInitEvents(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolver reinit events injobstream model");
+//        sosHibernateSession.beginTransaction();
+//        sosHibernateSession.commit();
+        jsEvents = null;
+        this.sosHibernateSession = sosHibernateSession;
+        this.initEvents();
+    }
+    
+    public boolean haveGlobalEvents(){
+        return this.jsJobInConditions.getHaveGlobalConditions();
     }
 
     public void init() throws SOSHibernateException {
@@ -367,7 +379,13 @@ public class JSConditionResolver {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
                 }
                 jsEventKey.setSession(eventDate.getEventDate(date));
-                jsEventKey.setSchedulerId(settings.getSchedulerId());
+                if (jsCondition.typeIsGlobalEvent()) {
+                    jsEventKey.setSchedulerId(null);
+                    jsEventKey.setGlobalEvent(true);
+                }else {
+                    jsEventKey.setSchedulerId(settings.getSchedulerId());
+                    jsEventKey.setGlobalEvent(false);
+                }
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
@@ -522,7 +540,7 @@ public class JSConditionResolver {
     }
 
     public void removeEvent(JSEvent event) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getJobStream() + "." + event.getEvent());
+        LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getEvent());
         this.removeJsEvents = new JSEvents();
         event.deleteEvent(sosHibernateSession);
         removeJsEvents.addEvent(event);
@@ -530,7 +548,7 @@ public class JSConditionResolver {
         LOGGER.debug(event.getEvent() + " removed");
     }
 
-    public Boolean eventExist(JSEventKey jsEventKey, String jobStream) {
+    public Boolean eventExists(JSEventKey jsEventKey, String jobStream) {
         JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jobStream);
         return jsEvent != null;
     }

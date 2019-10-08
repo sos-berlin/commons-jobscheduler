@@ -168,7 +168,6 @@ public class DBLayerOutConditions {
                 dbLayerOutConditionEvents.delete(filterOutConditionEvents);
 
                 FilterEvents filterEvents = new FilterEvents();
-                filterEvents.setSchedulerId(outConditions.getJobschedulerId());
                 filterEvents.setOutConditionId(dbItemOutCondition.getId());
                 dbLayerEvents.delete(filterEvents);
             }

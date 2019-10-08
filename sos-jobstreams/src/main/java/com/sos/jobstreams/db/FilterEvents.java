@@ -3,7 +3,7 @@ package com.sos.jobstreams.db;
 public class FilterEvents {
 
     private String event;
-    private Boolean globalEvent=false;
+    private Boolean globalEvent;
     private Long outConditionId;
     private String jobStream;
     private String session;
@@ -68,6 +68,7 @@ public class FilterEvents {
     }
 
     public String getGlobalEventAsString() {
+      
         if (globalEvent) {
             return "true";
         } else {

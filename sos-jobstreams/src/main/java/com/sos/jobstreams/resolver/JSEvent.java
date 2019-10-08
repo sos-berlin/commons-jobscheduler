@@ -34,7 +34,12 @@ public class JSEvent {
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
         jsEventKey.setJobStream(itemEvent.getJobStream());
-        jsEventKey.setSchedulerId(schedulerId);
+        if (itemEvent.getGlobalEvent()) {
+            jsEventKey.setSchedulerId(null);
+        } else {
+            jsEventKey.setSchedulerId(schedulerId);
+        }
+        jsEventKey.setGlobalEvent(itemEvent.getGlobalEvent());
         return jsEventKey;
     }
 
@@ -46,8 +51,8 @@ public class JSEvent {
     public void setItemEvent(DBItemEvent itemEvent) {
         this.itemEvent = itemEvent;
     }
-    
-    public Boolean isGlobal() {
+
+    public Boolean isGlobalEvent() {
         return itemEvent.getGlobalEvent();
     }
 
@@ -134,7 +139,7 @@ public class JSEvent {
             filterEvents.setSchedulerId(this.getSchedulerId());
             filterEvents.setEvent(this.getEvent());
             filterEvents.setSession(this.getSession());
-            filterEvents.setGlobalEvent(this.isGlobal());
+            filterEvents.setGlobalEvent(this.isGlobalEvent());
 
             dbLayerEvents.delete(filterEvents);
             sosHibernateSession.commit();
@@ -153,11 +158,11 @@ public class JSEvent {
         }
         return dbError;
     }
-    
+
     public boolean isDbError() {
         return dbError;
     }
-    
+
     public String toStr() {
         return this.getEvent() + "::" + SOSString.toString(this);
     }

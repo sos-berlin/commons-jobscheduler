@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
-
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 
 public class JSEvents {
@@ -51,8 +49,8 @@ public class JSEvents {
 
     }
 
-    public JSEvent getEventByJobStream(JSEventKey jsEventKey, String conditionJobStream) {
-        if (conditionJobStream.isEmpty()) {
+    public JSEvent getEventByJobStream(JSEventKey jsEventKey, String jobStream) {
+        if (jobStream.isEmpty()) {
             for (JSEventKey eventKey : this.listOfEvents.keySet()) {
                 jsEventKey.setJobStream(eventKey.getJobStream());
                 JSEvent jsEvent = getEvent(jsEventKey);
@@ -61,7 +59,7 @@ public class JSEvents {
                 }
             }
         } else {
-            jsEventKey.setJobStream(conditionJobStream);
+            jsEventKey.setJobStream(jobStream);
             return getEvent(jsEventKey);
         }
         return null;
@@ -73,6 +71,7 @@ public class JSEvents {
         jsEventKey.setJobStream(event.getJobStream());
         jsEventKey.setSession(event.getSession());
         jsEventKey.setSchedulerId(event.getSchedulerId());
+        jsEventKey.setGlobalEvent(event.isGlobalEvent());
         this.removeEvent(jsEventKey);
         jsEventKey.setSession("*");
         this.removeEvent(jsEventKey);

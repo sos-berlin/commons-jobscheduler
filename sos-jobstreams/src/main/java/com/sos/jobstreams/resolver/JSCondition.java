@@ -16,7 +16,7 @@ public class JSCondition {
     private String conditionJobChain;
     private String conditionQuery;
     private String eventName;
-
+ 
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);

@@ -6,22 +6,26 @@ public class JSEventKey {
     private String event;
     private String jobStream;
     private String schedulerId;
+    private Boolean globalEvent = false;
 
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof JSEventKey) {
             JSEventKey jsEventKey = (JSEventKey) obj;
-            if (session==null || event==null || jobStream == null || schedulerId == null) {
-                System.out.println("Häh?");
+            if (jsEventKey.schedulerId == null) {
+                return jsEventKey.globalEvent.equals(this.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
+                        && jobStream.equals(jsEventKey.jobStream);
+            } else {
+                return jsEventKey.globalEvent.equals(this.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
+                        && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
             }
-            return session.equals(jsEventKey.session) && event.equals(jsEventKey.event) && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (session + "." + event + "." + jobStream + "." + schedulerId).hashCode();
+        return (globalEvent + "." + session + "." + event + "." + jobStream + "." + schedulerId).hashCode();
     }
 
     public String getSession() {
@@ -40,24 +44,28 @@ public class JSEventKey {
         this.event = event;
     }
 
-    
     public String getJobStream() {
         return jobStream;
     }
 
-    
     public void setJobStream(String jobStream) {
         this.jobStream = jobStream;
     }
 
-    
     public String getSchedulerId() {
         return schedulerId;
     }
 
-    
     public void setSchedulerId(String schedulerId) {
         this.schedulerId = schedulerId;
+    }
+
+    public Boolean getGlobalEvent() {
+        return globalEvent;
+    }
+
+    public void setGlobalEvent(Boolean globalEvent) {
+        this.globalEvent = globalEvent;
     }
 
 }
