@@ -177,6 +177,8 @@ public class JSConditionResolver {
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSchedulerId(settings.getSchedulerId());
+            filterEvents.setIncludingGlobalEvent(true);
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);

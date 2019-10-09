@@ -36,7 +36,15 @@ public class DBLayerEvents {
         String where = "1=1";
         String and = " and ";
 
-        
+        if (filter.getSchedulerId() != null && !"".equals(filter.getSchedulerId())) {
+            if (filter.getIncludingGlobalEvent()) {
+                where += and + " (o.schedulerId = :schedulerId or e.globalEvent=true)";
+            } else {
+                where += and + " o.schedulerId = :schedulerId";
+            }
+            and = " and ";
+        }
+
         if (filter.getSession() != null && !"".equals(filter.getSession())) {
             where += and + " e.session = :session";
             and = " and ";
@@ -138,13 +146,17 @@ public class DBLayerEvents {
 
         int row = 0;
         String hql = "";
+        String schedulerId = filter.getSchedulerId();
+                
 
         if (filter.getGlobalEvent() == null || filter.getGlobalEvent()) {
             filter.setSchedulerId("");
             hql = "delete from " + DBItemEvents + " e " + getWhere(filter);
         } else {
-            String select = "select id from " + DBItemOutCondition + " where schedulerId = :schedulerId";
+            filter.setSchedulerId("");
+            String select = "select id from " + DBItemOutCondition  + " where schedulerId = :schedulerId";
             hql = "delete from " + DBItemEvents + " e " + getWhere(filter) + " and e.outConditionId in ( " + select + ")";
+            filter.setSchedulerId(schedulerId);
         }
         Query<DBItemEvent> query = sosHibernateSession.createQuery(hql);
         query = bindParameters(filter, query);

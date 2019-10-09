@@ -33,7 +33,8 @@ public class JSJobInConditions {
         if (jsInConditions == null) {
             jsInConditions = new JSInConditions();
         }
-        this.haveGlobalConditions = this.haveGlobalConditions || inCondition.getExpression().contains("global:");      
+        this.haveGlobalConditions = this.haveGlobalConditions || inCondition.getExpression().contains("global:");
+        jsInConditions.addInCondition(inCondition);
         listOfJobInConditions.put(jobConditionKey, jsInConditions);
     }
 

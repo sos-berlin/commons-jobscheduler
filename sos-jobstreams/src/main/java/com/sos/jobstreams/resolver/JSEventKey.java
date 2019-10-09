@@ -1,6 +1,12 @@
 package com.sos.jobstreams.resolver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSEventKey {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSEventKey.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     private String session;
     private String event;
@@ -16,7 +22,13 @@ public class JSEventKey {
                 return jsEventKey.globalEvent.equals(this.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
                         && jobStream.equals(jsEventKey.jobStream);
             } else {
-                return jsEventKey.globalEvent.equals(this.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
+                if (jsEventKey.globalEvent == null) {
+                    jsEventKey.setGlobalEvent(false);
+                    if (isDebugEnabled) {
+                        LOGGER.debug("!!!!!!! NPE in JSEventKey");
+                    }
+                }
+                return this.globalEvent.equals(jsEventKey.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
                         && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
             }
         }

@@ -20,7 +20,6 @@ public class JSEvents {
         JSEventKey key = event.getKey();
         key.setSession("*");
         this.listOfEvents.put(key, event);
-
     }
 
     public void removeEvent(JSEventKey eventKey) {

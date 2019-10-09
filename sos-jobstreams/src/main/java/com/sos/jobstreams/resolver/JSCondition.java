@@ -16,7 +16,8 @@ public class JSCondition {
     private String conditionJobChain;
     private String conditionQuery;
     private String eventName;
- 
+    private boolean globalEvent;
+
     public JSCondition(String condition) {
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
@@ -27,10 +28,21 @@ public class JSCondition {
         conditionDate = getConditionDate(conditionParam);
         eventName = getConditionEventName(conditionParam);
         conditionValue = condition;
+        globalEvent = typeIsGlobalEvent();
     }
 
     public String getEventName() {
         return eventName;
+    }
+
+    public String getEventNameWithType() {
+        String e = "";
+        if (this.typeIsGlobalEvent()) {
+            e = "global:" + this.getEventName();
+        } else {
+            e = this.getEventName();
+        }
+        return e;
     }
 
     private String getConditionDate(String conditionParam) {
@@ -145,5 +157,10 @@ public class JSCondition {
 
     public String getConditionJobChain() {
         return conditionJobChain;
+    }
+
+    
+    public boolean isGlobalEvent() {
+        return globalEvent;
     }
 }
