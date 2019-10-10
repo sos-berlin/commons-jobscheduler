@@ -29,8 +29,7 @@ public class TestInConditions {
 
     @Test
     public void testConditions() throws SOSHibernateException {
-        JSConditions jsConditions = new JSConditions();
-        List<JSCondition> listOfConditions = jsConditions.getListOfConditions("event:event1 and event2 or not event:event3");
+        List<JSCondition> listOfConditions = JSConditions.getListOfConditions("event:event1 and event2 or not event:event3");
         assertEquals("testConditions", "event", listOfConditions.get(0).getConditionType());
         assertEquals("testConditions", "event1", listOfConditions.get(0).getConditionParam());
         assertEquals("testConditions", "event", listOfConditions.get(1).getConditionType());
@@ -39,7 +38,7 @@ public class TestInConditions {
         assertEquals("testConditions", "event3", listOfConditions.get(2).getConditionParam());
 
         
-        listOfConditions = jsConditions.getListOfConditions("(event:event1 or event:event2) and event:event3");
+        listOfConditions = JSConditions.getListOfConditions("(event:event1 or event:event2) and event:event3");
         assertEquals("testConditions", "event", listOfConditions.get(0).getConditionType());
         assertEquals("testConditions", "event1", listOfConditions.get(0).getConditionParam());
         assertEquals("testConditions", "event", listOfConditions.get(1).getConditionType());

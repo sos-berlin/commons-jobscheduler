@@ -149,7 +149,7 @@ public class DBLayerEvents {
         String schedulerId = filter.getSchedulerId();
                 
 
-        if (filter.getGlobalEvent() == null || filter.getGlobalEvent()) {
+        if (filter.getGlobalEvent() != null && filter.getGlobalEvent()) {
             filter.setSchedulerId("");
             hql = "delete from " + DBItemEvents + " e " + getWhere(filter);
         } else {

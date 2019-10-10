@@ -233,8 +233,7 @@ public class JSConditionResolver {
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expressionValue = inCondition.getExpression();
-                JSConditions jsConditions = new JSConditions();
-                List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
+                List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
                 for (JSCondition jsCondition : listOfConditions) {
                     try {
                         switch (jsCondition.getConditionType()) {
@@ -292,8 +291,8 @@ public class JSConditionResolver {
 
     public boolean validate(Integer taskReturnCode, IJSCondition condition) {
         String expressionValue = condition.getExpression() + " ";
-        JSConditions jsConditions = new JSConditions();
-        List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
+        expressionValue = JSConditions.normalizeExpression(expressionValue);
+        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
         LOGGER.trace("JSConditionResolve::validate");
         for (JSCondition jsCondition : listOfConditions) {
             LOGGER.trace("JSConditionResolve::validate --> " + jsCondition.getConditionType());

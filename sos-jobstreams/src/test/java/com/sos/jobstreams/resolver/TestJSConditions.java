@@ -1,5 +1,7 @@
 package com.sos.jobstreams.resolver;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,8 +23,15 @@ public class TestJSConditions {
 
     @Test
     public void test() {
-        JSConditions jsConditions = new JSConditions();
-        jsConditions.getListOfConditions("job:isStartedToday and job:/job5.isStartedToday  and job_chain:/job_chain1[start].isStartedToday");
+        JSConditions.getListOfConditions("job:isStartedToday event:test2(yesterday) and job:/job5.isStartedToday  and job_chain:/job_chain1[start].isStartedToday");
+    }
+    
+    @Test
+    public void testNormalize() {
+        String s = JSConditions.normalizeExpression("job:isStartedToday and job:/job5.isStartedToday and event:test1 and test2 and global:test3[yesterday] and job_chain:/job_chain1[start].isStartedToday");
+        assertEquals("testNormalize", "job:isStartedToday and job:/job5.isStartedToday and event:test1 and event:test2 and global:test3[yesterday] and job_chain:/job_chain1[start].isStartedToday", s);
+
+         
     }
 
 }

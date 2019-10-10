@@ -13,12 +13,8 @@ import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBItemOutCondition;
-import com.sos.jobstreams.db.DBLayerEvents;
-import com.sos.jobstreams.db.FilterEvents;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
-
-import sos.util.SOSString;
 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
@@ -83,6 +79,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setSession(Constants.getSession());
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
+            event.setSchedulerId(jobSchedulerId);
 
             if (outConditionEvent.isCreateCommand()) {
                 jsEvents.addEvent(event);

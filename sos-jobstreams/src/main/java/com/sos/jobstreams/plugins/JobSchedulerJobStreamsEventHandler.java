@@ -77,19 +77,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public class InputTask extends TimerTask {
 
         public void run() {
-            SOSHibernateSession sosHibernateSession=null;
+            SOSHibernateSession sosHibernateSession = null;
             try {
-                 sosHibernateSession = reportingFactory.openStatelessSession();
+                sosHibernateSession = reportingFactory.openStatelessSession();
                 conditionResolver.reInitEvents(sosHibernateSession);
             } catch (SOSHibernateException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 if (sosHibernateSession != null) {
                     sosHibernateSession.close();
                 }
             }
-            
+
             globalEventsPollTimer.cancel();
             globalEventsPollTimer.purge();
 
