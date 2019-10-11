@@ -1,5 +1,8 @@
 package com.sos.jobstreams.plugins;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.Date;
@@ -14,6 +17,7 @@ import javax.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -81,16 +85,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             try {
                 sosHibernateSession = reportingFactory.openStatelessSession();
                 conditionResolver.reInitEvents(sosHibernateSession);
-            } catch (SOSHibernateException e) {
+                resolveInConditions(sosHibernateSession);
+            } catch (Exception e) {
                 e.printStackTrace();
+                removeTimer();
             } finally {
                 if (sosHibernateSession != null) {
                     sosHibernateSession.close();
                 }
             }
-
-            globalEventsPollTimer.cancel();
-            globalEventsPollTimer.purge();
 
         }
     }
@@ -213,6 +216,34 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         }
     }
+   
+    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception {
+        DurationCalculator duration = null;
+        if (isDebugEnabled) {
+            LOGGER.debug("Resolve inconditinons");
+            duration = new DurationCalculator();
+        }
+        List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
+        for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
+            if (!jsInCondition.isSkipOutCondition()) {
+                for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                    if (!inConditionCommand.isExecuted()) {
+                        TaskEndEvent taskEndEvent = new TaskEndEvent();
+                        taskEndEvent.setJobPath(jsInCondition.getJob());
+                        taskEndEvent.setReturnCode(0);
+                        taskEndEvent.setTaskId("");
+                        LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
+                        inConditionCommand.setExecuted(true);
+                        performTaskEnd(sosHibernateSession, taskEndEvent);
+                    }
+                }
+            }
+        }
+        if (isDebugEnabled & duration != null) {
+            duration.end("Resolving all InConditions: ");
+        }
+    }
 
     private void execute(boolean onNonEmptyEvent, Long eventId, JsonArray events) {
         String method = "execute";
@@ -299,6 +330,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             break;
                         case "StartConditionResolver":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "StartConditionResolver");
+                            if (!conditionResolver.haveGlobalEvents()) {
+                                conditionResolver.reInitEvents(sosHibernateSession);
+                            }
                             resolveInConditions = true;
                             break;
                         case "AddEvent":
@@ -374,32 +408,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
             if (resolveInConditions) {
-
-                DurationCalculator duration = null;
-                if (isDebugEnabled) {
-                    LOGGER.debug("Resolve inconditinons");
-                    duration = new DurationCalculator();
-                }
-                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions();
-                for (JSInCondition jsInCondition : listOfValidatedInconditions) {
-                    publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
-                    if (!jsInCondition.isSkipOutCondition()) {
-                        for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
-                            if (!inConditionCommand.isExecuted()) {
-                                TaskEndEvent taskEndEvent = new TaskEndEvent();
-                                taskEndEvent.setJobPath(jsInCondition.getJob());
-                                taskEndEvent.setReturnCode(0);
-                                taskEndEvent.setTaskId("");
-                                LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
-                                inConditionCommand.setExecuted(true);
-                                performTaskEnd(sosHibernateSession, taskEndEvent);
-                            }
-                        }
-                    }
-                }
-                if (isDebugEnabled & duration != null) {
-                    duration.end("Resolving all InConditions: ");
-                }
+                resolveInConditions(sosHibernateSession);
             }
         } catch (Exception e) {
             this.getMailer().sendOnError("JobSchedulerConditionsEventHandler", method, e);
