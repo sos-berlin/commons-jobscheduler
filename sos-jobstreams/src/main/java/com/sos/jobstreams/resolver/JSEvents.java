@@ -31,10 +31,12 @@ public class JSEvents {
 
     public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
         for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
-            JSEvent jsEvent = new JSEvent();
-            jsEvent.setItemEvent(itemEvent.getDbItemEvent());
-            jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
-            addEvent(jsEvent);
+            if (itemEvent != null) {
+                JSEvent jsEvent = new JSEvent();
+                jsEvent.setItemEvent(itemEvent.getDbItemEvent());
+                jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
+                addEvent(jsEvent);
+            }
         }
     }
 
@@ -54,7 +56,8 @@ public class JSEvents {
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
                     .getEvent()) && ("*".equals(jsEventKey.getSession()) || jsEventKey.getSession().equals(jsEvent.getKey().getSession()))
                     && (jsEventKey.getJobStream().isEmpty() || jsEventKey.getJobStream().equals(jsEvent.getValue().getJobStream())) && (jsEventKey
-                            .getGlobalEvent() && jsEvent.getValue().isGlobalEvent() || !jsEventKey.getGlobalEvent() && !jsEvent.getValue().isGlobalEvent() && jsEvent.getKey().getSchedulerId().equals(jsEventKey.getSchedulerId())))
+                            .getGlobalEvent() && jsEvent.getValue().isGlobalEvent() || !jsEventKey.getGlobalEvent() && !jsEvent.getValue()
+                                    .isGlobalEvent() && jsEvent.getKey().getSchedulerId().equals(jsEventKey.getSchedulerId())))
 
                     .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
             try {
