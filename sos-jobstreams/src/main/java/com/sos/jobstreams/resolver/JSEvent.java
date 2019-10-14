@@ -34,11 +34,7 @@ public class JSEvent {
         jsEventKey.setSession(itemEvent.getSession());
         jsEventKey.setEvent(itemEvent.getEvent());
         jsEventKey.setJobStream(itemEvent.getJobStream());
-        if (itemEvent.getGlobalEvent()) {
-            jsEventKey.setSchedulerId(null);
-        } else {
-            jsEventKey.setSchedulerId(schedulerId);
-        }
+        jsEventKey.setSchedulerId(schedulerId);
         jsEventKey.setGlobalEvent(itemEvent.getGlobalEvent());
         return jsEventKey;
     }

@@ -18,20 +18,16 @@ public class JSEventKey {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof JSEventKey) {
             JSEventKey jsEventKey = (JSEventKey) obj;
-            if (jsEventKey.schedulerId == null) {
-                return jsEventKey.globalEvent.equals(this.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
-                        && jobStream.equals(jsEventKey.jobStream);
-            } else {
-                if (jsEventKey.globalEvent == null) {
-                    jsEventKey.setGlobalEvent(false);
-                    if (isDebugEnabled) {
-                        LOGGER.debug("!!!!!!! NPE in JSEventKey");
-                    }
+            if (jsEventKey.globalEvent == null) {
+                jsEventKey.setGlobalEvent(false);
+                if (isDebugEnabled) {
+                    LOGGER.debug("!!!!!!! NPE in JSEventKey");
                 }
-                return this.globalEvent.equals(jsEventKey.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
-                        && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
             }
+            return this.globalEvent.equals(jsEventKey.globalEvent) && session.equals(jsEventKey.session) && event.equals(jsEventKey.event)
+                    && jobStream.equals(jsEventKey.jobStream) && schedulerId.equals(jsEventKey.schedulerId);
         }
+
         return false;
     }
 

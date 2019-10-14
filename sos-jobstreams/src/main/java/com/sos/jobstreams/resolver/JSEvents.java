@@ -3,6 +3,8 @@ package com.sos.jobstreams.resolver;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 
@@ -17,9 +19,6 @@ public class JSEvents {
 
     public void addEvent(JSEvent event) {
         this.listOfEvents.put(event.getKey(), event);
-        JSEventKey key = event.getKey();
-        key.setSession("*");
-        this.listOfEvents.put(key, event);
     }
 
     public void removeEvent(JSEventKey eventKey) {
@@ -48,20 +47,23 @@ public class JSEvents {
 
     }
 
-    public JSEvent getEventByJobStream(JSEventKey jsEventKey, String jobStream) {
-        if (jobStream.isEmpty()) {
-            for (JSEventKey eventKey : this.listOfEvents.keySet()) {
-                jsEventKey.setJobStream(eventKey.getJobStream());
-                JSEvent jsEvent = getEvent(jsEventKey);
-                if (jsEvent != null) {
-                    return jsEvent;
-                }
-            }
+    public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
+        if (jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
+            return this.getEvent(jsEventKey);
         } else {
-            jsEventKey.setJobStream(jobStream);
-            return getEvent(jsEventKey);
+            Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
+                    .getEvent()) && ("*".equals(jsEventKey.getSession()) || jsEventKey.getSession().equals(jsEvent.getKey().getSession()))
+                    && (jsEventKey.getJobStream().isEmpty() || jsEventKey.getJobStream().equals(jsEvent.getValue().getJobStream())) && (jsEventKey
+                            .getGlobalEvent() && jsEvent.getValue().isGlobalEvent() || !jsEventKey.getGlobalEvent() && !jsEvent.getValue().isGlobalEvent() && jsEvent.getKey().getSchedulerId().equals(jsEventKey.getSchedulerId())))
+
+                    .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+            try {
+                return collect.entrySet().stream().findAny().get().getValue();
+            } catch (NoSuchElementException e) {
+                return null;
+            }
         }
-        return null;
+
     }
 
     public void removeEvent(JSEvent event) {
@@ -72,19 +74,15 @@ public class JSEvents {
         jsEventKey.setSchedulerId(event.getSchedulerId());
         jsEventKey.setGlobalEvent(event.isGlobalEvent());
         this.removeEvent(jsEventKey);
-        jsEventKey.setSession("*");
-        this.removeEvent(jsEventKey);
     }
 
     public void newList() {
-        this.listOfEvents = new HashMap<JSEventKey, JSEvent>(); 
-    }
-    
-    public boolean isEmpty() {
-        return listOfEvents.size() == 0;
-        
+        this.listOfEvents = new HashMap<JSEventKey, JSEvent>();
     }
 
- 
-   
+    public boolean isEmpty() {
+        return listOfEvents.size() == 0;
+
+    }
+
 }

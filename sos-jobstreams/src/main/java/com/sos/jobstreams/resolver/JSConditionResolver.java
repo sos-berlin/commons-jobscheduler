@@ -380,14 +380,10 @@ public class JSConditionResolver {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
                 }
                 jsEventKey.setSession(eventDate.getEventDate(date));
-                if (jsCondition.typeIsGlobalEvent()) {
-                    jsEventKey.setSchedulerId(null);
-                    jsEventKey.setGlobalEvent(true);
-                }else {
-                    jsEventKey.setSchedulerId(settings.getSchedulerId());
-                    jsEventKey.setGlobalEvent(false);
-                }
-                JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jsCondition.getConditionJobStream());
+                jsEventKey.setGlobalEvent(jsCondition.typeIsGlobalEvent());
+                jsEventKey.setSchedulerId(settings.getSchedulerId());
+                jsEventKey.setJobStream(jsCondition.getConditionJobStream());
+                JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
                     expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
@@ -549,8 +545,8 @@ public class JSConditionResolver {
         LOGGER.debug(event.getEvent() + " removed");
     }
 
-    public Boolean eventExists(JSEventKey jsEventKey, String jobStream) {
-        JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey, jobStream);
+    public Boolean eventExists(JSEventKey jsEventKey) {
+        JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
         return jsEvent != null;
     }
 
