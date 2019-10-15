@@ -12,7 +12,7 @@ public class FunctionResolver {
     public String resolveFunctions(String paramValue) {
         String newValue = paramValue;
         String[] functions = paramValue.split("%%");
-        for (int i = 0; i < functions.length; i++) {
+        for (int i = 0; i < functions.length; i++) { 
             String f = functions[i];
             String functionName = HistoryHelper.getMethodName(f);
             String parameter = HistoryHelper.getParameter(f);
