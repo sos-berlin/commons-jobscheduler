@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,14 +18,16 @@ import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
-import com.sos.jobstreams.classes.Constants;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.JobStreamCalendar;
-import com.sos.jobstreams.db.DBItemConsumedInCondition;
-import com.sos.jobstreams.db.DBItemInCondition;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jobstreams.db.FilterCalendarUsage;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
+import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 import sos.util.SOSString;
@@ -143,7 +147,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public void executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
-            throws SOSHibernateException {
+            throws SOSHibernateException, JocException, JAXBException {
         LOGGER.trace("execute commands ------>");
         if (this.isMarkExpression()) {
             LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");

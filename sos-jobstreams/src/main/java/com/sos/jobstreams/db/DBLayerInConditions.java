@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
+import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.joc.model.jobstreams.InCondition;
 import com.sos.joc.model.jobstreams.InConditions;
 import com.sos.joc.model.jobstreams.JobInCondition;
@@ -75,8 +78,8 @@ public class DBLayerInConditions {
     }
 
     public List<DBItemInConditionWithCommand> getInConditionsList(FilterInConditions filter, final int limit) throws SOSHibernateException {
-        String q = "select new com.sos.jobstreams.db.DBItemInConditionWithCommand(i,c) from " + DBItemInCondition + " i, " + DBItemInConditionCommand
-                + " c " + getWhere(filter) + " and i.id=c.inConditionId";
+        String q = "select new com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand(i,c) from " + DBItemInCondition + " i, "
+                + DBItemInConditionCommand + " c " + getWhere(filter) + " and i.id=c.inConditionId";
         Query<DBItemInConditionWithCommand> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);
 
@@ -119,49 +122,48 @@ public class DBLayerInConditions {
     public void deleteInsert(InConditions inConditions) throws SOSHibernateException {
         DBLayerInConditionCommands dbLayerInConditionCommands = new DBLayerInConditionCommands(sosHibernateSession);
         DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-		for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
-	        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-	        FilterInConditions filterInConditions = new FilterInConditions();
-	        filterInConditions.setJob(jobInCondition.getJob());
-	        filterInConditions.setJobSchedulerId(inConditions.getJobschedulerId());
-	        List<DBItemInCondition> listOfInCondititinos = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
-	        
-	        delete(filterInConditions);
+        for (JobInCondition jobInCondition : inConditions.getJobsInconditions()) {
+            DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+            FilterInConditions filterInConditions = new FilterInConditions();
+            filterInConditions.setJob(jobInCondition.getJob());
+            filterInConditions.setJobSchedulerId(inConditions.getJobschedulerId());
+            List<DBItemInCondition> listOfInCondititinos = dbLayerInConditions.getSimpleInConditionsList(filterInConditions, 0);
 
-			for (InCondition inCondition : jobInCondition.getInconditions()) {
-			    Long oldId = inCondition.getId();
-				DBItemInCondition dbItemInCondition = new DBItemInCondition();
-				String expression = inCondition.getConditionExpression().getExpression();
-				if (expression == null || expression.isEmpty()) {
-				    expression = "false";
-				} 
-				dbItemInCondition.setExpression(expression);
-				dbItemInCondition.setJob(jobInCondition.getJob());
-				dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
-				dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
-                dbItemInCondition.setMarkExpression(getBoolean(inCondition.getMarkExpression(),true));
-                dbItemInCondition.setSkipOutCondition(getBoolean(inCondition.getSkipOutCondition(),false));
-				dbItemInCondition.setCreated(new Date());
-				sosHibernateSession.save(dbItemInCondition);
+            delete(filterInConditions);
+
+            for (InCondition inCondition : jobInCondition.getInconditions()) {
+                Long oldId = inCondition.getId();
+                DBItemInCondition dbItemInCondition = new DBItemInCondition();
+                String expression = inCondition.getConditionExpression().getExpression();
+                if (expression == null || expression.isEmpty()) {
+                    expression = "false";
+                }
+                dbItemInCondition.setExpression(expression);
+                dbItemInCondition.setJob(jobInCondition.getJob());
+                dbItemInCondition.setSchedulerId(inConditions.getJobschedulerId());
+                dbItemInCondition.setJobStream(Paths.get(inCondition.getJobStream()).getFileName().toString());
+                dbItemInCondition.setMarkExpression(getBoolean(inCondition.getMarkExpression(), true));
+                dbItemInCondition.setSkipOutCondition(getBoolean(inCondition.getSkipOutCondition(), false));
+                dbItemInCondition.setCreated(new Date());
+                sosHibernateSession.save(dbItemInCondition);
                 dbLayerInConditionCommands.deleteInsert(dbItemInCondition, inCondition);
-				Long newId = dbItemInCondition.getId();
-				if (oldId != null) {
-				    dbLayerConsumedInConditions.updateConsumedInCondition(oldId,newId);
-				}
-			}
-			
-			 
-			for (DBItemInCondition dbItemInCondition: listOfInCondititinos) {
-			    FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
-		        filterInConditionCommands.setInConditionId(dbItemInCondition.getId());
-		        dbLayerInConditionCommands.deleteByInConditionId(filterInConditionCommands);	
-		        
-		        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-		        filterConsumedInConditions.setInConditionId(dbItemInCondition.getId());
-		        dbLayerConsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
-		     }
-			
-		}
-	}
+                Long newId = dbItemInCondition.getId();
+                if (oldId != null) {
+                    dbLayerConsumedInConditions.updateConsumedInCondition(oldId, newId);
+                }
+            }
+
+            for (DBItemInCondition dbItemInCondition : listOfInCondititinos) {
+                FilterInConditionCommands filterInConditionCommands = new FilterInConditionCommands();
+                filterInConditionCommands.setInConditionId(dbItemInCondition.getId());
+                dbLayerInConditionCommands.deleteByInConditionId(filterInConditionCommands);
+
+                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                filterConsumedInConditions.setInConditionId(dbItemInCondition.getId());
+                dbLayerConsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
+            }
+
+        }
+    }
 
 }

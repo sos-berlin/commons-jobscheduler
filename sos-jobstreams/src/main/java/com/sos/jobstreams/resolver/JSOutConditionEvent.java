@@ -3,7 +3,7 @@ package com.sos.jobstreams.resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jobstreams.db.DBItemOutConditionEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionEvent;
 
 public class JSOutConditionEvent {
 

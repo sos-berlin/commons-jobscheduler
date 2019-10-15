@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jobstreams.db.DBItemEvent;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jobstreams.db.DBLayerEvents;
 import com.sos.jobstreams.db.FilterEvents;
 

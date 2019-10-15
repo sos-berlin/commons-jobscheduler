@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sos.jobstreams.db.DBItemInConditionWithCommand;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSInvalidDataException;
@@ -14,6 +13,7 @@ import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
 
 public class JSJobInConditions {
 

@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,9 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.EventMeta.EventType;
 import com.sos.jitl.eventhandler.handler.LoopEventHandler;
 import com.sos.jitl.eventhandler.plugin.notifier.Mailer;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
-import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.JobSchedulerEvent;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
@@ -38,6 +39,7 @@ import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSEvent;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -133,6 +135,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("onActivate createReportingFactory");
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
             Constants.settings = getSettings();
+            Constants.baseUrl = this.getBaseUrl();
             sosHibernateSession = reportingFactory.openStatelessSession();
 
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
@@ -186,7 +189,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("Plugin closed");
     }
 
-    private void performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
+    private void performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception   {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
@@ -217,7 +220,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
    
-    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception {
+    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception    {
         DurationCalculator duration = null;
         if (isDebugEnabled) {
             LOGGER.debug("Resolve inconditinons");

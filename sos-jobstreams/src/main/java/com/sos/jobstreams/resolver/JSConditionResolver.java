@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +22,19 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
+import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
 import com.sos.jobstreams.classes.CheckHistoryCacheRules;
 import com.sos.jobstreams.classes.CheckHistoryCondition;
 import com.sos.jobstreams.classes.CheckHistoryKey;
 import com.sos.jobstreams.classes.CheckHistoryValue;
-import com.sos.jobstreams.classes.Constants;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.EventDate;
-import com.sos.jobstreams.db.DBItemConsumedInCondition;
-import com.sos.jobstreams.db.DBItemInCondition;
-import com.sos.jobstreams.db.DBItemInConditionWithCommand;
-import com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jobstreams.db.DBLayerEvents;
 import com.sos.jobstreams.db.DBLayerInConditions;
@@ -42,6 +44,7 @@ import com.sos.jobstreams.db.FilterEvents;
 import com.sos.jobstreams.db.FilterInConditions;
 import com.sos.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
+import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JSConditionResolver {
@@ -87,24 +90,24 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
         jsJobOutConditions = null;
-//        sosHibernateSession.beginTransaction();
-//        sosHibernateSession.commit();
+        // sosHibernateSession.beginTransaction();
+        // sosHibernateSession.commit();
 
         jsEvents = null;
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
         this.init();
     }
-    
+
     public void reInitEvents(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver reinit events injobstream model");
-//        sosHibernateSession.beginTransaction();
-//        sosHibernateSession.commit();
+        // sosHibernateSession.beginTransaction();
+        // sosHibernateSession.commit();
         jsEvents = null;
         this.sosHibernateSession = sosHibernateSession;
         this.initEvents();
     }
-    
-    public boolean haveGlobalEvents(){
+
+    public boolean haveGlobalEvents() {
         return this.jsJobInConditions.getHaveGlobalConditions();
     }
 
@@ -135,7 +138,8 @@ public class JSConditionResolver {
                 if (inInCondition != null) {
                     boolean isConsumed = (mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null);
                     if (isTraceEnabled) {
-                        LOGGER.trace("Expression " + inInCondition.getExpression() + " in " + inInCondition.getJob() + " is set to consumed=" + isConsumed);
+                        LOGGER.trace("Expression " + inInCondition.getExpression() + " in " + inInCondition.getJob() + " is set to consumed="
+                                + isConsumed);
                     }
                     dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
                 } else {
@@ -186,7 +190,7 @@ public class JSConditionResolver {
     }
 
     public void reInitConsumedInConditions() throws SOSHibernateException {
-        
+
         LOGGER.debug("JSConditionResolver::reInitConsumedInConditions");
         FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
         filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
@@ -361,7 +365,7 @@ public class JSConditionResolver {
                 }
                 break;
             }
-            case "global": 
+            case "global":
             case "event": {
                 String event = jsCondition.getEventName();
 
@@ -405,7 +409,7 @@ public class JSConditionResolver {
     }
 
     public List<JSInCondition> resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
-            URISyntaxException {
+            JocException, URISyntaxException, JAXBException {
 
         List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
         if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
@@ -550,7 +554,7 @@ public class JSConditionResolver {
         return jsEvent != null;
     }
 
-    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception {
+    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception   {
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
         if (listOfCheckHistoryChacheRules == null) {
             LOGGER.warn("History not initialized");

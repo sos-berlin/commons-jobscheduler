@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionEvent;
 import com.sos.joc.model.jobstreams.OutCondition;
 import com.sos.joc.model.jobstreams.OutConditionEvent;
 

@@ -3,10 +3,15 @@ package com.sos.jobstreams.resolver;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jobstreams.db.DBItemInConditionCommand;
+import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
+import com.sos.jobstreams.classes.JobStarter;
+import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.job.JobV;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.xml.XMLBuilder;
 
@@ -44,51 +49,10 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private Map<String, String> getMapOfAttributes(String commandParam) {
+    private void startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
 
-        Map<String, String> listOfAttributes = new HashMap<String, String>();
-        if (commandParam == null || commandParam.isEmpty()) {
-            listOfAttributes.put("at", "now");
-        } else {
-            String name = "";
-            String value = "";
-            String[] attributes = commandParam.split(",");
-            for (int i = 0; i < attributes.length; i++) {
-                String attribute = attributes[i];
-                String[] parts = attribute.split("=");
-                if (parts.length == 1) {
-                    value = parts[0];
-                    name = "at";
-                } else if (parts.length == 2) {
-                    value = parts[1];
-                    name = parts[0];
-                }
-                listOfAttributes.put(name.trim(), value);
-            }
-        }
-        return listOfAttributes;
-    }
-
-    public Map<String, String> testGetMapOfAttributes(String commandParam) {
-        return getMapOfAttributes(commandParam);
-    }
-
-    private String buildJobStartXml(JSInCondition inCondition) {
-        XMLBuilder xml = new XMLBuilder("start_job");
-
-        xml.addAttribute("job", inCondition.getNormalizedJob());
-        Map<String, String> listOfAttributes = getMapOfAttributes(getCommandParam());
-
-        if (listOfAttributes.get("force") == null) {
-            listOfAttributes.put("force", "no");
-        }
-        listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
-        return xml.asXML();
-    }
-
-    private void startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
-
-        String jobXml = buildJobStartXml(inCondition);
+        JobStarter jobStarter = new JobStarter();
+        String jobXml = jobStarter.buildJobStartXml(inCondition, getCommandParam());
         String answer = "";
         String job = inCondition.getNormalizedJob();
         if (inCondition.isStartToday()) {
@@ -107,7 +71,7 @@ public class JSInConditionCommand {
 
     }
 
-    public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) {
+    public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
 
         String command = getCommand();
         String commandParam = getCommandParam();

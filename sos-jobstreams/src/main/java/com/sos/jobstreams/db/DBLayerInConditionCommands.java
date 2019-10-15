@@ -2,13 +2,15 @@ package com.sos.jobstreams.db;
 
 import java.util.Date;
 import java.util.List;
+
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.SearchStringHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.joc.model.jobstreams.InCondition;
 import com.sos.joc.model.jobstreams.InConditionCommand;
 

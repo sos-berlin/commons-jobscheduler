@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jobstreams.classes.Constants;
+import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.EventDate;
-import com.sos.jobstreams.db.DBItemEvent;
-import com.sos.jobstreams.db.DBItemOutCondition;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 

@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jobstreams.resolver.JSEventKey;
 import com.sos.joc.model.jobstreams.JobOutCondition;
 import com.sos.joc.model.jobstreams.OutCondition;
@@ -97,7 +100,7 @@ public class DBLayerOutConditions {
     }
 
     public List<DBItemOutConditionWithConfiguredEvent> getOutConditionsList(FilterOutConditions filter, final int limit) throws SOSHibernateException {
-        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithConfiguredEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemOutConditionEvent
+        String q = "select new com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemOutConditionEvent
                 + " e " + getWhere(filter) + " and o.id=e.outConditionId";
         Query<DBItemOutConditionWithConfiguredEvent> query = sosHibernateSession.createQuery(q);
         query = bindParameters(filter, query);

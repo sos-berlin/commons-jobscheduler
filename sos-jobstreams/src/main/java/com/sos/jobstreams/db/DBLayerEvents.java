@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutCondition;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 import com.sos.jobstreams.resolver.JSEvent;
 
 public class DBLayerEvents {
@@ -130,7 +134,7 @@ public class DBLayerEvents {
     }
 
     public List<DBItemOutConditionWithEvent> getEventsList(FilterEvents filter, final int limit) throws SOSHibernateException {
-        String q = "select new com.sos.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemEvents + " e "
+        String q = "select new com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent(o,e) from " + DBItemOutCondition + " o, " + DBItemEvents + " e "
                 + getWhere(filter) + " and o.id=e.outConditionId";
 
         Query<DBItemOutConditionWithEvent> query = sosHibernateSession.createQuery(q);

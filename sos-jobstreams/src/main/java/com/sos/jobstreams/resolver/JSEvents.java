@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import com.sos.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 
 public class JSEvents {
 

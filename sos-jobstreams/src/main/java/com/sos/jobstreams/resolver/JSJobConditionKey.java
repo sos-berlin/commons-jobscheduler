@@ -1,6 +1,6 @@
 package com.sos.jobstreams.resolver;
 
-import com.sos.jobstreams.resolver.interfaces.IJSJobConditionKey;
+import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 
 public class JSJobConditionKey {
 

@@ -37,6 +37,17 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.sos-berlin.joc</groupId>
+			<artifactId>webservice-global</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-util</artifactId>
 			<version>${project.version}</version>
@@ -129,7 +140,7 @@
 			<groupId>javax.jms</groupId>
 			<artifactId>javax.jms-api</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

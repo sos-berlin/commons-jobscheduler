@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sos.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
 
 public class JSInConditions {
 

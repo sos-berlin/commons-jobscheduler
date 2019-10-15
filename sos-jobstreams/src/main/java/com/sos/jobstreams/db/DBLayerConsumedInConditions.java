@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jobstreams.resolver.JSInCondition;
+import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
 
 public class DBLayerConsumedInConditions {
 

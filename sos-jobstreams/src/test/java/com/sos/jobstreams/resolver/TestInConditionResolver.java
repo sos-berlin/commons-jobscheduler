@@ -5,13 +5,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
+import javax.xml.bind.JAXBException;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.sos.jobstreams.classes.Constants;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -19,7 +20,9 @@ import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.JocException;
  
 
 public class TestInConditionResolver {
@@ -51,7 +54,7 @@ public class TestInConditionResolver {
     
     @Test
     @Ignore
-    public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
+    public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException, JocException, JAXBException     {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);

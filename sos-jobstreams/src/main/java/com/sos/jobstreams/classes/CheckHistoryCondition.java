@@ -38,7 +38,7 @@ public class CheckHistoryCondition {
     }
 
     public CheckHistoryValue validateJob(SOSHibernateSession sosHibernateSession, JSCondition jsCondition, String conditionJob,
-            Integer taskReturnCode) throws Exception {
+            Integer taskReturnCode) throws Exception   {
         String job = jsCondition.getConditionJob();
         if (job.isEmpty()) {
             job = conditionJob;
@@ -49,10 +49,8 @@ public class CheckHistoryCondition {
         HistoryDatabaseExecuter historyDatabaseExecuter = new HistoryDatabaseExecuter(sosHibernateSession);
         jobHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
 
-        HistoryHelper jobHistoryHelper = new HistoryHelper();
-
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
-        String method = jobHistoryHelper.getMethodName(query);
+        String method = HistoryHelper.getMethodName(query);
         if ("rc".equalsIgnoreCase(method)) {
             method = "returncode";
         }
@@ -69,7 +67,7 @@ public class CheckHistoryCondition {
                 if (taskReturnCode == null) {
                     taskReturnCode = jobHistoryInfo.getLastCompleted().executionResult;
                 }
-                String returnCode = jobHistoryHelper.getParameter(query);
+                String returnCode = HistoryHelper.getParameter(query);
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
             } else {
@@ -90,13 +88,12 @@ public class CheckHistoryCondition {
     }
 
     public CheckHistoryValue validateJobChain(SOSHibernateSession sosHibernateSession, JSCondition jsCondition) throws Exception {
-        HistoryHelper jobHistoryHelper = new HistoryHelper();
         String jobChain = jsCondition.getConditionJobChain();
         jobChain = jobChain.replace('[', '(').replace(']', ')');
 
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
 
-        String method = jobHistoryHelper.getMethodName(query);
+        String method = HistoryHelper.getMethodName(query);
         if ("rc".equalsIgnoreCase(method)) {
             method = "returncode";
         }
@@ -112,7 +109,7 @@ public class CheckHistoryCondition {
             if ("returncode".equals(method)) {
                 Integer taskReturnCode = jobChainHistoryInfo.getLastCompleted().executionResult;
 
-                String returnCode = jobHistoryHelper.getParameter(query);
+                String returnCode = HistoryHelper.getParameter(query);
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
             } else {
