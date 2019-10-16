@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.exception.SOSException;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
@@ -98,13 +99,20 @@ public class JSConditionResolver {
         this.init();
     }
 
-    public void reInitEvents(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+    public void reInitEvents(SOSHibernateFactory reportingFactory) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver reinit events injobstream model");
-        // sosHibernateSession.beginTransaction();
-        // sosHibernateSession.commit();
-        jsEvents = null;
-        this.sosHibernateSession = sosHibernateSession;
-        this.initEvents();
+        SOSHibernateSession session = null;
+        try {
+            session = reportingFactory.openStatelessSession("reInitEvents");
+            jsEvents = null;
+            this.initEvents(session);
+        } catch (Exception e) {
+            LOGGER.error("Could not reInit Events",e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     public boolean haveGlobalEvents() {
@@ -165,7 +173,7 @@ public class JSConditionResolver {
             listOfCheckHistoryChacheRules.initCacheRules();
         }
 
-        initEvents();
+        initEvents(sosHibernateSession);
         initCheckHistory();
         if (isDebugEnabled) {
             duration.end("Init JobStreams condition model ");
@@ -176,14 +184,14 @@ public class JSConditionResolver {
 
     }
 
-    public void initEvents() throws SOSHibernateException {
+    public void initEvents(SOSHibernateSession session) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolve::initEvents");
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
             filterEvents.setSchedulerId(settings.getSchedulerId());
             filterEvents.setIncludingGlobalEvent(true);
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(session);
             List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
@@ -408,7 +416,7 @@ public class JSConditionResolver {
         return evaluatedExpression;
     }
 
-    public List<JSInCondition> resolveInConditions() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
             JocException, URISyntaxException, JAXBException {
 
         List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
@@ -431,7 +439,7 @@ public class JSConditionResolver {
                             LOGGER.trace("---InCondition is: " + inCondition.toStr());
                         }
                         if (validate(null, inCondition)) {
-                            inCondition.executeCommand(sosHibernateSession, schedulerXmlCommandExecutor);
+                            inCondition.executeCommand(session, schedulerXmlCommandExecutor);
                             listOfValidatedInconditions.add(inCondition);
                         } else {
                             if (isTraceEnabled) {
@@ -522,7 +530,7 @@ public class JSConditionResolver {
             sosHibernateSession.commit();
 
             jsEvents = null;
-            initEvents();
+            initEvents(sosHibernateSession);
         } catch (
 
         Exception e) {

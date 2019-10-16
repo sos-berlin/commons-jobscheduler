@@ -59,9 +59,11 @@ public class TestEvents {
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, JocException, URISyntaxException, JAXBException     {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
-        JSConditionResolver expressionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings );
+        SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
+
+        JSConditionResolver expressionResolver = new JSConditionResolver(session,null,settings );
         expressionResolver.init();
-        expressionResolver.resolveInConditions();
+        expressionResolver.resolveInConditions(session);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.sos.jobstreams.resolver;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -56,10 +55,11 @@ public class TestInConditionResolver {
     @Ignore
     public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException, JocException, JAXBException     {
         EventHandlerSettings settings = new EventHandlerSettings();
+        SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
         settings.setSchedulerId("scheduler_joc_cockpit");
-        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);
+        JSConditionResolver conditionResolver = new JSConditionResolver(session,null,settings);
         conditionResolver.init();
-        conditionResolver.resolveInConditions();
+        conditionResolver.resolveInConditions(session);
       //  conditionResolver.resolveOutConditions();
     }
 
@@ -68,8 +68,9 @@ public class TestInConditionResolver {
     public void testEventList() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
-        JSConditionResolver conditionResolver = new JSConditionResolver(getSession("src/test/resources/reporting.hibernate.cfg.xml"),null,settings);
-        conditionResolver.initEvents();
+        SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
+        JSConditionResolver conditionResolver = new JSConditionResolver(session,null,settings);
+        conditionResolver.initEvents(session);
     }
 
 }
