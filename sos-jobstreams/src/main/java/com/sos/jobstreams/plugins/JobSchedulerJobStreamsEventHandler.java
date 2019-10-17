@@ -53,7 +53,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public void removeTimer() {
         if (isDebugEnabled) {
-            LOGGER.debug("Polling for global events is disabled");
+            LOGGER.debug("Polling for is disabled");
         }
         if (globalEventsPollTimer != null) {
             globalEventsPollTimer.cancel();
@@ -68,9 +68,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             globalEventsPollTimer.purge();
         }
         globalEventsPollTimer = new Timer();
-        globalEventsPollTimer.schedule(new InputTask(), 30 * 1000, 30 * 1000);
+        globalEventsPollTimer.schedule(new InputTask(), 60 * 1000, 60 * 1000);
         if (isDebugEnabled) {
-            LOGGER.debug("30s Polling for global events is activated");
+            LOGGER.debug("60s Polling for is activated");
         }
     }
 
@@ -78,7 +78,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         public void run() {
             try {
-                conditionResolver.reInitEvents(reportingFactory);
+                if (conditionResolver.haveGlobalEvents()) {
+                    conditionResolver.reInitEvents(reportingFactory);
+                }
                 resolveInConditions();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -129,11 +131,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
             conditionResolver.init();
-            if (conditionResolver.haveGlobalEvents()) {
-                this.resetTimer();
-            } else {
-                this.removeTimer();
-            }
+            this.resetTimer();
 
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
@@ -265,10 +263,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
                 try {
                     conditionResolver.init();
-                    if (conditionResolver.haveGlobalEvents()) {
-                        this.resetTimer();
-                    } else {
-                    }
+                    this.resetTimer();
 
                 } catch (Exception e) {
                     conditionResolver = null;
@@ -322,11 +317,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "InitConditionResolver":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + "InitConditionResolver");
                             conditionResolver.reInit();
-                            if (conditionResolver.haveGlobalEvents()) {
-                                this.resetTimer();
-                            } else {
-                                this.removeTimer();
-                            }
+                            this.resetTimer();
 
                             resolveInConditions = true;
                             break;
