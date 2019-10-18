@@ -15,7 +15,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.session.ExpiredSessionException;
@@ -61,7 +63,10 @@ public class SOSServicePermissionShiro {
 
     private SOSShiroCurrentUser currentUser;
     private SOSlogin sosLogin;
-
+    
+    @Context
+    UriInfo uriInfo;
+    
     public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
@@ -807,6 +812,7 @@ public class SOSServicePermissionShiro {
 
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
     //private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
+        Globals.setServletBaseUri(uriInfo);
         Globals.sosShiroProperties = new JocCockpitProperties();
         Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
