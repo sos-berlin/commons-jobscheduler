@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.jobstreams.plugins.JobSchedulerJobStreamsEventHandler;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventhandler.plugin.notifier.Mailer;
+import com.sos.jitl.eventhandler.plugin.notifier.Notifier;
 
 public class ConditionServletTest {
 
@@ -44,7 +45,7 @@ public class ConditionServletTest {
             mailSettings.put("mail_on_error","1");
             mailSettings.put("mail.smtp.port","25");
             Mailer mailer = new Mailer(eventHandler.getIdentifier(), mailSettings);
-            eventHandler.onActivate(mailer);
+            eventHandler.onActivate(new Notifier(mailer,ConditionServletTest.class));
         } catch (Exception e) {
             throw e;
         } finally {

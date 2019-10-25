@@ -19,7 +19,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.EventMeta.EventType;
 import com.sos.jitl.eventhandler.handler.LoopEventHandler;
-import com.sos.jitl.eventhandler.plugin.notifier.Mailer;
+import com.sos.jitl.eventhandler.plugin.notifier.Notifier;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
@@ -111,11 +111,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     @Override
-    public void onActivate(Mailer mailer) {
+    public void onActivate(Notifier notifier) {
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
 
-        super.onActivate(mailer);
+        super.onActivate(notifier);
 
         String method = "onActivate";
         session = Constants.getSession();
