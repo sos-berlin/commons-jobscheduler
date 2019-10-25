@@ -281,7 +281,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                 } catch (SOSHibernateException e) {
                     conditionResolver = null;
-                    getNotifier().smartNotifyOnError(method, e);
+                    getNotifier().smartNotifyOnError(getClass(), e);
                     LOGGER.error("%s: %s", method, e.toString(), e);
                     throw new RuntimeException(e);
                 }
@@ -405,7 +405,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (
 
         Exception e) {
-            getNotifier().smartNotifyOnError(method, e);
+            getNotifier().smartNotifyOnError(getClass(), e);
             LOGGER.error(String.format("%s: %s", method, e.toString()), e);
         } finally {
             if (sosHibernateSession != null) {
