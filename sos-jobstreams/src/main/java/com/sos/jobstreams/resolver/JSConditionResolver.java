@@ -268,8 +268,7 @@ public class JSConditionResolver {
         for (JSOutConditions jobOutConditions : jsJobOutConditions.getListOfJobOutConditions().values()) {
             for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
                 String expressionValue = outCondition.getExpression() + " ";
-                JSConditions jsConditions = new JSConditions();
-                List<JSCondition> listOfConditions = jsConditions.getListOfConditions(expressionValue);
+                List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
                 for (JSCondition jsCondition : listOfConditions) {
                     try {
                         switch (jsCondition.getConditionType().toLowerCase()) {

@@ -71,7 +71,7 @@ public class JobStarter {
         return listOfAttributes;
     }
 
-    private List<NameValuePair> substituteParameters(List<NameValuePair> parameters) throws JAXBException  {
+    private List<NameValuePair> substituteParameters(List<NameValuePair> parameters) throws JAXBException {
 
         JobchainNodeConfiguration jobchainNodeConfiguration = new JobchainNodeConfiguration();
         Map<String, String> taskParameters = new HashMap<String, String>();
@@ -91,8 +91,8 @@ public class JobStarter {
                 if (isTraceEnabled) {
                     LOGGER.debug("Replace task parameter " + paramName + " old value=" + taskParameters.get(paramName) + " with new value="
                             + paramValue);
-                    taskParameters.put(paramName, paramValue);
                 }
+                taskParameters.put(paramName, paramValue);
             }
         }
         parameters = new ArrayList<NameValuePair>();
@@ -110,7 +110,7 @@ public class JobStarter {
         return getMapOfAttributes(commandParam);
     }
 
-    public String buildJobStartXml(JSInCondition inCondition, String commandParam) throws JocException, JAXBException  {
+    public String buildJobStartXml(JSInCondition inCondition, String commandParam) throws JocException, JAXBException {
         JobV jobV = this.getJob(inCondition.getNormalizedJob());
         XMLBuilder xml = new XMLBuilder("start_job");
         xml.addAttribute("job", inCondition.getNormalizedJob());
