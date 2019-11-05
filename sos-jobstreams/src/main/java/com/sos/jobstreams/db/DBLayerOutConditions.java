@@ -46,9 +46,9 @@ public class DBLayerOutConditions {
 
         for (JSEventKey s : list) {
             if (s.getJobStream().isEmpty()) {
-                sql.append("e.event = " + "'" + s.getEvent() + "'").append(" or ");
+                sql.append("e.globalEvent = " + s.getGlobalEvent() + " and e.event = " + "'" + s.getEvent() + "'").append(" or ");
             } else {
-                sql.append("(e.event = " + "'" + s.getEvent() + "'").append(" and ").append("o.jobStream = " + "'" + s.getJobStream() + "')").append(
+                sql.append("(e.globalEvent = " + s.getGlobalEvent() + " and e.event = " + "'" + s.getEvent() + "'").append(" and ").append("o.jobStream = " + "'" + s.getJobStream() + "')").append(
                         " or ");
             }
         }

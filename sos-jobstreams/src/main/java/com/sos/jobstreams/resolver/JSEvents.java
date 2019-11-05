@@ -50,7 +50,7 @@ public class JSEvents {
     }
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
-        if (jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
+        if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
             return this.getEvent(jsEventKey);
         } else {
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
