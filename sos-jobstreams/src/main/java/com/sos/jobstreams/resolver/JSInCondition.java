@@ -1,6 +1,5 @@
 package com.sos.jobstreams.resolver;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,12 +12,9 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.exception.SOSInvalidDataException;
-import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
-import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
@@ -140,7 +136,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 haveCalendars = true;
                 this.listOfDates.addAll(l);
             }
-        } catch (SOSHibernateException | SOSMissingDataException | SOSInvalidDataException | IOException e) {
+        } catch (Exception e) {
             LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
         }
 
@@ -171,7 +167,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
         return false;
     }
-    
+
     public String toStr() {
         return this.getExpression() + "::" + SOSString.toString(this);
     }

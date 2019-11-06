@@ -6,12 +6,12 @@ import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.reporting.db.DBLayer;
 
-public class DBLayerCalendars extends DBLayer {
+public class DBLayerCalendarUsages extends DBLayer {
 
-    public DBLayerCalendars(SOSHibernateSession sosHibernateSession) {
+    public DBLayerCalendarUsages(SOSHibernateSession sosHibernateSession) {
         super(sosHibernateSession);
     }
 
@@ -45,10 +45,10 @@ public class DBLayerCalendars extends DBLayer {
         return query;
     }
 
-    public List<DBItemInventoryClusterCalendar> getCalendar(FilterCalendarUsage filter, final int limit) throws SOSHibernateException {
-        String q = "select c from " + DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE + " u, " + DBITEM_CLUSTER_CALENDARS + " c " + getWhere(filter)
-                + " and  c.id=u.calendarId ";
-        Query<DBItemInventoryClusterCalendar> query = super.getSession().createQuery(q);
+    public List<DBItemCalendarWithUsages> getCalendarUsages(FilterCalendarUsage filter, final int limit) throws SOSHibernateException {
+        String q = "select new com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages(c,u) from " + DBITEM_INVENTORY_CLUSTER_CALENDAR_USAGE + " u, " + DBITEM_CLUSTER_CALENDARS
+                + " c " + getWhere(filter) + " and  c.id=u.calendarId ";
+        Query<DBItemCalendarWithUsages> query = super.getSession().createQuery(q);
         query = bindParameters(filter, query);
 
         if (limit > 0) {

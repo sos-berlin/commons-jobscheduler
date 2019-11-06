@@ -94,9 +94,9 @@ public class CheckHistoryCondition {
         String query = jsCondition.getConditionQuery().replace('[', '(').replace(']', ')');
 
         String method = HistoryHelper.getMethodName(query);
-        if ("rc".equalsIgnoreCase(method)) {
-            method = "returncode";
-        }
+      //  if ("rc".equalsIgnoreCase(method)) {
+      //      method = "returncode";
+      //  }
 
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB_CHAIN, jobChain, jsCondition.getConditionQuery().toLowerCase());
         CheckHistoryValue validateResult = checkHistoryCache.get(checkHistoryKey);
@@ -106,13 +106,13 @@ public class CheckHistoryCondition {
             jobChainHistory.setHistoryDatasourceExecuter(historyDatabaseExecuter);
             JobSchedulerHistoryInfo jobChainHistoryInfo = jobChainHistory.getJobChainInfo(jobChain);
 
-            if ("returncode".equals(method)) {
-                Integer taskReturnCode = jobChainHistoryInfo.getLastCompleted().executionResult;
+            //    if ("returncode".equals(method)) {
+            //    Integer taskReturnCode = jobChainHistoryInfo.getLastCompleted().executionResult;
 
-                String returnCode = HistoryHelper.getParameter(query);
-                JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
-                validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
-            } else {
+            //    String returnCode = HistoryHelper.getParameter(query);
+            //    JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
+            //    validateResult = new CheckHistoryValue(returnCodeResolver.resolve(taskReturnCode, returnCode), jsCondition);
+            //} else {
 
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("validating job chain %s with: %s ", jobChain, query));
@@ -122,7 +122,7 @@ public class CheckHistoryCondition {
                     LOGGER.debug(String.format("validating result", validateResult.getValidateResult()));
                 }
                 checkHistoryCache.put(checkHistoryKey, validateResult);
-            }
+                //}
         }
         return validateResult;
 
