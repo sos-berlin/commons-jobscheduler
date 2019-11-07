@@ -50,7 +50,11 @@ public class JSCondition {
             String[] conditionParts = conditionParam.split("\\[");
             if (conditionParts.length > 1) {
                 String s = conditionParts[1].trim();
-                s = s.replaceAll("]", "");
+                try {
+                    s = s.replaceAll("]", "");
+                } catch (java.util.regex.PatternSyntaxException e) {
+                    LOGGER.warn(e.getMessage());
+                }
                 return s.trim();
             }
         }
@@ -90,7 +94,13 @@ public class JSCondition {
     private String getConditionTypeParam(String condition) {
         String[] s = condition.split(":");
         if (s.length > 1) {
-            String param = condition.replaceAll(s[0] + ":", "");
+            String param = s[0];
+            try {
+                param = condition.replaceAll(s[0] + ":", "");
+            } catch (java.util.regex.PatternSyntaxException e) {
+                LOGGER.warn(e.getMessage());
+            }
+
             return param;
         } else {
             return s[0];
@@ -159,7 +169,6 @@ public class JSCondition {
         return conditionJobChain;
     }
 
-    
     public boolean isGlobalEvent() {
         return globalEvent;
     }

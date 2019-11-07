@@ -17,7 +17,7 @@ public class FunctionResolver {
         String[] functions = paramValue.split("%%");
         for (int i = 0; i < functions.length; i++) {
             String f = functions[i];
-            String functionName = HistoryHelper.getMethodName(f);
+            String functionName = HistoryHelper.getMethodName(f).toLowerCase();
             String parameter = HistoryHelper.getParameter(f);
             f = f.replaceAll("\\)", "\\\\)");
             f = f.replaceAll("\\(", "\\\\(");
@@ -36,16 +36,17 @@ public class FunctionResolver {
         return df.format(new Date());
     }
 
-    private String calcDate(String dateString, String quantity) throws ParseException {
+    private String calcDate(String dateString, String quantity, SimpleDateFormat outFormat) throws ParseException {
         java.util.Calendar calendar = new GregorianCalendar();
         Date date;
-        SimpleDateFormat outFormat = null;
-        if (dateString.length() == 8) {
-            date = new SimpleDateFormat("yyyyMMdd").parse(dateString);
-            outFormat = new SimpleDateFormat("yyyyMMdd");
+        if ("today".equals(dateString)) {
+            date = new Date();
         } else {
-            date = new SimpleDateFormat("yyMMdd").parse(dateString);
-            outFormat = new SimpleDateFormat("yyMMdd");
+            if (dateString.length() == 8) {
+                date = new SimpleDateFormat("yyyyMMdd").parse(dateString);
+            } else {
+                date = new SimpleDateFormat("yyMMdd").parse(dateString);
+            }
         }
         calendar.setTime(date);
         int add = Integer.parseInt(quantity);
@@ -86,10 +87,14 @@ public class FunctionResolver {
 
         case "calcdate":
             if (params.length < 2) {
-                return functionName + "(" + parameter + ")" + " -> wrong number of parameters. Expected 2, found: " + params.length;
+                return functionName + "(" + parameter + ")" + " -> wrong number of parameters. Expected 2 or 3, found: " + params.length;
             }
             try {
-                return calcDate(params[0], params[1]);
+                if (params.length == 3) {
+                    return calcDate(params[0], params[1], new SimpleDateFormat(params[2]));
+                } else {
+                    return calcDate(params[0], params[1], new SimpleDateFormat("yyyyMMdd"));
+                }
             } catch (ParseException e) {
                 return functionName + "(" + parameter + ")" + " -> wrong dateformat. Expected yyyymmdd or yymmdd";
             } catch (

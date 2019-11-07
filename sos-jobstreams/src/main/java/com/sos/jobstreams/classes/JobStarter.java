@@ -22,7 +22,6 @@ import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.JobFilter;
 import com.sos.joc.model.job.JobV;
-import com.sos.scheduler.messages.JSMessages;
 import com.sos.xml.XMLBuilder;
 
 public class JobStarter {
@@ -71,31 +70,40 @@ public class JobStarter {
         return listOfAttributes;
     }
 
-    private List<NameValuePair> substituteParameters(List<NameValuePair> parameters) throws JAXBException {
+    private List<NameValuePair> substituteParameters(List<NameValuePair> parameters, List<NameValuePair> envVars) throws JAXBException {
 
         JobchainNodeConfiguration jobchainNodeConfiguration = new JobchainNodeConfiguration();
+        Map<String, String> schedulerParameters = new HashMap<String, String>();
         Map<String, String> taskParameters = new HashMap<String, String>();
         FunctionResolver functionResolver = new FunctionResolver();
 
-        for (NameValuePair param : parameters) {
-            taskParameters.put(param.getName(), param.getValue());
-        }
-
-        jobchainNodeConfiguration.setListOfTaskParameters(taskParameters);
-        jobchainNodeConfiguration.substituteTaskParamters();
-        for (Entry<String, String> entry : jobchainNodeConfiguration.getListOfTaskParameters().entrySet()) {
-            String paramName = entry.getKey();
-            String paramValue = entry.getValue();
-            paramValue = functionResolver.resolveFunctions(paramValue);
-            if (paramValue != null) {
-                if (isTraceEnabled) {
-                    LOGGER.debug("Replace task parameter " + paramName + " old value=" + taskParameters.get(paramName) + " with new value="
-                            + paramValue);
-                }
-                taskParameters.put(paramName, paramValue);
+        if (parameters != null) {
+            for (NameValuePair param : parameters) {
+                taskParameters.put(param.getName(), param.getValue());
             }
+            if (envVars != null) {
+                for (NameValuePair envVar : envVars) {
+                    schedulerParameters.put(envVar.getName(), envVar.getValue());
+                }
+            }
+            jobchainNodeConfiguration.setListOfTaskParameters(taskParameters);
+            jobchainNodeConfiguration.setListOfSchedulerParameters(schedulerParameters);
+
+            jobchainNodeConfiguration.substituteTaskParamters();
+            for (Entry<String, String> entry : jobchainNodeConfiguration.getListOfTaskParameters().entrySet()) {
+                String paramName = entry.getKey();
+                String paramValue = entry.getValue();
+                paramValue = functionResolver.resolveFunctions(paramValue);
+                if (paramValue != null) {
+                    if (isTraceEnabled) {
+                        LOGGER.debug("Replace task parameter " + paramName + " old value=" + taskParameters.get(paramName) + " with new value="
+                                + paramValue);
+                    }
+                    taskParameters.put(paramName, paramValue);
+                }
+            }
+            parameters = new ArrayList<NameValuePair>();
         }
-        parameters = new ArrayList<NameValuePair>();
         for (Entry<String, String> entry : taskParameters.entrySet()) {
             NameValuePair param = new NameValuePair();
             param.setName(entry.getKey());
@@ -104,6 +112,26 @@ public class JobStarter {
         }
 
         return parameters;
+    }
+
+    private List<NameValuePair> getDefaultEnvVars(JSInCondition inCondition) {
+
+        EnvVarCreator envVarCreator = new EnvVarCreator();
+
+        List<NameValuePair> envVars = new ArrayList<NameValuePair>();
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBSTREAM"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_TIME"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_CENTURY"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DAY"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH_NAME"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATEJJ"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATEJJJJ"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_FOLDER"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBNAME"));
+
+        return envVars;
     }
 
     public Map<String, String> testGetMapOfAttributes(String commandParam) {
@@ -121,7 +149,10 @@ public class JobStarter {
         }
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
 
-        xml.add(getParams(substituteParameters(jobV.getParams())));
+        List<NameValuePair> envVars = getDefaultEnvVars(inCondition);
+        List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
+        xml.add(getParams(params));
+        xml.add(getEnv(envVars));
         return xml.asXML();
     }
 
@@ -133,6 +164,16 @@ public class JobStarter {
             }
         }
 
+        return paramsElem;
+    }
+
+    private Element getEnv(List<NameValuePair> envVars) throws SessionNotExistException {
+        Element paramsElem = XMLBuilder.create("environment");
+        if (envVars != null) {
+            for (NameValuePair envVar : envVars) {
+                paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", envVar.getValue());
+            }
+        }
         return paramsElem;
     }
 
