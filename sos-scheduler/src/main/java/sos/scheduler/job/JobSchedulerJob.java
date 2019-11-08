@@ -274,10 +274,9 @@ public class JobSchedulerJob extends Job_impl {
 
     public static Path getHibernateConfigurationReporting(Spooler spooler, Task task) {
         Path configDir = null;
-        String agentUrl = task.agent_url();
-        if (!SOSString.isEmpty(agentUrl)) {
+        boolean isAgent = !SOSString.isEmpty(task.agent_url());
+        if (isAgent) {
             configDir = Paths.get(System.getenv("SCHEDULER_DATA")).resolve("config");
-
         } else {
             Variable_set vs = spooler.variables();
             if (vs != null) {
@@ -292,11 +291,10 @@ public class JobSchedulerJob extends Job_impl {
         if (Files.exists(configFile)) {
             return configFile;
         }
-        if (SOSString.isEmpty(agentUrl)) {
-            return getHibernateConfigurationScheduler(spooler);
-        } else {
+        if (isAgent) {
             throw new JobSchedulerException("no hibernate configuration file found on agent file system!");
         }
+        return getHibernateConfigurationScheduler(spooler);
     }
 
     private boolean getSettings() {
