@@ -1,7 +1,6 @@
 package com.sos.VirtualFileSystem.DataElements;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -12,7 +11,7 @@ import org.junit.Test;
 
 import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.enuTransferStatus;
+import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.TransferStatus;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
@@ -47,12 +46,12 @@ public class SOSFileListEntryTest extends JSListenerClass {
         objOptions.compressFiles.value(true);
         objOptions.compressedFileExtension.setValue(".zip");
         SOSFileListEntry objE = new SOSFileListEntry(PATHNAME + FILENAME);
-        objE.setDataSourceClient(objFileSystemHandler);
+        objE.setSourceFileTransfer(objFileSystemHandler);
         objE.setOptions(objOptions);
         objE.getTargetFile();
         LOGGER.info("SourceFileName         = " + objE.getSourceFileName());
-        LOGGER.info("SourceTransferFileName = " + objE.getSourceTransferName());
-        LOGGER.info("TargetTransferFileName = " + objE.getTargetTransferName());
+        LOGGER.info("SourceTransferFileName = " + objE.getSourceTransferFileName());
+        LOGGER.info("TargetTransferFileName = " + objE.getTargetTransferFileName());
         LOGGER.info("TargetFileName         = " + objE.getTargetFileName());
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.getSourceFileName());
         assertEquals("final TargetFileName", FILENAME + objOptions.compressedFileExtension.getValue(), objE.getTargetFileName());
@@ -65,7 +64,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
             objFile.writeLine("Das ist eine Testdatei. Weiter nichts");
             objFile.close();
             objE = new SOSFileListEntry(PATHNAME + FILENAME);
-            objE.setDataSourceClient(objFileSystemHandler);
+            objE.setSourceFileTransfer(objFileSystemHandler);
             objE.setOptions(objOptions);
             objE.getTargetFile();
         } catch (IOException e) {
@@ -98,13 +97,13 @@ public class SOSFileListEntryTest extends JSListenerClass {
     public void testMakeAtomicFileName() {
         objOptions.atomicPrefix.setValue(APREFIX);
         SOSFileListEntry objE = new SOSFileListEntry(PATHNAME + FILENAME);
-        objE.setDataSourceClient(objFileSystemHandler);
+        objE.setSourceFileTransfer(objFileSystemHandler);
         objE.setOptions(objOptions);
         objE.getTargetFile();
         objE.log4Debug();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.getSourceFileName());
-        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferName());
-        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomicPrefix.getValue() + FILENAME, objE.getTargetTransferName());
+        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferFileName());
+        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomicPrefix.getValue() + FILENAME, objE.getTargetTransferFileName());
         assertEquals("final TargetFileName", FILENAME, objE.getTargetFileName());
     }
 
@@ -114,34 +113,34 @@ public class SOSFileListEntryTest extends JSListenerClass {
         objOptions.atomicSuffix.setValue(APREFIX + APREFIX);
         createTestFile();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.getSourceFileName());
-        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferName());
+        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferFileName());
         assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomicPrefix.getValue() + FILENAME + objOptions.atomicSuffix.getValue(),
-                objE.getTargetTransferName());
+                objE.getTargetTransferFileName());
         assertEquals("final TargetFileName", FILENAME, objE.getTargetFileName());
     }
 
     @Test
     public void testMakeAtomicFileName3() {
         SOSFileListEntry objE = new SOSFileListEntry(PATHNAME + FILENAME);
-        objE.setDataSourceClient(objFileSystemHandler);
+        objE.setSourceFileTransfer(objFileSystemHandler);
         objE.setOptions(objOptions);
         objE.getTargetFile();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.getSourceFileName());
-        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferName());
-        assertEquals("intermediate Atomic-File TargetTransferName", FILENAME, objE.getTargetTransferName());
+        assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.getSourceTransferFileName());
+        assertEquals("intermediate Atomic-File TargetTransferName", FILENAME, objE.getTargetTransferFileName());
         assertEquals("final TargetFileName", FILENAME, objE.getTargetFileName());
     }
 
     @Test
     public void testSetStatus() {
         createTestFile();
-        objE.setStatus(enuTransferStatus.waiting4transfer);
-        objE.setStatus(enuTransferStatus.transferring);
-        objE.setDataTargetClient(objFileSystemHandler);
+        objE.setStatus(TransferStatus.waiting4transfer);
+        objE.setStatus(TransferStatus.transferring);
+        objE.setTargetFileTransfer(objFileSystemHandler);
         for (int i = 1; i < 10; i++) {
             objE.setTransferProgress(i * 100);
         }
-        objE.setStatus(enuTransferStatus.transferred);
+        objE.setStatus(TransferStatus.transferred);
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)

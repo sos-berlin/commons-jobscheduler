@@ -63,12 +63,12 @@ public class JobSchedulerJob extends Job_impl {
                     throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
                 }
                 if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").isEmpty()) {
-                    throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: "
-                            + spooler.ini_path());
+                    throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler
+                            .ini_path());
                 }
                 if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
-                    throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: "
-                            + spooler.ini_path());
+                    throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler
+                            .ini_path());
                 }
                 if (this.getLogger() != null) {
                     sosLogger.debug6("connecting to database...");
@@ -274,9 +274,9 @@ public class JobSchedulerJob extends Job_impl {
 
     public static Path getHibernateConfigurationReporting(Spooler spooler, Task task) {
         Path configDir = null;
-        if (!SOSString.isEmpty(task.agent_url())) {
+        boolean isAgent = !SOSString.isEmpty(task.agent_url());
+        if (isAgent) {
             configDir = Paths.get(System.getenv("SCHEDULER_DATA")).resolve("config");
-
         } else {
             Variable_set vs = spooler.variables();
             if (vs != null) {
@@ -291,11 +291,10 @@ public class JobSchedulerJob extends Job_impl {
         if (Files.exists(configFile)) {
             return configFile;
         }
-        if (SOSString.isEmpty(task.agent_url())) {
-            return getHibernateConfigurationScheduler(spooler);
-        } else {
+        if (isAgent) {
             throw new JobSchedulerException("no hibernate configuration file found on agent file system!");
         }
+        return getHibernateConfigurationScheduler(spooler);
     }
 
     private boolean getSettings() {

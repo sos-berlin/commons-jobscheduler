@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
-        <version>1.12.10-SNAPSHOT</version>
+        <version>1.12.11-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
@@ -143,8 +143,16 @@
 			<artifactId>jsch-111-bugfix</artifactId>
 		</dependency>
         <dependency>
-            <groupId>jsch-agent-proxy</groupId>
-            <artifactId>jsch-agent-proxy</artifactId>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.jsch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.sshagent</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>

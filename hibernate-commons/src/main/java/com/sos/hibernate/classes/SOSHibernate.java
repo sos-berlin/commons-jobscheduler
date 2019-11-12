@@ -1,10 +1,13 @@
 package com.sos.hibernate.classes;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Id;
 import javax.persistence.Parameter;
@@ -13,7 +16,10 @@ import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateLockAcquisitionException;
+
+import sos.util.SOSString;
 
 public class SOSHibernate {
 
@@ -37,6 +43,17 @@ public class SOSHibernate {
                 return (SOSHibernateLockAcquisitionException) e;
             } else if (e instanceof LockAcquisitionException) {
                 return (LockAcquisitionException) e;
+            }
+            e = e.getCause();
+        }
+        return null;
+    }
+
+    public static Exception findInvalidSessionException(Exception cause) {
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof SOSHibernateInvalidSessionException) {
+                return (SOSHibernateInvalidSessionException) e;
             }
             e = e.getCause();
         }
@@ -82,6 +99,16 @@ public class SOSHibernate {
         } catch (Throwable e) {
         }
         return null;
+    }
+
+    public static String toString(Object o) {
+        if (o == null) {
+            return null;
+        }
+        // exclude BLOB (byte[]) fields
+        List<String> excludeFieldNames = Arrays.stream(o.getClass().getDeclaredFields()).filter(m -> m.getType().isAssignableFrom(byte[].class)).map(
+                Field::getName).collect(Collectors.toList());
+        return SOSString.toString(o, excludeFieldNames);
     }
 
     protected static String getLogIdentifier(String identifier) {
