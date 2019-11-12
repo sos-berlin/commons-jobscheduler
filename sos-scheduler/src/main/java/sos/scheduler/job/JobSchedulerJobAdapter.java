@@ -255,21 +255,24 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 		return globalSchedulerParams;
 	}
 
-	@Override
-	public void setJSParam(final String pstrKey, final String pstrValue) {
-		if (isNotNull(getTaskParams())) {
-			getTaskParams().put(pstrKey, pstrValue);
-		}
-		if (hasOrderParameters()) {
-			if (isNotNull(getOrderParams())) {
-				getOrderParams().set_var(pstrKey, pstrValue);
-			}
-		}
-		if (isNotNull(schedulerParameters)) {
-			schedulerParameters.put(pstrKey, pstrValue);
-		}
-	}
-
+	 
+	 @Override
+	    public void setJSParam(final String pstrKey, final String pstrValue) {
+	        if (isNotNull(getTaskParams())) {
+	            getTaskParams().put(pstrKey, pstrValue);
+	        }
+	        if (isNotNull(spooler_task.params())) {
+	            spooler_task.params().set_var(pstrKey, pstrValue);
+	        }
+	        if (hasOrderParameters()) {
+	            if (isNotNull(getOrderParams())) {
+	                getOrderParams().set_var(pstrKey, pstrValue);
+	            }
+	        }
+	        if (isNotNull(schedulerParameters)) {
+	            schedulerParameters.put(pstrKey, pstrValue);
+	        }
+	    }
 	@Override
 	public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
 		setJSParam(pstrKey, pstrValue.toString());
