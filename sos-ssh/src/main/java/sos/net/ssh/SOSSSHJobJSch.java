@@ -571,7 +571,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
         alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
         alternateOptions.ignoreError.value(options.getIgnoreError().value());
-        if (objOptions.commandScriptFile.getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
+        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile.getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
             alternateOptions.setWithoutSFTPChannel(false);
         } else {
             alternateOptions.setWithoutSFTPChannel(true);
