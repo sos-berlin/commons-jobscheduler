@@ -106,6 +106,7 @@ public class SOSMail {
     private boolean changed = false;
     private final String queuePattern = "yyyy-MM-dd.HHmmss.S";
     private String queuePraefix = "sos.";
+    private String queueFailedPraefix = "failed.";
     private String lastGeneratedFileName = "";
     private String loadedMessageId = "";
     private boolean messageReady = false;
@@ -696,7 +697,7 @@ public class SOSMail {
             lastError = "AuthenticationFailedException while connecting to " + host + ":" + port + " " + user + "/******** -->" + ee.getMessage();
             if (queueMailOnError) {
                 try {
-                    dumpMessageToFile(true);
+                    dumpFailedMessageToFile(true);
                 } catch (Exception e) {
                     LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                 }
@@ -711,7 +712,7 @@ public class SOSMail {
                                 "Exception reading response")) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
-                        dumpMessageToFile(true);
+                        dumpFailedMessageToFile(true);
                     } catch (Exception ee) {
                         LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
@@ -728,7 +729,7 @@ public class SOSMail {
                 if (!queueDir.isEmpty()) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
-                        dumpMessageToFile(true);
+                        dumpFailedMessageToFile(true);
                     } catch (Exception ee) {
                         LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
@@ -896,17 +897,17 @@ public class SOSMail {
         return dumpMessageAsString(false);
     }
 
-    private void dumpMessageToFile(final boolean withAttachment) throws Exception {
+    private void dumpFailedMessageToFile(final boolean withAttachment) throws Exception {
         Date d = new Date();
         StringBuffer bb = new StringBuffer();
         SimpleDateFormat s = new SimpleDateFormat(queuePattern);
         FieldPosition fp = new FieldPosition(0);
         StringBuffer b = s.format(d, bb, fp);
-        lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
+        lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + b + ".email";
         File f = new File(lastGeneratedFileName);
         while (f.exists()) {
             b = s.format(d, bb, fp);
-            lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
+            lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + b + ".email";
             f = new File(lastGeneratedFileName);
         }
         dumpMessageToFile(f, withAttachment);
@@ -1577,6 +1578,7 @@ public class SOSMail {
         try {
             SOSMail sosMail = this;
             sosMail.init();
+
             sosMail.setHost(options.getHost().getValue());
             sosMail.setPort(options.getPort().getValue());
             sosMail.setQueueDir(options.getQueueDirectory().getValue());
@@ -1629,6 +1631,11 @@ public class SOSMail {
             LOGGER.error(e.getMessage(), e);
             throw new Exception("error occurred sendMail: " + e.getMessage());
         }
+    }
+
+    
+    public void setQueueFailedPraefix(String queueFailedPraefix) {
+        this.queueFailedPraefix = queueFailedPraefix;
     }
 
 }
