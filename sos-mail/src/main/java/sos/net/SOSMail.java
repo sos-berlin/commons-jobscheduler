@@ -897,17 +897,18 @@ public class SOSMail {
         return dumpMessageAsString(false);
     }
 
+
     private void dumpFailedMessageToFile(final boolean withAttachment) throws Exception {
         Date d = new Date();
         StringBuffer bb = new StringBuffer();
         SimpleDateFormat s = new SimpleDateFormat(queuePattern);
         FieldPosition fp = new FieldPosition(0);
         StringBuffer b = s.format(d, bb, fp);
-        lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + b + ".email";
+        lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + "sos." + b + ".email";
         File f = new File(lastGeneratedFileName);
         while (f.exists()) {
             b = s.format(d, bb, fp);
-            lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + b + ".email";
+            lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + "sos." + b + ".email";
             f = new File(lastGeneratedFileName);
         }
         dumpMessageToFile(f, withAttachment);
