@@ -97,7 +97,7 @@
 										<xs:element name="manageCategories" type="xs:boolean"/>
 										<xs:element name="editPermissions" type="xs:boolean"/>
 										<xs:element name="editMainSection"/>
-										<xs:element name="Configurations">
+										<xs:element name="configurations">
 											<xs:complexType>
 												<xs:sequence>
 													<xs:element name="view" type="xs:boolean"/>
