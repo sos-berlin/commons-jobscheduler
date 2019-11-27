@@ -43,8 +43,14 @@ class EnvVarCreator {
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
         case "JS_YEAR":
+        case "JS_YEAR_YYYY":
             outFormat = new SimpleDateFormat("yyyy");
-            envVar.setName("JS_YEAR");
+            envVar.setName("JS_YEAR_YYYY");
+            envVar.setValue(outFormat.format(calendar.getTime()));
+            return envVar;
+        case "JS_YEAR_YY":
+            outFormat = new SimpleDateFormat("yy");
+            envVar.setName("JS_YEAR_YY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
         case "JS_MONTH":
@@ -56,14 +62,15 @@ class EnvVarCreator {
             envVar.setName("JS_MONTH_NAME");
             envVar.setValue(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
             return envVar;
-        case "JS_DATEJJ":
+        case "JS_DATE_YY":
             outFormat = new SimpleDateFormat("yyMMdd");
-            envVar.setName("JS_DATEJJ");
+            envVar.setName("JS_DATE_YY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_DATEJJJJ":
+        case "JS_DATE":
+        case "JS_DATE_YYYY":
             outFormat = new SimpleDateFormat("yyyyMMdd");
-            envVar.setName("JS_DATEJJ");
+            envVar.setName("JS_DATE_YYYY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
         case "JS_FOLDER":
