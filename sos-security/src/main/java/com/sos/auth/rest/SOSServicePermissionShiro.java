@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.TimeZone;
 
+import javax.servlet.http.HttpServletRequest;
 /*import javax.servlet.http.HttpServletRequest;
  * 
  */
@@ -66,6 +67,8 @@ public class SOSServicePermissionShiro {
     
     @Context
     UriInfo uriInfo;
+    
+ 
     
     public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -222,7 +225,7 @@ public class SOSServicePermissionShiro {
         }
     }
     
-    /*
+    
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -231,8 +234,8 @@ public class SOSServicePermissionShiro {
             @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
         return login(request, basicAuthorization, user, pwd);
     }
-*/
-    @POST
+
+/*    @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -240,7 +243,7 @@ public class SOSServicePermissionShiro {
             @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
         return login(basicAuthorization, user, pwd);
     }
-    
+  */  
      
     private JOCDefaultResponse logout(String accessToken) {
 
@@ -810,9 +813,9 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
-    //private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
+    private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
         Globals.setServletBaseUri(uriInfo);
+        
         Globals.sosShiroProperties = new JocCockpitProperties();
         Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
@@ -840,7 +843,7 @@ public class SOSServicePermissionShiro {
             }
 
             currentUser.setAuthorization(basicAuthorization);
-          //  currentUser.setHttpServletRequest(request); 
+            currentUser.setHttpServletRequest(request); 
              
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
             LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
