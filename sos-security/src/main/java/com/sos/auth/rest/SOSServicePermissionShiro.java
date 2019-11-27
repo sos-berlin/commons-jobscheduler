@@ -232,7 +232,7 @@ public class SOSServicePermissionShiro {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse loginPost(@Context HttpServletRequest request, @HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user,
             @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
-        return login(request, basicAuthorization, user, pwd);
+        return  login(request, basicAuthorization, user, pwd);
     }
 
 /*    @POST
@@ -846,6 +846,12 @@ public class SOSServicePermissionShiro {
             currentUser.setHttpServletRequest(request); 
              
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
+            
+            if (request != null) {
+                sosShiroCurrentUserAnswer.setCallerIpAddress(request.getRemoteAddr());
+                sosShiroCurrentUserAnswer.setCallerHostName(request.getRemoteHost());
+            }
+
             LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
 
             Globals.jocWebserviceDataContainer.getCurrentUsersList().removeTimedOutUser(currentUser.getUsername());
