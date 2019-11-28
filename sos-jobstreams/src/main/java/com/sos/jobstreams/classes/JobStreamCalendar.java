@@ -9,8 +9,6 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
-import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendar;
-import com.sos.jitl.reporting.db.DBItemInventoryClusterCalendarUsage;
 import com.sos.jobstreams.db.DBLayerCalendarUsages;
 import com.sos.jobstreams.db.FilterCalendarUsage;
 import com.sos.joc.classes.calendars.CalendarResolver;

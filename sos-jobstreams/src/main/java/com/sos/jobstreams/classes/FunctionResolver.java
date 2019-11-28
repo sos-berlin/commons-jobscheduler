@@ -7,10 +7,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.checkhistory.HistoryHelper;
 
 public class FunctionResolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FunctionResolver.class);
 
     public String resolveFunctions(String paramValue) {
         String newValue = paramValue;
@@ -19,11 +23,17 @@ public class FunctionResolver {
             String f = functions[i];
             String functionName = HistoryHelper.getMethodName(f).toLowerCase();
             String parameter = HistoryHelper.getParameter(f);
-            f = f.replaceAll("\\)", "\\\\)");
-            f = f.replaceAll("\\(", "\\\\(");
-            String s = resolveFunction(functionName, parameter);
-            if (!s.isEmpty()) {
-                newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
+            try {
+                f = f.replaceAll("\\)", "\\\\)");
+                f = f.replaceAll("\\(", "\\\\(");
+                String s = resolveFunction(functionName, parameter);
+                if (!s.isEmpty()) {
+                    newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not parse " + paramValue);
+                return paramValue;
+
             }
         }
         return newValue;

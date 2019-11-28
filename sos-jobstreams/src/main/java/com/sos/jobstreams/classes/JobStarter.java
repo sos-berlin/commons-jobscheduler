@@ -83,16 +83,19 @@ public class JobStarter {
             }
             if (envVars != null) {
                 for (NameValuePair envVar : envVars) {
-                    schedulerParameters.put(envVar.getName(), envVar.getValue());
+                    if (envVar != null) {
+                        schedulerParameters.put(envVar.getName(), envVar.getValue());
+                    }
                 }
             }
             jobchainNodeConfiguration.setListOfTaskParameters(taskParameters);
             jobchainNodeConfiguration.setListOfSchedulerParameters(schedulerParameters);
-
             jobchainNodeConfiguration.substituteTaskParamters();
-            for (Entry<String, String> entry : jobchainNodeConfiguration.getListOfTaskParameters().entrySet()) {
-                String paramName = entry.getKey();
-                String paramValue = entry.getValue();
+
+            for (NameValuePair entry : parameters) {
+                String paramName = entry.getName();
+                String paramValue = jobchainNodeConfiguration.getListOfTaskParameters().get(paramName);
+
                 paramValue = functionResolver.resolveFunctions(paramValue);
                 if (paramValue != null) {
                     if (isTraceEnabled) {
@@ -124,10 +127,13 @@ public class JobStarter {
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_CENTURY"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DAY"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YY"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YYYY"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH_NAME"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATEJJ"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATEJJJJ"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YY"));
+        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YYYY"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_FOLDER"));
         envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBNAME"));
 
