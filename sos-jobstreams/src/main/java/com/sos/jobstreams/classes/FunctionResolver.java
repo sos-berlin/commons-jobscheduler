@@ -18,24 +18,33 @@ public class FunctionResolver {
 
     public String resolveFunctions(String paramValue) {
         String newValue = paramValue;
-        String[] functions = paramValue.split("%%");
-        for (int i = 0; i < functions.length; i++) {
-            String f = functions[i];
-            String functionName = HistoryHelper.getMethodName(f).toLowerCase();
-            String parameter = HistoryHelper.getParameter(f);
-            try {
-                f = f.replaceAll("\\)", "\\\\)");
-                f = f.replaceAll("\\(", "\\\\(");
-                String s = resolveFunction(functionName, parameter);
-                if (!s.isEmpty()) {
-                    newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Could not parse " + paramValue);
-                return paramValue;
+        boolean haveResolved;
+        do {
+            haveResolved = false;
+            String[] functions = paramValue.split("%%");
+            for (int i = 0; i < functions.length; i++) {
+                String f = functions[i];
+                if (f.toUpperCase().matches("(TODAY|GETENV|CALCDATE|SUBSTRING)\\(.*\\)")) {
+                    String functionName = HistoryHelper.getMethodName(f).toLowerCase();
+                    String parameter = HistoryHelper.getParameter(f);
+                    try {
+                        f = f.replaceAll("\\)", "\\\\)");
+                        f = f.replaceAll("\\(", "\\\\(");
+                        String s = resolveFunction(functionName, parameter);
+                        if (!s.isEmpty()) {
+                            newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
+                        }
+                        haveResolved = true;
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not parse " + paramValue);
+                        return paramValue;
 
+                    }
+                }
             }
-        }
+            paramValue = newValue;
+        } while (haveResolved);
+
         return newValue;
     }
 
