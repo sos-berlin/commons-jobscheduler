@@ -127,13 +127,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 						String replacedValue = replaceSchedulerVars(value);
 						if (!replacedValue.equalsIgnoreCase(value)) {
 							schedulerParameters.put(key, replacedValue);
-							if (key.contains("password")) {
+                            if (key.contains("password") || key.contains("passphrase")) {
 								logger.trace(String.format("%1$s = *****", key));
 							} else {
 								logger.trace(String.format("%1$s = %2$s", key, replacedValue));
 							}
 						} else {
-							if (key.contains("password")) {
+                            if (key.contains("password") || key.contains("passphrase")) {
 								logger.trace(String.format("%1$s = *****", key));
 							} else {
 								logger.trace(String.format("%1$s = %2$s", key, value));
