@@ -103,7 +103,20 @@
 													<xs:element name="view" type="xs:boolean"/>
 													<xs:element name="edit" type="xs:boolean"/>
 													<xs:element name="delete" type="xs:boolean"/>
-													<xs:element name="deploy" type="xs:boolean"/>
+													<xs:element name="deploy">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="job" type="xs:boolean"/>
+																<xs:element name="jobChain" type="xs:boolean"/>
+																<xs:element name="order" type="xs:boolean"/>
+																<xs:element name="processClass" type="xs:boolean"/>
+																<xs:element name="schedule" type="xs:boolean"/>
+																<xs:element name="lock" type="xs:boolean"/>
+																<xs:element name="monitor" type="xs:boolean"/>
+																<xs:element name="xmlEditor" type="xs:boolean"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
@@ -211,7 +224,6 @@
 										<xs:element name="runTime" type="xs:boolean"/>
 										<xs:element name="state" type="xs:boolean"/>
 										<xs:element name="parameter" type="xs:boolean"/>
-										<xs:element name="hotFolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -264,13 +276,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="change">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="hotFolder" type="xs:boolean"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
 							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
@@ -293,7 +298,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="runTime" type="xs:boolean"/>
-										<xs:element name="hotfolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -327,13 +331,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="change">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="hotFolder" type="xs:boolean"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
 							<xs:element name="assignDocumentation" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
@@ -354,7 +351,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="addSubstitute" type="xs:boolean"/>
-										<xs:element name="hotFolder" type="xs:boolean"/>
 										<xs:element name="editContent" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
@@ -372,13 +368,6 @@
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
 										<xs:element name="documentation" type="xs:boolean"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="change">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="hotFolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
