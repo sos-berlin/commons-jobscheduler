@@ -290,13 +290,14 @@ public class JSConditionResolver {
     }
 
     private String expressionPrepare(String e) {
-        return e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ", "###|||###")
-                .replaceAll("not ", "###!!!###");
+        return "<###" + e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ", "###|||###")
+                .replaceAll("not ", "###!!!###") + "###>";
+
     }
 
     private String expressionBack(String e) {
         return e.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll("\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ")
-                .replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ");
+                .replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ").replaceAll("<\\#\\#\\#", "").replaceAll("\\#\\#\\#>","");
 
     }
 
@@ -314,7 +315,8 @@ public class JSConditionResolver {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    String s = "###" + jsCondition.getConditionValue() + "###";
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
 
@@ -338,7 +340,8 @@ public class JSConditionResolver {
                 if (f.exists()) {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    String s = "###" + jsCondition.getConditionValue() + "###";
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 } else {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " does not exist");
@@ -350,7 +353,8 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                        String s = "###" + jsCondition.getConditionValue() + "###";
+                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
                     }
@@ -363,7 +367,8 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                        String s = "###" + jsCondition.getConditionValue() + "###";
+                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
                     }
@@ -397,7 +402,8 @@ public class JSConditionResolver {
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace(jsCondition.getConditionValue(), "true");
+                    String s = "###" + jsCondition.getConditionValue() + "###";
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
 
