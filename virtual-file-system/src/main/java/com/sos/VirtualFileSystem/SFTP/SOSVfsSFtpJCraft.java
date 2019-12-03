@@ -760,12 +760,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", method, keePassPath));
                         }
-                        secureChannel.addIdentity("yade", pr, (byte[]) null, authenticationOptions.getPassphrase().getValue().getBytes());
+                        secureChannel.addIdentity(SOSVfsSFtpJCraft.class.getSimpleName(), pr, (byte[]) null, authenticationOptions.getPassphrase().getValue().getBytes());
                     } else {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s", method, keePassPath));
                         }
-                        secureChannel.addIdentity("yade", pr, (byte[]) null, (byte[]) null);
+                        secureChannel.addIdentity(SOSVfsSFtpJCraft.class.getSimpleName(), pr, (byte[]) null, (byte[]) null);
                     }
                 } catch (Exception e) {
                     throw new Exception(String.format("[%s][keepass]%s", method, e.toString()), e);

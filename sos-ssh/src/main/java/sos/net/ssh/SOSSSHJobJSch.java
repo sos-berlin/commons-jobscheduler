@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -185,7 +186,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             return null;
                         }
                     };
-                    
+
                     commandExecution = executorService.submit(runCompleteCmd);
                     Callable<Void> sendSignal = new Callable<Void>() {
 
@@ -193,12 +194,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         public Void call() throws Exception {
                             try {
                                 Thread.sleep(1000);
-                            } catch (InterruptedException e) {}
+                            } catch (InterruptedException e) {
+                            }
                             while (!commandExecution.isDone()) {
                                 for (int i = 0; i < 600; i++) {
                                     try {
                                         Thread.sleep(100);
-                                    } catch (InterruptedException e) {}
+                                    } catch (InterruptedException e) {
+                                    }
                                 }
                                 ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("CONT");
                             }
@@ -485,17 +488,18 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 } else {
                     postCommandRead = String.format(DEFAULT_LINUX_POST_COMMAND_READ, tmpFileName, tmpFileName);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         String stdErr = "";
-//        try {
-            if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
-                for (String tempFileName : tempFilesToDelete) {
-                    ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
-                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
-                }
+        // try {
+        if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
+            for (String tempFileName : tempFilesToDelete) {
+                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
+                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
             }
-//        } catch (Exception e) {}
+        }
+        // } catch (Exception e) {}
         tempFilesToDelete = null;
         try {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
@@ -523,21 +527,21 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         }
                     }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
-//                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
+                    // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 }
-//                else {
-//                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
-//                }
+                // else {
+                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
+                // }
             } else {
-//                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
-//                stdErr = prePostCommandVFSHandler.getStdErr().toString();
-//                if (stdErr.length() > 0) {
-//                    LOGGER.debug(stdErr);
-//                }
-                
+                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
+                // stdErr = prePostCommandVFSHandler.getStdErr().toString();
+                // if (stdErr.length() > 0) {
+                // LOGGER.debug(stdErr);
+                // }
+
             }
         } catch (Exception e) {
-//            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+            // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
         } finally {
             try {
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
@@ -551,7 +555,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 try {
                     prePostCommandVFSHandler.closeConnection();
                     prePostCommandVFSHandler.closeSession();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
         }
@@ -571,7 +576,20 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
         alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
         alternateOptions.ignoreError.value(options.getIgnoreError().value());
-        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile.getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
+
+        if (options.credential_store_filename.isNotEmpty()) {
+            SOSCredentialStoreOptions csOptions = new SOSCredentialStoreOptions();
+            csOptions.useCredentialStore.setValue("true");
+            csOptions.credentialStoreFileName.setValue(options.credential_store_filename.getValue());
+            csOptions.credentialStoreKeyFileName.setValue(options.credential_store_key_filename.getValue());
+            csOptions.credentialStorePassword.setValue(options.credential_store_password.getValue());
+            csOptions.credentialStoreKeyPath.setValue(options.credential_store_entry_path.getValue());
+            alternateOptions.setCredentialStore(csOptions);
+            alternateOptions.checkCredentialStoreOptions();
+        }
+
+        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile
+                .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
             alternateOptions.setWithoutSFTPChannel(false);
         } else {
             alternateOptions.setWithoutSFTPChannel(true);
