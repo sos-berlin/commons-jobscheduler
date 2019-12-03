@@ -25,6 +25,8 @@ import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.classes.JSEvent;
+import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.JocException;
  

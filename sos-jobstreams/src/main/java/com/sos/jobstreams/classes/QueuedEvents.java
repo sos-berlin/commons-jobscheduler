@@ -1,7 +1,7 @@
 package com.sos.jobstreams.classes;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jobstreams.resolver.JSEvent;
+import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jobstreams.resolver.JSEvents;
 
 import sos.util.SOSString;

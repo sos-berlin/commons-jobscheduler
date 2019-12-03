@@ -8,10 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.sos.jobstreams.db.DBLayerConsumedInConditions;
-import com.sos.jobstreams.db.DBLayerEvents;
-import com.sos.jobstreams.db.FilterConsumedInConditions;
-import com.sos.jobstreams.db.FilterEvents;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
@@ -19,7 +15,12 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.db.DBItemEvent;
+import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
+import com.sos.jitl.jobstreams.db.DBLayerEvents;
+import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
+import com.sos.jitl.jobstreams.db.FilterEvents;
 
 @Ignore
 public class TestEventsDb {
