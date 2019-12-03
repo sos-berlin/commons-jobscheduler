@@ -460,7 +460,21 @@ public class SOSServicePermissionShiro {
             addPermission(forUser, sosPermissionJoc.getSOSPermission(),
                     "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:delete");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(),
-                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy");
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:job");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:job_chain");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:lock");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:monitor");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:order");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:process_class");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:schedule");
+            addPermission(forUser, sosPermissionJoc.getSOSPermission(),
+                    "sos:products:joc_cockpit:jobscheduler_master:administration:configurations:deploy:xml_editor");
 
             addPermission(forUser, sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status");
             addPermission(forUser, sosPermissionJoc.getSOSPermission(),
