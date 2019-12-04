@@ -800,9 +800,7 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setCallerHostName(currentUser.getCallerHostName());
         sosShiroCurrentUserAnswer.setCallerIpAddress(currentUser.getCallerIpAddress());
 
-        
         LOGGER.info("CallerIpAddress=" + currentUser.getCallerIpAddress());
-        LOGGER.info("CallerHostName=" + currentUser.getCallerHostName());
 
         boolean enableTouch = "true".equals(Globals.sosShiroProperties.getProperty(WebserviceConstants.ENABLE_SESSION_TOUCH,
                 WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
