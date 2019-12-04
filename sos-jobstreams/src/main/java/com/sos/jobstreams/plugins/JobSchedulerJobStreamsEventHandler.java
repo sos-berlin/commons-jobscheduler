@@ -298,12 +298,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     switch (jobSchedulerEvent.getType()) {
 
                     case "OrderFinished":
-                        LOGGER.debug("OrderFinished event to be executed");
+                        LOGGER.debug("Event event to be executed: " + jobSchedulerEvent.getType());
                         OrderFinishedEvent orderFinishedEvent = new OrderFinishedEvent((JsonObject) entry);
                         conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain(), null);
                         conditionResolver.checkHistoryCache(orderFinishedEvent.getJobChain() + "(" + orderFinishedEvent.getOrderId() + ")", null);
                         break;
                     case "TaskEnded":
+                        LOGGER.debug("Event event to be executed: " + jobSchedulerEvent.getType());
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         performTaskEnd(sosHibernateSession, taskEndEvent);
                         resolveInConditions = true;
@@ -315,19 +316,20 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         switch (customEvent.getKey()) {
 
                         case "InitConditionResolver":
-                            LOGGER.debug("VariablesCustomEvent event to be executed: " + "InitConditionResolver");
+                        case "CalendarUsageUpdated":
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reInit();
                             this.resetTimer();
 
                             resolveInConditions = true;
                             break;
                         case "StartConditionResolver":
-                            LOGGER.debug("VariablesCustomEvent event to be executed: " + "StartConditionResolver");
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reInitEvents(reportingFactory);
                             resolveInConditions = true;
                             break;
                         case "AddEvent":
-                            LOGGER.debug("VariablesCustomEvent event to be executed: " + "AddEvent --> " + customEvent.getEvent());
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
                             JSEvent event = new JSEvent();
                             event.setCreated(new Date());
@@ -354,8 +356,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             break;
                         case "RemoveEvent":
-                            LOGGER.debug("VariablesCustomEvent event to be executed: " + "RemoveEvent -->" + customEvent.getEvent());
-
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
                             event = new JSEvent();
                             event.setCreated(new Date());
                             event.setEvent(customEvent.getEvent());
@@ -374,7 +375,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             break;
 
                         case "ResetConditionResolver":
-                            LOGGER.debug("VariablesCustomEvent event to be executed: " + "ResetConditionResolver -->" + customEvent.getJobStream());
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getJobStream());
 
                             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
                             filterConsumedInConditions.setJobSchedulerId(super.getSettings().getSchedulerId());

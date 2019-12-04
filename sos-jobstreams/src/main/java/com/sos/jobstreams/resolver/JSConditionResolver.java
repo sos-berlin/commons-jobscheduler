@@ -93,9 +93,6 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
         jsJobOutConditions = null;
-        // sosHibernateSession.beginTransaction();
-        // sosHibernateSession.commit();
-
         jsEvents = null;
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
         this.init();
@@ -317,7 +314,6 @@ public class JSConditionResolver {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    String s = "###" + jsCondition.getConditionValue() + "###";
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
@@ -342,7 +338,6 @@ public class JSConditionResolver {
                 if (f.exists()) {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
                     expressionValue = this.expressionPrepare(expressionValue);
-                    String s = "###" + jsCondition.getConditionValue() + "###";
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 } else {
@@ -355,7 +350,6 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        String s = "###" + jsCondition.getConditionValue() + "###";
                         expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
@@ -369,7 +363,6 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        String s = "###" + jsCondition.getConditionValue() + "###";
                         expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
@@ -404,7 +397,6 @@ public class JSConditionResolver {
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    String s = "###" + jsCondition.getConditionValue() + "###";
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
