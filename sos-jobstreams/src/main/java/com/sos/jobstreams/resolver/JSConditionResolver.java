@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBException;
 
@@ -110,6 +111,14 @@ public class JSConditionResolver {
         } finally {
             if (session != null) {
                 session.close();
+            }
+        }
+    }
+    
+    public void reinitCalendarUsage() {
+        for (JSInConditions jsInConditions : jsJobInConditions.getListOfJobInConditions().values()){
+            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
             }
         }
     }

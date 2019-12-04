@@ -125,6 +125,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
         filterCalendarUsage.setPath(normalizedJob);
         filterCalendarUsage.setSchedulerId(schedulerId);
+        this.listOfDates = new HashSet<LocalDate>();
+
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
         Set<LocalDate> l;
 

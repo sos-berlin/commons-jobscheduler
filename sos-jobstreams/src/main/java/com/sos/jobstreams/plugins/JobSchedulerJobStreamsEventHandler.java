@@ -316,9 +316,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         switch (customEvent.getKey()) {
 
                         case "InitConditionResolver":
-                        case "CalendarUsageUpdated":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reInit();
+                            this.resetTimer();
+
+                            resolveInConditions = true;
+                            break;
+                        case "CalendarUsageUpdated":
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            conditionResolver.reinitCalendarUsage();
                             this.resetTimer();
 
                             resolveInConditions = true;
