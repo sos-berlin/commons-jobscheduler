@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -322,11 +323,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
+            alternateOptions.checkMandatory();
             vfsHandler.connect(alternateOptions);
-            vfsHandler.authenticate(objOptions);
+            vfsHandler.authenticate(alternateOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
@@ -569,6 +570,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.port.value(options.getPort().value());
         alternateOptions.user.setValue(options.getUser().getValue());
         alternateOptions.password.setValue(options.getPassword().getValue());
+        alternateOptions.passphrase.setValue(options.passphrase.getValue());
+        alternateOptions.authMethod.setValue(options.authMethod.getValue());
+        alternateOptions.authFile.setValue(options.authFile.getValue());
+        alternateOptions.protocol.setValue(enuTransferTypes.ssh2);
+
         alternateOptions.proxyProtocol.setValue(options.getProxyProtocol().getValue());
         alternateOptions.proxyHost.setValue(options.getProxyHost().getValue());
         alternateOptions.proxyPort.value(options.getProxyPort().value());
@@ -586,6 +592,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             csOptions.credentialStoreKeyPath.setValue(options.credential_store_entry_path.getValue());
             alternateOptions.setCredentialStore(csOptions);
             alternateOptions.checkCredentialStoreOptions();
+            
+            mapBackOptionsFromCS(alternateOptions);
         }
 
         if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile
@@ -595,6 +603,19 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             alternateOptions.setWithoutSFTPChannel(true);
         }
         return alternateOptions;
+    }
+    
+    private void mapBackOptionsFromCS (SOSConnection2OptionsAlternate alternateOptions) {
+        objOptions.host.setValue(alternateOptions.host.getValue());
+        objOptions.port.setValue(alternateOptions.port.getValue());
+        objOptions.user.setValue(alternateOptions.user.getValue());
+        objOptions.password.setValue(alternateOptions.password.getValue());
+        objOptions.passphrase.setValue(alternateOptions.passphrase.getValue());
+        
+        objOptions.proxyHost.setValue(alternateOptions.proxyHost.getValue());
+        objOptions.proxyPort.setValue(alternateOptions.proxyPort.getValue());
+        objOptions.proxyUser.setValue(alternateOptions.proxyUser.getValue());
+        objOptions.proxyPassword.setValue(alternateOptions.proxyPassword.getValue());
     }
 
     public String getPidFileName() {
