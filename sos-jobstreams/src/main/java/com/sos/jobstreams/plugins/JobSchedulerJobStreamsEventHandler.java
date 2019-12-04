@@ -323,6 +323,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             resolveInConditions = true;
                             break;
                         case "CalendarUsageUpdated":
+                        case "CalendarDeleted":
+                            
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reinitCalendarUsage();
                             this.resetTimer();
