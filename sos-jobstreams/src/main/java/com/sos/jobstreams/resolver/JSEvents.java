@@ -33,7 +33,7 @@ public class JSEvents {
 
     public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
         for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
-            if (itemEvent != null) {
+            if (itemEvent != null && itemEvent.getDbItemEvent() != null) {
                 JSEvent jsEvent = new JSEvent();
                 jsEvent.setItemEvent(itemEvent.getDbItemEvent());
                 jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
