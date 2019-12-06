@@ -217,23 +217,29 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         try {
             session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
 
-            List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session);
-            for (JSInCondition jsInCondition : listOfValidatedInconditions) {
-                publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
-                if (!jsInCondition.isSkipOutCondition()) {
-                    for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
-                        if (!inConditionCommand.isExecuted()) {
-                            TaskEndEvent taskEndEvent = new TaskEndEvent();
-                            taskEndEvent.setJobPath(jsInCondition.getJob());
-                            taskEndEvent.setReturnCode(0);
-                            taskEndEvent.setTaskId("");
-                            LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
-                            inConditionCommand.setExecuted(true);
-                            performTaskEnd(session, taskEndEvent);
+            boolean skippedTask = false;
+            do {
+                skippedTask = false;
+
+                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session);
+                for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+                    publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
+                    if (!jsInCondition.isSkipOutCondition()) {
+                        for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                            if (!inConditionCommand.isExecuted()) {
+                                TaskEndEvent taskEndEvent = new TaskEndEvent();
+                                taskEndEvent.setJobPath(jsInCondition.getJob());
+                                taskEndEvent.setReturnCode(0);
+                                taskEndEvent.setTaskId("");
+                                LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
+                                inConditionCommand.setExecuted(true);
+                                performTaskEnd(session, taskEndEvent);
+                                skippedTask = true;
+                            }
                         }
                     }
                 }
-            }
+            } while (skippedTask);
             if (isDebugEnabled & duration != null) {
                 duration.end("Resolving all InConditions: ");
             }
@@ -324,7 +330,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             break;
                         case "CalendarUsageUpdated":
                         case "CalendarDeleted":
-                            
+
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reinitCalendarUsage();
                             this.resetTimer();
