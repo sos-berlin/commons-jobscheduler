@@ -24,7 +24,6 @@
         <module>hibernate-commons</module>
         <module>jobscheduler-helper</module>
         <module>jobscheduler-object-model</module>
-        <!-- module>jobscheduler-web-services</module-->
         <module>jobscheduler-web-services-globals</module>
         <module>sos-net</module>
         <module>sos-dialog</module>
