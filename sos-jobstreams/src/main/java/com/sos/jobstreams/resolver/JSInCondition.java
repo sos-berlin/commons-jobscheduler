@@ -34,6 +34,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
     private boolean consumed;
+    private boolean jobIsRunning;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
     private boolean haveCalendars;
@@ -41,6 +42,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public JSInCondition() {
         super();
         haveCalendars = false;
+        jobIsRunning = false;
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -116,7 +118,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public boolean isConsumed() {
         return consumed;
     }
-
+    
     public void setConsumed(boolean consumed) {
         this.consumed = consumed;
     }
@@ -144,17 +146,22 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public void executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
+    public String executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
             throws SOSHibernateException, JocException, JAXBException {
         LOGGER.trace("execute commands ------>");
+        String startedJob = "";
         if (this.isMarkExpression()) {
             LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
             this.markAsConsumed(sosHibernateSession);
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
+            String s = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
+            if (!s.isEmpty()) {
+                startedJob = s;
+            }
         }
+        return startedJob;
     }
 
     public boolean isStartToday() {
@@ -172,6 +179,16 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public String toStr() {
         return this.getExpression() + "::" + SOSString.toString(this);
+    }
+
+    
+    public boolean jobIsRunning() {
+        return jobIsRunning;
+    }
+
+    
+    public void setJobIsRunning(boolean jobIsRunning) {
+        this.jobIsRunning = jobIsRunning;
     }
 
 }

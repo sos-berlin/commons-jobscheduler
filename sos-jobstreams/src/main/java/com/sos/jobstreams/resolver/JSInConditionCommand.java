@@ -49,16 +49,18 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private void startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
+    private String startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
 
         JobStarter jobStarter = new JobStarter();
         String jobXml = jobStarter.buildJobStartXml(inCondition, getCommandParam());
         String answer = "";
         String job = inCondition.getNormalizedJob();
+        String startedJob = "";
         if (inCondition.isStartToday()) {
             LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
             if (schedulerXmlCommandExecutor != null) {
                 answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+                startedJob = job;
             } else {
                 LOGGER.debug("Start job will be ignored as running in debug  mode.: " + job);
             }
@@ -68,11 +70,12 @@ public class JSInConditionCommand {
             executed = false;
         }
         LOGGER.trace(answer);
-
+        return startedJob;
     }
 
-    public void executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
+    public String executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
 
+        String startedJob = "";
         String command = getCommand();
         String commandParam = getCommandParam();
         LOGGER.debug("execution command: " + command + " " + commandParam);
@@ -83,8 +86,9 @@ public class JSInConditionCommand {
         }
         if ("startjob".equalsIgnoreCase(command)) {
             LOGGER.debug("....starting job:" + inCondition.getJob());
-            startJob(schedulerXmlCommandExecutor, inCondition);
+            startedJob = startJob(schedulerXmlCommandExecutor, inCondition);
         }
+        return startedJob;
     }
 
     public void setCommand(String command) {

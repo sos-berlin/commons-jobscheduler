@@ -181,6 +181,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
                 .getJobPath());
+        
+        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());

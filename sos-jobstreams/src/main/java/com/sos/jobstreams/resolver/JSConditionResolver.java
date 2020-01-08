@@ -107,16 +107,16 @@ public class JSConditionResolver {
             jsEvents = null;
             this.initEvents(session);
         } catch (Exception e) {
-            LOGGER.error("Could not reInit Events",e);
+            LOGGER.error("Could not reInit Events", e);
         } finally {
             if (session != null) {
                 session.close();
             }
         }
     }
-    
+
     public void reinitCalendarUsage() {
-        for (JSInConditions jsInConditions : jsJobInConditions.getListOfJobInConditions().values()){
+        for (JSInConditions jsInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                 jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
             }
@@ -193,7 +193,7 @@ public class JSConditionResolver {
     }
 
     public void initEvents(SOSHibernateSession session) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::initEvents");
+        LOGGER.debug("JSConditionResolver::initEvents");
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
@@ -249,7 +249,7 @@ public class JSConditionResolver {
 
     public void initCheckHistory() throws SOSHibernateException {
 
-        LOGGER.debug("JSConditionResolve::initCheckHistory");
+        LOGGER.debug("JSConditionResolver::initCheckHistory");
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
             for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                 String expressionValue = inCondition.getExpression();
@@ -305,7 +305,8 @@ public class JSConditionResolver {
 
     private String expressionBack(String e) {
         return e.replaceAll("\\#\\#\\#\\(\\#\\#\\#", "(").replaceAll("\\#\\##\\)\\#\\#\\#", ")").replaceAll("\\#\\#\\#\\&\\&\\&\\#\\#\\#", " and ")
-                .replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ").replaceAll("<\\#\\#\\#", "").replaceAll("\\#\\#\\#>","");
+                .replaceAll("\\#\\#\\#\\|\\|\\|\\#\\#\\#", " or ").replaceAll("\\#\\#\\#\\!\\!\\!\\#\\#\\#", "not ").replaceAll("<\\#\\#\\#", "")
+                .replaceAll("\\#\\#\\#>", "");
 
     }
 
@@ -313,9 +314,9 @@ public class JSConditionResolver {
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
-        LOGGER.trace("JSConditionResolve::validate");
+        LOGGER.trace("JSConditionResolver::validate");
         for (JSCondition jsCondition : listOfConditions) {
-            LOGGER.trace("JSConditionResolve::validate --> " + jsCondition.getConditionType());
+            LOGGER.trace("JSConditionResolver::validate --> " + jsCondition.getConditionType());
 
             switch (jsCondition.getConditionType()) {
             case "rc":
@@ -323,7 +324,7 @@ public class JSConditionResolver {
                 JSReturnCodeResolver returnCodeResolver = new JSReturnCodeResolver();
                 if (returnCodeResolver.resolve(taskReturnCode, jsCondition.getConditionParam())) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
 
@@ -347,7 +348,7 @@ public class JSConditionResolver {
                 if (f.exists()) {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " exists");
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 } else {
                     LOGGER.debug("file " + jsCondition.getConditionParam() + " does not exist");
@@ -359,7 +360,7 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJob(sosHibernateSession, jsCondition, condition.getJob(), taskReturnCode).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
+                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
                     }
@@ -372,7 +373,7 @@ public class JSConditionResolver {
                 try {
                     if (checkHistoryCondition.validateJobChain(sosHibernateSession, jsCondition).getValidateResult()) {
                         expressionValue = this.expressionPrepare(expressionValue);
-                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
+                        expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                         expressionValue = this.expressionBack(expressionValue);
 
                     }
@@ -406,7 +407,7 @@ public class JSConditionResolver {
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
-                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###" , "###true###");
+                    expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }
 
@@ -424,8 +425,8 @@ public class JSConditionResolver {
         return evaluatedExpression;
     }
 
-    public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException,
-            JocException, URISyntaxException, JAXBException {
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws UnsupportedEncodingException, MalformedURLException,
+            InterruptedException, SOSException, JocException, URISyntaxException, JAXBException {
 
         List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
         if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
@@ -433,7 +434,7 @@ public class JSConditionResolver {
 
         } else {
 
-            LOGGER.debug("JSConditionResolve::resolveInConditions");
+            LOGGER.debug("JSConditionResolver::resolveInConditions");
             for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
                 for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
                     String logPrompt = "";
@@ -442,31 +443,41 @@ public class JSConditionResolver {
                                 .getExpression();
                     }
                     if (!inCondition.isConsumed()) {
+                        if (!inCondition.jobIsRunning()) {
 
-                        if (isTraceEnabled) {
-                            LOGGER.trace("---InCondition is: " + inCondition.toStr());
-                        }
-                        if (validate(null, inCondition)) {
-                            inCondition.executeCommand(session, schedulerXmlCommandExecutor);
-                            listOfValidatedInconditions.add(inCondition);
+                            if (isTraceEnabled) {
+                                LOGGER.trace("---InCondition is: " + inCondition.toStr());
+                            }
+                            if (validate(null, inCondition)) {
+                                String startedJob = inCondition.executeCommand(session, schedulerXmlCommandExecutor);
+                                if (!startedJob.isEmpty()) {
+                                    this.disableInconditionsForJob(settings.getSchedulerId(), startedJob);
+                                }
+                                listOfValidatedInconditions.add(inCondition);
+                            } else {
+                                if (isTraceEnabled) {
+                                    LOGGER.trace(logPrompt + " evaluated to --> false");
+                                }
+                            }
                         } else {
                             if (isTraceEnabled) {
-                                LOGGER.trace(logPrompt + " evaluated to --> false");
+                                LOGGER.trace(logPrompt + " not executed --> job is running");
                             }
                         }
                     } else {
                         if (isTraceEnabled) {
-                            LOGGER.trace(logPrompt + "--> already consumed");
+                            LOGGER.trace(logPrompt + " not executed --> already consumed");
                         }
                     }
                 }
             }
         }
         return listOfValidatedInconditions;
+
     }
 
     public boolean resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::resolveOutConditions for job:" + job);
+        LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
         boolean dbChange = false;
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         this.newJsEvents = new JSEvents();
@@ -498,12 +509,47 @@ public class JSConditionResolver {
         return dbChange;
     }
 
+    public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job) throws SOSHibernateException {
+        JSJobConditionKey jobConditionKey = new JSJobConditionKey();
+        jobConditionKey.setJob(job);
+        jobConditionKey.setJobSchedulerId(jobSchedulerId);
+        JSInConditions jobInConditions = jsJobInConditions.getListOfJobInConditions().get(jobConditionKey);
+        if (jobInConditions != null && jobInConditions.getListOfInConditions().size() == 0) {
+            LOGGER.debug("No in conditions defined. Nothing to do");
+        } else {
+            if (jobInConditions != null) {
+                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                    inCondition.setJobIsRunning(value);
+                    if (isTraceEnabled) {
+                        if (value) {
+                            LOGGER.trace("In conditions for job " + job + " disabled");
+                        }else {
+                            LOGGER.trace("In conditions for job " + job + " enabled");
+                        }
+                    }
+                }
+            } else {
+                LOGGER.debug("No in conditions for job " + job + " found. Nothing to do");
+            }
+        }
+    }
+
+
+    public void enableInconditionsForJob(String jobSchedulerId, String job) throws SOSHibernateException {
+        setJobIsRunningInconditionsForJob(false, jobSchedulerId, job);
+    }
+    
+    public void disableInconditionsForJob(String jobSchedulerId, String job) throws SOSHibernateException {
+        setJobIsRunningInconditionsForJob(true, jobSchedulerId, job);
+    }
+
+    
     public BooleanExp getBooleanExpression() {
         return booleanExpression;
     }
 
     public void removeConsumedInconditions(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeConsumedInconditions --> " + filterConsumedInConditions.getJobStream() + "."
+        LOGGER.debug("JSConditionResolver::removeConsumedInconditions --> " + filterConsumedInConditions.getJobStream() + "."
                 + filterConsumedInConditions.getJob());
 
         try {
@@ -530,7 +576,7 @@ public class JSConditionResolver {
     }
 
     public void removeEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeEventsFromJobStream --> " + filter.getJobStream() + "." + filter.getJob());
+        LOGGER.debug("JSConditionResolver::removeEventsFromJobStream --> " + filter.getJobStream() + "." + filter.getJob());
         try {
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
             sosHibernateSession.beginTransaction();
@@ -548,7 +594,7 @@ public class JSConditionResolver {
     }
 
     public void addEvent(JSEvent event) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::addEvent --> " + event.getJobStream() + "." + event.getEvent());
+        LOGGER.debug("JSConditionResolver::addEvent --> " + event.getJobStream() + "." + event.getEvent());
         this.newJsEvents = new JSEvents();
         event.store(sosHibernateSession);
         jsEvents.addEvent(event);
@@ -557,7 +603,7 @@ public class JSConditionResolver {
     }
 
     public void removeEvent(JSEvent event) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolve::removeEvent --> " + event.getEvent());
+        LOGGER.debug("JSConditionResolver::removeEvent --> " + event.getEvent());
         this.removeJsEvents = new JSEvents();
         event.deleteEvent(sosHibernateSession);
         removeJsEvents.addEvent(event);
@@ -570,7 +616,7 @@ public class JSConditionResolver {
         return jsEvent != null;
     }
 
-    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception   {
+    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception {
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
         if (listOfCheckHistoryChacheRules == null) {
             LOGGER.warn("History not initialized");
