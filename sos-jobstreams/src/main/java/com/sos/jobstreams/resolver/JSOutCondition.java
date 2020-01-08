@@ -92,7 +92,9 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     EventDate eventDate = new EventDate();
                     event.setEvent(jsCondition.getEventName());
                     event.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
-                    event.setJobStream(jsCondition.getConditionJobStream());
+                    if (jsCondition.getConditionJobStream() != "") {
+                       event.setJobStream(jsCondition.getConditionJobStream());
+                    }
                     jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);
                     dbChange = !event.deleteEvent(sosHibernateSession);
