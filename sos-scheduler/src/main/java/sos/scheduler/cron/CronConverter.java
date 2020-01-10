@@ -25,9 +25,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -56,7 +57,7 @@ import com.sos.scheduler.model.objects.Spooler.Config;
 /** @author Andreas Liebert */
 public class CronConverter extends JSToolBox {
 
-    protected static Logger logger = Logger.getLogger(CronConverter.class);
+    protected static Logger logger = LoggerFactory.getLogger(CronConverter.class);
     protected Pattern cronRegExPattern;
     protected Pattern cronRegExSystemPattern;
     protected Pattern cronRegExAliasPattern;
@@ -249,9 +250,9 @@ public class CronConverter extends JSToolBox {
             objSchedulerObjectFactory.initMarshaller(Spooler.class);
             Spooler objSchedulerConfig = (Spooler) objSchedulerObjectFactory.unMarshall(target);
             Config objConfig = objSchedulerConfig.getConfig().get(0);
-            logger.debug(objConfig.getPort());
-            logger.debug(objConfig.getTcpPort());
-            logger.debug(objConfig.getUdpPort());
+            logger.debug("" + objConfig.getPort());
+            logger.debug("" + objConfig.getTcpPort());
+            logger.debug("" + objConfig.getUdpPort());
             String strPathName = new File(sourceFile).getParent();
             strPathName += "/live/";
             new File(strPathName).mkdirs();

@@ -6,14 +6,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSOptionValueListTest {
 
-    private static final Logger LOGGER = Logger.getLogger(JSOptionValueListTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionValueListTest.class);
     private final String strKey = "sql_statement";
     private final String strDescr = "SQL Statements";
     private final String strDelimiter = ";";

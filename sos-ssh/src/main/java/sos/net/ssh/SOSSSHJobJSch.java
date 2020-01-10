@@ -14,7 +14,8 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -38,7 +39,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     protected ISOSVFSHandler prePostCommandVFSHandler = null;
     protected ISOSVFSHandler vfsHandler;
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobJSch.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
     private static final String DEFAULT_LINUX_DELIMITER = ";";
     private static final String DEFAULT_WINDOWS_DELIMITER = "&";

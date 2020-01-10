@@ -3,7 +3,6 @@
  */
 package com.sos.dialog.components;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -26,6 +25,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.IValueChangedListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
@@ -38,7 +39,7 @@ import com.sos.dialog.classes.SOSCheckBox;
 /** @author KB */
 public class ControlHelper implements IValueChangedListener {
 
-    private static final Logger LOGGER = Logger.getLogger(ControlHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControlHelper.class);
     private Control objControl = null;
     private boolean flgIsDirty = false;
     private Label objLabel = null;

@@ -1,13 +1,15 @@
 package sos.scheduler.job;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.settings.SOSProfileSettings;
 
 public class JobSchedulerDatabaseMonitor extends JobSchedulerJob {
     
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerDatabaseMonitor.class); 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerDatabaseMonitor.class); 
 
     public boolean spooler_init() {
         try {

@@ -2,7 +2,8 @@ package com.sos.VirtualFileSystem.FTPS;
 
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPSClient;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.FTP.SOSFtpClientLogger;
@@ -12,7 +13,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpS2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpS2.class);
     private FTPSClient objFTPClient = null;
 
     public SOSVfsFtpS2() {

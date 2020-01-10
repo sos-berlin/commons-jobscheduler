@@ -2,7 +2,8 @@ package sos.net.ssh;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
@@ -28,7 +29,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     protected StringBuffer strbStdoutOutput;
     protected StringBuffer strbStderrOutput;
     protected Vector<String> tempFilesToDelete = new Vector<String>();
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2.class);
     private static final String STD_ERR_OUTPUT = "std_err_output";
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_SIGNAL = "exit_signal";

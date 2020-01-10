@@ -1,8 +1,9 @@
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSBase64EncodeFilterTest extends SOSNullFilterBase<SOSBase64EncodeFilter> {
 
@@ -10,7 +11,7 @@ public class SOSBase64EncodeFilterTest extends SOSNullFilterBase<SOSBase64Encode
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public SOSBase64EncodeFilterTest() {
         super(new SOSBase64EncodeFilter());

@@ -5,7 +5,6 @@ package com.sos.dialog.classes;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,8 +21,6 @@ public class SOSTree extends Tree {
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id: SOSTree.java 23811 2014-04-15 15:45:10Z kb $";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
     private final Vector<Control> objControlList = new Vector<Control>();
 
     /**

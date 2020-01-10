@@ -2,11 +2,13 @@ package com.sos.dialog.classes;
 
 import java.net.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class SOSUrl {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSUrl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSUrl.class);
     private static final String DEFAULT_PROTOCOL = "http";
     private static final int DEFAULT_PORT = 40444;
     private static final String DEFAULT_HOST = "localhost";

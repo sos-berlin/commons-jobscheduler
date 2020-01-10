@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -24,6 +23,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Utility class for managing OS resources associated with SWT controls such as
  * colors, fonts, images, etc.
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Dan Rubel */
 public class SWTResourceManager {
 
-    private static final Logger LOGGER = Logger.getLogger(SWTResourceManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SWTResourceManager.class);
     /** Maps RGB values to colors */
     private static HashMap<RGB, Color> m_ColorMap = new HashMap<RGB, Color>();
     /** Maps image names to images */

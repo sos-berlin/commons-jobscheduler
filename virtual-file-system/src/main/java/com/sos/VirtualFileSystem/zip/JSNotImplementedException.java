@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.zip;
 
-import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -37,9 +36,7 @@ public class JSNotImplementedException extends JobSchedulerException {
     private static final long serialVersionUID = -2550077407292808377L;
     @SuppressWarnings("unused")
     private final String conClassName = "JSNotImplementedException";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSNotImplementedException.class);
-
+ 
     public JSNotImplementedException() {
         //
     }

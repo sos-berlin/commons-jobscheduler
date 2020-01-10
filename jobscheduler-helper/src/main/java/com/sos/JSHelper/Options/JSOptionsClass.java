@@ -21,8 +21,9 @@ import java.util.regex.Matcher;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.StrTokenizer;
-import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -59,7 +60,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected Msg objMsg = null;
     protected String strAlternativePrefix = "";
     private static final String CLASS_NAME = "JSOptionsClass";
-    private static final Logger LOGGER = Logger.getLogger(JSOptionsClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClass.class);
     private static final long serialVersionUID = 8497293387023797049L;
     private static String conEnvVarJS_TEST_MODE = new String("JS_TEST_MODE");
     private static Properties objP = new Properties();

@@ -20,8 +20,9 @@ package com.sos.JSHelper.io.Files;
  *
  * Created on 26.08.2011 21:31:13 */
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class JSIniFileTest {
 
     private static final String conIniFileName = "src/test/resources/jade_settings.ini";
-    private static final Logger LOGGER = Logger.getLogger(JSIniFileTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSIniFileTest.class);
     private JSIniFile objF = null;
 
     @Before

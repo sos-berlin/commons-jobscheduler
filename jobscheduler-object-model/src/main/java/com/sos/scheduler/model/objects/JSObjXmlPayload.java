@@ -1,13 +1,15 @@
 package com.sos.scheduler.model.objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import org.apache.log4j.Logger;
 
 /** @author oh */
 public class JSObjXmlPayload extends XmlPayload {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjXmlPayload.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjXmlPayload.class);
 
     public JSObjXmlPayload(SchedulerObjectFactory schedulerObjectFactory) {
         super();

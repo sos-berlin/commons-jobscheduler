@@ -1,10 +1,11 @@
 package com.sos.hibernate.classes;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,7 +14,7 @@ import java.util.TimeZone;
 
 public class UtcTimeHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(UtcTimeHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UtcTimeHelper.class);
 
     public static String localTimeZoneString() {
         return TimeZone.getDefault().getID();

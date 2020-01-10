@@ -3,7 +3,9 @@
  */
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 
@@ -11,7 +13,7 @@ import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 public class SOSExcludeIncludeRecordsFilter extends SOSNullFilter {
 
     private final String conClassName = this.getClass().getSimpleName();
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSExcludeIncludeRecordsFilter.class);
     private boolean flgIncludeRecord = false;
     private long lngRecordsIncluded = 0;
     private long lngRecordsExcluded = 0;
@@ -22,7 +24,7 @@ public class SOSExcludeIncludeRecordsFilter extends SOSNullFilter {
 
     public SOSExcludeIncludeRecordsFilter(final SOSFilterOptions pobjOptions) {
         super(pobjOptions);
-        logger.debug(conClassName);
+        LOGGER.debug(conClassName);
     }
 
     @Override

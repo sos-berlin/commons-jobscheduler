@@ -3,7 +3,6 @@ package com.sos.scheduler.model.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -37,8 +36,6 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 public class JSObjSpooler extends Spooler {
 
     private final String conClassName = "JSObjSpooler";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjSpooler.class);
 
     public JSObjSpooler(final SchedulerObjectFactory schedulerObjectFactory) {
         super();

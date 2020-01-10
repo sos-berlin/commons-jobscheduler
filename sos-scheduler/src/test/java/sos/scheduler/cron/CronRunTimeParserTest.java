@@ -3,16 +3,16 @@ package sos.scheduler.cron;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class CronRunTimeParserTest {
 
-    private static final Logger LOGGER = Logger.getLogger(CronRunTimeParserTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CronRunTimeParserTest.class);
     private static final String TAG_RUN_TIME = "run_time";
     private final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
     private DocumentBuilder docBuilder = null;
@@ -24,7 +24,7 @@ public class CronRunTimeParserTest {
     public void setUp() throws Exception {
         docBuilder = docFactory.newDocumentBuilder();
         objOrderDocument = docBuilder.newDocument();
-        BasicConfigurator.configure();
+//        BasicConfigurator.configure();
         runTimeElement = objOrderDocument.createElement(TAG_RUN_TIME);
         objP = new CronRunTimeParser("00 20 * * 2,6 /rwe/oracle/scripts/backup/Rman_Backup.ksh STBCR1P LEVEL0 2>&1 > /dev/null");
     }

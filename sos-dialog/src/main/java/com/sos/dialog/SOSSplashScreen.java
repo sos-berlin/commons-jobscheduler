@@ -2,7 +2,6 @@ package com.sos.dialog;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -11,13 +10,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.swtdesigner.SWTResourceManager;
 
 /** @author KB */
 public class SOSSplashScreen {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSplashScreen.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSplashScreen.class);
 
     public SOSSplashScreen() {
         //

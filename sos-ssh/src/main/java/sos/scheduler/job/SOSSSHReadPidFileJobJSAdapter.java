@@ -19,7 +19,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.fatal(stackTrace2String(e));
+            logger.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();

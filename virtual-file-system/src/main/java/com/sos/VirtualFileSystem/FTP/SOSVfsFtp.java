@@ -15,7 +15,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPHTTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
@@ -38,7 +39,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
     private static final String CLASS_NAME = "SOSVfsFtp";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtp.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtp.class);
     private FTPClient objFTPClient = null;
     private boolean simulateShell = false;
 

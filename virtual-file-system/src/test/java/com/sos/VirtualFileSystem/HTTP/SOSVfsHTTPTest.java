@@ -1,9 +1,10 @@
 package com.sos.VirtualFileSystem.HTTP;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -15,7 +16,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSVfsHTTPTest {
 
-    protected static final Logger LOGGER = Logger.getLogger(SOSVfsHTTPTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsHTTPTest.class);
     protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
     protected static final String HTTP_URI = "www.sos-berlin.com";
     protected static final int HTTP_PORT = 80;

@@ -1,9 +1,11 @@
 package sos.net.ssh;
 
-import org.apache.log4j.Logger;
 
 import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -13,7 +15,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHJobTrilead extends SOSSSHJob2 {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobTrilead.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJobTrilead.class);
     private ISOSVFSHandler vfsHandler;
 
     @Override

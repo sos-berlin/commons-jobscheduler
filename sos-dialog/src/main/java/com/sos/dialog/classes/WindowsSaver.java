@@ -1,6 +1,5 @@
 package com.sos.dialog.classes;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -10,6 +9,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.components.SOSPreferenceStore;
 
@@ -19,7 +20,7 @@ public class WindowsSaver extends SOSPreferenceStore {
     private static final String WIN_LOCATE_X = "win:locateX:";
     private static final String WIN_SIZE_Y = "win:sizeY:";
     private static final String WIN_SIZE_X = "win:sizeX:";
-    private static final Logger LOGGER = Logger.getLogger(WindowsSaver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WindowsSaver.class);
     private static final String WIDTH = "width";
     private final Point defaultSize;
     private final Point defaultLocation;

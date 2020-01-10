@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -15,7 +16,7 @@ import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFileReader {
 
     protected SOSFilterOptions objFilterOptions = null;
-    private static final Logger LOGGER = Logger.getLogger(SOSFilteredFileReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFilteredFileReader.class);
     private Vector<SOSNullFilter> lstFilters = null;
     private JSFile objFile2Read = null;
     private ISOSFilteredFileReader objProcessHandler = this;

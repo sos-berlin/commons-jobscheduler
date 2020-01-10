@@ -9,7 +9,8 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -20,7 +21,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 @XmlTransient
 public class JSObjBase implements Comparable<JSObjBase> {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjBase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjBase.class);
     protected static final String conEMPTY = "";
     protected static final String conNO = "no";
     protected static final String conYES = "yes";

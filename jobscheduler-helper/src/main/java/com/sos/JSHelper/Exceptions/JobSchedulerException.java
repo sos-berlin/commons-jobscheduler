@@ -1,6 +1,8 @@
 package com.sos.JSHelper.Exceptions;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -12,7 +14,7 @@ public class JobSchedulerException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     protected String strMessage = null;
     protected SOSMsg objSOSMsg = null;
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerException.class);
     private int intStatus = SUCCESS;
     private Throwable nestedException;
     private int intErrorNumber = 0;

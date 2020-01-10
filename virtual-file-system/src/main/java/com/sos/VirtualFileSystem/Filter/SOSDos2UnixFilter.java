@@ -4,14 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 
 /** @author KB */
 public class SOSDos2UnixFilter extends SOSNullFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSDos2UnixFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSDos2UnixFilter.class);
 
     public SOSDos2UnixFilter() {
         super();

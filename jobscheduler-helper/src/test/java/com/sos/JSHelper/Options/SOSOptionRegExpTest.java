@@ -4,16 +4,17 @@ import static org.junit.Assert.*;
 
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 
 /** @author KB */
 public class SOSOptionRegExpTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionRegExpTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionRegExpTest.class);
     private SOSOptionRegExp objRE = null;
 
     @Test

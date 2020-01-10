@@ -15,7 +15,8 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
@@ -26,7 +27,7 @@ import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 
 public class SOSVfsJms extends SOSVfsTransferBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsJms.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsJms.class);
     private ConnectionFactory factory = null;
     private Connection jmsConnection = null;
     private Session session = null;

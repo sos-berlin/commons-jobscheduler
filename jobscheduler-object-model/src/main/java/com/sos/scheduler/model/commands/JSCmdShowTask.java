@@ -1,15 +1,11 @@
 package com.sos.scheduler.model.commands;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.SchedulerObjectFactory.enu4What;
 
 public class JSCmdShowTask extends ShowTask {
 
     private final String conClassName = "JSCmdShowTask";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSCmdShowTask.class);
 
     public JSCmdShowTask(SchedulerObjectFactory schedulerObjectFactory) {
         super();

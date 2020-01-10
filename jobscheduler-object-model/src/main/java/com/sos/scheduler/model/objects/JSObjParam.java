@@ -1,6 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
@@ -34,8 +33,6 @@ public class JSObjParam extends Param {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjParam";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjParam.class);
 
     public JSObjParam(SchedulerObjectFactory schedulerObjectFactory) {
         super();

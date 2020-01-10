@@ -16,8 +16,9 @@ import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.ssl.TrustMaterial;
-import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -37,7 +38,7 @@ import sos.util.SOSString;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAV.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAV.class);
     private HttpURL rootUrl = null;
     private WebdavResource davClient = null;
     private String currentDirectory = "";

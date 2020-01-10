@@ -1,6 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
@@ -34,8 +33,6 @@ public class JSObjCluster extends Cluster {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjCluster";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjCluster.class);
 
     public JSObjCluster(SchedulerObjectFactory schedulerObjectFactory) {
         super();

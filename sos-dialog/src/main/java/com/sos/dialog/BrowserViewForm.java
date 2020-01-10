@@ -1,6 +1,5 @@
 package com.sos.dialog;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
@@ -19,6 +18,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.classes.SOSUrl;
 
@@ -27,7 +28,7 @@ public class BrowserViewForm {
     private Browser browser = null;
     private GridLayout gridLayout;
     private GridData data;
-    private final Logger logger = Logger.getLogger(BrowserViewForm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserViewForm.class);
     private SOSUrl url;
     private final Composite parent;
 
@@ -56,20 +57,20 @@ public class BrowserViewForm {
         try {
             browser = new Browser(parent, SWT.NONE);
             initialize(parent.getDisplay(), browser);
-            logger.debug("load url = " + url.getUrlValue());
+            LOGGER.debug("load url = " + url.getUrlValue());
             browser.setUrl(url.getUrlValue());
             browser.addProgressListener(new ProgressAdapter() {
 
                 @Override
                 public void completed(final ProgressEvent event) {
-                    logger.trace("processed");
+                    LOGGER.trace("processed");
                 }
             });
             browser.addStatusTextListener(new StatusTextListener() {
 
                 @Override
                 public void changed(final StatusTextEvent event) {
-                    logger.trace("status = " + event.text);
+                    LOGGER.trace("status = " + event.text);
                 }
             });
             data = new GridData();

@@ -2,14 +2,16 @@ package com.sos.scheduler.plugins.variablehandling;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.ParameterSubstitutor;
  
 public class JobSchedulerParameterSubstitution {
     
     private HashMap<String,String> parameters;
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerParameterSubstitution.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerParameterSubstitution.class);
 
     private void replace(){
         ParameterSubstitutor parameterSubstitutor = new ParameterSubstitutor();       

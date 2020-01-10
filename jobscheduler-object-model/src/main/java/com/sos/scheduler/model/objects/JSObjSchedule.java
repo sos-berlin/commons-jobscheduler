@@ -2,7 +2,6 @@ package com.sos.scheduler.model.objects;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.log4j.Logger;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -37,8 +36,6 @@ public class JSObjSchedule extends RunTime {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjSchedule";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjSchedule.class);
 
     public final static String fileNameExtension = ".schedule.xml";
 

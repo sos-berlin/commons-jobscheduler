@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.objects.JSObjBase;
@@ -24,7 +25,7 @@ import com.sos.scheduler.model.objects.JSObjSchedule;
 /** @author oh */
 public class SchedulerHotFolderFileList {
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerHotFolderFileList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerHotFolderFileList.class);
     private List<JSObjBase> fileList = new ArrayList<JSObjBase>();
     private ISOSVirtualFile hotFolderSrc = null;
 

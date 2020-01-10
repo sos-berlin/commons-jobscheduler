@@ -11,7 +11,8 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDateTime;
@@ -27,7 +28,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 
     private static final long serialVersionUID = 7478704922673917684L;
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsLocalFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocalFile.class);
     private ISOSVfsFileTransfer objVFSHandler = null;
     private InputStream objInputStream = null;
     private OutputStream objOutputStream = null;

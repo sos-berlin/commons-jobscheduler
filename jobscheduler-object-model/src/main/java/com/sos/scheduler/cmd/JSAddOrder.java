@@ -1,16 +1,17 @@
 package com.sos.scheduler.cmd;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.objects.JSObjParams;
 import com.sos.scheduler.model.objects.Param;
 import com.sos.scheduler.model.objects.Params;
 
-import org.apache.log4j.Logger;
-
 public class JSAddOrder extends JSCommand {
 
-    private final Logger logger = Logger.getLogger(JSAddOrder.class);
+    private final Logger logger = LoggerFactory.getLogger(JSAddOrder.class);
 
     private final JSCmdAddOrder cmdAddOrder;
 

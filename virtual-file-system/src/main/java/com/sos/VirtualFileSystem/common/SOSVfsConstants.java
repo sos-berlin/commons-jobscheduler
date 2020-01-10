@@ -1,6 +1,6 @@
 package com.sos.VirtualFileSystem.common;
 
-import org.apache.log4j.Logger;
+
 
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -31,7 +31,6 @@ public class SOSVfsConstants {
     @SuppressWarnings("unused")
     private final String conClassName = "SOSVfsConstants";
     private static final String conSVNVersion = "$Id$";
-    private static final Logger logger = Logger.getLogger(SOSVfsConstants.class);
 
     public final static String strBundleBaseName = "SOSVirtualFileSystem";
     public static String strVFSLoggerName = "SOSVfsReportLog";

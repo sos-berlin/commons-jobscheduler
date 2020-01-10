@@ -2,7 +2,6 @@ package com.sos.dialog.classes;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
@@ -14,13 +13,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.interfaces.IAutoCompleteProposal;
 
 /** @author KB */
 public class SOSTextBox extends Text {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSTextBox.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSTextBox.class);
     private static final String KEY_PRESS = "Ctrl+Space";
     private Vector<Control> objControlList = new Vector<>();
     private Text objThisText = this;

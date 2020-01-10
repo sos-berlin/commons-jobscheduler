@@ -6,7 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
@@ -24,7 +25,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer2 {
 
     protected Vector<SOSFileListEntry> objFileListEntries = null;
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpBaseClass2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpBaseClass2.class);
 
     public SOSVfsFtpBaseClass2() {
         super();

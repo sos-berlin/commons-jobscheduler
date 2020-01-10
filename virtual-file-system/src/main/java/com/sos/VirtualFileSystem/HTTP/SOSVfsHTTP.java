@@ -28,7 +28,8 @@ import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.ssl.TrustMaterial;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -45,7 +46,7 @@ import sos.util.SOSString;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsHTTP.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsHTTP.class);
     private MultiThreadedHttpConnectionManager connectionManager;
     private HttpClient httpClient;
     private HttpURL rootUrl = null;

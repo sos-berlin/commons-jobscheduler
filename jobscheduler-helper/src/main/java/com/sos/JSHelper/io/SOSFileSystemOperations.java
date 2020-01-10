@@ -21,7 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTime;
@@ -29,7 +30,7 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 /** @author Florian Schreiber */
 public abstract class SOSFileSystemOperations {
 
-	protected static final Logger LOGGER = Logger.getLogger(SOSFileSystemOperations.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(SOSFileSystemOperations.class);
 	public static final int CREATE_DIR = 0x01;
 	public static final int GRACIOUS = 0x02;
 	public static final int NOT_OVERWRITE = 0x04;

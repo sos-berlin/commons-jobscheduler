@@ -38,8 +38,9 @@ import net.vzurczak.main.XmlRegion;
 import net.vzurczak.main.XmlRegion.XmlRegionType;
 import net.vzurczak.main.XmlRegionAnalyzer;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Unit tests for {@link XmlRegionAnalyzer}.
  * 
@@ -47,7 +48,7 @@ import org.junit.Test;
 public class XmlRegionAnalyzerTests {
 
     private static final String ISTR_STD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    private static final Logger LOGGER = Logger.getLogger(XmlRegionAnalyzerTests.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlRegionAnalyzerTests.class);
 
     @Test
     public void testInstructions() throws Exception {

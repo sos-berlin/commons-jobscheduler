@@ -3,7 +3,8 @@ package com.sos.VirtualFileSystem.TransferHistoryExport;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSCsvFile;
@@ -17,7 +18,7 @@ import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferHistory {
 
     private static final String CLASSNAME = "SOSVfsCsvExport";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsCsvExport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsCsvExport.class);
     private static final String CSV_FILE_NAME = "c:/temp/jade-csv.csv";
     private SOSFTPOptions objOptions = null;
     private JSCsvFile objCSVFile = null;

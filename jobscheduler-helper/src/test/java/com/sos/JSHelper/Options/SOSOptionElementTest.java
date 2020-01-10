@@ -4,15 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class SOSOptionElementTest {
 
     private static final String CLASSNAME = "SOSOptionElementTest";
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionElementTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionElementTest.class);
     private SOSOptionElement objOption = null;
 
     public SOSOptionElementTest() {

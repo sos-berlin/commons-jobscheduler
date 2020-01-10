@@ -3,7 +3,9 @@
  */
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 
@@ -13,7 +15,7 @@ public class SOSRecordsFilter extends SOSNullFilter {
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private boolean flgIncludeRecord = false;
     private long lngRecordsIncluded = 0;
     private long lngRecordsExcluded = 0;

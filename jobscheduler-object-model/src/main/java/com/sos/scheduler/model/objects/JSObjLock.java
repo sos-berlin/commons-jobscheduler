@@ -4,7 +4,6 @@ import java.math.BigInteger;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.log4j.Logger;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -38,8 +37,6 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 public class JSObjLock extends Lock {
 
     private final String conClassName = "JSObjLock";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjLock.class);
 
     public final static String fileNameExtension = ".lock.xml";
 

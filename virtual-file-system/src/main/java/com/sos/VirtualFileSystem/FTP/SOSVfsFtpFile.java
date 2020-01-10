@@ -8,7 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
@@ -21,7 +22,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsFtpFile extends SOSVfsCommonFile {
 
     private static final String CLASSNAME = "SOSVfsFtpFile";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpFile.class);
     private String strFileName = EMPTY_STRING;
 
     public SOSVfsFtpFile(final String pstrFileName) {

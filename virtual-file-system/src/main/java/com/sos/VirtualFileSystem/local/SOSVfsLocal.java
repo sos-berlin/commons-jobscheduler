@@ -7,7 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -40,7 +41,7 @@ import sos.util.SOSFile;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsLocal.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
     private final InputStream objInputStream = null;
     private final OutputStream objOutputStream = null;
     private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;

@@ -10,7 +10,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
@@ -39,7 +40,7 @@ public class JobSchedulerJob extends Job_impl {
 
     protected String application = new String("");
     protected SOSSchedulerLogger sosLogger = null;
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJob.class);
     private SOSConnection sosConnection = null;
     private SOSConnectionSettings connectionSettings = null;
     private SOSSettings jobSettings = null;

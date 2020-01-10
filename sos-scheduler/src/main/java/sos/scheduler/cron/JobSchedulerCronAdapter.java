@@ -16,9 +16,10 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
-import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,7 +34,7 @@ import sos.xml.SOSXMLXPath;
 
 public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerCronAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerCronAdapter.class);
     private static final String XPATH_SPOOLER_ANSWER_ERROR = "//spooler/answer/ERROR";
     private File schedulerCronConfigurationDir = new File("config/live/cron");
     private String crontab = "";

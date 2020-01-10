@@ -2,7 +2,6 @@ package com.sos.dialog.classes;
 
 import static com.sos.dialog.Globals.MsgHandler;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
@@ -22,6 +21,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.interfaces.IDirty;
 import com.sos.dialog.Globals;
@@ -37,7 +38,7 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
 /** @author KB */
 public class SOSCTabFolder extends CTabFolder {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSCTabFolder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCTabFolder.class);
     public static final String conTABITEM_I18NKEY = "key";
     public static final String conTABITEM_SOSITEM = "SOSCTABITEM";
     public static final String conCOMPOSITE_OBJECT_KEY = "composite";

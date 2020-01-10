@@ -1,6 +1,7 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSJobId extends SOSOptionInteger {
 
@@ -8,7 +9,7 @@ public class JSJobId extends SOSOptionInteger {
     @SuppressWarnings("unused")
     private final String conClassName = "JSJobId";
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSJobId.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSJobId.class);
 
     public JSJobId(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
             final String pPstrDefaultValue, final boolean pPflgIsMandatory) {

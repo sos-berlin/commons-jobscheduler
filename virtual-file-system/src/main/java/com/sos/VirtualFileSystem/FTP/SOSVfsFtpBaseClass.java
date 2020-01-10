@@ -23,7 +23,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.Util;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -76,7 +77,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     protected SOSFtpServerReply objFTPReply = null;
     protected SOSOptionTransferMode objTransferMode = null;
     private static final String CLASS_NAME = "SOSVfsFtpBaseClass";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpBaseClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpBaseClass.class);
     private ISOSAuthenticationOptions objAO = null;
     private SOSOptionProxyProtocol proxyProtocol = null;
     private String proxyHost = null;

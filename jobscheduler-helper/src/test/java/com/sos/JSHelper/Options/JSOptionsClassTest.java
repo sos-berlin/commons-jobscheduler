@@ -6,13 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class JSOptionsClassTest {
     
-    private static final Logger LOGGER = Logger.getLogger(JSOptionsClassTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClassTest.class);
 
     @Test
     public void testIsOption() throws Exception {

@@ -16,9 +16,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
@@ -39,7 +38,7 @@ import sos.util.ParameterSubstitutor;
 public class JobSchedulerJobAdapter extends JobSchedulerJob
 		implements JSJobUtilities, IJSCommands, IMonitor_impl, IJobSchedulerEventHandler {
 
-    protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
+    protected Logger logger = LoggerFactory.getLogger(JobSchedulerJobAdapter.class);
 	protected Messages Messages = null;
 	protected HashMap<String, String> schedulerParameters = new HashMap<String, String>();
 	protected HashMap<String, String> hsmParameters = null;
@@ -66,9 +65,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 
 	public JobSchedulerJobAdapter() {
 		Messages = new Messages(conMessageFilePath, Locale.getDefault());
-		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
-			BasicConfigurator.configure();
-		}
+//		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
+//			BasicConfigurator.configure();
+//		}
 	}
 
 	@Override
@@ -94,25 +93,25 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 	}
 
 	protected void initializeLog4jAppenderClass() {
-		logger = Logger.getRootLogger();
-		if (!loggerConfigured) {
-			LOG_D_0020.toLog();
-			if (schedulerLogLevel == null) {
-				schedulerLogLevel = spooler_log.level();
-			}
-			if (schedulerLogLevel > 1) {
-				logger.setLevel(Level.ERROR);
-			} else if (schedulerLogLevel == 1) {
-				logger.setLevel(Level.WARN);
-			} else if (schedulerLogLevel == 0) {
-				logger.setLevel(Level.INFO);
-			} else if (schedulerLogLevel == -9) {
-				logger.setLevel(Level.TRACE);
-			} else if (schedulerLogLevel < 0) {
-				logger.setLevel(Level.DEBUG);
-			}
-			loggerConfigured = true;
-		}
+//		logger = Logger.getRootLogger();
+//		if (!loggerConfigured) {
+//			LOG_D_0020.toLog();
+//			if (schedulerLogLevel == null) {
+//				schedulerLogLevel = spooler_log.level();
+//			}
+//			if (schedulerLogLevel > 1) {
+//				logger.setLevel(Level.ERROR);
+//			} else if (schedulerLogLevel == 1) {
+//				logger.setLevel(Level.WARN);
+//			} else if (schedulerLogLevel == 0) {
+//				logger.setLevel(Level.INFO);
+//			} else if (schedulerLogLevel == -9) {
+//				logger.setLevel(Level.TRACE);
+//			} else if (schedulerLogLevel < 0) {
+//				logger.setLevel(Level.DEBUG);
+//			}
+//			loggerConfigured = true;
+//		}
 	}
 
 	protected HashMap<String, String> getSchedulerParameterAsProperties(

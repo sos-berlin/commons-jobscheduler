@@ -9,7 +9,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
@@ -37,7 +38,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_CODE = "exit_code";
     private static final String EXIT_SIGNAL = "exit_signal";
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2JSAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2JSAdapter.class);
     private boolean useTrilead = true;
     private String pidFileName;
     private String envVarNamePrefix;
@@ -48,7 +49,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            LOGGER.fatal(stackTrace2String(e));
+            LOGGER.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();

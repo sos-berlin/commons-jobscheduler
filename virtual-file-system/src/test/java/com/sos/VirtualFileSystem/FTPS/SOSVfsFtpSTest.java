@@ -5,10 +5,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -21,7 +22,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSVfsFtpSTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpSTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpSTest.class);
     private static final String TEST_FILE_NAME = "text.junittest";
     private static final String TEST_PATH_NAME = "c:/temp/";
     private static final String HOST_NAME_4_TEST = "localhost";

@@ -6,9 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.mail.options.SOSSmtpMailOptions;
 
@@ -19,7 +20,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 
 public class SOSFTPOptionsTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFTPOptionsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPOptionsTest.class);
 
     @Test
     public void testProtocolCommandListener() throws Exception {

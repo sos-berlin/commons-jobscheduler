@@ -1,7 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
-
 /** \class SOSOptionLocale
  * 
  * \brief SOSOptionLocale -
@@ -28,18 +26,9 @@ import org.apache.log4j.Logger;
 /** @author KB */
 public class SOSOptionLocale extends SOSOptionString {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = 333232591167035226L;
 
-    @SuppressWarnings("unused")
-    private final String conSVNVersion = "$Id$";
-
     private final String conClassName = "SOSOptionLocale";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SOSOptionLocale.class);
-
     public static java.util.Locale i18nLocale = java.util.Locale.getDefault();
 
     /** \brief SOSOptionLocale

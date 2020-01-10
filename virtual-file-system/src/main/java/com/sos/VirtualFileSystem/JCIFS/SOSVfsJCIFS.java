@@ -12,7 +12,8 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -39,7 +40,7 @@ import sos.util.SOSString;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFS.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsJCIFS.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private static final int DEFAULT_PORT = 445;

@@ -2,7 +2,8 @@ package com.sos.JSHelper.io.Files;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -12,7 +13,7 @@ import com.sos.JSHelper.Options.JSOptionsClass;
 public class JSCsvFileOptions extends JSOptionsClass {
 
     private static final long serialVersionUID = -8996877249675870658L;
-    private static final Logger LOGGER = Logger.getLogger(JSCsvFileOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSCsvFileOptions.class);
     private static final String CLASSNAME = "JSCsvFileOptions";
     private static final String DELIMITER_SETTINGS_KEY = CLASSNAME + ".Delimiter";
     private static final String CSV_COLUMN_DELIMITER_SETTINGS_KEY = CLASSNAME + ".CSVColumnDelimiter";

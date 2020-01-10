@@ -1,6 +1,7 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** \class SOSOptionArrayList
  * 
@@ -34,7 +35,7 @@ public class SOSOptionArrayList extends SOSOptionElement {
     private static final long serialVersionUID = -1909046265576551293L;
     @SuppressWarnings("unused")
     private final String conClassName = "SOSOptionArrayList";
-    private static final Logger logger = Logger.getLogger(SOSOptionArrayList.class);
+    private static final Logger logger = LoggerFactory.getLogger(SOSOptionArrayList.class);
 
     /** \brief SOSOptionArrayList
      *

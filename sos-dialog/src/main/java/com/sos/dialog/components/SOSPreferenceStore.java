@@ -6,8 +6,9 @@ package com.sos.dialog.components;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.dialog.interfaces.ISOSPreferenceStore;
@@ -18,7 +19,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
     protected String strKey = "";
     protected String className = "";
     protected Shell shell = null;
-    private static final Logger logger = Logger.getLogger(SOSPreferenceStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSPreferenceStore.class);
     public static String gstrApplication = "SOS";
     public Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
 
@@ -75,13 +76,13 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
         if ("".equals(strKey)) {
             strKey = "context";
         }
-        logger.trace("key = " + "properties/" + strKey);
+        LOGGER.trace("key = " + "properties/" + strKey);
         return "properties/" + strKey;
     }
 
     public void saveProperty(final String pstrPropName, final String pstrPropValue) {
         prefs.node(getPropertyKey()).put(pstrPropName, pstrPropValue);
-        logger.trace(String.format("saveProperty %1$s = %2$s", strKey + "/" + pstrPropName, pstrPropValue));
+        LOGGER.trace(String.format("saveProperty %1$s = %2$s", strKey + "/" + pstrPropName, pstrPropValue));
         try {
             prefs.flush();
         } catch (BackingStoreException e) {
@@ -91,13 +92,13 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 
     public String getProperty(final String pstrPropName, final String pstrDefaultValue) {
         String strR = prefs.node(getPropertyKey()).get(pstrPropName, pstrDefaultValue);
-        logger.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
+        LOGGER.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
         return strR;
     }
 
     public String getProperty(final String pstrPropName) {
         String strR = prefs.node(getPropertyKey()).get(pstrPropName, "");
-        logger.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
+        LOGGER.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
         return strR;
     }
 

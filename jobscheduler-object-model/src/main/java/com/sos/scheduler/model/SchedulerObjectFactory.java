@@ -30,18 +30,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
-
-import sos.spooler.Variable_set;
-import sos.xml.SOSXMLXPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -122,12 +114,14 @@ import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.Spooler;
 import com.sos.xml.SOSXmlCommand;
 
+import sos.spooler.Variable_set;
+
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     private static final int READ_TIME_OUT = 60;
     private static final int WRITE_TIME_OUT = 60;
     private static final Class<Spooler> DEFAULT_MARSHALLER = Spooler.class;
-    private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerObjectFactory.class);
     private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
     private static JAXBContext jc;
     private static JAXBContext jc4Answers = null;
@@ -553,7 +547,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public SchedulerSocket getSocket() {
         if (objSchedulerSocket == null) {
             try {
-                LOGGER.debug(objOptions.toXML());
+                LOGGER.debug(objOptions.toXML().toString());
                 objSchedulerSocket = new SchedulerSocket(objOptions);
             } catch (Exception e) {
                 throw new JobSchedulerException(e.getMessage(), e);

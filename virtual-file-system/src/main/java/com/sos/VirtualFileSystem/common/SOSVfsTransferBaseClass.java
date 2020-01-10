@@ -5,12 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -44,7 +44,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     protected String currentDirectory = "";
     protected SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
     protected ISOSAuthenticationOptions authenticationOptions = null;
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsTransferBaseClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
     private Vector<String> directoryListing = null;
 
     public SOSVfsTransferBaseClass() {

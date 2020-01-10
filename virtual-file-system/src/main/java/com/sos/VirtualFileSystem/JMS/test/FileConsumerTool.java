@@ -41,11 +41,12 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQBytesMessage;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileConsumerTool extends Thread implements MessageListener, ExceptionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(FileConsumerTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileConsumerTool.class);
     private ActiveMQConnection connection;
     private boolean running;
     private Session session;

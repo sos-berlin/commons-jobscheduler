@@ -5,7 +5,8 @@ import java.math.BigInteger;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -13,7 +14,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 /** @author oh */
 public class JSObjProcessClass extends ProcessClass {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjProcessClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjProcessClass.class);
     public final static String fileNameExtension = ".process_class.xml";
 
     public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory) {

@@ -11,7 +11,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
@@ -19,7 +20,7 @@ import com.sos.JSHelper.Options.SOSOptionProxyProtocol.Protocol;
 
 public class SOSVfsFtpSProxySelector extends ProxySelector {
 
-    private final Logger logger = Logger.getLogger(SOSVfsFtpSProxySelector.class);
+    private final Logger logger = LoggerFactory.getLogger(SOSVfsFtpSProxySelector.class);
 
     private Protocol proxyProtocol;
     private String proxyHost;

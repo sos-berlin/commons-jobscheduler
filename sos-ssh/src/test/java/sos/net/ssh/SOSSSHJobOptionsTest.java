@@ -6,9 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Options.JSOptionsClass;
@@ -16,7 +17,7 @@ import com.sos.JSHelper.io.Files.JSXMLFile;
 
 public class SOSSSHJobOptionsTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobOptionsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJobOptionsTest.class);
     private static final String SOS_USER = "sos-user";
     private static final String USER = "user";
     private static final String AUTH_FILE = "auth_file";

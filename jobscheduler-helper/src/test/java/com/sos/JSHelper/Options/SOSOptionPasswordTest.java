@@ -3,15 +3,16 @@ package com.sos.JSHelper.Options;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
 public class SOSOptionPasswordTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionPasswordTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionPasswordTest.class);
     private SOSOptionPassword objOption = null;
 
     @Before

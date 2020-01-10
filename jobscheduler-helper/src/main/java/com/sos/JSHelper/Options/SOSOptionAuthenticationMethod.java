@@ -1,13 +1,15 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
 
     private static final long serialVersionUID = 806321970898790899L;
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionAuthenticationMethod.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionAuthenticationMethod.class);
     private static final String PASSWORD = "password";
     private static final String PUBLICKEY = "publickey";
     private static final String URL = "url";

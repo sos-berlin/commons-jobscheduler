@@ -2,7 +2,8 @@ package com.sos.scheduler.model.objects;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -12,7 +13,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 /** @author oh */
 public class JSObjParams extends Params {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjParams.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjParams.class);
     public static final String fileNameExtension = ".params.xml";
 
     public JSObjParams(final SchedulerObjectFactory schedulerObjectFactory) {
