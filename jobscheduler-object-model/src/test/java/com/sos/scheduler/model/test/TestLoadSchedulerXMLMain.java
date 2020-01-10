@@ -1,6 +1,5 @@
 package com.sos.scheduler.model.test;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 
 /** \class TestLoadSchedulerXML
@@ -35,8 +34,6 @@ public class TestLoadSchedulerXMLMain {
 
     @SuppressWarnings("unused")
     private final String conClassName = "TestLoadSchedulerXMLMain";
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(TestLoadSchedulerXMLMain.class);
 
     /** \brief main
      * 

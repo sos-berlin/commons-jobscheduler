@@ -4,19 +4,20 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class JSObjPeriodTest {
 
-    private final static Logger logger = Logger.getLogger(JSObjPeriodTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JSObjPeriodTest.class);
     private final static DateTimeFormatter fmtDateTime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     private final static DateTimeFormatter fmtTime = DateTimeFormat.forPattern("HH:mm:ss");
 
@@ -42,7 +43,7 @@ public class JSObjPeriodTest {
     public final void testSetInvalidXmlContent() {
         xml = "<invalid period='' />";
         JSObjPeriod period = new JSObjPeriod(factory, xml);
-        logger.debug(period.toXMLString());
+        LOGGER.debug(period.toXMLString());
     }
 
     @Test
@@ -137,7 +138,7 @@ public class JSObjPeriodTest {
         JSObjPeriod period = new JSObjPeriod(factory, xml);
         List<DateTime> starts = period.getRunTimeElements(IntervalConstants.NEXT_24H.getInterval()).getStartTimes();
         for (DateTime start : starts) {
-            logger.debug("Start time: " + fmtDateTime.print(start));
+            LOGGER.debug("Start time: " + fmtDateTime.print(start));
         }
     }
 

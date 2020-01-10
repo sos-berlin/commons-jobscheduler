@@ -2,10 +2,11 @@ package com.sos.scheduler.model.commands;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -17,7 +18,7 @@ import com.sos.scheduler.model.objects.Spooler;
 @Ignore("Test set to Ignore for later examination")
 public class JSCmdAddOrderTest {
 
-    private final static Logger logger = Logger.getLogger(JSCmdAddOrderTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JSCmdAddOrderTest.class);
     private static SchedulerObjectFactory factory = null;
 
     @BeforeClass
@@ -46,7 +47,7 @@ public class JSCmdAddOrderTest {
         Answer answer = cmdOrder.getAnswer();
         ERROR jsError = answer.getERROR();
         if (jsError != null) {
-            logger.debug(xml + "\n" + jsError.getText() + "\n" + factory.answerToXMLString(jsError));
+            LOGGER.debug(xml + "\n" + jsError.getText() + "\n" + factory.answerToXMLString(jsError));
             throw new JobSchedulerException("Error in execution of order");
         }
     }

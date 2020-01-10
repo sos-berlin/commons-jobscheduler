@@ -3,9 +3,10 @@ package com.sos.scheduler.cmd;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.JSObjParams;
@@ -14,7 +15,7 @@ import com.sos.scheduler.model.objects.Spooler;
 
 public class JSAddOrderTest {
 
-    private final static Logger logger = Logger.getLogger(JSAddOrderTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JSAddOrderTest.class);
 
     private static SchedulerObjectFactory factory = null;
 

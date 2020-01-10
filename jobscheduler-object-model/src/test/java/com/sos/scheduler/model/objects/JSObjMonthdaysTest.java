@@ -1,10 +1,11 @@
 package com.sos.scheduler.model.objects;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
@@ -18,8 +19,6 @@ import com.sos.scheduler.model.tools.JodaTools;
 
 public class JSObjMonthdaysTest {
 
-    @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(JSObjMonthdaysTest.class);
 
     private final static DateTimeFormatter fmtDateTime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     private final static DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");

@@ -1,9 +1,10 @@
 package com.sos.scheduler.model;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -15,7 +16,7 @@ import com.sos.scheduler.model.objects.Spooler;
 /** @author oh */
 public class JSConfigurationTest {
 
-    private static final Logger LOGGER = Logger.getLogger(JSConfigurationTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSConfigurationTest.class);
     private static SchedulerObjectFactory objFactory = null;
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
@@ -33,7 +34,7 @@ public class JSConfigurationTest {
             objVFS = VFSFactory.getHandler("local");
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -48,7 +49,7 @@ public class JSConfigurationTest {
             objVFS.authenticate(objOptions);
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

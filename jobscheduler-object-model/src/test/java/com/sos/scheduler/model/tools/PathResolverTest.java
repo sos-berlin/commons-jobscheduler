@@ -1,13 +1,14 @@
 package com.sos.scheduler.model.tools;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
 public class PathResolverTest {
 
-    private final static Logger logger = Logger.getLogger(PathResolverTest.class);
+    private final static Logger logger = LoggerFactory.getLogger(PathResolverTest.class);
 
     @Test
     public void test() throws Exception {

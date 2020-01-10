@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
@@ -16,6 +15,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -29,7 +30,7 @@ import com.sos.scheduler.model.tools.RunTimeElements;
 public class JSObjHolidaysTest extends TestBase {
 
     @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(JSObjHolidaysTest.class);
+    private final static Logger logger = LoggerFactory.getLogger(JSObjHolidaysTest.class);
 
     private static SchedulerObjectFactory factory = null;
     private final static DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");
