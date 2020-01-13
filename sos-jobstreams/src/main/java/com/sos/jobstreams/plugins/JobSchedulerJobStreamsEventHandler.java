@@ -139,7 +139,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (Exception e) {
             conditionResolver = null;
             getNotifier().notifyOnError(method, e);
-            LOGGER.error("%s: %s", method, e.toString(), e);
+            LOGGER.error(String.format("%s: %s", method, e.toString()), e);
         } finally {
             if (sosHibernateSession != null) {
                 sosHibernateSession.close();
@@ -290,7 +290,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 } catch (SOSHibernateException e) {
                     conditionResolver = null;
                     getNotifier().smartNotifyOnError(getClass(), e);
-                    LOGGER.error("%s: %s", method, e.toString(), e);
+                    LOGGER.error(String.format("%s: %s", method, e.toString()), e);
                     throw new RuntimeException(e);
                 }
             }
