@@ -29,6 +29,7 @@ import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConvertException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
+import com.sos.keepass.SOSKeePassResolver;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -430,6 +431,7 @@ public class SOSHibernateFactory implements Serializable {
         setDefaultConfigurationProperties();
         configure();
         setConfigurationProperties();
+        resolveCredentialStoreProperties();
         showConfigurationProperties();
     }
 
@@ -505,6 +507,37 @@ public class SOSHibernateFactory implements Serializable {
                     //
                 }
             }
+        }
+    }
+
+    private void resolveCredentialStoreProperties() throws SOSHibernateConfigurationException {
+        if (configuration == null) {
+            return;
+        }
+
+        try {
+            String f = configuration.getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_CREDENTIAL_STORE_FILE);
+            String kf = configuration.getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_CREDENTIAL_STORE_KEY_FILE);
+            String p = configuration.getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_CREDENTIAL_STORE_PASSWORD);
+            String ep = configuration.getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_CREDENTIAL_STORE_ENTRY_PATH);
+            SOSKeePassResolver r = new SOSKeePassResolver(f, kf, p);
+            r.setEntryPath(ep);
+
+            String url = configuration.getProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_URL);
+            if (url != null) {
+                configuration.setProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_URL, r.resolve(url));
+            }
+            String username = configuration.getProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_USERNAME);
+            if (username != null) {
+                configuration.setProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_USERNAME, r.resolve(username));
+            }
+            String password = configuration.getProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_PASSWORD);
+            if (password != null) {
+                configuration.setProperty(SOSHibernate.HIBERNATE_PROPERTY_CONNECTION_PASSWORD, r.resolve(password));
+            }
+
+        } catch (Throwable e) {
+            throw new SOSHibernateConfigurationException(e.toString(), e);
         }
     }
 
