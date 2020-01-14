@@ -376,7 +376,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event = new JSEvent();
                             event.setCreated(new Date());
                             event.setEvent(customEvent.getEvent());
-                            event.setSession(customEvent.getSession());
+                            event.setJobStream(customEvent.getJobStream());
+                            if (customEvent.getSession() == null || customEvent.getSession().isEmpty()) {
+                                event.setSession(Constants.getSession());
+                            }else {
+                                event.setSession(customEvent.getSession());
+                            }
                             event.setSchedulerId(super.getSettings().getSchedulerId());
                             event.setGlobalEvent(customEvent.isGlobalEvent());
 
