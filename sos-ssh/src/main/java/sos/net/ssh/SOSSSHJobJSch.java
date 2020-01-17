@@ -47,9 +47,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final String DEFAULT_WINDOWS_PRE_COMMAND = "set \"%s=%s\"";
     private static final String DEFAULT_LINUX_PRE_COMMAND = "export %s='%s'";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "if exist \"%s\" type \"%s\"";
-    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s&&cat %s";
+    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s && cat %s; echo ''";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
-    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "rm %s";
+    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; echo ''";
     private String tempFileName;
     private String resolvedTempFileName;
     private String pidFileName;
@@ -508,7 +508,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 if (!prePostCommandVFSHandler.getStdOut().toString().isEmpty()) {
                     BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
                     String line = null;
-                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
                     while ((line = reader.readLine()) != null) {
                         Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
                         if (regExMatcher.find()) {
@@ -530,9 +529,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
                     // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 }
-                // else {
-                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
-                // }
             } else {
                 // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
                 // stdErr = prePostCommandVFSHandler.getStdErr().toString();
