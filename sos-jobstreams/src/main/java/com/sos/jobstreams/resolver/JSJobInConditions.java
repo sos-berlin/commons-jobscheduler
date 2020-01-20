@@ -1,21 +1,19 @@
 package com.sos.jobstreams.resolver;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sos.exception.SOSInvalidDataException;
-import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSJobInConditions {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSJobInConditions.class);
 
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
     private EventHandlerSettings settings;
@@ -59,6 +57,11 @@ public class JSJobInConditions {
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
             jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
+            try {
+                jsInCondition.setNextPeriod(sosHibernateSession);
+            } catch (SOSHibernateException e) {
+               LOGGER.error("Could not set the next period",e);
+            }
             addInCondition(jsInCondition);
         }
     }

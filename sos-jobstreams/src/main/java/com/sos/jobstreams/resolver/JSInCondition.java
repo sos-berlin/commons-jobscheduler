@@ -1,6 +1,8 @@
 package com.sos.jobstreams.resolver;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         super();
         haveCalendars = false;
         jobIsRunning = false;
+
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -115,10 +118,36 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
     }
 
+  
+
+    protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        LocalDate today = LocalDate.now();
+        LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
+        LocalDate next = null;
+
+        for (LocalDate d : this.listOfDates) {
+            
+            if (d.isBefore(last) && (d.isAfter(today) || d.isEqual(today))) {
+                last = d;
+                next = d;
+            }
+        }
+        if (next != null && next.isAfter(today)) {//Empty if today. 
+            this.itemInCondition.setNextPeriod(Date.from(last.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            try {
+                sosHibernateSession.beginTransaction();
+                sosHibernateSession.update(this.itemInCondition);
+                sosHibernateSession.commit();
+            } catch (Exception e) {
+                sosHibernateSession.rollback();
+            }
+        }
+    }
+
     public boolean isConsumed() {
         return consumed;
     }
-    
+
     public void setConsumed(boolean consumed) {
         this.consumed = consumed;
     }
@@ -181,14 +210,16 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return this.getExpression() + "::" + SOSString.toString(this);
     }
 
-    
     public boolean jobIsRunning() {
         return jobIsRunning;
     }
 
-    
     public void setJobIsRunning(boolean jobIsRunning) {
         this.jobIsRunning = jobIsRunning;
+    }
+
+    public Date getNextPeriod() {
+        return this.itemInCondition.getNextPeriod();
     }
 
 }
