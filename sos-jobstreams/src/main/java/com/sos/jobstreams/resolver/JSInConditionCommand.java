@@ -1,8 +1,5 @@
 package com.sos.jobstreams.resolver;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
@@ -11,9 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.jobstreams.classes.JobStarter;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.job.JobV;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
-import com.sos.xml.XMLBuilder;
 
 public class JSInConditionCommand {
 
@@ -60,6 +55,7 @@ public class JSInConditionCommand {
             LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
             if (schedulerXmlCommandExecutor != null) {
                 answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+                LOGGER.trace(answer);
                 startedJob = job;
             } else {
                 LOGGER.debug("Start job will be ignored as running in debug  mode.: " + job);

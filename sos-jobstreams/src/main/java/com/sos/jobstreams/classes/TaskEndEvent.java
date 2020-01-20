@@ -28,7 +28,7 @@ public class TaskEndEvent {
 
     public TaskEndEvent(JsonObject entry) {
         super();
-        this.returnCode = entry.getInt("returnCode");
+        this.returnCode = entry.getInt("returnCode",-1);
         this.type = entry.getString("TYPE");
 
         JsonObject key = entry.getJsonObject("key");

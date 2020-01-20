@@ -146,7 +146,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         }
 
-        EventType[] observedEventTypes = new EventType[] { EventType.TaskEnded, EventType.VariablesCustomEvent, EventType.OrderFinished };
+        EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent, EventType.OrderFinished };
         start(observedEventTypes);
     }
 
@@ -316,6 +316,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         performTaskEnd(sosHibernateSession, taskEndEvent);
                         resolveInConditions = true;
+                        break;
+                    case "TaskClosed":
+                        taskEndEvent = new TaskEndEvent((JsonObject) entry);
+                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
                         break;
 
                     case "VariablesCustomEvent":
