@@ -527,15 +527,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         }
                     }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
-                    // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 }
-            } else {
-                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
-                // stdErr = prePostCommandVFSHandler.getStdErr().toString();
-                // if (stdErr.length() > 0) {
-                // LOGGER.debug(stdErr);
-                // }
-
             }
         } catch (Exception e) {
             // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
