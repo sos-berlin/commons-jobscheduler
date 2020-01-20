@@ -47,9 +47,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final String DEFAULT_WINDOWS_PRE_COMMAND = "set \"%s=%s\"";
     private static final String DEFAULT_LINUX_PRE_COMMAND = "export %s='%s'";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_READ = "if exist \"%s\" type \"%s\"";
-    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s && cat %s; echo ''";
+    private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s && cat %s; exit 0";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
-    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; echo ''";
+    private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; exit 0";
     private String tempFileName;
     private String resolvedTempFileName;
     private String pidFileName;
