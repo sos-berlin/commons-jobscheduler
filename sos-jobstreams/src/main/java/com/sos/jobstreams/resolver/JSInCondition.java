@@ -169,6 +169,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 haveCalendars = true;
                 this.listOfDates.addAll(l);
             }
+            
+            try {
+                this.setNextPeriod(sosHibernateSession);
+            } catch (SOSHibernateException e) {
+               LOGGER.error("Could not set the next period",e);
+            }
         } catch (Exception e) {
             LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
         }

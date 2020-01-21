@@ -57,11 +57,7 @@ public class JSJobInConditions {
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
             jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
-            try {
-                jsInCondition.setNextPeriod(sosHibernateSession);
-            } catch (SOSHibernateException e) {
-               LOGGER.error("Could not set the next period",e);
-            }
+          
             addInCondition(jsInCondition);
         }
     }
