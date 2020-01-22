@@ -238,7 +238,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                 } finally {
                     if (executorService != null) {
-                        ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("KILL");
                         if (commandExecution != null) {
                             commandExecution.cancel(true);
                         }
