@@ -297,14 +297,15 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob
 	public String replaceSchedulerVars(final String string2Modify) {
 		String resultString = string2Modify;
 		if (isNotNull(schedulerParameters)) {
+
 			fillParameterSubstitutor();
-			if (string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
+			if (string2Modify.contains("${")){
 				parameterSubstitutor.setOpenTag("${");
 				parameterSubstitutor.setCloseTag("}");
 				resultString = parameterSubstitutor.replace(string2Modify);
 			}
 
-			if (string2Modify.matches("(.*)%(.+)%(.*)")) {
+			if (string2Modify.contains("%")){
 				parameterSubstitutor.setOpenTag("%");
 				parameterSubstitutor.setCloseTag("%");
 				resultString = parameterSubstitutor.replace(string2Modify);
