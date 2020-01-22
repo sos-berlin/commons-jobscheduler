@@ -301,10 +301,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 if (prePostCommandVFSHandler != null) {
                     LOGGER.debug("***** prePostCommandVFSHandler disconnecting... *****");
                     prePostCommandVFSHandler.closeConnection();
+                    prePostCommandVFSHandler.closeSession();
                     LOGGER.debug("***** prePostCommandVFSHandler disconnected! *****");
                 }
                 LOGGER.debug("***** vfsHandler disconnecting... *****");
                 vfsHandler.closeConnection();
+                vfsHandler.closeSession();
                 LOGGER.debug("***** vfsHandler disconnected! *****");
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
@@ -529,38 +531,24 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         }
                     }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
-                    // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 }
-                // else {
-                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
-                // }
-            } else {
-                // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
-                // stdErr = prePostCommandVFSHandler.getStdErr().toString();
-                // if (stdErr.length() > 0) {
-                // LOGGER.debug(stdErr);
-                // }
-
             }
         } catch (Exception e) {
-            // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+            // prevent Exception to show in case of postCommandDelete errors
         } finally {
             try {
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
                 prePostCommandVFSHandler.closeConnection();
+                prePostCommandVFSHandler.closeSession();
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            } catch (Exception e) {}
+            // retry once if still connected
             if (prePostCommandVFSHandler.isConnected()) {
                 try {
                     prePostCommandVFSHandler.closeConnection();
                     prePostCommandVFSHandler.closeSession();
-                } catch (Exception e) {
-                }
+                } catch (Exception e) {}
             }
-
         }
     }
 
