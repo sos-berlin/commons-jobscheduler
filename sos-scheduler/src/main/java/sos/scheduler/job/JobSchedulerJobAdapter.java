@@ -69,9 +69,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
-        // if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
-        // BasicConfigurator.configure();
-        // }
         if (LogManager.getRootLogger() == null) {
             Configurator.initialize(new DefaultConfiguration());
         }
