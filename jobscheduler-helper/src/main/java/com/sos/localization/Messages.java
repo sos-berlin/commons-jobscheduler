@@ -9,13 +9,15 @@ import java.util.ResourceBundle;
 import java.util.UnknownFormatConversionException;
 import java.util.regex.Matcher;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author KB */
 public class Messages implements Serializable {
 
     private static final long serialVersionUID = -1276188512965716159L;
-    private static final Logger LOGGER = Logger.getLogger(Messages.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
     private static final String ENCODING_KEY = "properties.file.encoding";
     private String BUNDLE_NAME = "com.sos.localization.messages";
     private ResourceBundle objResource_Bundle = null;

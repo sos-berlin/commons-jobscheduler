@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -38,7 +39,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private static final String OPERATION_SEND = "send";
     private static final long serialVersionUID = -8219289268940238015L;
-    private static final Logger LOGGER = Logger.getLogger(SOSFTPOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPOptions.class);
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private Properties propSOSFtpEnvironmentVars = null;
     private Properties schedulerParams = null;

@@ -6,7 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
@@ -34,7 +35,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class VFSFactory extends SOSVfsMessageCodes {
 
     protected static Msg objMsg = new Msg(new BundleBaseName("SOSVirtualFileSystem"));
-    private static final Logger LOGGER = Logger.getLogger(VFSFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VFSFactory.class);
     private static final String USE_TRILEAD = ".TRILEAD";
     private static final String USE_JSCH = ".JSCH";
     private static SOSConnection2OptionsAlternate objConnectionOptions = null;

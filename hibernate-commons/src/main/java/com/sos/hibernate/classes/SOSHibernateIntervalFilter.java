@@ -4,14 +4,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author Uwe Risse */
 public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 
     private String timeZone;
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateIntervalFilter.class);
 
     public abstract void setIntervalFromDate(Date d);
 

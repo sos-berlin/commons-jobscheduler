@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -37,7 +35,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
 
     @SuppressWarnings("unused")
     private final String conClassName = "SOSVfsCommonFile";
-    private static final Logger logger = Logger.getLogger(SOSVfsCommonFile.class);
     protected ISOSVfsFileTransfer objVFSHandler = null;
     protected InputStream objInputStream = null;
     public OutputStream objOutputStream = null;

@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
@@ -20,7 +21,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHTerminateRemotePidJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHTerminateRemotePidJob.class);
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String PID_PLACEHOLDER = "${pid}";
     private static final String USER_PLACEHOLDER = "${user}";

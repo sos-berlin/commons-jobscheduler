@@ -1,16 +1,17 @@
 package com.sos.dialog.message;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class ErrorLog {
 
-    private static final Logger LOGGER = Logger.getLogger(ErrorLog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorLog.class);
     private static Shell sShell = null;
     public static String gstrApplication = "";
 

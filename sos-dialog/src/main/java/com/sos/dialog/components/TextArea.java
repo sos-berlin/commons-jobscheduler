@@ -7,7 +7,6 @@ import java.util.List;
 import net.vzurczak.main.XmlRegion;
 import net.vzurczak.main.XmlRegionAnalyzer;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -33,6 +32,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -44,7 +45,7 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
 /** @author Uwe Risse */
 public class TextArea extends StyledText {
 
-    private static final Logger LOGGER = Logger.getLogger(TextArea.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextArea.class);
     private WindowsSaver objFormPosSizeHandler = null;
     private String strPreferenceStoreKey = "";
     private StyledText objThis = this;

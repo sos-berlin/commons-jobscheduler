@@ -1,6 +1,5 @@
 package com.sos.scheduler.model.test;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 
 /** \class TestLoadSchedulerXML
@@ -33,19 +32,6 @@ import org.junit.Ignore;
 @Ignore("Test set to Ignore for later examination")
 public class TestLoadSchedulerXMLMain {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = "TestLoadSchedulerXMLMain";
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(TestLoadSchedulerXMLMain.class);
-
-    /** \brief main
-     * 
-     * \details
-     *
-     * \return void
-     *
-     * @param args
-     * @throws Exception */
     public static void main(String[] args) throws Exception {
         TestLoadSchedulerXML objT = new TestLoadSchedulerXML();
         objT.run();

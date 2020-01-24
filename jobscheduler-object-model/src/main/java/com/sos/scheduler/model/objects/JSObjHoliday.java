@@ -1,6 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -37,8 +36,6 @@ public class JSObjHoliday extends Holiday {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjHoliday";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjHoliday.class);
 
     public JSObjHoliday(SchedulerObjectFactory schedulerObjectFactory) {
         super();

@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjJobChainNodeEnd
@@ -34,8 +32,6 @@ public class JSObjJobChainNodeEnd extends JobChainNodeEnd {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjJobChainNodeEnd";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjJobChainNodeEnd.class);
 
     public JSObjJobChainNodeEnd(SchedulerObjectFactory schedulerObjectFactory) {
         super();

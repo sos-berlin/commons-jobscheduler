@@ -1,8 +1,9 @@
 package com.sos.VirtualFileSystem.TransferHistoryExport;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
@@ -10,7 +11,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author oh */
 public class SOSVfsXmlExportTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsXmlExportTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsXmlExportTest.class);
     private SOSVfsXmlExport objExp = null;
     private SOSFTPOptions objO = null;
     private JadeTransferDetailHistoryExportDataTest objJadeDetail = null;

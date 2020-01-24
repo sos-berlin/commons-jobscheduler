@@ -11,7 +11,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
@@ -19,7 +20,7 @@ import com.sos.JSHelper.Options.SOSOptionProxyProtocol.Protocol;
 
 public class SOSVfsFtpSProxySelector extends ProxySelector {
 
-    private final Logger logger = Logger.getLogger(SOSVfsFtpSProxySelector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpSProxySelector.class);
 
     private Protocol proxyProtocol;
     private String proxyHost;
@@ -39,7 +40,7 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         proxyUser = user;
         proxyPassword = password;
 
-        logger.info(String.format("using proxy. protocol = %s, host = %s:%s, user = %s ", proxyProtocol, proxyHost, proxyPort, proxyUser));
+        LOGGER.info(String.format("using proxy. protocol = %s, host = %s:%s, user = %s ", proxyProtocol, proxyHost, proxyPort, proxyUser));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         Proxy proxy = null;
         List<Proxy> result = null;
 
-        logger.debug(String.format("using proxy [%s]. protocol = %s, host = %s:%s, user = %s ", uri.getScheme(), proxyProtocol, proxyHost, proxyPort,
+        LOGGER.debug(String.format("using proxy [%s]. protocol = %s, host = %s:%s, user = %s ", uri.getScheme(), proxyProtocol, proxyHost, proxyPort,
                 proxyUser));
 
         if (!SOSString.isEmpty(proxyUser)) {

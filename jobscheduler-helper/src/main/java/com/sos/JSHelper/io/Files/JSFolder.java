@@ -7,7 +7,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
@@ -16,7 +17,7 @@ import com.sos.JSHelper.Options.SOSOptionRegExp;
 public class JSFolder extends File {
 
     private static final long serialVersionUID = -4423886110579623387L;
-    private static final Logger LOGGER = Logger.getLogger(JSFolder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSFolder.class);
     private static final long UNDEFINED = -1L;
     private String strFolderName = "";
     public long IncludeOlderThan = UNDEFINED;

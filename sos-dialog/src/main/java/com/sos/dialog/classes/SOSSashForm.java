@@ -5,7 +5,6 @@ package com.sos.dialog.classes;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
@@ -25,8 +24,6 @@ public class SOSSashForm extends SashForm {
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id: SOSSashForm.java 23811 2014-04-15 15:45:10Z kb $";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
     private final Vector<Control> objControlList = new Vector<Control>();
 
     private final WindowsSaver objPersistenceStore;

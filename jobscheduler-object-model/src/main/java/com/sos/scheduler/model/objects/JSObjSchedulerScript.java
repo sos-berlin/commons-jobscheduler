@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjSchedulerScript
@@ -34,8 +32,6 @@ public class JSObjSchedulerScript extends SchedulerScript {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjSchedulerScript";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjSchedulerScript.class);
 
     public JSObjSchedulerScript(SchedulerObjectFactory schedulerObjectFactory) {
         super();

@@ -2,13 +2,14 @@ package com.sos.JSHelper.Options;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class SOSOptionHexStringTest {
     
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionHexStringTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionHexStringTest.class);
 
     @Test
     public void testValue() {

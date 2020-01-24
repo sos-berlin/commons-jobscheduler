@@ -9,13 +9,14 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class SOSVfsWebDAVTest {
 
-    protected static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAVTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAVTest.class);
     protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
     protected static final String REMOTE_BASE_PATH = "/webdav/";
     protected static final String WEB_URI = "http://homer.sos/webdav";
@@ -67,7 +68,7 @@ public class SOSVfsWebDAVTest {
         objVfsClient.rmdir(REMOTE_BASE_PATH + "kb/test1");
         objVfsClient.mkdir(REMOTE_BASE_PATH + "kb/test1");
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "kb/test1");
-        LOGGER.info(objVF.getFileSize());
+        LOGGER.info("" + objVF.getFileSize());
         objVfsClient.disconnect();
     }
 
@@ -92,7 +93,7 @@ public class SOSVfsWebDAVTest {
     public void testSize() throws Exception {
         connect();
         authenticate();
-        LOGGER.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
+        LOGGER.info("" + objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
         objVfsClient.disconnect();
     }
 

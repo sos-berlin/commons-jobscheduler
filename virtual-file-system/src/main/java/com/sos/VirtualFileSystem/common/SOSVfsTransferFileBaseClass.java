@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
@@ -17,7 +18,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 
     protected String fileName = EMPTY_STRING;
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsTransferFileBaseClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferFileBaseClass.class);
 
     public SOSVfsTransferFileBaseClass() {
         super("SOSVirtualFileSystem");

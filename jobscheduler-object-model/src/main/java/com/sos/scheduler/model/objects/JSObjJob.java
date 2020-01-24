@@ -5,7 +5,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -15,7 +16,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 /** @author oh */
 public class JSObjJob extends Job {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjJob.class);
     private Script objScript = null;
     public static final String[] ValidLanguages4Job = LanguageDescriptorList.getLanguages4APIJobs();
     public static final String[] ValidLanguages4Monitor = LanguageDescriptorList.getLanguages4Monitor();

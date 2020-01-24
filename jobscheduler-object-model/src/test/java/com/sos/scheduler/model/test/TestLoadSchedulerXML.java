@@ -12,15 +12,17 @@ import com.sos.scheduler.model.objects.Job;
 import com.sos.scheduler.model.objects.ProcessClass;
 import com.sos.scheduler.model.objects.Spooler;
 import com.sos.scheduler.model.objects.Spooler.Config;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.math.BigInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /** @author KB */
 public class TestLoadSchedulerXML implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXML.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestLoadSchedulerXML.class);
 
         //
     @Override
@@ -31,9 +33,9 @@ public class TestLoadSchedulerXML implements Runnable {
             objFactory.initMarshaller(Spooler.class);
             Spooler objSchedulerConfig = (Spooler) objFactory.unMarshall(new File("C:/Program Files (x86)/Scheduler/config/scheduler.xml"));
             Config objConfig = objSchedulerConfig.getConfig().get(0);
-            LOGGER.debug(objConfig.getPort());
-            LOGGER.debug(objConfig.getTcpPort());
-            LOGGER.debug(objConfig.getUdpPort());
+            LOGGER.debug("" + objConfig.getPort());
+            LOGGER.debug("" + objConfig.getTcpPort());
+            LOGGER.debug("" + objConfig.getUdpPort());
             for (ProcessClass objProcessClass : objConfig.getProcessClasses().getProcessClass()) {
                 LOGGER.debug("ProcessClass = " + objProcessClass.getName());
             }

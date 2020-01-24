@@ -6,19 +6,19 @@ import com.sos.scheduler.model.answers.Answer;
 import com.sos.scheduler.model.answers.ERROR;
 import com.sos.scheduler.model.answers.JSCmdBase;
 import com.sos.scheduler.model.objects.Spooler;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 abstract class JSCommand implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(JSCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSCommand.class);
     private final SchedulerObjectFactory objectFactory;
     private JSCmdBase jsCommand;
-    private List<ICommandActionsListener> listeners = new ArrayList<ICommandActionsListener>();
 
     public JSCommand(String host, Integer port) {
         this.objectFactory = new SchedulerObjectFactory(host, port);
@@ -50,7 +50,7 @@ abstract class JSCommand implements Runnable {
             doCommand(jsCommand);
         } catch (Exception e) {
             String msg = "Error fetching command.";
-            notifyListener(Level.ERROR, msg);
+            LOGGER.info(msg);
             throw new JobSchedulerException(msg, e);
         }
     }
@@ -58,40 +58,26 @@ abstract class JSCommand implements Runnable {
     private void doCommand(JSCmdBase command) {
         try {
             command.run();
-            notifyListener(Level.INFO, command.toXMLString());
+            LOGGER.info(command.toXMLString());
         } catch (Exception e) {
             String msg = "Error fetching command.";
-            notifyListener(Level.ERROR, msg);
+            LOGGER.error(msg);
             throw new JobSchedulerException(msg, e);
         }
-        notifyListener(Level.DEBUG, "Command submitted - waiting for answer ...");
+        LOGGER.debug("Command submitted - waiting for answer ...");
         Answer objA = command.getAnswer();
         ERROR objE = objA.getERROR();
-        notifyListener(Level.DEBUG, "JS answer received.");
+        LOGGER.error("JS answer received.");
         if (objE != null) {
-            notifyListener(Level.ERROR, "The answer contains an error - order not started. Errortext from JS: " + objE.getText());
+            LOGGER.error("The answer contains an error - order not started. Errortext from JS: " + objE.getText());
         }
         try {
             objectFactory.getSocket().doClose();
         } catch (IOException e) {
             String msg = "Error closing JobScheduler socket.";
-            notifyListener(Level.ERROR, msg);
+            LOGGER.error(msg);
             throw new JobSchedulerException(msg, e);
         }
-    }
-
-    private void notifyListener(Level level, String message) {
-        if (listeners.isEmpty()) {
-            LOGGER.log(level, message);
-        } else {
-            for (ICommandActionsListener l : listeners) {
-                l.onMessage(level, message);
-            }
-        }
-    }
-
-    public void addMessageListener(ICommandActionsListener listener) {
-        this.listeners.add(listener);
     }
 
     public SchedulerObjectFactory getFactory() {

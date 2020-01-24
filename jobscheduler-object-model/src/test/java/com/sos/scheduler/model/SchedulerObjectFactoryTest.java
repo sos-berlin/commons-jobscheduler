@@ -21,8 +21,9 @@ import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.Job.Description;
 import com.sos.scheduler.model.objects.Spooler;
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import static org.junit.Assert.fail;
 /** @author KB */
 public class SchedulerObjectFactoryTest extends JSToolBox {
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactoryTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerObjectFactoryTest.class);
     private static SchedulerObjectFactory objSchedulerObjectFactory = null;
 
     public SchedulerObjectFactoryTest() {

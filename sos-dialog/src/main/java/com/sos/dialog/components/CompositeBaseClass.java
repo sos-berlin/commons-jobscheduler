@@ -3,13 +3,14 @@
  */
 package com.sos.dialog.components;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.IValueChangedListener;
 import com.sos.JSHelper.Options.SOSOptionElement;
@@ -24,7 +25,7 @@ import com.sos.dialog.layouts.Gridlayout;
 /** @author KB */
 public abstract class CompositeBaseClass<T> extends Composite implements ISOSTabItem, ICompositeBaseAbstract {
 
-    protected Logger logger = Logger.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(CompositeBaseClass.class);
     protected Composite objParent = null;
     protected T objJadeOptions = null;
     protected ControlCreator objCC = null;

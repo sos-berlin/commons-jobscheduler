@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.exceptions;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /** \class JSCommandOKException
@@ -37,8 +35,6 @@ public class JSCommandOKException extends JobSchedulerException {
     private static final long serialVersionUID = 7094590460479639416L;
     @SuppressWarnings("unused")
     private final String conClassName = "JSCommandOKException";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSCommandOKException.class);
 
     public JSCommandOKException() {
         //

@@ -6,7 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -17,7 +18,7 @@ import sos.util.SOSString;
 public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     private static final String CHARACTER_ENCODING = "Cp1252";
-    private static final Logger LOGGER = Logger.getLogger(CmdShell.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmdShell.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private String strStdOut = "";
     private String strStdErr = "";

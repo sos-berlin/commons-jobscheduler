@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.List;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.io.SOSFileSystemOperations;
@@ -17,7 +17,7 @@ import com.sos.JSHelper.io.SOSFileSystemOperationsImpl;
 /** @author KB */
 public class SOSFileSystemOperationsTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFileSystemOperationsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileSystemOperationsTest.class);
     private String strReplaceWhat = "";
     private String strReplaceWith = "";
     private String strStringToWorkOn = "";

@@ -3,17 +3,14 @@ package com.sos.VirtualFileSystem.local;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -26,7 +23,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 /** @author KB */
 public class SOSVfslocalTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfslocalTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfslocalTest.class);
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
     private final String strTestFileName = "text.txt";

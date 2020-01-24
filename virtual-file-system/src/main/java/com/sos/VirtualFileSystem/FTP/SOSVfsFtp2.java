@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -32,7 +33,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
     private static final String CLASS_NAME = "SOSVfsFtp";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtp2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtp2.class);
     private FTPClient objFTPClient = null;
     private boolean simulateShell = false;
 

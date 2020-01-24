@@ -8,7 +8,8 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.prefs.Preferences;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -21,7 +22,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     protected static final String conNullButMandatory = "JSO-D-0011";
     protected static final String conChangedMsg = "JSO-D-0010";
-    protected static final Logger logger = Logger.getLogger(SOSOptionElement.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SOSOptionElement.class);
     protected static final int isOptionTypeString = 0;
     protected static final int isOptionTypeBoolean = 1;
     protected static final int isOptionTypeFileName = 2;

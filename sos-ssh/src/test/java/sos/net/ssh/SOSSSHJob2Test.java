@@ -6,11 +6,10 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Listener.JSListenerClass;
@@ -20,7 +19,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com.sos.net.messages", defaultLocale = "en")
 public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2Test.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2Test.class);
     private SOSSSHJob2 objSSH = null;
     private SOSSSHJobOptions objOptions = null;
 
@@ -34,10 +33,6 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         objSSH.setJSJobUtilites(this);
         JSListenerClass.bolLogDebugInformation = true;
         JSListenerClass.intMaxDebugLevel = 9;
-        if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
-            BasicConfigurator.configure();
-        }
-        LOGGER.setLevel(Level.DEBUG);
     }
 
     @Test

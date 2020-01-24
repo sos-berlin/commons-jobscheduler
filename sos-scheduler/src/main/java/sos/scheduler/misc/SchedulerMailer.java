@@ -2,7 +2,8 @@ package sos.scheduler.misc;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.SOSMail;
 import sos.scheduler.job.JobSchedulerJob;
@@ -117,7 +118,7 @@ public class SchedulerMailer {
 
     private SOSMail sosMail;
     private final Spooler spooler;
-    private Logger LOGGER = Logger.getLogger(SchedulerMailer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerMailer.class);
 
     public SchedulerMailer(final sos.spooler.Job_impl job) throws Exception {
         spooler = job.spooler;

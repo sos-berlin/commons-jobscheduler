@@ -2,14 +2,14 @@ package sos.scheduler.job;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.spooler.Variable_set;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
 
@@ -17,7 +17,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
     private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
     private static final String PARAM_SSH_JOB_TIMEOUT_KILL_AFTER = "ssh_job_timeout_kill_after";
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHKillJobJSAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillJobJSAdapter.class);
     private HashMap<String, String> allParams;
 
     @Override
@@ -27,7 +27,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             successfull = doProcessing();
         } catch (Exception e) {
-            LOGGER.fatal(stackTrace2String(e));
+            LOGGER.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         if (successfull) {

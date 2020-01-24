@@ -6,9 +6,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
@@ -21,7 +22,7 @@ import com.sos.scheduler.model.tools.RunTimeElements;
 /** @author oh */
 public class JSObjHolidays extends Holidays {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjHolidays.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjHolidays.class);
     private List<JSObjInclude> includes = null;
 
     public JSObjHolidays(SchedulerObjectFactory schedulerObjectFactory) {
@@ -149,8 +150,8 @@ public class JSObjHolidays extends Holidays {
                 Include i = (Include) o;
                 LOGGER.warn("the <include> element is not parsed yet.");
                 LOGGER.debug(i.getLiveFile());
-                LOGGER.debug(i.getHotFolderSrc());
-                LOGGER.debug(getHotFolderSrc());
+                LOGGER.debug(i.getHotFolderSrc().toString());
+                LOGGER.debug(getHotFolderSrc().toString());
             }
         }
         return result;

@@ -2,7 +2,8 @@ package sos.net.mail.options;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -13,7 +14,7 @@ import com.sos.JSHelper.interfaces.ISOSSmtpMailOptions;
 public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements ISOSSmtpMailOptions {
 
     private static final long serialVersionUID = 6441074884525254517L;
-    private static final Logger LOGGER = Logger.getLogger(SOSSmtpMailOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSmtpMailOptions.class);
     @JSOptionClass(description = "", name = "SOSSmtpMailOptions")
     private SOSSmtpMailOptions objMailOnError = null;
     @JSOptionClass(description = "", name = "SOSSmtpMailOptions")

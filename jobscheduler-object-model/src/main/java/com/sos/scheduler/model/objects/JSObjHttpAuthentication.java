@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjHttpAuthentication
@@ -34,8 +32,6 @@ public class JSObjHttpAuthentication extends HttpAuthentication {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjHttpAuthentication";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjHttpAuthentication.class);
 
     public JSObjHttpAuthentication(SchedulerObjectFactory schedulerObjectFactory) {
         super();

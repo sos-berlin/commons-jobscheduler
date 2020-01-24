@@ -3,7 +3,8 @@ package sos.scheduler.job;
 import java.io.File;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.marshalling.SOSExport;
@@ -16,7 +17,7 @@ import sos.util.SOSString;
 /** @author mueruevet oeksuez */
 public class JobSchedulerExportJob extends JobSchedulerJob {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerExportJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerExportJob.class);
     private String exportPath = "";
     private String outputFilenameMask = "[dataobject]_[id]_[datetime].xml";
     private Variable_set parameters = null;

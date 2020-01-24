@@ -5,13 +5,15 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author Ghassan Beydoun */
 public class SOSFTPS extends SOSFTP {
 
     protected static final String DEFAULT_SSL_TLS_PROTOCOL = "TLS";
-    private static final Logger LOGGER = Logger.getLogger(SOSFTPS.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPS.class);
     private String securityProtocol = DEFAULT_SSL_TLS_PROTOCOL;
     private int ftpPort = 990;
     private String proxyHost;

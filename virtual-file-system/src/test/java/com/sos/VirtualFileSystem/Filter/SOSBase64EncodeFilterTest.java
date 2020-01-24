@@ -1,8 +1,9 @@
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSBase64EncodeFilterTest extends SOSNullFilterBase<SOSBase64EncodeFilter> {
 
@@ -10,7 +11,7 @@ public class SOSBase64EncodeFilterTest extends SOSNullFilterBase<SOSBase64Encode
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSBase64EncodeFilterTest.class);
 
     public SOSBase64EncodeFilterTest() {
         super(new SOSBase64EncodeFilter());
@@ -24,7 +25,7 @@ public class SOSBase64EncodeFilterTest extends SOSNullFilterBase<SOSBase64Encode
 
         bteBuffer = objF.read();
         String strX = new String(bteBuffer);
-        logger.debug(strX);
+        LOGGER.debug(strX);
         // bteBuffer ends with "\r\n", therefore "\r\n" has to be added to
         // expected value
         Assert.assertEquals(strT2 + "\r\n", strX);

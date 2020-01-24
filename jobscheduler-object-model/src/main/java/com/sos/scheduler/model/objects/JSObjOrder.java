@@ -4,7 +4,8 @@ import java.io.File;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -13,7 +14,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 /** @author oh */
 public class JSObjOrder extends Order {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjOrder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjOrder.class);
     public final static String fileNameExtension = ".order.xml";
 
     @SuppressWarnings("unchecked")

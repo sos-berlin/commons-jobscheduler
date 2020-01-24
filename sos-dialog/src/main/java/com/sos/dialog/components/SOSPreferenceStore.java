@@ -6,8 +6,9 @@ package com.sos.dialog.components;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.dialog.interfaces.ISOSPreferenceStore;
@@ -18,7 +19,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
     protected String strKey = "";
     protected String className = "";
     protected Shell shell = null;
-    private static final Logger logger = Logger.getLogger(SOSPreferenceStore.class);
+    private static final Logger logger = LoggerFactory.getLogger(SOSPreferenceStore.class);
     public static String gstrApplication = "SOS";
     public Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
 

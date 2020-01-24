@@ -3,12 +3,11 @@ package com.sos.VirtualFileSystem.DataElements;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
@@ -27,8 +26,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileList extends SOSVfsMessageCodes {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFileList.class);
-    private static final Logger JADE_REPORT_LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileList.class);
+    private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(VFSFactory.getLoggerName());
 
     public ISOSVfsFileTransfer sourceFileTransfer = null;
     public ISOSVfsFileTransfer targetFileTransfer = null;

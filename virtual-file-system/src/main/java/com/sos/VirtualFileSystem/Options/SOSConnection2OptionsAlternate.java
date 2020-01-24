@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.linguafranca.pwdb.Entry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
@@ -36,7 +37,7 @@ import sos.util.SOSString;
 public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(SOSConnection2OptionsAlternate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSConnection2OptionsAlternate.class);
     private static final String CLASSNAME = SOSConnection2OptionsAlternate.class.getSimpleName();
     private String strAlternativePrefix = "";
     public boolean isSource = false;

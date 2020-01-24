@@ -3,7 +3,8 @@ package sos.scheduler.job;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
@@ -17,7 +18,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHCheckRemotePidJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHCheckRemotePidJob.class);
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
     private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "Qprocess ${pid}";

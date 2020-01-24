@@ -8,20 +8,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.util.SOSLogger;
 
 public class JobSchedulerLiveXml {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerLiveXml.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerLiveXml.class);
     private File xmlFile;
     private Document doc;
     private HashMap tableNames;

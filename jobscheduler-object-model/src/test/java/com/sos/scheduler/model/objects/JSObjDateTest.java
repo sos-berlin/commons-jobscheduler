@@ -4,19 +4,21 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class JSObjDateTest {
 
-    private final static Logger logger = Logger.getLogger(JSObjDateTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JSObjDateTest.class);
 
     private final static DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");
 
@@ -52,7 +54,7 @@ public class JSObjDateTest {
     public final void testSetInvalidXmlContent() {
         xml = "<invalid date />";
         JSObjPeriod period = new JSObjPeriod(factory, xml);
-        logger.debug(period.toXMLString());
+        LOGGER.debug(period.toXMLString());
     }
 
     @Test
@@ -72,7 +74,7 @@ public class JSObjDateTest {
             Iterator<DateTime> it = date.getRunTimeElements(next24H).getStartTimes().iterator();
             while (it.hasNext()) {
                 DateTime dt = it.next();
-                logger.debug(fmtDateTime.print(dt));
+                LOGGER.debug(fmtDateTime.print(dt));
             }
         }
     }

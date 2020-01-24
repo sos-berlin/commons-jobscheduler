@@ -5,12 +5,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.tools.JodaTools;
@@ -43,7 +44,7 @@ import com.sos.scheduler.model.tools.JodaTools;
 /** @author ss */
 public class JSObjHolidaysWeekdaysDay extends Holidays.Weekdays.Day {
 
-    private static final Logger logger = Logger.getLogger(JSObjWeekdays.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSObjWeekdays.class);
 
     public JSObjHolidaysWeekdaysDay(SchedulerObjectFactory schedulerObjectFactory) {
         super();

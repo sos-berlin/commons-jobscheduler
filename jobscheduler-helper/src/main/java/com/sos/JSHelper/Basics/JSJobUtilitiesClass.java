@@ -1,6 +1,7 @@
 package com.sos.JSHelper.Basics;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities, IJSCommands {
@@ -13,7 +14,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
     protected IJSCommands objJSCommands = this;
     protected T objOptions = null;
     protected int intCC = 0;
-    private static final Logger LOGGER = Logger.getLogger(JSJobUtilitiesClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSJobUtilitiesClass.class);
 
     @Deprecated
     public JSJobUtilitiesClass() {

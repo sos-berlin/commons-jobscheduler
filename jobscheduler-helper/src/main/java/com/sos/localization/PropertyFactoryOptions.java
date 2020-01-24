@@ -6,7 +6,6 @@ import com.sos.JSHelper.Annotations.JSOptionClass;
 
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
-import org.apache.log4j.Logger;
 
 /** \class PropertyFactoryOptions - PropertyFactora - a Factoroy to maintain I18N
  * Files
@@ -26,11 +25,6 @@ import org.apache.log4j.Logger;
  * http://www.sos-berlin.com at 20141009200110 \endverbatim */
 @JSOptionClass(name = "PropertyFactoryOptions", description = "PropertyFactora - a Factoroy to maintain I18N Files")
 public class PropertyFactoryOptions extends PropertyFactoryOptionsSuperClass {
-
-    @SuppressWarnings("unused")
-    private final String conClassName = "PropertyFactoryOptions";
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(PropertyFactoryOptions.class);
 
     /** constructors */
 

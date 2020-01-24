@@ -3,7 +3,8 @@ package com.sos.VirtualFileSystem.TransferHistoryExport;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSXMLFile;
@@ -17,7 +18,7 @@ import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferHistory {
 
     private static final String CLASSNAME = "SOSVfsXmlExport";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsXmlExport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsXmlExport.class);
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final String rootElementName = "transfer_history";
     private final String exportElementName = "summary";

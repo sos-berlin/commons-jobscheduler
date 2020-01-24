@@ -26,8 +26,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
 import org.apache.xalan.xslt.EnvironmentCheck;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -42,7 +43,7 @@ public class JSXMLFile extends JSTextFile {
     protected final String conMissingDate = "0000-00-00";
     protected final String conMissingDate2 = "--";
     protected HashMap<String, String> hsmParameters = null;
-    private static final Logger LOGGER = Logger.getLogger(JSXMLFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSXMLFile.class);
     private static final long serialVersionUID = 1L;
     private Boolean flgFileIsOpen = false;
     private int intIndent = 0;

@@ -6,16 +6,18 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSObjJobChain extends JobChain {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjJobChain.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjJobChain.class);
     public final static String fileNameExtension = ".job_chain.xml";
     public static final String conFileNameExtension4NodeParameterFile = ".config.xml";
 

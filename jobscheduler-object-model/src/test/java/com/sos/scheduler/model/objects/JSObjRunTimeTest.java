@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
@@ -12,6 +11,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -19,7 +20,7 @@ import com.sos.scheduler.model.TestBase;
 
 public class JSObjRunTimeTest extends TestBase {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjRunTimeTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjRunTimeTest.class);
     private static final DateTimeFormatter FMT_DATE_TIME = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
     private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm:ss");

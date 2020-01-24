@@ -6,20 +6,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
-// import sos.util.SOSImport;
 import sos.marshalling.SOSImport;
 import sos.spooler.Variable_set;
 import sos.util.SOSClassUtil;
-import sos.util.SOSStandardLogger;
 import sos.util.SOSString;
 
 /** @author mueruevet oeksuez */
 public class JobSchedulerImportJob extends JobSchedulerJob {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerImportJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerImportJob.class);
     private Variable_set parameters = null;
     private SOSConnection sosConnection = null;
     private SOSConnection sosUpdateStateConnection = null;

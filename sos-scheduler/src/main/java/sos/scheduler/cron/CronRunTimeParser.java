@@ -11,9 +11,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,7 +26,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class CronRunTimeParser extends JSToolBox {
 
     protected Pattern cronRegExPattern;
-    private static final Logger LOGGER = Logger.getLogger(CronRunTimeParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CronRunTimeParser.class);
     private static final String CRON_REG_EX = "-?([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s+(.+)$";
     private String strCronLine = "";
     private boolean flgUsedNewRunTime = false;

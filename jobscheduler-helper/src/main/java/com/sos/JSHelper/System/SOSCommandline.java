@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author Andreas Püschel */
 public class SOSCommandline {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSCommandline.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommandline.class);
 
     public String[] splitArguments(final String arguments) throws Exception {
         String[] resultArguments = null;

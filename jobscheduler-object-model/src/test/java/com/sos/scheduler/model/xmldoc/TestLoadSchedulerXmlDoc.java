@@ -1,17 +1,20 @@
 package com.sos.scheduler.model.xmldoc;
 
-import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /** @author KB */
 public class TestLoadSchedulerXmlDoc implements Runnable {
 
     private final String testFilename = "./JobSchedulerCanWrite.xml";
-    private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXmlDoc.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestLoadSchedulerXmlDoc.class);
 
     TestLoadSchedulerXmlDoc() {
     }

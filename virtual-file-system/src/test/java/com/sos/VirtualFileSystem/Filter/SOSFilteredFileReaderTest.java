@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -21,7 +22,7 @@ import com.sos.graphviz.enums.Shape;
 
 public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFilteredFileReaderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFilteredFileReaderTest.class);
     private final SOSFilteredFileReader objR = null;
     JSFile objOutput = new JSFile("c:/temp/anubex.txt");
     String strLastTooken = "";

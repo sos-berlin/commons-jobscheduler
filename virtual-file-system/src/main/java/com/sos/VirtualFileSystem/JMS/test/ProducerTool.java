@@ -29,11 +29,12 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
 import org.apache.activemq.util.IndentPrinter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProducerTool extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(ProducerTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerTool.class);
     private Destination destination;
     private int messageCount = 10;
     private long sleepTime;

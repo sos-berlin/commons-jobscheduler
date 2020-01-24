@@ -2,7 +2,6 @@ package com.sos.graphviz.main;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -16,8 +15,6 @@ public class JSObjects2GraphvizOptions extends JSObjects2GraphvizOptionsSuperCla
     private static final long serialVersionUID = 6063266497954052063L;
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjects2GraphvizOptions";  //$NON-NLS-1$
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(JSObjects2GraphvizOptions.class);
 
  
     public JSObjects2GraphvizOptions() {

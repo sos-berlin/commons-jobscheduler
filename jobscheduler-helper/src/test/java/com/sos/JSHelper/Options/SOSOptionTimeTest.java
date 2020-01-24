@@ -1,14 +1,15 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class SOSOptionTimeTest {
 
     private final String conClassName = "SOSOptionTimeTest";
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionTimeTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionTimeTest.class);
     private SOSOptionTime objTime = null;
 
     @Before

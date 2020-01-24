@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.Interval;
@@ -42,8 +41,6 @@ public class JSObjHolidaysWeekdays extends Holidays.Weekdays {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjHolidaysWeekdays";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjHolidaysWeekdays.class);
 
     public JSObjHolidaysWeekdays(SchedulerObjectFactory schedulerObjectFactory) {
         super();

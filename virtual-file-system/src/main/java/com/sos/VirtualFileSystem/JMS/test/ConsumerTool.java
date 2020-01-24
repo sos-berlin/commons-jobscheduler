@@ -35,14 +35,15 @@ import javax.jms.Topic;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A simple tool for consuming messages
  *
  * @version $Id$ $Revision: 1.1.1.1 $ */
 public class ConsumerTool extends Thread implements MessageListener, ExceptionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(ConsumerTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerTool.class);
     private static int parallelThreads = 1;
     private boolean running;
     private Session session;

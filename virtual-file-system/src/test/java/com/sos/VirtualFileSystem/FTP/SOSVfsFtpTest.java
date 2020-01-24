@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
@@ -29,7 +30,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpTest.class);
     private SOSFTPOptions objOptions = null;
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer ftpClient = null;

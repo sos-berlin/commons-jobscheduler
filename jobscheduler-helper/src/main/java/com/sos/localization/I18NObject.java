@@ -3,12 +3,13 @@ package com.sos.localization;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class I18NObject {
 
-    private static final Logger LOGGER = Logger.getLogger(I18NObject.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(I18NObject.class);
     private String strKey = "";
     private String strLanguage = "";
     private String f1 = "";

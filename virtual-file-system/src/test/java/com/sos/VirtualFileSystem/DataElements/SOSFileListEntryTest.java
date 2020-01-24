@@ -5,9 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -20,7 +21,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSFileListEntryTest extends JSListenerClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFileListEntryTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileListEntryTest.class);
     private static final String FILENAME = "text.txt";
     private static final String PATHNAME = "c:\\temp\\";
     private static final String APREFIX = "~~";

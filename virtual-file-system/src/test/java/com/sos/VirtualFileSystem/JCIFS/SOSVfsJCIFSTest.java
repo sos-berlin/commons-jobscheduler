@@ -9,8 +9,9 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 /** @author KB */
 public class SOSVfsJCIFSTest {
 
-    protected static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFSTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsJCIFSTest.class);
     protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
     protected static final String REMOTE_BASE_PATH = "/test/unittests/testdata/JADE/";
     protected static final String HOST = "wilma.sos";
@@ -70,7 +71,7 @@ public class SOSVfsJCIFSTest {
         objVfsClient.rmdir(REMOTE_BASE_PATH + "test1");
         objVfsClient.mkdir(REMOTE_BASE_PATH + "test1");
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "test1");
-        LOGGER.info(objVF.getFileSize());
+        LOGGER.info("" + objVF.getFileSize());
         objVfsClient.disconnect();
     }
 
@@ -96,7 +97,7 @@ public class SOSVfsJCIFSTest {
     public void testSize() throws Exception {
         connect();
         authenticate();
-        LOGGER.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
+        LOGGER.info("" + objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
         objVfsClient.disconnect();
     }
 

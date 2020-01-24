@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
 
@@ -35,8 +33,6 @@ public class JSObjJobChainNode extends JobChainNode {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjJobChainNode";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjJobChainNode.class);
 
     public JSObjJobChainNode(final SchedulerObjectFactory schedulerObjectFactory) {
         super();

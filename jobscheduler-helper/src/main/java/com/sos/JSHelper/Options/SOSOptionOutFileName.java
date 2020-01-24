@@ -2,14 +2,15 @@ package com.sos.JSHelper.Options;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
 public class SOSOptionOutFileName extends SOSOptionFileName {
 
     private static final long serialVersionUID = -8227806083390668082L;
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionOutFileName.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionOutFileName.class);
     private JSFile objFile = null;
 
     public SOSOptionOutFileName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,

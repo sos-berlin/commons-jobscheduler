@@ -6,10 +6,11 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -20,7 +21,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 /** @author KB */
 public class SOSVfsZipTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsZipTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsZipTest.class);
     private static final String TEST_PATH_NAME = "R:\\nobackup\\junittests\\testdata\\ZIP\\";
     private static final String TEST_ZIP = TEST_PATH_NAME + "test.zip";
     private static final String ZIP_FILE1 = TEST_PATH_NAME + "sos-net-src.zip";

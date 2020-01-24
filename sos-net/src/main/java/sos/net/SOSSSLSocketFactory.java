@@ -18,12 +18,14 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author Ghassan Beydoun */
 public class SOSSSLSocketFactory extends SSLSocketFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSSLSocketFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSLSocketFactory.class);
     private SSLSocketFactory sslFactory;
     private String proxyHost;
     private int proxyPort = 3128;

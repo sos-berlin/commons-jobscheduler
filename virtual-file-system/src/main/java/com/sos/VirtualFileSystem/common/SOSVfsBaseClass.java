@@ -1,7 +1,5 @@
 package com.sos.VirtualFileSystem.common;
 
-import org.apache.log4j.Logger;
-
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 

@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
@@ -56,7 +57,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     protected Messages objMsg = new Messages(this.getClass().getAnnotation(I18NResourceBundle.class).baseName());
     private static final long serialVersionUID = -4445655877481869778L;
     private static final String CLASSNAME = "SOSFtpOptionsSuperClass";
-    private static final Logger LOGGER = Logger.getLogger(SOSFtpOptionsSuperClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFtpOptionsSuperClass.class);
 
     public SOSFtpOptionsSuperClass() {
         objParentClass = this.getClass();

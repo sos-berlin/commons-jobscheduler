@@ -4,12 +4,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author ap */
 public class SOSMimeBase64 {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSMimeBase64.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSMimeBase64.class);
     static String BaseTable[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W",
             "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
             "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "/" };

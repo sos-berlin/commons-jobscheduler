@@ -1,6 +1,8 @@
 package com.sos.VirtualFileSystem.DataElements;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -15,7 +17,7 @@ import com.sos.exception.SOSYadeTargetConnectionException;
 public class SOSVfsConnectionFactory {
 
     protected SOSFTPOptions objOptions = null;
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsConnectionFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsConnectionFactory.class);
     private SOSVfsConnectionPool objConnPoolSource = null;
     private SOSVfsConnectionPool objConnPoolTarget = null;
 

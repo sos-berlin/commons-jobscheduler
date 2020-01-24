@@ -34,7 +34,7 @@ import java.util.Locale;
  * @version $Revision: 1.2 $ */
 public class Log4jLogger extends Logger {
 
-    private org.apache.log4j.Logger m_log;
+    private org.apache.logging.log4j.Logger m_log;
 
     /** @see Logger#Logger(String, Msg.BundleBaseName, Locale) */
     public Log4jLogger(String name, Msg.BundleBaseName basename, Locale locale) {
@@ -230,13 +230,13 @@ public class Log4jLogger extends Logger {
      *
      * @see Logger#createLogObject(Class) */
     protected void createLogObject(Class clazz) {
-        m_log = org.apache.log4j.Logger.getLogger(clazz);
+        m_log = org.apache.logging.log4j.LogManager.getLogger(clazz);
     }
 
     /** Creates the Commons-Logging log object.
      *
      * @see Logger#createLogObject(String) */
     protected void createLogObject(String name) {
-        m_log = org.apache.log4j.Logger.getLogger(name);
+        m_log = org.apache.logging.log4j.LogManager.getLogger(name);
     }
 }

@@ -1,7 +1,10 @@
 package com.sos.scheduler.model.objects;
 
 import java.io.File;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -10,7 +13,7 @@ import com.sos.scheduler.model.tools.PathResolver;
 /** @author oh */
 public class JSObjInclude extends Include {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjInclude.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjInclude.class);
 
     public JSObjInclude(SchedulerObjectFactory schedulerObjectFactory) {
         super();
