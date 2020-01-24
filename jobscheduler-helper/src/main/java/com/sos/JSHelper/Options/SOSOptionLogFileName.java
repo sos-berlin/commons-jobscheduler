@@ -1,22 +1,17 @@
 package com.sos.JSHelper.Options;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
-import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.SOSHtmlLayout;
 import com.sos.JSHelper.io.Files.JSTextFile;
 
 public class SOSOptionLogFileName extends SOSOptionOutFileName {
 
     private static final long serialVersionUID = 144340120069043974L;
-    private static Logger logger = LogManager.getLogger(SOSOptionLogFileName.class);
+    private static Logger logger = LoggerFactory.getLogger(SOSOptionLogFileName.class);
     private FileAppender objFileAppender = null;
     private String strHtmlLogFile = "";
     public String ControlType = "file";
