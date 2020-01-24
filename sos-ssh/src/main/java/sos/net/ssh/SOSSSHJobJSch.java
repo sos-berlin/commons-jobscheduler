@@ -543,14 +543,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 prePostCommandVFSHandler.closeConnection();
                 prePostCommandVFSHandler.closeSession();
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
-            } catch (Exception e) {}
+            } catch (Exception e) {
                 LOGGER.debug("Error closing connection from prePostCommandVFSHandler", e);
+            }
             if (prePostCommandVFSHandler.isConnected()) {
                 try {
                     prePostCommandVFSHandler.closeConnection();
                     prePostCommandVFSHandler.closeSession();
-                } catch (Exception e) {}
-                    LOGGER.debug("Error closing connection from prePostCommandVFSHandler - second try", e);
+                } catch (Exception e1) {
+                    LOGGER.debug("Error closing connection from prePostCommandVFSHandler - second try", e1);
+                }
             }
         }
     }
