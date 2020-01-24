@@ -304,10 +304,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 if (prePostCommandVFSHandler != null) {
                     LOGGER.debug("***** prePostCommandVFSHandler disconnecting... *****");
                     prePostCommandVFSHandler.closeConnection();
+                    prePostCommandVFSHandler.closeSession();
                     LOGGER.debug("***** prePostCommandVFSHandler disconnected! *****");
                 }
                 LOGGER.debug("***** vfsHandler disconnecting... *****");
                 vfsHandler.closeConnection();
+                vfsHandler.closeSession();
                 LOGGER.debug("***** vfsHandler disconnected! *****");
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
@@ -534,25 +536,22 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
             }
         } catch (Exception e) {
-            // LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+            // prevent Exception to show in case of postCommandDelete errors
         } finally {
             try {
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
                 prePostCommandVFSHandler.closeConnection();
                 prePostCommandVFSHandler.closeSession();
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
-            } catch (Exception e) {
+            } catch (Exception e) {}
                 LOGGER.debug("Error closing connection from prePostCommandVFSHandler", e);
-            }
             if (prePostCommandVFSHandler.isConnected()) {
                 try {
                     prePostCommandVFSHandler.closeConnection();
                     prePostCommandVFSHandler.closeSession();
-                } catch (Exception e) {
+                } catch (Exception e) {}
                     LOGGER.debug("Error closing connection from prePostCommandVFSHandler - second try", e);
-                }
             }
-
         }
     }
 
