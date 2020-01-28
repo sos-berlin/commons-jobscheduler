@@ -199,7 +199,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             } catch (InterruptedException e) {
                             }
                             while (!commandExecution.isDone()) {
-                                for (int i = 0; i < 600; i++) {
+                                for (int i = 0; i < 10; i++) {
                                     try {
                                         Thread.sleep(100);
                                     } catch (InterruptedException e) {
