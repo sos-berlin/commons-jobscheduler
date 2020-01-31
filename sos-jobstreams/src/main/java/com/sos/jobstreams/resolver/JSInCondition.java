@@ -118,30 +118,31 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
     }
 
-  
-
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         LocalDate today = LocalDate.now();
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
 
         for (LocalDate d : this.listOfDates) {
-            
-            if (d.isBefore(last) && (d.isAfter(today) || d.isEqual(today))) {
+
+            if (d.isBefore(last) && (d.isAfter(today) || d.getDayOfYear() == today.getDayOfYear())) {
                 last = d;
                 next = d;
             }
         }
-        if (next != null && next.isAfter(today)) {//Empty if today. 
+        
+        this.itemInCondition.setNextPeriod(null);
+        if (next != null && next.isAfter(today)) {// Empty if today.
             this.itemInCondition.setNextPeriod(Date.from(last.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            try {
-                sosHibernateSession.beginTransaction();
-                sosHibernateSession.update(this.itemInCondition);
-                sosHibernateSession.commit();
-            } catch (Exception e) {
-                sosHibernateSession.rollback();
-            }
         }
+        try {
+            sosHibernateSession.beginTransaction();
+            sosHibernateSession.update(this.itemInCondition);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+
     }
 
     public boolean isConsumed() {
@@ -169,11 +170,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 haveCalendars = true;
                 this.listOfDates.addAll(l);
             }
-            
+
             try {
                 this.setNextPeriod(sosHibernateSession);
             } catch (SOSHibernateException e) {
-               LOGGER.error("Could not set the next period",e);
+                LOGGER.error("Could not set the next period", e);
             }
         } catch (Exception e) {
             LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
