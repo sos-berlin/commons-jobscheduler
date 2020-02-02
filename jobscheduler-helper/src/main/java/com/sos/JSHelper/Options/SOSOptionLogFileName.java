@@ -1,103 +1,150 @@
 package com.sos.JSHelper.Options;
 
+import java.util.Map.Entry;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.layout.HtmlLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sos.JSHelper.Logging.SOSHtmlLayout;
+
 public class SOSOptionLogFileName extends SOSOptionOutFileName {
 
     private static final long serialVersionUID = 144340120069043974L;
     private static Logger LOGGER = LoggerFactory.getLogger(SOSOptionLogFileName.class);
-    // private FileAppender objFileAppender = null;
-    private String strHtmlLogFile = "";
+    private String htmlLogFile = "";
     public String ControlType = "file";
+    // private FileAppender fileAppender = null;
 
-    public SOSOptionLogFileName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
-            final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
-        super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+    public SOSOptionLogFileName(final JSOptionsClass parent, final String key, final String description, final String value,
+            final String defaultValue, final boolean mandatory) {
+        super(parent, key, description, value, defaultValue, mandatory);
+    }
+
+    public void setLogger(final Logger log) {
+        if (!isDirty() || log == null) {
+            return;
+        }
+
+        try {
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            LoggerConfig config = context.getConfiguration().getLoggerConfig(log.getName());
+            boolean update = false;
+            for (Entry<String, Appender> pair : config.getAppenders().entrySet()) {
+                Appender app = pair.getValue();
+                if (app != null) {
+                    FileAppender.Builder<?> faBuilder = null;
+                    RollingFileAppender.Builder<?> rfaBuilder = null;
+
+                    if (app instanceof FileAppender) {
+                        faBuilder = createBuilder((FileAppender) app);
+                    } else if (app instanceof RollingFileAppender) {
+                        rfaBuilder = createBuilder((RollingFileAppender) app);
+                    }
+                    if (faBuilder == null && rfaBuilder == null) {
+                        LOGGER.debug(String.format("[%s][skip]no File or RollingFile appender found", app.getName()));
+                        continue;
+                    }
+                    String fileName = getValue();
+                    if (app.getLayout() instanceof SOSHtmlLayout || app.getLayout() instanceof HtmlLayout) {
+                        htmlLogFile = getValue().concat(".html");
+                        fileName = htmlLogFile;
+                    }
+                    app.stop();
+                    config.removeAppender(app.getName());
+
+                    if (faBuilder != null) {
+                        faBuilder.withFileName(fileName);
+                        FileAppender a = faBuilder.build();
+                        a.start();
+                        config.addAppender(a, Level.INFO, a.getFilter());
+
+                        LOGGER.debug(String.format("[File][%s]%s", a.getName(), fileName));
+                        update = true;
+                    } else if (rfaBuilder != null) {
+                        rfaBuilder.withFileName(fileName);
+                        try {
+                            rfaBuilder.withFilePattern(fileName.concat(".%d{yyyy-MM}-%i.gz"));
+                        } catch (Throwable e) {
+
+                        }
+
+                        RollingFileAppender a = rfaBuilder.build();
+                        a.start();
+                        config.addAppender(a, Level.INFO, a.getFilter());
+
+                        LOGGER.debug(String.format("[RollingFile][%s]%s", a.getName(), fileName));
+                        update = true;
+                    }
+                }
+            }
+            if (update) {
+                context.updateLoggers();
+            }
+        } catch (Throwable e) {
+            LOGGER.error(e.toString(), e);
+        }
+    }
+
+    private FileAppender.Builder<?> createBuilder(FileAppender source) {
+        try {
+            FileAppender.Builder<?> b = FileAppender.newBuilder();
+            b.setName(source.getName());
+            b.setFilter(source.getFilter());
+            b.setLayout(source.getLayout());
+            b.withAppend(source.getManager().isAppend());
+            b.withCreateOnDemand(false);
+            b.withLocking(false);
+            b.withAdvertise(false);
+            return b;
+        } catch (Throwable e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return null;
+    }
+
+    private RollingFileAppender.Builder<?> createBuilder(RollingFileAppender source) {
+        try {
+            RollingFileAppender.Builder<?> b = RollingFileAppender.newBuilder();
+            b.setName(source.getName());
+            b.setFilter(source.getFilter());
+            b.setLayout(source.getLayout());
+            b.withFilePattern(source.getFilePattern());
+            b.withPolicy(source.getTriggeringPolicy());
+            b.withStrategy(source.getManager().getRolloverStrategy());
+            b.withAppend(source.getManager().isAppend());
+            b.withCreateOnDemand(false);
+            b.withLocking(false);
+            b.withAdvertise(false);
+            return b;
+        } catch (Throwable e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return null;
     }
 
     public String getHtmlLogFileName() {
-        if (!isEmpty(strHtmlLogFile)) {
-            return strHtmlLogFile;
+        if (!isEmpty(htmlLogFile)) {
+            return htmlLogFile;
         } else {
             return "";
         }
     }
 
     public void resetHTMLEntities() {
-        /** if (isNotEmpty(strHtmlLogFile) == true && objFileAppender != null) { // objFileAppender.close(); JSTextFile objF = new JSTextFile(strHtmlLogFile);
-         * try { objF.replaceString("&lt;", "<"); objF.replaceString("&gt;", ">"); } catch (IOException e) { // } } */
+        /** if (isNotEmpty(htmlLogFile) == true && fileAppender != null) { // fileAppender.close(); JSTextFile f = new JSTextFile(htmlLogFile); try {
+         * f.replaceString("&lt;", "<"); f.replaceString("&gt;", ">"); } catch (IOException e) { // } } */
     }
 
     public String getContent() {
-        String strContent = "";
-        return strContent;
-    }
-
-    public void setLogger(final Logger log) {
-        if (log != null && this.isDirty()) {
-            LOGGER = log;
-        }
-        // if (pobjLogger != null && this.isDirty()) {
-        // try {
-        // logger = pobjLogger;
-        // @SuppressWarnings("rawtypes")
-        // Enumeration appenders = pobjLogger.getAllAppenders();
-        // objFileAppender = null;
-        // while (appenders.hasMoreElements()) {
-        // Appender currAppender = (Appender) appenders.nextElement();
-        // if (currAppender != null) {
-        // if (currAppender instanceof FileAppender || currAppender instanceof RollingFileAppender) {
-        // objFileAppender = (FileAppender) currAppender;
-        // if (objFileAppender != null) {
-        // String strLogFileName = this.getValue();
-        // if (objFileAppender.getLayout() instanceof SOSHtmlLayout) {
-        // if (isNotNull(objParentClass)) {
-        // /** This is a dirty trick: get the
-        // * optionname by name will check, wether
-        // * the option is present. if not, the
-        // * title will not changed This coding
-        // * below, with profile and settings, is
-        // * for JADE */
-        // String strProfile = objParentClass.getOptionByName("profile");
-        // if (isNotEmpty(strProfile)) {
-        // String strSettings = objParentClass.getOptionByName("settings");
-        // if (isNotEmpty(strSettings)) {
-        // strSettings += ":";
-        // } else {
-        // strSettings = "";
-        // }
-        // SOSHtmlLayout objLayout = (SOSHtmlLayout) objFileAppender.getLayout();
-        // String strTitle = objLayout.getTitle();
-        // objLayout.setTitle("[" + strSettings + strProfile + "] - " + strTitle);
-        //
-        // }
-        // }
-        // strLogFileName = strLogFileName + ".html";
-        // objFileAppender.setFile(strLogFileName);
-        // logger.debug(Messages.getMsg("%2$s: filename changed to '%1$s'", strLogFileName, "log4J.HTMLLayout"));
-        // strHtmlLogFile = strLogFileName;
-        // } else {
-        // objFileAppender.setFile(strLogFileName);
-        // logger.debug(Messages.getMsg("%2$s: filename changed to '%1$s'", strLogFileName, "log4J.FileAppender"));
-        // }
-        // objFileAppender.activateOptions();
-        // }
-        // }
-        // }
-        // }
-        // if (objFileAppender == null) {
-        // logger.info("No File Appender found");
-        // }
-        // } catch (Exception e) {
-        // logger.error(e.getMessage());
-        // throw new JobSchedulerException("Problems with log4jappender", e);
-        // }
-        // } else {
-        // logger.trace("setLogger without instance of logger called.");
-        // }
+        return "";
     }
 
 }
