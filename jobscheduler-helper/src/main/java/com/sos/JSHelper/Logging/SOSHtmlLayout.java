@@ -26,7 +26,7 @@ import org.apache.logging.log4j.core.util.Transform;
 import org.apache.logging.log4j.util.Strings;
 
 // package org.apache.logging.log4j.core.layout;
-@Plugin(name = "HtmlLayout", category = Node.CATEGORY, elementType = Layout.ELEMENT_TYPE, printObject = true)
+@Plugin(name = "SOSHtmlLayout", category = Node.CATEGORY, elementType = Layout.ELEMENT_TYPE, printObject = true)
 public final class SOSHtmlLayout extends AbstractStringLayout {
 
     /** Default font family: {@value}. */
