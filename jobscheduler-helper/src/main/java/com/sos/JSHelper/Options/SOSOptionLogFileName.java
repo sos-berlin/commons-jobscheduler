@@ -65,6 +65,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                         FileAppender a = faBuilder.build();
                         a.start();
                         config.addAppender(a, Level.INFO, a.getFilter());
+                        config.setLevel(Level.INFO);
 
                         LOGGER.debug(String.format("[File][%s]%s", a.getName(), fileName));
                         update = true;
@@ -79,6 +80,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                         RollingFileAppender a = rfaBuilder.build();
                         a.start();
                         config.addAppender(a, Level.INFO, a.getFilter());
+                        config.setLevel(Level.INFO);
 
                         LOGGER.debug(String.format("[RollingFile][%s]%s", a.getName(), fileName));
                         update = true;
