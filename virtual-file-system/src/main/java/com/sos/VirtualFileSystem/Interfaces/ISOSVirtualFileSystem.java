@@ -1,11 +1,11 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
 import java.io.IOException;
+import java.util.List;
 
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 
-/** @author KB */
 public interface ISOSVirtualFileSystem {
 
     public ISOSConnection getConnection();
@@ -16,8 +16,8 @@ public interface ISOSVirtualFileSystem {
 
     public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException;
 
-    public SOSFileList dir(SOSFolderName pobjFolderName);
+    public List<SOSFileEntry> dir(SOSFolderName pobjFolderName);
 
-    public SOSFileList dir(String pathname, int flag);
+    public List<SOSFileEntry> dir(String pathname, int flag);
 
 }

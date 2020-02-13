@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -21,7 +23,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.shell.CmdShell;
@@ -66,7 +69,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public ISOSConnection connect(final SOSConnection2OptionsAlternate options) {
         connection2OptionsAlternate = options;
         if (connection2OptionsAlternate == null) {
-            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         return this;
     }
@@ -101,7 +104,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             reply = "OK";
             logReply();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("authentication"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
         }
     }
 
@@ -282,7 +285,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             LOGGER.info(String.format("%s[mkdir][%s]%s", logPrefix, path, getReplyString()));
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, String.format("%s[mkdir][%s]%s", logPrefix, path, e.toString()));
+            throw new JobSchedulerException(String.format("%s[mkdir][%s]%s", logPrefix, path, e.toString()), e);
         } finally {
             if (smbFile != null) {
                 smbFile.close();
@@ -322,9 +325,24 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String[] listNames(String path) throws IOException {
+    public SOSFileEntry getFileEntry(String pathname) throws Exception {
+        SmbFile f = getSmbFile(this.normalizePath(pathname));
+
+        SOSFileEntry entry = new SOSFileEntry(EntryType.SMB);
+        entry.setDirectory(f.isDirectory());
+        entry.setFilename(f.getName());
+        entry.setFilesize(f.length());
+        entry.setParentPath(f.getPath());// TODO
+
+        reply = "get OK";
+        return entry;
+    }
+
+    @Override
+    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         SmbFile smbFile = null;
         try {
+            List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("%s[listNames]%s", logPrefix, path));
             }
@@ -337,19 +355,26 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             if (!smbFile.exists()) {
                 throw new JobSchedulerException(SOSVfs_E_226.params(path));
             }
-            if (!smbFile.isDirectory()) {
+            if (checkIfIsDirectory && !smbFile.isDirectory()) {
                 reply = "ls OK";
-                return new String[] { path };
+                return list;
             }
 
             path = path.endsWith("/") ? path : path + "/";
             SmbFile[] smbFiles = smbFile.listFiles();
-            String[] result = new String[smbFiles.length];
             for (int i = 0; i < smbFiles.length; i++) {
-                result[i] = new StringBuilder(path).append(smbFiles[i].getName()).toString();
+                SmbFile file = smbFiles[i];
+
+                SOSFileEntry entry = new SOSFileEntry(EntryType.SMB);
+                entry.setDirectory(file.isDirectory());
+                entry.setFilename(file.getName());
+                entry.setFilesize(file.length());
+                entry.setParentPath(path);
+                list.add(entry);
+
             }
             reply = "ls OK";
-            return result;
+            return list;
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
@@ -398,7 +423,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, String.format("%s[getFile][%s][%s][failed]%s", logPrefix, remoteFilePath, localFile, ex.toString()));
+            throw new JobSchedulerException(String.format("%s[getFile][%s][%s][failed]%s", logPrefix, remoteFilePath, localFile, ex.toString()), ex);
         } finally {
             if (in != null) {
                 try {
@@ -441,7 +466,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             size = size(normalizePath(remoteFile));
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, String.format("%s[putFile][%s][%s][failed]%s", logPrefix, localFile, remoteFile, e.toString()));
+            throw new JobSchedulerException(String.format("%s[putFile][%s][%s][failed]%s", logPrefix, localFile, remoteFile, e.toString()), e);
         } finally {
             if (in != null) {
                 try {
@@ -465,11 +490,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void delete(final String path) {
+    public void delete(final String path, boolean checkIsDirectory) {
         SmbFile smbFile = null;
         try {
             smbFile = getSmbFile(normalizePath(path));
-            if (smbFile.isDirectory()) {
+            if (checkIsDirectory && smbFile.isDirectory()) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
             if (isDebugEnabled) {
@@ -478,7 +503,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             smbFile.delete();
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, String.format("%s[delete][%s][failed]%s", logPrefix, path, ex.toString()));
+            throw new JobSchedulerException(String.format("%s[delete][%s][failed]%s", logPrefix, path, ex.toString()), ex);
         } finally {
             if (smbFile != null) {
                 smbFile.close();
@@ -549,8 +574,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             smbFile = getSmbFile(normalizePath(path));
             return new SmbFileInputStream(smbFile);
         } catch (Exception ex) {
-            raiseException(ex, String.format("%s[getInputStream][%s][failed]%s", logPrefix, path, ex.toString()));
-            return null;
+            throw new JobSchedulerException(String.format("%s[getInputStream][%s][failed]%s", logPrefix, path, ex.toString()), ex);
         } finally {
             if (smbFile != null) {
                 smbFile.close();
@@ -565,8 +589,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             smbFile = getSmbFile(normalizePath(path));
             return new SmbFileOutputStream(smbFile);
         } catch (Exception ex) {
-            raiseException(ex, String.format("%s[getOutputStream][%s][failed]%s", logPrefix, path, ex.toString()));
-            return null;
+            throw new JobSchedulerException(String.format("%s[getOutputStream][%s][failed]%s", logPrefix, path, ex.toString()), ex);
         } finally {
             if (smbFile != null) {
                 smbFile.close();
@@ -706,11 +729,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public InputStream getInputStream() {
         return null;
-    }
-
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
     }
 
     @Override

@@ -46,8 +46,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
                         client.setProxy(getHTTPProxy());
                     } else {
                         SOSOptionProxyProtocol.Protocol proxyProtocol = getProxyProtocol().isSocks4() ? Protocol.socks4 : Protocol.socks5;
-                        SOSVfsFtpSProxySelector ps =
-                                new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(), getProxyPassword());
+                        SOSVfsFtpSProxySelector ps = new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(),
+                                getProxyPassword());
                         ProxySelector.setDefault(ps);
                     }
                 }
@@ -113,7 +113,7 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
             LOGGER.info(SOSVfs_D_151.params(command, ex.toString()));
         } catch (Exception ex) {
             if (objConnection2Options.raiseExceptionOnError.value()) {
-                raiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+                throw new JobSchedulerException(SOSVfs_E_134.params("ExecuteCommand"), ex);
             }
             LOGGER.info(SOSVfs_D_151.params(command, ex.toString()));
         }

@@ -22,7 +22,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 
 public class SOSVfsJms extends SOSVfsTransferBaseClass {
@@ -42,7 +42,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     public ISOSConnection connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
         connection2OptionsAlternate = pConnection2OptionsAlternate;
         if (connection2OptionsAlternate == null) {
-            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
         return this;
@@ -64,7 +64,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
                 throw new JobSchedulerException(ex);
             }
         } else {
-            logWARN(SOSVfs_D_0103.params(host, port));
+            LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }
     }
 
@@ -210,13 +210,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         // not implemented, no need
         return null;
     }
-
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        // not implemented, no need
-        return null;
-    }
-
+   
     @Override
     public boolean isSimulateShell() {
         return false;
@@ -235,6 +229,12 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSFileEntry getFileEntry(String path) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

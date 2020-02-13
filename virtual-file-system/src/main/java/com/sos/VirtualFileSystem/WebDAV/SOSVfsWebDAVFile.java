@@ -9,7 +9,6 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
 
@@ -30,8 +29,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
@@ -44,8 +42,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer, intOffset, intLength);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
@@ -61,7 +58,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             objOutputStream.write(bteBuffer, intOffset, intLength);
             ((SOSVfsWebDAVOutputStream) objOutputStream).put();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("write", fileName));
+            throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
     }
 
@@ -77,13 +74,13 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             objOutputStream.write(bteBuffer);
             ((SOSVfsWebDAVOutputStream) objOutputStream).put();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("write", fileName));
+            throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
     }
-    
+
     @Override
     public long setModificationDateTime(final long timeStamp) {
-        //not supported
+        // not supported
         return -1L;
     }
 

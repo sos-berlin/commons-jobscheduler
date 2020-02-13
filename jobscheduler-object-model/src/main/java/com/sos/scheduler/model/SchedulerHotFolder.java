@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.scheduler.model.objects.JSObjBase;
 import com.sos.scheduler.model.objects.JSObjJob;
 import com.sos.scheduler.model.objects.JSObjJobChain;
@@ -49,7 +50,7 @@ public class SchedulerHotFolder extends JSObjBase {
         if (isLoaded) {
             return getHotFolderFileList();
         }
-        objHotFolderFileList = load(this.getHotFolderSrc(),".*(" + JSObjOrder.fileNameExtension+")");
+        objHotFolderFileList = load(this.getHotFolderSrc(), ".*(" + JSObjOrder.fileNameExtension + ")");
         return objHotFolderFileList;
     }
 
@@ -90,10 +91,10 @@ public class SchedulerHotFolder extends JSObjBase {
     }
 
     private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) {
-        return load(pobjVirtualDir,".*");
+        return load(pobjVirtualDir, ".*");
     }
-    
-    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir,String regex) {
+
+    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir, String regex) {
         final String conMethodName = "SchedulerHotFolder::load";
         SchedulerHotFolderFileList result = new SchedulerHotFolderFileList();
         try {
@@ -106,14 +107,14 @@ public class SchedulerHotFolder extends JSObjBase {
             throw objJSException;
         }
         ISOSVfsFileTransfer objVFSHandler = pobjVirtualDir.getHandler();
-        String[] filenames = objVFSHandler.getFolderlist(pobjVirtualDir.getName(), ".*", 0, false);
+        List<SOSFileEntry> entries = objVFSHandler.getFolderlist(pobjVirtualDir.getName(), ".*", 0, false);
         result.setHotFolderSrc(pobjVirtualDir);
-        for (String filename : filenames) {
-            if (!filename.contains(".svn")) {
-                ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(filename);
+        for (SOSFileEntry entry : entries) {
+            if (!entry.getFilename().contains(".svn")) {
+                ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(entry.getFilename());
                 try {
                     if (objVirtualFile1.isDirectory()) {
-                        LOGGER.debug("load SchedulerHotFolder = " + filename);
+                        LOGGER.debug("load SchedulerHotFolder = " + entry.getFilename());
                         SchedulerHotFolder obj = objFactory.createSchedulerHotFolder(objVirtualFile1);
                         result.add(obj);
                     }
@@ -123,41 +124,41 @@ public class SchedulerHotFolder extends JSObjBase {
             }
         }
         LOGGER.debug("getFilelist from: " + pobjVirtualDir.getName());
-        filenames = objVFSHandler.getFilelist(pobjVirtualDir.getName(), regex, 0, false, null);
-        for (String filename : filenames) {
-            ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(filename);
-            String lowerFilename = filename.toLowerCase();
+        entries = objVFSHandler.getFilelist(pobjVirtualDir.getName(), regex, 0, false, true, null);
+        for (SOSFileEntry entry : entries) {
+            ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(entry.getFilename());
+            String lowerFilename = entry.getFilename().toLowerCase();
             try {
                 if (objVirtualFile1.isDirectory()) {
-                    LOGGER.debug("load SchedulerHotFolder = " + filename);
+                    LOGGER.debug("load SchedulerHotFolder = " + entry.getFilename());
                     SchedulerHotFolder obj = objFactory.createSchedulerHotFolder(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjJob.fileNameExtension)) {
-                    LOGGER.debug("load JSObjJob = " + filename);
+                    LOGGER.debug("load JSObjJob = " + entry.getFilename());
                     JSObjJob obj = objFactory.createJob(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjJobChain.fileNameExtension)) {
-                    LOGGER.debug("load JSObjJobChain = " + filename);
+                    LOGGER.debug("load JSObjJobChain = " + entry.getFilename());
                     JSObjJobChain obj = objFactory.createJobChain(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjOrder.fileNameExtension)) {
-                    LOGGER.debug("load JSObjOrder = " + filename);
+                    LOGGER.debug("load JSObjOrder = " + entry.getFilename());
                     JSObjOrder obj = objFactory.createOrder(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjLock.fileNameExtension)) {
-                    LOGGER.debug("load JSObjLock = " + filename);
+                    LOGGER.debug("load JSObjLock = " + entry.getFilename());
                     JSObjLock obj = objFactory.createLock(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjProcessClass.fileNameExtension)) {
-                    LOGGER.debug("load JSObjProcessClass = " + filename);
+                    LOGGER.debug("load JSObjProcessClass = " + entry.getFilename());
                     JSObjProcessClass obj = objFactory.createProcessClass(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjSchedule.fileNameExtension)) {
-                    LOGGER.debug("load JSObjSchedule = " + filename);
+                    LOGGER.debug("load JSObjSchedule = " + entry.getFilename());
                     JSObjSchedule obj = objFactory.createSchedule(objVirtualFile1);
                     result.add(obj);
                 } else if (lowerFilename.endsWith(JSObjParams.fileNameExtension)) {
-                    LOGGER.debug("load JSObjParams = " + filename);
+                    LOGGER.debug("load JSObjParams = " + entry.getFilename());
                     JSObjParams obj = objFactory.createParams(objVirtualFile1);
                     result.add(obj);
                 } else {
@@ -173,9 +174,7 @@ public class SchedulerHotFolder extends JSObjBase {
         LOGGER.debug(String.format("%1$s objects found in %2$s", result.getFileList().size(), pobjVirtualDir.getName()));
         return result;
     }
- 
-    
-    
+
     public SchedulerHotFolderFileList getHotFolderFileList() {
         return objHotFolderFileList;
     }

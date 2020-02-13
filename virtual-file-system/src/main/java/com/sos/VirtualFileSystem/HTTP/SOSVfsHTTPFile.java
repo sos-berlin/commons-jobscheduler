@@ -29,8 +29,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", this.fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", this.fileName), e);
         }
     }
 
@@ -43,8 +42,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer, offset, len);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", this.fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", this.fileName), e);
         }
     }
 
@@ -59,7 +57,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             objOutputStream.write(buffer, offset, length);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("write", fileName));
+            throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
     }
 
@@ -74,7 +72,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             objOutputStream.write(buffer);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("write", fileName));
+            throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
     }
 

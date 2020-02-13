@@ -4,12 +4,22 @@ import java.io.File;
 
 public class SOSFileEntry {
 
+    // TODO webdav, http, smb
+    public static enum EntryType {
+        FILESYSTEM, HTTP, SMB, ZIP
+    }
+
     private static final String FILE = "File";
     private static final String FOLDER = "Folder";
     private String filename;
     private long filesize;
     private boolean directory;
     private String parentPath;
+    private EntryType type;
+
+    public SOSFileEntry(final EntryType entryType) {
+        type = entryType;
+    }
 
     public String getFilename() {
         return filename;
@@ -43,24 +53,34 @@ public class SOSFileEntry {
         }
     }
 
-    public void setParentPath(String parentPath) {
-        if (parentPath == null) {
+    public void setParentPath(String parent) {
+        if (parent == null) {
             parentPath = "/";
         } else {
-            parentPath = new File(parentPath).getPath();
-            if (parentPath != null) {
-                this.parentPath = parentPath.replaceAll("\\\\", "/");
+            if (type.equals(EntryType.FILESYSTEM)) {
+                // TODO use nio
+                parentPath = new File(parent).getPath().replaceAll("\\\\", "/");
             } else {
-                this.parentPath = parentPath;
+                // TODO not tested
+                parentPath = parent;
             }
         }
     }
 
     public String getFullPath() {
-        File f = new File(parentPath, filename);
-        String p = f.getPath();
-        p = p.replaceAll("\\\\", "/");
-        return p;
+        if (type.equals(EntryType.FILESYSTEM)) {
+            // TODO use nio Path
+            String path = new File(parentPath, filename).getPath();
+            return path.replaceAll("\\\\", "/");
+        } else {
+            // TODO not tested
+            if (parentPath == null) {
+                return filename;
+            } else {
+                String parent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
+                return parent + filename;
+            }
+        }
     }
 
     public boolean isDirUp() {

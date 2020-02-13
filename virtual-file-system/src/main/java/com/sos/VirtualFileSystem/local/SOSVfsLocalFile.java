@@ -23,7 +23,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 
@@ -45,9 +44,11 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public boolean delete() {
+    public boolean delete(boolean checkIsDirectory) {
         super.delete();
-        LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(strFileName));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(strFileName));
+        }
         return true;
     }
 
@@ -168,7 +169,9 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public void rename(final String pstrNewFileName) {
         super.renameTo(new File(pstrNewFileName));
-        LOGGER.info(SOSVfsMessageCodes.SOSVfs_I_150.params(strFileName, pstrNewFileName));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_150.params(strFileName, pstrNewFileName));
+        }
     }
 
     @Override
@@ -336,7 +339,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
         boolean flgClosingDone = false;
-        long lngTotalBytesTransferred = 0;
         try {
             int lngBufferSize = 4096;
             byte[] buffer = new byte[lngBufferSize];
@@ -348,7 +350,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
                     } catch (JobSchedulerException e) {
                         break;
                     }
-                    lngTotalBytesTransferred += intBytesTransferred;
                 }
             }
             pobjVirtualFile.closeInput();

@@ -37,14 +37,14 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     }
 
     @Override
-    public boolean delete() {
+    public boolean delete(boolean checkIsDirectory) {
         notImplemented();
         return true;
     }
 
     @Override
     public void deleteFile() {
-        this.delete();
+        this.delete(false);
     }
 
     @Override

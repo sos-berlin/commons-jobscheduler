@@ -3,27 +3,22 @@ package com.sos.VirtualFileSystem.DataElements;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
@@ -31,23 +26,20 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.util.SOSDate;
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData {
 
     public enum TransferStatus {
-        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
-    }
-
-    public enum HistoryRecordType {
-        XML, CSV
+        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling, moved
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileListEntry.class);
@@ -58,14 +50,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private static String ENV_VAR_FILE_TRANSFER_STATUS = "YADE_FILE_TRANSFER_STATUS";
     private static String ENV_VAR_FILE_IS_TRANSFERRED = "YADE_FILE_IS_TRANSFERRED";
 
-    private IJobSchedulerEventHandler eventHandler = null;
     private TransferStatus transferStatus = TransferStatus.transferUndefined;
-    private SOSFTPOptions options = null;
-    private SOSFileList fileList = null;
-    private SOSVfsConnectionPool sourceConnectionPool = null;
-    private SOSVfsConnectionPool targetConnectionPool = null;
-    private ISOSVfsFileTransfer sourceFileTransfer = null;
-    private ISOSVfsFileTransfer targetFileTransfer = null;
+    private SOSFileList parent = null;
     private ISOSVirtualFile sourceTransferFile = null;
     private ISOSVirtualFile targetTransferFile = null;
     private ISOSVirtualFile targetChecksumFile = null;
@@ -84,47 +70,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private boolean targetFileExists = false;
     private String targetAtomicFileName = EMPTY_STRING;
 
-    private Date transferStart = null;
-    private Date transferEnd = null;
-    private String errorMessage = null;
-    private Map<String, String> jumpHistoryRecord = null;
     private boolean transactional = false;// ? not used???
     private long bytesTransferred = 0;
-
-    private ISOSVfsFileTransfer fileTransfer = null;
-    private FTPFile ftpFile = null;
-
-    // history file
-    private final String guid = UUID.randomUUID().toString();
-    private static final String FIELD_JUMP_USER = "jump_user";
-    private static final String FIELD_JUMP_PROTOCOL = "jump_protocol";
-    private static final String FIELD_JUMP_PORT = "jump_port";
-    private static final String FIELD_JUMP_HOST_IP = "jump_host_ip";
-    private static final String FIELD_JUMP_HOST = "jump_host";
-    private static final String FIELD_LOG_FILENAME = "log_filename";
-    private static final String FIELD_LAST_ERROR_MESSAGE = "last_error_message";
-    private static final String FIELD_STATUS = "status";
-    private static final String FIELD_MD5 = "md5";
-    private static final String FIELD_FILE_SIZE = "file_size";
-    private static final String FIELD_REMOTE_FILENAME = "remote_filename";
-    private static final String FIELD_LOCAL_FILENAME = "local_filename";
-    private static final String FIELD_REMOTE_DIR = "remote_dir";
-    private static final String FIELD_LOCAL_DIR = "local_dir";
-    private static final String FIELD_PORT = "port";
-    private static final String FIELD_PROTOCOL = "protocol";
-    private static final String FIELD_REMOTE_USER = "remote_user";
-    private static final String FIELD_REMOTE_HOST_IP = "remote_host_ip";
-    private static final String FIELD_REMOTE_HOST = "remote_host";
-    private static final String FIELD_LOCAL_USER = "local_user";
-    private static final String FIELD_LOCALHOST_IP = "localhost_ip";
-    private static final String FIELD_LOCALHOST = "localhost";
-    private static final String FIELD_OPERATION = "operation";
-    private static final String FIELD_PPID = "ppid";
-    private static final String FIELD_PID = "pid";
-    private static final String FIELD_TRANSFER_START = "transfer_start";
-    private static final String FIELD_TRANSFER_END = "transfer_end";
-    private static final String FIELD_MANDATOR = "mandator";
-    private static final String FIELD_GUID = "guid";
+    private SOSFileEntry entry;
+    private Instant startTime;
+    private Instant endTime;
 
     private class Buffer {
 
@@ -153,12 +103,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         super(SOSVfsConstants.strBundleBaseName);
     }
 
-    public SOSFileListEntry(final FTPFile file) {
-        this();
-        sourceFileName = file.getName();
-        sourceFileSize = file.getSize();
-        sourceFileModificationDateTime = file.getTimestamp().getTimeInMillis();
-        ftpFile = file;
+    public SOSFileListEntry(final SOSFileEntry val) {
+        this("", val.getFullPath(), 0);
+        entry = val;
     }
 
     public SOSFileListEntry(final String localFileName) {
@@ -177,41 +124,49 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void deleteSourceFile() {
-        sourceFileTransfer.getFileHandle(sourceFileName).delete();
+        parent.getSourceClient().getFileHandle(sourceFileName).delete(true);
         String msg = SOSVfs_I_0113.params(sourceFileName);
         LOGGER.info(msg);
         JADE_REPORT_LOGGER.info(msg);
     }
 
-    private boolean doTransfer(final ISOSVirtualFile sourceFile, final ISOSVirtualFile targetFile) {
+    private boolean doTransfer(ISOSVirtualFile source, String fileHandlerSourceFileName, ISOSVirtualFile target, String fileHandlerTargetFileName) {
         boolean closed = false;
-        if (targetFile == null) {
-            raiseException(SOSVfs_E_273.params("Target"));
+        if (target == null) {
+            setTransferStatus(TransferStatus.transfer_aborted);
+
+            String msg = SOSVfs_E_273.params("Target");
+            LOGGER.error(msg);
+            throw new JobSchedulerException(msg);
         }
-        if (sourceFile == null) {
-            raiseException(SOSVfs_E_273.params("Source"));
+        if (source == null) {
+            setTransferStatus(TransferStatus.transfer_aborted);
+
+            String msg = SOSVfs_E_273.params("Source");
+            LOGGER.error(msg);
+            throw new JobSchedulerException(msg);
         }
 
         MessageDigest targetChecksum = null;
-        boolean targetCreateIntegrityHashFile = options.createIntegrityHashFile.isTrue();
+        boolean targetCreateIntegrityHashFile = parent.getOptions().createIntegrityHashFile.isTrue();
         if (targetCreateIntegrityHashFile) {
             try {
-                targetChecksum = MessageDigest.getInstance(options.integrityHashType.getValue());
+                targetChecksum = MessageDigest.getInstance(parent.getOptions().integrityHashType.getValue());
             } catch (NoSuchAlgorithmException e1) {
                 LOGGER.error(e1.toString());
-                options.createIntegrityHashFile.value(false);
+                parent.getOptions().createIntegrityHashFile.value(false);
                 targetCreateIntegrityHashFile = false;
             }
         }
 
         MessageDigest sourceChecksum = null;
-        boolean sourceCheckIntegrityHash = options.checkIntegrityHash.isTrue();
+        boolean sourceCheckIntegrityHash = parent.getOptions().checkIntegrityHash.isTrue();
         if (sourceCheckIntegrityHash) {
             try {
-                sourceChecksum = MessageDigest.getInstance(options.integrityHashType.getValue());
+                sourceChecksum = MessageDigest.getInstance(parent.getOptions().integrityHashType.getValue());
             } catch (NoSuchAlgorithmException e1) {
                 LOGGER.error(e1.toString());
-                options.checkIntegrityHash.value(false);
+                parent.getOptions().checkIntegrityHash.value(false);
                 sourceCheckIntegrityHash = false;
             }
         }
@@ -219,143 +174,231 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         long totalBytesTransferred = 0;
         this.setStatus(TransferStatus.transferring);
         // send event to inform that transfer starts?
+
+        long fileSize = entry == null ? source.getFileSize() : entry.getFilesize();
         try {
+            boolean run = true;
+            int count = 0;
             int cumulativeFileSeperatorLength = 0;
-            byte[] buffer = new byte[options.bufferSize.value()];
-            int bytesTransferred;
-            synchronized (this) {
-                if (options.cumulateFiles.isTrue() && options.cumulativeFileSeparator.isNotEmpty()) {
-                    String fs = options.cumulativeFileSeparator.getValue();
-                    fs = this.replaceVariables(fs) + System.getProperty("line.separator");
-                    byte[] bytes = fs.getBytes();
-                    cumulativeFileSeperatorLength = bytes.length;
-                    Buffer compressedBytes = compress(bytes);
-                    targetFile.write(compressedBytes.getBytes());
-                    if (sourceCheckIntegrityHash) {
-                        sourceChecksum.update(bytes);
-                    }
-                    if (targetCreateIntegrityHashFile) {
-                        targetChecksum.update(compressedBytes.getBytes());
-                    }
-                }
-                if (sourceFile.getFileSize() <= 0) {
-                    byte[] bytes = new byte[0];
-                    Buffer compressedBytes = compress(bytes);
-                    targetFile.write(compressedBytes.getBytes());
-                    if (sourceCheckIntegrityHash) {
-                        sourceChecksum.update(bytes);
-                    }
-                    if (targetCreateIntegrityHashFile) {
-                        targetChecksum.update(compressedBytes.getBytes());
-                    }
-                    if (eventHandler != null) {
-                        Map<String, String> values = new HashMap<String, String>();
-                        values.put("sourcePath", this.getSourceFilename());
-                        values.put("targetPath", this.getTargetFilename());
-                        values.put("state", "5");
-                        eventHandler.updateDb(null, "YADE_FILE", values);
-                    }
-                } else {
-                    // int actualBytesTransferred = 0;
-                    if (eventHandler != null) {
-                        Map<String, String> values = new HashMap<String, String>();
-                        values.put("sourcePath", this.getSourceFilename());
-                        values.put("targetPath", this.getTargetFilename());
-                        values.put("state", "5");
-                        eventHandler.updateDb(null, "YADE_FILE", values);
-                    }
-                    while ((bytesTransferred = sourceFile.read(buffer)) != -1) {
-                        try {
-                            // actualBytesTransferred += bytesTransferred;
-                            Buffer compressedBytes = compress(buffer, bytesTransferred);
-                            targetFile.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
-                            // Map<String, String> values = new HashMap<String, String>();
-                            // values.put("bytesTransferred", "" + actualBytesTransferred);
-                            // values.put("targetSize", "" + target.getFileSize());
-                            // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-                            // eventParams.put("transferring:" + source.getName(), values);
-                            // sendEvent(eventParams);
 
-                            // commented due to not having a progress bar and performance
+            while (run) {
+                count++;
+                totalBytesTransferred = 0;
 
-                            // if (eventHandler != null) {
-                            // Map<String, String> values = new HashMap<String, String>();
-                            // values.put("sourcePath", this.getSourceFilename());
-                            // values.put("targetPath", this.getTargetFilename());
-                            // values.put("state", "5");
-                            // eventHandler.updateDb(null, "YADE_FILE", values);
-                            // }
+                try {
+                    startTime = Instant.now();
+                    cumulativeFileSeperatorLength = 0;
+                    byte[] buffer = new byte[parent.getOptions().bufferSize.value()];
+                    int bytesTransferred;
+                    synchronized (this) {
+                        if (parent.getOptions().cumulateFiles.isTrue() && parent.getOptions().cumulativeFileSeparator.isNotEmpty()) {
+                            String fs = parent.getOptions().cumulativeFileSeparator.getValue();
+                            fs = this.replaceVariables(fs) + System.getProperty("line.separator");
+                            byte[] bytes = fs.getBytes();
+                            cumulativeFileSeperatorLength = bytes.length;
+                            Buffer compressedBytes = compress(bytes);
+                            target.write(compressedBytes.getBytes());
                             if (sourceCheckIntegrityHash) {
-                                sourceChecksum.update(buffer, 0, bytesTransferred);
+                                sourceChecksum.update(bytes);
                             }
                             if (targetCreateIntegrityHashFile) {
-                                targetChecksum.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+                                targetChecksum.update(compressedBytes.getBytes());
                             }
-                        } catch (JobSchedulerException e) {
-                            if (eventHandler != null) {
+                        }
+                        if (fileSize <= 0) {
+                            byte[] bytes = new byte[0];
+                            Buffer compressedBytes = compress(bytes);
+                            target.write(compressedBytes.getBytes());
+                            if (sourceCheckIntegrityHash) {
+                                sourceChecksum.update(bytes);
+                            }
+                            if (targetCreateIntegrityHashFile) {
+                                targetChecksum.update(compressedBytes.getBytes());
+                            }
+                            if (parent.getEventHandler() != null) {
                                 Map<String, String> values = new HashMap<String, String>();
                                 values.put("sourcePath", this.getSourceFilename());
-                                values.put("state", "7");
-                                values.put("errorMessage", e.getMessage());
-                                updateDb(null, "YADE_FILE", values);
+                                values.put("targetPath", this.getTargetFilename());
+                                values.put("state", "5");
+                                parent.getEventHandler().updateDb(null, "YADE_FILE", values);
                             }
-                            setEntryErrorMessage(e);
-                            LOGGER.error(errorMessage);
-                            break;
-                        }
-                        totalBytesTransferred += bytesTransferred;
-                        setTransferProgress(totalBytesTransferred);
+                        } else {
+                            // int actualBytesTransferred = 0;
+                            if (parent.getEventHandler() != null) {
+                                Map<String, String> values = new HashMap<String, String>();
+                                values.put("sourcePath", this.getSourceFilename());
+                                values.put("targetPath", this.getTargetFilename());
+                                values.put("state", "5");
+                                parent.getEventHandler().updateDb(null, "YADE_FILE", values);
+                            }
+                            while ((bytesTransferred = source.read(buffer)) != -1) {
+                                try {
+                                    // actualBytesTransferred += bytesTransferred;
+                                    Buffer compressedBytes = compress(buffer, bytesTransferred);
+                                    target.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+                                    // Map<String, String> values = new HashMap<String, String>();
+                                    // values.put("bytesTransferred", "" + actualBytesTransferred);
+                                    // values.put("targetSize", "" + target.getFileSize());
+                                    // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                                    // eventParams.put("transferring:" + source.getName(), values);
+                                    // sendEvent(eventParams);
 
-                        // event processing
-                        // Map<String, String> values = new HashMap<String, String>();
-                        // values.put("totalBytesTransferred", "" + totalBytesTransferred);
-                        // values.put("targetSize", "" + target.getFileSize());
-                        // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
-                        // eventParams.put("transferred:" + source.getName(), values);
-                        // sendEvent(eventParams);
-                        // end of event processing
+                                    // commented due to not having a progress bar and performance
+
+                                    // if (eventHandler != null) {
+                                    // Map<String, String> values = new HashMap<String, String>();
+                                    // values.put("sourcePath", this.getSourceFilename());
+                                    // values.put("targetPath", this.getTargetFilename());
+                                    // values.put("state", "5");
+                                    // eventHandler.updateDb(null, "YADE_FILE", values);
+                                    // }
+                                    if (sourceCheckIntegrityHash) {
+                                        sourceChecksum.update(buffer, 0, bytesTransferred);
+                                    }
+                                    if (targetCreateIntegrityHashFile) {
+                                        targetChecksum.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+                                    }
+                                } catch (JobSchedulerException e) {
+                                    if (parent.getEventHandler() != null) {
+                                        Map<String, String> values = new HashMap<String, String>();
+                                        values.put("sourcePath", this.getSourceFilename());
+                                        values.put("state", "7");
+                                        values.put("errorMessage", e.getMessage());
+                                        updateDb(null, "YADE_FILE", values);
+                                    }
+                                    setEntryErrorMessage(parent.getSourceClient(), parent.getTargetClient(), e);
+                                    break;
+                                }
+                                totalBytesTransferred += bytesTransferred;
+                                setTransferProgress(totalBytesTransferred);
+
+                                // event processing
+                                // Map<String, String> values = new HashMap<String, String>();
+                                // values.put("totalBytesTransferred", "" + totalBytesTransferred);
+                                // values.put("targetSize", "" + target.getFileSize());
+                                // Map <String, Map<String, String>> eventParams = new HashMap<String, Map<String, String>>();
+                                // eventParams.put("transferred:" + source.getName(), values);
+                                // sendEvent(eventParams);
+                                // end of event processing
+                            }
+                        }
                     }
+                    // TODO: define the structure of the event answer
+                    // sendEvent(null);
+                    source.closeInput();
+                    target.closeOutput();
+                    closed = true;
+                    run = false;
+                    endTime = Instant.now();
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                    if (count == parent.getOptions().connection_error_max_retry.value()) {
+                        LOGGER.error(String.format("[%s]%s", fileHandlerSourceFileName, e.toString()), e);
+                        run = false;
+                        throw e;
+                    } else {
+                        JobSchedulerException.LastErrorMessage = "";
+                    }
+                    parent.setLastErrorMessage(e.toString());
+                    LOGGER.warn(String.format("[%s]%s", fileHandlerSourceFileName, e.toString()), e);
+                    if (!closed) {
+                        source.closeInput();
+                        target.closeOutput();
+                        closed = true;
+                    }
+
+                    ISOSVirtualFile vfs = tryReconnect("source", parent.getSourceClient(), parent.getOptions().getSource(), fileHandlerSourceFileName,
+                            count);
+                    if (vfs != null) {
+                        source = vfs;
+                    }
+                    ISOSVirtualFile vft = tryReconnect("target", parent.getTargetClient(), parent.getOptions().getTarget(), fileHandlerTargetFileName,
+                            count);
+                    if (vft != null) {
+                        target = vft;
+                    }
+                    if (vfs == null && vft == null) {
+                        throw e;
+                    }
+                    // TODO check file after rerun- should be deleted or will overridden?
                 }
             }
-            // TODO: define the structure of the event answer
-            // sendEvent(null);
-            sourceFile.closeInput();
-            targetFile.closeOutput();
-            closed = true;
 
-            LOGGER.info(String.format("[transferred]Source=%s, Target=%s, Bytes=%s", sourceFile.getName(), targetFile.getName(),
-                    totalBytesTransferred));
+            LOGGER.info(String.format("[transferred]Source=%s, Target=%s, Bytes=%s %s", source.getName(), target.getName(), totalBytesTransferred,
+                    getDateTimeInfos(startTime, endTime)));
+            // LOGGER.info(String.format("[transferred]Source=%s, Target=%s, Bytes=%s %s", fileHandlerSourceFileName, fileHandlerTargetFileName,
+            // totalBytesTransferred, getDateTimeInfos(startTime, endTime)));
 
-            if (targetFileTransfer.isNegativeCommandCompletion()) {
-                raiseException(SOSVfs_E_175.params(targetTransferFile.getName(), targetFileTransfer.getReplyString()));
+            if (parent.getTargetClient().isNegativeCommandCompletion()) {
+                setTransferStatus(TransferStatus.transfer_aborted);
+                String msg = SOSVfs_E_175.params(targetTransferFile.getName(), parent.getTargetClient().getReplyString());
+                LOGGER.error(msg);
+                throw new JobSchedulerException(msg);
             }
             if (targetCreateIntegrityHashFile) {
                 targetFileChecksum = toHexString(targetChecksum.digest());
                 sourceFileChecksum = targetFileChecksum;
-                LOGGER.debug(SOSVfs_I_274.params(targetFileChecksum, targetFileName, options.integrityHashType.getValue()));
+                LOGGER.debug(SOSVfs_I_274.params(targetFileChecksum, targetFileName, parent.getOptions().integrityHashType.getValue()));
             }
             if (sourceCheckIntegrityHash) {
                 sourceFileChecksum = toHexString(sourceChecksum.digest());
-                LOGGER.debug(SOSVfs_I_274.params(sourceFileChecksum, sourceFileName, options.integrityHashType.getValue()));
+                LOGGER.debug(SOSVfs_I_274.params(sourceFileChecksum, sourceFileName, parent.getOptions().integrityHashType.getValue()));
             }
-            setNoOfBytesTransferred(totalBytesTransferred);
+            setNoOfBytesTransferred(totalBytesTransferred, fileSize);
             totalBytesTransferred += cumulativeFileSeperatorLength;
-            checkSourceChecksumFile(sourceFile, targetFile);
+            checkSourceChecksumFile(source, target);
             executeTFNPostCommnands();
             return true;
         } catch (JobSchedulerException e) {
-            setEntryErrorMessage(e);
+            e.printStackTrace();
+            setEntryErrorMessage(parent.getSourceClient(), parent.getTargetClient(), e);
             throw e;
         } catch (Exception e) {
-            errorMessage = e.toString();
+            e.printStackTrace();
+            parent.setLastErrorMessage(e.toString());
             throw new JobSchedulerException(e);
         } finally {
+            if (endTime == null) {
+                endTime = Instant.now();
+            }
             if (!closed) {
-                sourceFile.closeInput();
-                targetFile.closeOutput();
+                source.closeInput();
+                target.closeOutput();
                 closed = true;
             }
         }
+    }
+
+    private ISOSVirtualFile tryReconnect(String range, ISOSVfsFileTransfer transfer, SOSConnection2OptionsAlternate opt, String fileName, int count) {
+        if (transfer.isConnected()) {
+            return null;
+        }
+
+        boolean run = true;
+        while (run) {
+            try {
+                LOGGER.info("----------------------------------------------------");
+                LOGGER.info(String.format("[%s][%s] connection lost. wait %ss and try reconnect %s of %s ...", range, fileName, parent
+                        .getOptions().connection_error_retry_wait_interval.value(), count, parent.getOptions().connection_error_max_retry.value()));
+                LOGGER.info("----------------------------------------------------");
+                if (parent.getOptions().connection_error_retry_wait_interval.value() > 0) {
+                    try {
+                        Thread.sleep(parent.getOptions().connection_error_retry_wait_interval.value() * 1_000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                transfer.reconnect(opt);
+                return transfer.getFileHandle(fileName);
+            } catch (Throwable e) {
+                LOGGER.warn(e.toString(), e);
+                if (count == parent.getOptions().connection_error_max_retry.value()) {
+                    run = false;
+                }
+                count++;
+            }
+        }
+        return null;
     }
 
     // private void sendEvent(Map<String, Map<String, String>> eventParams) {
@@ -365,24 +408,33 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     // }
 
     private void updateDb(Long id, String type, Map<String, String> values) {
-        if (eventHandler != null) {
+        if (parent.getEventHandler() != null) {
             // id of the DBItem
             // type of the Item, here always YADE_FILE
             // map of values of the Item, with key = propertyName and value = propertyValue
-            eventHandler.updateDb(id, type, values);
+            parent.getEventHandler().updateDb(id, type, values);
         }
     }
 
+    public Instant getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public Instant getEndTime() {
+        return endTime;
+    }
+
     public void createTargetChecksumFile() {
-        createTargetChecksumFile(makeFullPathName(options.targetDir.getValue(), targetFileName));
+        createTargetChecksumFile(makeFullPathName(parent.getOptions().targetDir.getValue(), targetFileName));
     }
 
     public void createTargetChecksumFile(String targetFileName) {
-        if (options.createIntegrityHashFile.isTrue() && isTransferred()) {
+        if (parent.getOptions().createIntegrityHashFile.isTrue() && isTransferred()) {
             ISOSVirtualFile checksumFile = null;
             try {
                 targetFileName = resolveDotsInPath(targetFileName);
-                checksumFile = targetFileTransfer.getFileHandle(targetFileName + "." + options.integrityHashType.getValue());
+                checksumFile = parent.getTargetClient().getFileHandle(targetFileName + "." + parent.getOptions().integrityHashType.getValue());
                 checksumFile.write(targetFileChecksum.getBytes());
                 LOGGER.info(SOSVfs_I_285.params(checksumFile.getName()));
                 targetChecksumFile = checksumFile;
@@ -397,17 +449,17 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void checkSourceChecksumFile(ISOSVirtualFile sourceFile, ISOSVirtualFile targetFile) {
-        if (options.checkIntegrityHash.isTrue()) {
+        if (parent.getOptions().checkIntegrityHash.isTrue()) {
             ISOSVirtualFile sourceFileChecksumFile = null;
-            String sourceFileChecksumFileName = sourceFile.getName() + "." + options.securityHashType.getValue();
+            String sourceFileChecksumFileName = sourceFile.getName() + "." + parent.getOptions().securityHashType.getValue();
             try {
-                sourceFileChecksumFile = geSourceFileTransfer().getFileHandle(sourceFileChecksumFileName);
+                sourceFileChecksumFile = parent.getSourceClient().getFileHandle(sourceFileChecksumFileName);
                 if (sourceFileChecksumFile.fileExists()) {
                     String checksum = sourceFileChecksumFile.file2String().trim();
                     if (!checksum.equals(sourceFileChecksum)) {
                         try {
                             if (targetFile.fileExists()) {
-                                targetFile.delete();
+                                targetFile.delete(false);
                             }
                         } catch (Exception ex) {
                             LOGGER.debug(ex.toString(), ex);
@@ -431,14 +483,23 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void setEntryErrorMessage(JobSchedulerException ex) {
-        errorMessage = JobSchedulerException.LastErrorMessage;
-        if (isEmpty(errorMessage)) {
-            errorMessage = ex.toString();
-            if (ex.getNestedException() != null) {
-                errorMessage += " " + ex.getNestedException().toString();
-            }
+    private void setEntryErrorMessage(ISOSVfsFileTransfer sourceTransfer, ISOSVfsFileTransfer targetTransfer, JobSchedulerException ex) {
+        StringBuilder msg = new StringBuilder();
+        if (sourceTransfer != null && !sourceTransfer.isConnected()) {
+            msg.append("[source not connected]");
         }
+        if (targetTransfer != null && !targetTransfer.isConnected()) {
+            msg.append("[target not connected]");
+        }
+        if (isEmpty(JobSchedulerException.LastErrorMessage)) {
+            msg.append(ex.toString());
+            if (ex.getNestedException() != null) {
+                msg.append(" ").append(ex.getNestedException().toString());
+            }
+        } else {
+            msg.append(JobSchedulerException.LastErrorMessage);
+        }
+        parent.setLastErrorMessage(msg.toString());
     }
 
     private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
@@ -504,20 +565,20 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void executeTFNPostCommnands() {
-        SOSConnection2OptionsAlternate target = options.getConnectionOptions().getTarget();
+        SOSConnection2OptionsAlternate target = parent.getOptions().getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_target_tfn_post_command", targetFileTransfer, target.getAlternatives().tfnPostCommand, target
+            executeCommands("alternative_target_tfn_post_command", parent.getTargetClient(), target.getAlternatives().tfnPostCommand, target
                     .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("tfn_post_command", targetFileTransfer, options.tfnPostCommand);
-            executeCommands("target_tfn_post_command", targetFileTransfer, target.tfnPostCommand, target.commandDelimiter);
+            executeCommands("tfn_post_command", parent.getTargetClient(), parent.getOptions().tfnPostCommand);
+            executeCommands("target_tfn_post_command", parent.getTargetClient(), target.tfnPostCommand, target.commandDelimiter);
         }
-        SOSConnection2OptionsAlternate source = options.getConnectionOptions().getSource();
+        SOSConnection2OptionsAlternate source = parent.getOptions().getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands("alternative_source_tfn_post_command", sourceFileTransfer, source.getAlternatives().tfnPostCommand, source
+            executeCommands("alternative_source_tfn_post_command", parent.getSourceClient(), source.getAlternatives().tfnPostCommand, source
                     .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("source_tfn_post_command", sourceFileTransfer, source.tfnPostCommand, source.commandDelimiter);
+            executeCommands("source_tfn_post_command", parent.getSourceClient(), source.tfnPostCommand, source.commandDelimiter);
         }
     }
 
@@ -530,87 +591,88 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         SOSVfsEnv envs = new SOSVfsEnv();
         envs.setLocalEnvs(env);
 
-        SOSConnection2OptionsAlternate target = options.getConnectionOptions().getTarget();
+        SOSConnection2OptionsAlternate target = parent.getOptions().getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && target.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[alternative_target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("alternative_target_post_command", targetFileTransfer, target.getAlternatives().postCommand, target
+                executeCommands("alternative_target_post_command", parent.getTargetClient(), target.getAlternatives().postCommand, target
                         .getAlternatives().commandDelimiter, envs);
             }
         } else {
-            if (!isTransferred && options.post_command_disable_for_skipped_transfer.value()) {
+            if (!isTransferred && parent.getOptions().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("post_command", targetFileTransfer, options.postCommand, target.commandDelimiter, envs);
+                executeCommands("post_command", parent.getTargetClient(), parent.getOptions().postCommand, target.commandDelimiter, envs);
             }
             if (!isTransferred && target.post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[target_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("target_post_command", targetFileTransfer, target.postCommand, target.commandDelimiter, envs);
+                executeCommands("target_post_command", parent.getTargetClient(), target.postCommand, target.commandDelimiter, envs);
             }
         }
-        SOSConnection2OptionsAlternate source = options.getConnectionOptions().getSource();
+        SOSConnection2OptionsAlternate source = parent.getOptions().getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && source.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[alternative_source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("alternative_source_post_command", sourceFileTransfer, source.getAlternatives().postCommand, source
+                executeCommands("alternative_source_post_command", parent.getSourceClient(), source.getAlternatives().postCommand, source
                         .getAlternatives().commandDelimiter, envs);
             }
         } else {
             if (!isTransferred && source.post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[source_post_command][skip]disable_for_skipped_transfer=true, status=%s", status));
             } else {
-                executeCommands("source_post_command", sourceFileTransfer, source.postCommand, source.commandDelimiter, envs);
+                executeCommands("source_post_command", parent.getSourceClient(), source.postCommand, source.commandDelimiter, envs);
             }
         }
     }
 
     private void executePreCommands(boolean isSkipped) {
-        SOSConnection2OptionsAlternate target = options.getConnectionOptions().getTarget();
+        SOSConnection2OptionsAlternate target = parent.getOptions().getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (target.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("alternative_target_pre_command enable_for_skipped_transfer=true", targetFileTransfer, target
+                    executeCommands("alternative_target_pre_command enable_for_skipped_transfer=true", parent.getTargetClient(), target
                             .getAlternatives().preCommand, target.commandDelimiter);
                 }
             } else {
-                executeCommands("alternative_target_pre_command", targetFileTransfer, target.getAlternatives().preCommand, target.commandDelimiter);
+                executeCommands("alternative_target_pre_command", parent.getTargetClient(), target.getAlternatives().preCommand,
+                        target.commandDelimiter);
             }
         } else {
             if (isSkipped) {
-                if (options.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("pre_command enable_for_skipped_transfer=true", targetFileTransfer, options.preCommand);
+                if (parent.getOptions().pre_command_enable_for_skipped_transfer.value()) {
+                    executeCommands("pre_command enable_for_skipped_transfer=true", parent.getTargetClient(), parent.getOptions().preCommand);
                 }
                 if (target.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("target_pre_command enable_for_skipped_transfer=true", targetFileTransfer, target.preCommand,
+                    executeCommands("target_pre_command enable_for_skipped_transfer=true", parent.getTargetClient(), target.preCommand,
                             target.commandDelimiter);
                 }
             } else {
-                executeCommands("pre_command", targetFileTransfer, options.preCommand);
-                executeCommands("target_pre_command", targetFileTransfer, target.preCommand, target.commandDelimiter);
+                executeCommands("pre_command", parent.getTargetClient(), parent.getOptions().preCommand);
+                executeCommands("target_pre_command", parent.getTargetClient(), target.preCommand, target.commandDelimiter);
             }
         }
-        SOSConnection2OptionsAlternate source = options.getConnectionOptions().getSource();
+        SOSConnection2OptionsAlternate source = parent.getOptions().getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (source.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("alternative_source_pre_command enable_for_skipped_transfer=true", sourceFileTransfer, source
+                    executeCommands("alternative_source_pre_command enable_for_skipped_transfer=true", parent.getSourceClient(), source
                             .getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
                 }
             } else {
-                executeCommands("alternative_source_pre_command", sourceFileTransfer, source.getAlternatives().preCommand, source
+                executeCommands("alternative_source_pre_command", parent.getSourceClient(), source.getAlternatives().preCommand, source
                         .getAlternatives().commandDelimiter);
             }
         } else {
             if (isSkipped) {
                 if (source.pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("source_pre_command enable_for_skipped_transfer=true", sourceFileTransfer, source.preCommand,
+                    executeCommands("source_pre_command enable_for_skipped_transfer=true", parent.getSourceClient(), source.preCommand,
                             source.commandDelimiter);
                 }
             } else {
-                executeCommands("source_pre_command", sourceFileTransfer, source.preCommand, source.commandDelimiter);
+                executeCommands("source_pre_command", parent.getSourceClient(), source.preCommand, source.commandDelimiter);
             }
         }
     }
@@ -643,25 +705,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return EMPTY_STRING;
     }
 
-    public ISOSVfsFileTransfer geSourceFileTransfer() {
-        return sourceFileTransfer;
-    }
-
-    public ISOSVfsFileTransfer geTargetFileTransfer() {
-        return targetFileTransfer;
-    }
-
-    @Override
-    public Date getEndTime() {
-        return transferEnd;
-    }
-
     public String getFileName4ResultList() {
         String result = targetFileName;
         if (isEmpty(result)) {
             result = sourceFileName;
         }
-        if (options.resultSetFileName.getValue().endsWith(".source.tmp")) {
+        if (parent.getOptions().resultSetFileName.getValue().endsWith(".source.tmp")) {
             result = sourceFileName;
         }
         return result;
@@ -715,7 +764,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     @Override
     public String getPid() {
-        return options.getPid();
+        return parent.getOptions().getPid();
     }
 
     @Override
@@ -729,11 +778,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     @Override
-    public Date getStartTime() {
-        return transferStart;
-    }
-
-    @Override
     public Integer getStatus() {
         return new Integer(transferStatus.ordinal());
     }
@@ -744,34 +788,34 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public ISOSVirtualFile getTargetFile() {
-        ISOSVirtualFile sourceFile = sourceFileTransfer.getFileHandle(sourceFileName);
+        ISOSVirtualFile sourceFile = parent.getSourceClient().getFileHandle(sourceFileName);
         sourceTransferFileName = sourceFile.getName();
         targetFileName = sourceFile.getName();
-        boolean recursive = options.recursive.value();
-        if (options.compressFiles.isTrue()) {
-            targetFileName = targetFileName + options.compressedFileExtension.getValue();
+        boolean recursive = parent.getOptions().recursive.value();
+        if (parent.getOptions().compressFiles.isTrue()) {
+            targetFileName = targetFileName + parent.getOptions().compressedFileExtension.getValue();
         }
-        if (options.cumulateFiles.isTrue()) {
-            targetFileName = options.cumulativeFileName.getValue();
+        if (parent.getOptions().cumulateFiles.isTrue()) {
+            targetFileName = parent.getOptions().cumulativeFileName.getValue();
             targetTransferFileName = targetFileName;
-            options.appendFiles.value(true);
+            parent.getOptions().appendFiles.value(true);
         } else {
             targetFileName = getFileNameWithoutPath(targetFileName);
             targetTransferFileName = targetFileName;
-            if (options.getReplacing().isNotEmpty()) {
+            if (parent.getOptions().getReplacing().isNotEmpty()) {
                 try {
-                    targetFileName = options.getReplacing().doReplace(targetFileName, options.getReplacement().getValue());
+                    targetFileName = parent.getOptions().getReplacing().doReplace(targetFileName, parent.getOptions().getReplacement().getValue());
                 } catch (Exception e) {
                     throw new JobSchedulerException(SOSVfs_E_0150.get() + " " + e.toString(), e);
                 }
             }
         }
-        if (options.isAtomicTransfer() || options.transactionMode.isTrue()) {
-            targetTransferFileName = getTargetAtomicFileName(options);
+        if (parent.getOptions().isAtomicTransfer() || parent.getOptions().transactionMode.isTrue()) {
+            targetTransferFileName = getTargetAtomicFileName(parent.getOptions());
         }
         if (recursive) {
             String sourceDir = getPathWithoutFileName(sourceFile.getName());
-            String sourceDirOrig = options.sourceDir().getValue();
+            String sourceDirOrig = parent.getOptions().sourceDir().getValue();
             if (!fileNamesAreEqual(sourceDir, sourceDirOrig, true) && sourceDir.length() > sourceDirOrig.length()) {
                 String subFolder = sourceDir.substring(sourceDirOrig.length());
                 subFolder = adjustFileSeparator(addFileSeparator(subFolder));
@@ -781,8 +825,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     setTargetAtomicFileName(targetTransferFileName);
                 }
                 try {
-                    if (fileList.add2SubFolders(subFolder)) {
-                        targetFileTransfer.mkdir(addFileSeparator(options.targetDir().getValue()) + subFolder);
+                    if (parent.add2SubFolders(subFolder)) {
+                        parent.getTargetClient().mkdir(addFileSeparator(parent.getOptions().targetDir().getValue()) + subFolder);
                     }
                 } catch (IOException e) {
                     throw new JobSchedulerException(e);
@@ -793,8 +837,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void setRenamedSourceFilename() {
-        SOSConnection2OptionsAlternate sourceOptions = options.getSource();
-        if (sourceOptions.replacing.isDirty() && !options.removeFiles.value()) {
+        SOSConnection2OptionsAlternate sourceOptions = parent.getOptions().getSource();
+        if (sourceOptions.replacing.isDirty() && !parent.getOptions().removeFiles.value()) {
             String replaceWith = sourceOptions.replacement.getValue();
             try {
                 String sourceName = new File(sourceFileName).getName();
@@ -807,7 +851,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 }
                 if (!equals) {
                     String sourceDir = addFileSeparator(sourceOptions.directory.getValue()).replace('\\', '/');
-                    if (options.recursive.value()) {
+                    if (parent.getOptions().recursive.value()) {
                         String subDirs = sourceParent.substring(sourceDir.length());
                         sourceNameNew = subDirs + sourceNameNew;
                     }
@@ -838,7 +882,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public String getTargetFileNameAndPath() {
-        return options.targetDir.getValue() + targetFileName;
+        return parent.getOptions().targetDir.getValue() + targetFileName;
     }
 
     public void setTransactional() {
@@ -891,9 +935,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     private String makeFileNameReplacing(final String fileName) {
         String name = adjustFileSeparator(fileName);
-        String replacement = options.getReplacement().getValue();
+        String replacement = parent.getOptions().getReplacement().getValue();
         try {
-            name = options.getReplacing().doReplace(name, replacement);
+            name = parent.getOptions().getReplacing().doReplace(name, replacement);
         } catch (Exception e) {
             LOGGER.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
             throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
@@ -924,18 +968,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    public void setOptions(final ISOSFtpOptions val) {
-        options = (SOSFTPOptions) val;
-    }
-
-    private void raiseException(final String msg) {
-        setTransferStatus(TransferStatus.transfer_aborted);
-        LOGGER.error(msg);
-        throw new JobSchedulerException(msg);
-    }
-
     public void renameSourceFile() {
-        renameSourceFile(sourceFileTransfer.getFileHandle(sourceFileName));
+        renameSourceFile(parent.getSourceClient().getFileHandle(sourceFileName));
     }
 
     private void renameSourceFile(final ISOSVirtualFile sourceFile) {
@@ -945,13 +979,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     LOGGER.debug(String.format("[sourceFile=%s][sourceFileNameRenamed=%s]", sourceFile.getName(), sourceFileNameRenamed));
                 }
 
-                ISOSVirtualFile renamedSourceFile = sourceFileTransfer.getFileHandle(sourceFileNameRenamed);
+                ISOSVirtualFile renamedSourceFile = parent.getSourceClient().getFileHandle(sourceFileNameRenamed);
                 if (renamedSourceFile.fileExists()) {
-                    renamedSourceFile.delete();
+                    renamedSourceFile.delete(false);
                 }
-                if (sourceFileNameRenamed.contains("/") && options.makeDirs.isTrue()) {
-                    String parent = sourceFileNameRenamed.replaceFirst("[^/]*$", "");
-                    sourceFileTransfer.mkdir(parent);
+                if (sourceFileNameRenamed.contains("/") && parent.getOptions().makeDirs.isTrue()) {
+                    String parentName = sourceFileNameRenamed.replaceFirst("[^/]*$", "");
+                    parent.getSourceClient().mkdir(parentName);
                 }
                 sourceFile.rename(sourceFileNameRenamed);
             } catch (Exception e) {
@@ -963,8 +997,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void rollbackRenameSourceFile() {
         if (sourceFileNameRenamed != null) {
             try {
-                ISOSVirtualFile sourceFile = sourceFileTransfer.getFileHandle(sourceFileName);
-                ISOSVirtualFile sourceFileRenamed = sourceFileTransfer.getFileHandle(sourceFileNameRenamed);
+                ISOSVirtualFile sourceFile = parent.getSourceClient().getFileHandle(sourceFileName);
+                ISOSVirtualFile sourceFileRenamed = parent.getSourceClient().getFileHandle(sourceFileNameRenamed);
                 if (!sourceFile.fileExists() && sourceFileRenamed.fileExists()) {
                     sourceFileRenamed.rename(sourceFileName);
                 }
@@ -976,7 +1010,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void renameTargetFile() {
         if (!skipTransfer()) {
-            renameTargetFile(targetFileTransfer.getFileHandle(makeFullPathName(options.targetDir.getValue(), targetFileName)));
+            renameTargetFile(parent.getTargetClient().getFileHandle(makeFullPathName(parent.getOptions().targetDir.getValue(), targetFileName)));
         }
     }
 
@@ -989,13 +1023,15 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
         if (!equals) {
             try {
-                if (options.overwriteFiles.isTrue() && targetFile.fileExists()) {
+                if (parent.getOptions().overwriteFiles.isTrue() && targetFile.fileExists()) {
                     targetFileExists = true;
-                    targetFile.delete();
+                    targetFile.delete(false);
                 }
-                if (targetFileNewName.contains("/") && options.makeDirs.isTrue()) { // sosftp-158
-                    String parent = targetFileNewName.replaceFirst("[^/]*$", "");
-                    targetFileTransfer.mkdir(parent);
+
+                // TODO check - if needed
+                if (targetFileNewName.contains("/") && parent.getOptions().makeDirs.isTrue()) { // sosftp-158
+                    String parentName = targetFileNewName.replaceFirst("[^/]*$", "");
+                    parent.getTargetClient().mkdir(parentName);
                 }
                 targetTransferFile.rename(targetFileNewName);
             } catch (Exception e) {
@@ -1008,15 +1044,15 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         if (isTraceEnabled) {
             LOGGER.trace(String.format("[replaceVariables]%s", value));
         }
-        EntryPaths targetFile = new EntryPaths(options.targetDir.getValue(), resolveDotsInPath(makeFullPathName(options.targetDir.getValue(),
-                targetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(options.targetDir.getValue(), resolveDotsInPath(makeFullPathName(options.targetDir.getValue(),
-                targetTransferFileName)));
+        EntryPaths targetFile = new EntryPaths(parent.getOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(parent
+                .getOptions().targetDir.getValue(), targetFileName)));
+        EntryPaths targetTransferFile = new EntryPaths(parent.getOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(parent
+                .getOptions().targetDir.getValue(), targetTransferFileName)));
 
-        EntryPaths sourceFile = new EntryPaths(options.sourceDir.getValue(), resolveDotsInPath(sourceFileName));
-        EntryPaths sourceFileRenamed = new EntryPaths(options.sourceDir.getValue(), sourceFileNameRenamed);
+        EntryPaths sourceFile = new EntryPaths(parent.getOptions().sourceDir.getValue(), resolveDotsInPath(sourceFileName));
+        EntryPaths sourceFileRenamed = new EntryPaths(parent.getOptions().sourceDir.getValue(), sourceFileNameRenamed);
 
-        Properties vars = options.getTextProperties();
+        Properties vars = parent.getOptions().getTextProperties();
         vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
         vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
 
@@ -1044,37 +1080,27 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentDirFullName());
         vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentDirBaseName());
 
-        return options.replaceVars(value);
+        return parent.getOptions().replaceVars(value);
     }
 
     @Override
     public void run() {
-        boolean isNewConnectionUsed = false;
         try {
-            isNewConnectionUsed = false;
-            if (sourceFileTransfer == null) {
-                setSourceFileTransfer((ISOSVfsFileTransfer) sourceConnectionPool.getUnused());
-            }
-            ISOSVirtualFile sourceFile = sourceFileTransfer.getFileHandle(sourceFileName);
-            if (sourceFile.notExists()) {
-                throw new JobSchedulerException(SOSVfs_E_226.params(sourceFileName));
-            }
-            if (targetFileTransfer == null && options.isNeedTargetClient()) {
-                setTargetFileTransfer((ISOSVfsFileTransfer) targetConnectionPool.getUnused());
-            }
-            if (targetFileTransfer != null && options.isNeedTargetClient()) {
-                String sourceDir = options.sourceDir.getValue();
-                String targetDir = options.targetDir.getValue();
-                File parentFile = null;
-                String subPath = "";
-                if (options.recursive.value()) {
+            ISOSVirtualFile sourceFile = parent.getSourceClient().getFileHandle(sourceFileName);
+            if (parent.getOptions().isNeedTargetClient()) {
+                if (parent.getOptions().recursive.value()) {
+                    String sourceDir = parent.getOptions().sourceDir.getValue();
+                    String targetDir = parent.getOptions().targetDir.getValue();
+                    File parentFile = null;
+                    String subPath = "";
+
                     if (sourceFile.getParentVfs() != null && sourceFile.getParentVfsFile().isDirectory()) {
                         subPath = sourceFileName.substring(sourceDir.length());
                         parentFile = new File(subPath).getParentFile();
                         if (parentFile != null) {
                             subPath = adjustFileSeparator(subPath);
                             subPath = subPath.substring(0, subPath.length() - new File(sourceFileName.toString()).getName().length() - 1);
-                            targetFileTransfer.mkdir(targetDir + "/" + subPath);
+                            parent.getTargetClient().mkdir(targetDir + "/" + subPath);
                         } else {
                             subPath = "";
                         }
@@ -1085,55 +1111,63 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
             setRenamedSourceFilename();
 
-            if (options.transactional.value()) {
+            if (parent.getOptions().transactional.value()) {
                 setTransactional();
             }
-            switch (options.operation.value()) {
+            boolean removeSourceFile = false;
+            switch (parent.getOptions().operation.value()) {
             case getlist:
                 return;
             case delete:
                 executePreCommands(false);
-                sourceFile.delete();
+                sourceFile.delete(true);
                 LOGGER.info(SOSVfs_I_0113.params(sourceFileName));
                 this.setStatus(TransferStatus.deleted);
                 return;
             case rename:
                 File file = new File(sourceFileName);
-                String parent = changeBackslashes(normalized(file.getParent()));
+                String parentName = changeBackslashes(normalized(file.getParent()));
                 String fileNameRenamed = makeFileNameReplacing(file.getName());
-                if (fileNameRenamed.contains("/") && options.makeDirs.isTrue()) {
-                    sourceFileTransfer.mkdir(normalized(new File(fileNameRenamed).getParent()));
+                if (fileNameRenamed.contains("/") && parent.getOptions().makeDirs.isTrue()) {
+                    parent.getSourceClient().mkdir(normalized(new File(fileNameRenamed).getParent()));
                 }
-                fileNameRenamed = changeBackslashes(addFileSeparator(parent) + fileNameRenamed);
+                fileNameRenamed = changeBackslashes(addFileSeparator(parentName) + fileNameRenamed);
                 LOGGER.info(SOSVfs_I_150.params(sourceFileName, fileNameRenamed));
                 targetFileName = fileNameRenamed;
                 sourceFile.rename(fileNameRenamed);
                 setStatus(TransferStatus.renamed);
                 return;
+            case move:
+                removeSourceFile = true;
+                break;
             default:
                 break;
             }
-            ISOSVirtualFile targetFile = targetFileTransfer.getFileHandle(makeFullPathName(options.targetDir.getValue(), targetFileName));
-            if (options.cumulateFiles.isTrue()) {
-                if (options.cumulativeFileDelete.isTrue() && !options.flgCumulativeTargetDeleted) {
-                    targetFile.delete();
-                    options.flgCumulativeTargetDeleted = true;
+
+            String fileHandlerTargetFileName = makeFullPathName(parent.getOptions().targetDir.getValue(), targetFileName);
+            ISOSVirtualFile targetFile = parent.getTargetClient().getFileHandle(fileHandlerTargetFileName);
+            if (parent.getOptions().cumulateFiles.isTrue()) {
+                if (parent.getOptions().cumulativeFileDelete.isTrue() && !parent.getOptions().flgCumulativeTargetDeleted) {
+                    targetFile.delete(true);
+                    parent.getOptions().flgCumulativeTargetDeleted = true;
                     LOGGER.debug(String.format("cumulative file '%1$s' deleted.", targetFileName));
                 }
             }
-            targetFile.setModeAppend(options.appendFiles.value());
-            targetFile.setModeRestart(options.resumeTransfer.value());
+            targetFile.setModeAppend(parent.getOptions().appendFiles.value());
+            targetFile.setModeRestart(parent.getOptions().resumeTransfer.value());
             if (!fileNamesAreEqual(targetFileName, targetTransferFileName, false)) {
-                targetTransferFile = targetFileTransfer.getFileHandle(makeFullPathName(options.targetDir.getValue(), targetTransferFileName));
+                targetTransferFile = parent.getTargetClient().getFileHandle(makeFullPathName(parent.getOptions().targetDir.getValue(),
+                        targetTransferFileName));
             } else {
                 targetTransferFile = targetFile;
             }
-            if (options.cumulateFiles.isTrue()) {
-                targetTransferFile.setModeAppend(options.appendFiles.value());
-                targetTransferFile.setModeRestart(options.resumeTransfer.value());
+            if (parent.getOptions().cumulateFiles.isTrue()) {
+                targetTransferFile.setModeAppend(parent.getOptions().appendFiles.value());
+                targetTransferFile.setModeRestart(parent.getOptions().resumeTransfer.value());
             }
             sourceTransferFileName = getFileNameWithoutPath(sourceTransferFileName);
-            sourceTransferFile = sourceFileTransfer.getFileHandle(makeFullPathName(getPathWithoutFileName(sourceFileName), sourceTransferFileName));
+            String fileHandlerSourceFileName = makeFullPathName(getPathWithoutFileName(sourceFileName), sourceTransferFileName);
+            sourceTransferFile = parent.getSourceClient().getFileHandle(fileHandlerSourceFileName);
             if (transferStatus.equals(TransferStatus.ignoredDueToZerobyteConstraint)) {
                 String strM = SOSVfs_D_0110.params(sourceFileName);
                 LOGGER.debug(strM);
@@ -1142,7 +1176,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
             if (targetFile.fileExists()) {
                 targetFileExists = true;
-                if (options.isDoNotOverwrite()) {
+                if (parent.getOptions().isDoNotOverwrite()) {
                     LOGGER.debug(SOSVfs_E_228.params(targetFileName));
                     setNotOverwritten();
                 }
@@ -1152,25 +1186,33 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 executePreCommands(true);
             } else {
 
-                doTransfer(sourceTransferFile, targetTransferFile);
+                doTransfer(sourceTransferFile, fileHandlerSourceFileName, targetTransferFile, fileHandlerTargetFileName);
 
                 if (isDebugEnabled) {
-                    LOGGER.debug("[sourceFileModificationDateTime]" + sourceFileModificationDateTime);
+                    if (parent.getOptions().checkSteadyStateOfFiles.isTrue()) {
+                        LOGGER.debug("[sourceFileModificationDateTime]" + sourceFileModificationDateTime);
+                    }
                 }
 
-                if (options.keepModificationDate.isTrue()) {
+                if (parent.getOptions().keepModificationDate.isTrue()) {
                     if (sourceFileModificationDateTime != -1) {
                         targetFile.setModificationDateTime(sourceFileModificationDateTime);
                     }
                 }
-                if ((options.isAtomicTransfer() || options.isReplaceReplacingInEffect()) && options.transactional.isFalse()) {
+                if ((parent.getOptions().isAtomicTransfer() || parent.getOptions().isReplaceReplacingInEffect()) && parent.getOptions().transactional
+                        .isFalse()) {
                     renameTargetFile(targetFile);
                 }
             }
-            if (options.transactional.isFalse()) {
+            if (parent.getOptions().transactional.isFalse()) {
                 createTargetChecksumFile(targetFile.getName());
                 if (sourceFileNameRenamed != null) {
                     renameSourceFile(sourceFile);
+                }
+
+                if (removeSourceFile) {
+                    sourceFile.delete(false);
+                    transferStatus = TransferStatus.moved;
                 }
             }
         } catch (JobSchedulerException e) {
@@ -1182,58 +1224,26 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             throw new JobSchedulerException(msg, e);
         } finally {
             try {
-                if (sourceFileTransfer != null) {
-                    sourceFileTransfer.getHandler().release();
+                if (parent.getSourceClient() != null) {
+                    parent.getSourceClient().getHandler().release();
                 }
-                if (targetFileTransfer != null) {
-                    targetFileTransfer.getHandler().release();
+                if (parent.getTargetClient() != null) {
+                    parent.getTargetClient().getHandler().release();
                 }
-                if (isNewConnectionUsed) {
-                    if (sourceFileTransfer != null) {
-                        sourceFileTransfer.logout();
-                        sourceFileTransfer.disconnect();
-                    }
-                    if (targetFileTransfer != null) {
-                        targetFileTransfer.logout();
-                        targetFileTransfer.disconnect();
-                    }
-                }
-            } catch (IOException e) {
+
+            } catch (Exception e) {
                 //
             }
         }
     }
 
-    public void setSourceConnectionPool(final SOSVfsConnectionPool val) {
-        sourceConnectionPool = val;
-    }
-
-    public void setTargetConnectionPool(final SOSVfsConnectionPool val) {
-        targetConnectionPool = val;
-    }
-
-    public void setSourceFileTransfer(final ISOSVfsFileTransfer fileTransfer) {
-        sourceFileTransfer = fileTransfer;
-        sourceFileModificationDateTime = -1;
-        if (sourceFileTransfer != null) {
-            ISOSVirtualFile file = sourceFileTransfer.getFileHandle(sourceFileName);
-            if (file != null) {
-                sourceFileModificationDateTime = file.getModificationDateTime();
-            }
-        }
-    }
-
-    public void setTargetFileTransfer(final ISOSVfsFileTransfer val) {
-        targetFileTransfer = val;
-    }
-
-    public void setNoOfBytesTransferred(final long bytes) {
+    public void setNoOfBytesTransferred(final long bytes, long fileSize) {
         bytesTransferred = bytes;
-        SOSConnection2Options connectionOptions = options.getConnectionOptions();
-        if (!(options.checkSize.isFalse() || options.compressFiles.isTrue() || options.transferMode.isAscii() || connectionOptions
-                .getSource().transferMode.isAscii() || connectionOptions.getTarget().transferMode.isAscii())) {
+        SOSConnection2Options connectionOptions = parent.getOptions().getConnectionOptions();
+        if (!(parent.getOptions().checkSize.isFalse() || parent.getOptions().compressFiles.isTrue() || parent.getOptions().transferMode.isAscii()
+                || connectionOptions.getSource().transferMode.isAscii() || connectionOptions.getTarget().transferMode.isAscii())) {
             if (sourceFileSize <= 0) {
-                sourceFileSize = sourceFileTransfer.getFileHandle(sourceFileName).getFileSize();
+                sourceFileSize = fileSize;// sourceFileTransfer.getFileHandle(sourceFileName).getFileSize();
             }
             if (sourceFileSize != bytesTransferred) {
                 LOGGER.error(SOSVfs_E_216.params(bytesTransferred, sourceFileSize, sourceFileName));
@@ -1251,8 +1261,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void setNotOverwritten() {
         transferStatus = TransferStatus.notOverwritten;
-        transferEnd = now();
-        // LOGGER.warn(SOSVfs_D_0111.params(strSourceFileName));
+        endTime = Instant.now();
         LOGGER.warn(String.format("[skipped][due to overwrite constraint]Source=%s", sourceFileName));
     }
 
@@ -1260,13 +1269,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return transferStatus.equals(TransferStatus.notOverwritten);
     }
 
-    public void setFileList(final SOSFileList list) {
-        fileList = list;
-        sourceFileTransfer = fileList.sourceFileTransfer;
-        targetFileTransfer = fileList.targetFileTransfer;
-        if (sourceFileTransfer != null) {
-            setSourceFileProperties(sourceFileTransfer.getFileHandle(sourceFileName));
-        }
+    public void setParent(final SOSFileList list) {
+        parent = list;
     }
 
     public void setSourceFileProperties(ISOSVirtualFile file) {
@@ -1285,20 +1289,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             msg = SOSVfs_I_0115.get();
             break;
         case transfer_skipped:
-            transferEnd = now();
             msg = SOSVfs_I_0116.get();
             break;
         case transferring:
             msg = SOSVfs_I_0117.get();
-            transferStart = now();
             break;
         case transferred:
             msg = SOSVfs_I_0118.get();
-            transferEnd = now();
             break;
         case transfer_aborted:
             msg = SOSVfs_I_0119.get();
-            transferEnd = now();
             break;
         default:
             break;
@@ -1318,8 +1318,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         setStatus(TransferStatus.transferred);
     }
 
-    public void setStatusEndTransfer(final long val) {
-        setNoOfBytesTransferred(val);
+    public void setStatusEndTransfer(final long val, long fileSize) {
+        setNoOfBytesTransferred(val, fileSize);
         setStatusEndTransfer();
     }
 
@@ -1337,7 +1337,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void setTransferSkipped() {
         transferStatus = TransferStatus.transfer_skipped;
-        transferEnd = now();
+        endTime = Instant.now();
         String msg = SOSVfs_D_0110.params(sourceFileName);
         LOGGER.debug(msg);
         JADE_REPORT_LOGGER.info(msg);
@@ -1345,12 +1345,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void setIgnoredDueToZerobyteConstraint() {
         transferStatus = TransferStatus.ignoredDueToZerobyteConstraint;
-        transferEnd = now();
+        endTime = Instant.now();
     }
 
     public boolean isSourceFileExists() {
         try {
-            return sourceFileTransfer.getFileHandle(sourceFileName).fileExists();
+            return parent.getSourceClient().getFileHandle(sourceFileName).fileExists();
         } catch (Exception e) {
             //
         }
@@ -1376,211 +1376,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return targetTransferFileName;
     }
 
-    private String normalizeErrorMessageForXml(String msg) {
-        msg = msg.replaceAll("\r?\n", " ");
-        msg = StringEscapeUtils.escapeXml(msg);
-        int msgLength = msg.length();
-        if (msgLength > 255) {
-            msg = msg.substring(msgLength - 255, msgLength);
-        }
-        return msg;
-    }
-
-    private String normalizeErrorMessageForCSV(String msg) {
-        msg = msg.replaceAll("\r?\n", " ");
-        msg = StringEscapeUtils.escapeCsv(msg);
-        int msgLength = msg.length();
-        if (msgLength > 255) {
-            msg = msg.substring(msgLength - 255, msgLength);
-        }
-        return msg;
-    }
-
-    public Map<String, String> getFileAttributes(HistoryRecordType recordType) {
-        Map<String, String> fileAttributes = new HashMap<String, String>();
-        String mandator = options.mandator.getValue(); // 0-
-        String pid = "0";
-        try {
-            pid = ManagementFactory.getRuntimeMXBean().getName();
-            String[] arr = pid.split("@");
-            pid = arr[0];
-        } catch (Exception e) {
-            pid = "0";
-        }
-        String ppid = System.getProperty(FIELD_PPID, "0");
-        String operation = options.operation.getValue();
-        SOSConnection2OptionsAlternate source = options.getConnectionOptions().getSource();
-        if (source.alternateOptionsUsed.isTrue()) {
-            source = source.getAlternatives();
-        }
-        SOSConnection2OptionsAlternate target = options.getConnectionOptions().getTarget();
-        if (target.alternateOptionsUsed.isTrue()) {
-            target = target.getAlternatives();
-        }
-        String localhost = source.host.getLocalHostIfHostIsEmpty();
-        String localhost_ip = source.host.getLocalHostAdressIfHostIsEmpty();
-        String local_user = source.user.getSystemUserIfUserIsEmpty();
-        String remote_host = target.host.getLocalHostIfHostIsEmpty();
-        String remote_host_ip = target.host.getLocalHostAdressIfHostIsEmpty();
-        String remote_user = target.user.getSystemUserIfUserIsEmpty();
-        String protocol = target.protocol.getValue();
-        String port = target.port.getValue();
-        String local_dir = source.directory.getValue();
-        if (isEmpty(local_dir)) {
-            local_dir = "";
-        } else {
-            local_dir = normalized(local_dir);
-        }
-        String remote_dir = target.directory.getValue();
-        if (isEmpty(remote_dir)) {
-            remote_dir = "";
-        } else {
-            remote_dir = normalized(remote_dir);
-        }
-        String local_filename = getSourceFilename();
-        local_filename = adjustFileSeparator(local_filename);
-        String remote_filename = getTargetFilename();
-        if (isEmpty(remote_filename)) {
-            remote_filename = "";
-        } else {
-            remote_filename = adjustFileSeparator(remote_filename);
-        }
-        String fileSize = String.valueOf(getFileSize());
-        String last_error_message = "";
-        if (!isEmpty(errorMessage)) {
-            if (recordType.equals(HistoryRecordType.XML)) {
-                last_error_message = normalizeErrorMessageForXml(errorMessage);
-            } else if (recordType.equals(HistoryRecordType.CSV)) {
-                last_error_message = normalizeErrorMessageForCSV(errorMessage);
-            }
-        }
-        String log_filename = options.logFilename.getValue();
-        String jump_host = options.jumpHost.getValue();
-        String jump_user = options.jumpUser.getValue();
-        String jump_host_ip = "";
-        String jump_port = "";
-        String jump_protocol = "";
-        if (!isEmpty(jump_host) && !isEmpty(jump_user)) {
-            jump_host_ip = options.jumpHost.getHostAdress();
-            jump_port = options.jumpPort.getValue();
-            jump_protocol = options.jumpProtocol.getValue();
-        }
-        Date endTime = getEndTime();
-        Date startTime = getStartTime();
-        if (startTime == null) {
-            startTime = now();
-        }
-        if (endTime == null) {
-            endTime = startTime;
-        }
-        fileAttributes.put(FIELD_GUID, guid);
-        fileAttributes.put(FIELD_MANDATOR, mandator);
-        fileAttributes.put(FIELD_TRANSFER_END, getTransferTimeAsString(endTime));
-        fileAttributes.put(FIELD_PID, pid);
-        fileAttributes.put(FIELD_PPID, ppid);
-        fileAttributes.put(FIELD_OPERATION, operation);
-        fileAttributes.put(FIELD_LOCALHOST, localhost);
-        fileAttributes.put(FIELD_LOCALHOST_IP, localhost_ip);
-        fileAttributes.put(FIELD_LOCAL_USER, local_user);
-        fileAttributes.put(FIELD_REMOTE_HOST, remote_host);
-        fileAttributes.put(FIELD_REMOTE_HOST_IP, remote_host_ip);
-        fileAttributes.put(FIELD_REMOTE_USER, remote_user);
-        fileAttributes.put(FIELD_PROTOCOL, protocol);
-        fileAttributes.put(FIELD_PORT, port);
-        fileAttributes.put(FIELD_LOCAL_DIR, local_dir);
-        fileAttributes.put(FIELD_REMOTE_DIR, remote_dir);
-        fileAttributes.put(FIELD_LOCAL_FILENAME, local_filename);
-        fileAttributes.put(FIELD_REMOTE_FILENAME, remote_filename);
-        fileAttributes.put(FIELD_FILE_SIZE, fileSize);
-        fileAttributes.put(FIELD_MD5, getMd5());
-        String status = getStatusText();
-        if ("transferred".equalsIgnoreCase(status)) {
-            status = "success";
-        }
-        fileAttributes.put(FIELD_STATUS, status);
-        fileAttributes.put(FIELD_LAST_ERROR_MESSAGE, last_error_message);
-        fileAttributes.put(FIELD_LOG_FILENAME, log_filename);
-        fileAttributes.put(FIELD_JUMP_HOST, jump_host);
-        fileAttributes.put(FIELD_JUMP_HOST_IP, jump_host_ip);
-        fileAttributes.put(FIELD_JUMP_PORT, jump_port);
-        fileAttributes.put(FIELD_JUMP_PROTOCOL, jump_protocol);
-        fileAttributes.put(FIELD_JUMP_USER, jump_user);
-        fileAttributes.put(FIELD_TRANSFER_START, getTransferTimeAsString(startTime));
-        if (jumpHistoryRecord != null) {
-            if ("copyToInternet".equals(options.getDmzOptions().get("operation"))) {
-                fileAttributes.put(FIELD_JUMP_HOST, fileAttributes.get(FIELD_REMOTE_HOST));
-                fileAttributes.put(FIELD_JUMP_HOST_IP, fileAttributes.get(FIELD_REMOTE_HOST_IP));
-                fileAttributes.put(FIELD_JUMP_PORT, fileAttributes.get(FIELD_PORT));
-                fileAttributes.put(FIELD_JUMP_PROTOCOL, fileAttributes.get(FIELD_PROTOCOL));
-                fileAttributes.put(FIELD_JUMP_USER, fileAttributes.get(FIELD_REMOTE_USER));
-                fileAttributes.put(FIELD_REMOTE_HOST, jumpHistoryRecord.get(FIELD_REMOTE_HOST));
-                fileAttributes.put(FIELD_REMOTE_HOST_IP, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_HOST_IP, ""));
-                fileAttributes.put(FIELD_REMOTE_USER, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_USER, ""));
-                fileAttributes.put(FIELD_PROTOCOL, jumpHistoryRecord.getOrDefault(FIELD_PROTOCOL, ""));
-                fileAttributes.put(FIELD_PORT, jumpHistoryRecord.getOrDefault(FIELD_PORT, ""));
-                fileAttributes.put(FIELD_REMOTE_DIR, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_DIR, ""));
-                fileAttributes.put(FIELD_REMOTE_FILENAME, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_FILENAME, ""));
-                fileAttributes.put(FIELD_TRANSFER_END, jumpHistoryRecord.getOrDefault(FIELD_TRANSFER_END, ""));
-                fileAttributes.put(FIELD_STATUS, jumpHistoryRecord.getOrDefault(FIELD_STATUS, ""));
-                if (recordType.equals(HistoryRecordType.XML)) {
-                    last_error_message = normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(
-                            FIELD_LAST_ERROR_MESSAGE, "")));
-                } else {
-                    last_error_message = jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "");
-                }
-                fileAttributes.put(FIELD_LAST_ERROR_MESSAGE, last_error_message);
-            } else if ("copyFromInternet".equals(options.getDmzOptions().get("operation"))) {
-                fileAttributes.put(FIELD_JUMP_HOST, fileAttributes.get(FIELD_LOCALHOST));
-                fileAttributes.put(FIELD_JUMP_HOST_IP, fileAttributes.get(FIELD_LOCALHOST_IP));
-                fileAttributes.put(FIELD_JUMP_PORT, source.port.getValue());
-                fileAttributes.put(FIELD_JUMP_PROTOCOL, source.protocol.getValue());
-                fileAttributes.put(FIELD_JUMP_USER, source.user.getValue());
-                fileAttributes.put(FIELD_LOCALHOST, jumpHistoryRecord.get(FIELD_LOCALHOST));
-                fileAttributes.put(FIELD_LOCALHOST_IP, jumpHistoryRecord.getOrDefault(FIELD_LOCALHOST_IP, ""));
-                fileAttributes.put(FIELD_LOCAL_DIR, jumpHistoryRecord.getOrDefault(FIELD_LOCAL_DIR, ""));
-                fileAttributes.put(FIELD_LOCAL_FILENAME, jumpHistoryRecord.getOrDefault(FIELD_LOCAL_FILENAME, ""));
-                fileAttributes.put(FIELD_TRANSFER_START, jumpHistoryRecord.getOrDefault(FIELD_TRANSFER_START, ""));
-            }
-        }
-        return fileAttributes;
-    }
-
-    public String toCsv() {
-        Map<String, String> properties = getFileAttributes(HistoryRecordType.CSV);
-        StringBuffer strB = new StringBuffer();
-        strB.append(properties.get(FIELD_GUID) + ";");
-        strB.append(properties.get(FIELD_MANDATOR) + ";");
-        strB.append(properties.get(FIELD_TRANSFER_END) + ";");
-        strB.append(properties.get(FIELD_PID) + ";");
-        strB.append(properties.get(FIELD_PPID) + ";");
-        strB.append(properties.get(FIELD_OPERATION) + ";");
-        strB.append(properties.get(FIELD_LOCALHOST) + ";");
-        strB.append(properties.get(FIELD_LOCALHOST_IP) + ";");
-        strB.append(properties.get(FIELD_LOCAL_USER) + ";");
-        strB.append(properties.get(FIELD_REMOTE_HOST) + ";");
-        strB.append(properties.get(FIELD_REMOTE_HOST_IP) + ";");
-        strB.append(properties.get(FIELD_REMOTE_USER) + ";");
-        strB.append(properties.get(FIELD_PROTOCOL) + ";");
-        strB.append(properties.get(FIELD_PORT) + ";");
-        strB.append(properties.get(FIELD_LOCAL_DIR) + ";");
-        strB.append(properties.get(FIELD_REMOTE_DIR) + ";");
-        strB.append(properties.get(FIELD_LOCAL_FILENAME) + ";");
-        strB.append(properties.get(FIELD_REMOTE_FILENAME) + ";");
-        strB.append(properties.get(FIELD_FILE_SIZE) + ";");
-        strB.append(properties.get(FIELD_MD5) + ";");
-        strB.append(properties.get(FIELD_STATUS) + ";");
-        strB.append(properties.get(FIELD_LAST_ERROR_MESSAGE) + ";");
-        strB.append(properties.get(FIELD_LOG_FILENAME) + ";");
-        strB.append(properties.get(FIELD_JUMP_HOST) + ";");
-        strB.append(properties.get(FIELD_JUMP_HOST_IP) + ";");
-        strB.append(properties.get(FIELD_JUMP_PORT) + ";");
-        strB.append(properties.get(FIELD_JUMP_PROTOCOL) + ";");
-        strB.append(properties.get(FIELD_JUMP_USER) + ";");
-        strB.append(properties.get(FIELD_TRANSFER_START) + ";");
-        strB.append(getTransferTimeAsString(now()));
-        return strB.toString();
-    }
-
     private String toHexString(final byte[] b) {
         char[] hexChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
         int length = b.length * 2;
@@ -1596,7 +1391,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public String toString() {
         String msg;
         try {
-            msg = SOSVfs_D_214.params(getTargetFileNameAndPath(), getSourceFileName(), getBytesTransferred(), options.operation.getValue());
+            msg = SOSVfs_D_214.params(getTargetFileNameAndPath(), getSourceFileName(), getBytesTransferred(), parent.getOptions().operation
+                    .getValue(), getDateTimeInfos(startTime, endTime));
         } catch (RuntimeException e) {
             LOGGER.error(e.toString());
             msg = "???";
@@ -1604,12 +1400,28 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return msg;
     }
 
-    public void setTransferStatus(final TransferStatus val) {
-        setStatus(val);
+    public static String getDateTimeInfos(Instant start, Instant end) {
+        StringBuilder sb = new StringBuilder("(");
+        if (start != null) {
+            sb.append(SOSDate.getDateTime(start));
+        }
+        sb.append("-");
+        if (end != null) {
+            sb.append(SOSDate.getDateTime(end));
+        }
+        sb.append(")");
+        if (start != null && end != null) {
+            sb.append(SOSDate.getDuration(start, end));
+        }
+        return sb.toString();
     }
 
-    public void setVfsHandler(final ISOSVfsFileTransfer val) {
-        fileTransfer = val;
+    public SOSFileEntry getEntry() {
+        return entry;
+    }
+
+    public void setTransferStatus(final TransferStatus val) {
+        setStatus(val);
     }
 
     private boolean fileNamesAreEqual(String filenameA, String filenameB, boolean caseSensitiv) {
@@ -1626,23 +1438,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return targetChecksumFile;
     }
 
-    private String getTransferTimeAsString(Date time) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.setLenient(false);
-        return formatter.format(time.getTime());
-    }
-
-    public void setJumpHistoryRecord(Map<String, String> val) {
-        jumpHistoryRecord = val;
-    }
-
     private Buffer compress(byte[] dataToCompress) {
         return compress(dataToCompress, dataToCompress.length);
     }
 
     private Buffer compress(byte[] dataToCompress, int length) {
         Buffer buf = new Buffer();
-        if (options.compressFiles.isTrue()) {
+        if (parent.getOptions().compressFiles.isTrue()) {
             try {
                 ByteArrayOutputStream byteStream = new ByteArrayOutputStream(length);
                 try {
@@ -1669,10 +1471,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public long getSourceFileModificationDateTime() {
         return sourceFileModificationDateTime;
-    }
-
-    public void setEventHandler(IJobSchedulerEventHandler val) {
-        eventHandler = val;
     }
 
     private class EntryPaths {
