@@ -204,7 +204,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         openSession();
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
-                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
+                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName,true);
                 LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
             }
         }

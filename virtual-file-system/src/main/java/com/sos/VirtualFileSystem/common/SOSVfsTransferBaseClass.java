@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +19,6 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -36,16 +37,18 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem,
         ISOSConnection {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
+    private List<SOSFileEntry> directoryListing = null;
+
+    protected SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
+    protected ISOSAuthenticationOptions authenticationOptions = null;
+
     protected String authenticationFilename = "";
     protected String host = EMPTY_STRING;
     protected int port = 0;
     protected String userName = EMPTY_STRING;
     protected String reply = "OK";
     protected String currentDirectory = "";
-    protected SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
-    protected ISOSAuthenticationOptions authenticationOptions = null;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
-    private Vector<String> directoryListing = null;
 
     public SOSVfsTransferBaseClass() {
         super();
@@ -63,11 +66,10 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     @Override
     public String doPWD() {
         try {
-            logDEBUG(SOSVfs_D_141.params("pwd."));
+            LOGGER.debug(SOSVfs_D_141.params("pwd."));
             return this.getCurrentPath();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("pwd"));
-            return null;
+            throw new JobSchedulerException(SOSVfs_E_134.params("pwd"), e);
         }
     }
 
@@ -78,7 +80,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     protected boolean logReply() {
         reply = getReplyString();
         if (!reply.trim().isEmpty()) {
-            logDEBUG(reply);
+            LOGGER.debug(reply);
         }
         return true;
     }
@@ -111,93 +113,24 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public Vector<String> nList(final String pathname) {
-        return getFilenames(pathname);
-    }
-
-    @Override
-    public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
-        Vector<String> result = null;
+    public List<SOSFileEntry> nList(final String pathname, final boolean flgRecurseSubFolder, boolean checkIfExists) {
         try {
-            result = getFilenames(pathname, flgRecurseSubFolder);
+            return getFilenames(pathname, flgRecurseSubFolder, 0, checkIfExists);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("nList"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("nList"), e);
         }
-        return result;
-    }
-
-    @Override
-    public Vector<String> nList() {
-        Vector<String> result = null;
-        try {
-            result = getFilenames();
-        } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("nList"));
-        }
-        return result;
-    }
-
-    @Override
-    public Vector<String> nList(final boolean recursive) {
-        Vector<String> result = null;
-        try {
-            result = getFilenames(recursive);
-        } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("nList"));
-        }
-        return result;
-    }
-
-    public SOSFileList dir(final String pathname) {
-        Vector<String> strList = getFilenames(pathname);
-        String[] strT = strList.toArray(new String[strList.size()]);
-        SOSFileList objFileList = new SOSFileList(strT);
-        return objFileList;
-    }
-
-    @Override
-    public SOSFileList dir(final String pathname, final int flag) {
-        SOSFileList fileList = new SOSFileList();
-        String[] listFiles = null;
-        try {
-            listFiles = this.listNames(pathname);
-        } catch (IOException e) {
-            raiseException(e, SOSVfs_E_128.params(listFiles, "dir()"));
-        }
-        if (listFiles != null) {
-            for (String listFile : listFiles) {
-                if (flag > 0 && isDirectory(listFile)) {
-                    fileList.addAll(this.dir(pathname + "/" + listFile, flag >= 1024 ? flag : flag + 1024));
-                } else {
-                    if (flag >= 1024) {
-                        fileList.add(pathname + "/" + listFile.toString());
-                    } else {
-                        fileList.add(listFile.toString());
-                    }
-                }
-            }
-        }
-        return fileList;
     }
 
     @Override
     public boolean isDirectory(final String filename) {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
         return false;
     }
 
     @Override
-    public String[] listNames(final String path) throws IOException {
-        logINFO("not implemented yet");
+    public List<SOSFileEntry> listNames(final String path, boolean checkIfExists, boolean checkIfIsDirector) throws IOException {
+        LOGGER.info("not implemented yet");
         return null;
-    }
-
-    public SOSFileList dir() {
-        try {
-            return dir(".");
-        } catch (Exception e) {
-            throw new RuntimeException(SOSVfs_E_130.params("dir"), e);
-        }
     }
 
     public String getResponse() {
@@ -255,13 +188,13 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public long putFile(final String localFile, final String remoteFile) {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
         return 0;
     }
 
     public long putFile(final String localFile, final OutputStream out) {
         if (out == null) {
-            raiseException(SOSVfs_E_147.get());
+            throw new JobSchedulerException(SOSVfs_E_147.get());
         }
         FileInputStream in = null;
         long bytesWrittenTotal = 0;
@@ -279,12 +212,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             closeObject(out);
             return bytesWrittenTotal;
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_130.params("putFile()"));
+            throw new JobSchedulerException(SOSVfs_E_130.params("putFile()"), e);
         } finally {
             closeInput(in);
             closeObject(out);
         }
-        return bytesWrittenTotal;
     }
 
     @Override
@@ -314,7 +246,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public boolean changeWorkingDirectory(final String pathname) throws IOException {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
         return true;
     }
 
@@ -347,12 +279,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         try {
             if (isConnected()) {
                 disconnect();
-                logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
+                LOGGER.debug(SOSVfs_D_138.params(host, getReplyString()));
             } else {
-                logINFO("not connected, logout useless.");
+                LOGGER.info("not connected, logout useless.");
             }
         } catch (Exception e) {
-            logWARN(SOSVfs_W_140.get() + e.getMessage());
+            LOGGER.warn(SOSVfs_W_140.get() + e.getMessage(), e);
         }
     }
 
@@ -367,7 +299,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
     }
 
     @Override
@@ -397,7 +329,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     public void closeConnection() throws Exception {
         if (isConnected()) {
             disconnect();
-            logDEBUG(SOSVfs_D_125.params(host));
+            LOGGER.debug(SOSVfs_D_125.params(host));
             logReply();
         }
     }
@@ -447,9 +379,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     public SOSFileListEntry getNewVirtualFile(final String pstrFileName) {
-        SOSFileListEntry objF = new SOSFileListEntry(pstrFileName);
-        objF.setVfsHandler(this);
-        return objF;
+        return new SOSFileListEntry(pstrFileName);
     }
 
     @Override
@@ -475,9 +405,14 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public SOSFileList dir(final SOSFolderName pobjFolderName) {
-        this.dir(pobjFolderName.getValue());
-        return null;
+    public List<SOSFileEntry> dir(final SOSFolderName pobjFolderName) {
+        try {
+            return getFilenames(pobjFolderName.getValue(), false, 0, true);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }//
     }
 
     @Override
@@ -506,31 +441,40 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, String integrityHashType) {
-        Vector<String> result = nList(folder, withSubFolder);
-        Vector<String> newResult = new Vector<String>();
+    public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder,
+            boolean checkIfExists, String integrityHashType) {
+        List<SOSFileEntry> result = nList(folder, withSubFolder, checkIfExists);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s][total] %s files", folder, result.size()));
+        }
+
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         Pattern pattern = Pattern.compile(regexp, flag);
-        for (String strFile : result) {
-            Matcher matcher = pattern.matcher(new File(strFile).getName());
+        for (SOSFileEntry fe : result) {
+            Matcher matcher = pattern.matcher(fe.getFilename());
             if (matcher.find()) {
-                newResult.add(strFile);
+                list.add(fe);
             }
         }
-        return newResult.toArray(new String[newResult.size()]);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s][filtered] %s files", folder, list.size()));
+        }
+        return list;
     }
 
     @Override
-    public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
-        Vector<String> result = nList(folder, withSubFolder);
-        Vector<String> newResult = new Vector<String>();
+    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+        List<SOSFileEntry> result = nList(folder, withSubFolder, true);
+
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         Pattern pattern = Pattern.compile(regexp, flag);
-        for (String strFile : result) {
-            Matcher matcher = pattern.matcher(new File(strFile).getName());
+        for (SOSFileEntry entry : result) {
+            Matcher matcher = pattern.matcher(entry.getFilename());
             if (matcher.find()) {
-                newResult.add(strFile);
+                list.add(entry);
             }
         }
-        return newResult.toArray(new String[newResult.size()]);
+        return list;
     }
 
     @Override
@@ -540,7 +484,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     protected long size(final String strFileName) throws Exception {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
         return 0;
     }
 
@@ -564,7 +508,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public String getModificationTime(final String fileName) {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
         return null;
     }
 
@@ -599,7 +543,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
     }
 
     @Override
@@ -653,17 +597,17 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void mkdir(final String pathname) throws IOException {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
     }
 
     @Override
     public void rmdir(final String pstrFolderName) throws IOException {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
     }
 
     @Override
-    public void delete(final String pathname) throws IOException {
-        logINFO("not implemented yet");
+    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
+        LOGGER.info("not implemented yet");
     }
 
     @Override
@@ -673,104 +617,41 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public void rename(final String from, final String to) {
-        logINFO("not implemented yet");
+        LOGGER.info("not implemented yet");
     }
 
-    protected void raiseException(final Exception e, final String msg) {
-        LOGGER.error(msg + " (" + e.getMessage() + ")");
-        throw new JobSchedulerException(msg, e);
-    }
-
-    protected void raiseException(final String msg) {
-        logEXCEPTION(msg);
-        throw new JobSchedulerException(msg);
-    }
-
-    private String getLogPrefix() {
-        return getLogPrefix(4);
-    }
-
-    private String getLogPrefix(final int level) {
-        StackTraceElement ste = Thread.currentThread().getStackTrace()[level];
-        String[] classNameArr = ste.getClassName().split("\\.");
-        return "(" + classNameArr[classNameArr.length - 1] + "::" + ste.getMethodName() + ") ";
-    }
-
-    protected void logINFO(final Object msg) {
-        LOGGER.info(this.getLogPrefix() + msg);
-    }
-
-    protected void logDEBUG(final Object msg) {
-        LOGGER.debug(this.getLogPrefix() + msg);
-    }
-
-    protected void logWARN(final Object msg) {
-        LOGGER.warn(this.getLogPrefix() + msg);
-    }
-
-    protected void logERROR(final Object msg) {
-        LOGGER.error(this.getLogPrefix() + msg);
-    }
-
-    protected void logEXCEPTION(final Object msg) {
-        LOGGER.error(this.getLogPrefix(4) + msg);
-    }
-
-    private Vector<String> getFilenames() throws Exception {
-        return getFilenames("", false);
-    }
-
-    private Vector<String> getFilenames(final boolean flgRecurseSubFolders) throws Exception {
-        return getFilenames("", flgRecurseSubFolders);
-    }
-
-    private Vector<String> getFilenames(final String pathname) {
-        try {
-            return getFilenames(pathname, false);
-        } catch (Exception e) {
-            raiseException(e, SOSVfs_E_130.params("getFilelist"));
-            return null;
-        }
-    }
-
-    private Vector<String> getFilenames(final String path, final boolean recurseSubFolders) throws Exception {
-        return getFilenames(path, recurseSubFolders, 0);
-    }
-
-    private Vector<String> getFilenames(String path, final boolean recurseSubFolders, int recLevel) throws Exception {
-        String currentPath = "";
+    private List<SOSFileEntry> getFilenames(String path, final boolean recurseSubFolders, int recLevel, boolean checkIfExists) throws Exception {
         if (recLevel == 0) {
-            directoryListing = new Vector<String>();
-            currentPath = this.doPWD();
+            directoryListing = new ArrayList<SOSFileEntry>();
+            this.doPWD();
         }
-        String[] fileList = null;
+        List<SOSFileEntry> entries = null;
         path = path.trim();
         if (path.isEmpty()) {
             path = ".";
         }
         try {
-            fileList = listNames(path);
+            entries = listNames(path, checkIfExists, checkIfExists);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
-        if (fileList == null) {
+        if (entries == null) {
             return directoryListing;
         }
-        for (String currentFile : fileList) {
-            if (!isNotHiddenFile(currentFile)) {
+        for (SOSFileEntry entry : entries) {
+            if (!isNotHiddenFile(entry.getFilename())) {
                 continue;
             }
-            if (currentFile.indexOf("/") == -1) {
-                currentFile = path + "/" + currentFile;
-                currentFile = currentFile.replaceAll("//+", "/");
-            }
-            if (this.isDirectory(currentFile)) {
+            /** if (currentFile.indexOf("/") == -1) { currentFile = path + "/" + currentFile; currentFile = currentFile.replaceAll("//+", "/"); } if
+             * (this.isDirectory(currentFile)) { if (recurseSubFolders) { recLevel++; this.getFilenames(currentFile, recurseSubFolders, recLevel); } } else {
+             * directoryListing.add(currentFile); } */
+            if (entry.isDirectory()) {
                 if (recurseSubFolders) {
                     recLevel++;
-                    this.getFilenames(currentFile, recurseSubFolders, recLevel);
+                    getFilenames(entry.getFullPath(), recurseSubFolders, recLevel, checkIfExists);
                 }
             } else {
-                directoryListing.add(currentFile);
+                directoryListing.add(entry);
             }
         }
         return directoryListing;
@@ -809,6 +690,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
                 throw new JobSchedulerException(e);
             }
         }
+    }
+
+    @Override
+    public List<SOSFileEntry> dir(String pathname, int flag) {
+        notImplemented();
+        return null;
     }
 
 }

@@ -1,9 +1,11 @@
 package com.sos.VirtualFileSystem.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 
@@ -11,7 +13,7 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
     protected boolean flgLoggedIn = false;
     protected boolean flgConnected = false;
     protected SOSFTPOptions objOptions = null;
-    protected SOSFileEntries sosFileEntries = null;
+    protected List<SOSFileEntry> sosFileEntries = null;
     private enuSourceOrTarget intSourceOrTarget = enuSourceOrTarget.isUndefined;
 
     public static enum enuSourceOrTarget {
@@ -20,7 +22,7 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 
     public SOSVfsBaseClass() {
         super("SOSVirtualFileSystem");
-        sosFileEntries = new SOSFileEntries();
+        sosFileEntries = new ArrayList<SOSFileEntry>();
     }
 
     public boolean isConnected() {

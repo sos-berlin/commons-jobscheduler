@@ -4,7 +4,7 @@ import com.sos.JSHelper.Options.JSOptionsClass;
 
 public interface IJadeEngine extends Runnable {
 
-    public abstract boolean execute() throws Exception;
+    public abstract void execute() throws Exception;
 
     public abstract int getCC();
 

@@ -672,15 +672,14 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     @JSOptionDefinition(name = "server_alive_interval", description = "Sets the interval to send a keep-alive message. can contains not integer value", key = "server_alive_interval", type = "SOSOptionString", mandatory = false)
     public SOSOptionString server_alive_interval = new SOSOptionString(this, CLASSNAME + ".server_alive_interval",
             "Sets the interval to send a keep-alive message", "", "", false);
-    
+
     @JSOptionDefinition(name = "server_alive_count_max", description = "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", key = "server_alive_count_max", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger server_alive_count_max = new SOSOptionInteger(this, CLASSNAME + ".server_alive_count_max",
             "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
-    
-    @JSOptionDefinition(name = "use_keyagent", description = "Using a keyagent to get the privat key file", key = "use_keyagent",
-            type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", 
-            "Using a keyagent to get the privat key file", "false", "false", false);
+
+    @JSOptionDefinition(name = "use_keyagent", description = "Using a keyagent to get the privat key file", key = "use_keyagent", type = "SOSOptionBoolean", mandatory = true)
+    public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", "Using a keyagent to get the privat key file",
+            "false", "false", false);
 
     public SOSOptionBoolean isUseKeyAgent() {
         return useKeyAgent;
@@ -689,5 +688,13 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public void setUseKeyAgent(final SOSOptionBoolean useKeyAgent) {
         this.useKeyAgent = useKeyAgent;
     }
+
+    @JSOptionDefinition(name = "session_connect_timeout", description = "Sets the interval for session connect", key = "session_connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString session_connect_timeout = new SOSOptionString(this, CLASSNAME + ".session_connect_timeout",
+            "Sets the interval for session connect", "", "", false);
+
+    @JSOptionDefinition(name = "channel_connect_timeout", description = "Sets the interval for channel connect", key = "channel_connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString channel_connect_timeout = new SOSOptionString(this, CLASSNAME + ".channel_connect_timeout",
+            "Sets the interval for cannel connect", "", "", false);
 
 }

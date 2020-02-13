@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -23,7 +25,6 @@ import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
@@ -36,7 +37,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -113,7 +115,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void delete(final String pathname) throws IOException {
+    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
         throw new JSNotImplementedException();
     }
 
@@ -178,9 +180,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public String[] listNames(final String pathname) throws IOException {
-        Vector<String> objV = nList(pathname);
-        return objV.toArray(new String[objV.size()]);
+    public List<SOSFileEntry> listNames(final String pathname, boolean checkIfExists, boolean checkIfIsDirector) throws IOException {
+        return nList(pathname, false, checkIfExists);
     }
 
     @Override
@@ -199,32 +200,21 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public Vector<String> nList(final String pathname) {
+    public List<SOSFileEntry> nList(final String pathname, final boolean flgRecurseSubFolder, boolean checkIfExists) {
         changeWorkingDirectory(pathname);
-        Vector<String> objV = new Vector<String>();
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         for (Enumeration<? extends ZipEntry> e = objWorkingDirectory.entries(); e.hasMoreElements();) {
-            ZipEntry entry = e.nextElement();
-            String strZipEntryName = entry.getName();
-            LOGGER.debug(SOSVfs_D_201.params(strZipEntryName));
-            objV.add(strZipEntryName);
+            ZipEntry zipEntry = e.nextElement();
+
+            SOSFileEntry entry = new SOSFileEntry(EntryType.ZIP);
+            entry.setFilename(zipEntry.getName());
+            entry.setFilesize(zipEntry.getSize());
+            entry.setDirectory(zipEntry.isDirectory());
+            entry.setParentPath(pathname);
+
+            list.add(entry);
         }
-        return objV;
-    }
-
-    @Override
-    public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
-        return nList(pathname);
-    }
-
-    @Override
-    public Vector<String> nList(final boolean recursive) throws Exception {
-        return nList();
-    }
-
-    @Override
-    public Vector<String> nList() throws Exception {
-        notImplemented();
-        return null;
+        return list;
     }
 
     @Override
@@ -302,15 +292,12 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public SOSFileList dir(final SOSFolderName pobjFolderName) {
-        String[] strEntryNames = getFilelist("", ".*", 1, true, null);
-        SOSFileList objFL = new SOSFileList();
-        objFL.add(strEntryNames, "");
-        return objFL;
+    public List<SOSFileEntry> dir(final SOSFolderName pobjFolderName) {
+        return getFilelist("", ".*", 1, true, true, null);
     }
 
     @Override
-    public SOSFileList dir(final String pathname, final int flag) {
+    public List<SOSFileEntry> dir(final String pathname, final int flag) {
         notImplemented();
         return null;
     }
@@ -443,48 +430,57 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, String integrityHashType) {
-        String[] strS = null;
+    public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder,
+            boolean checkIfExists, String integrityHashType) {
+        List<SOSFileEntry> list = new ArrayList<>();
         try {
-            Vector<String> objV = new Vector<String>();
             Pattern pattern = Pattern.compile(regexp, flag);
             Enumeration<?> zipEntries = objWorkingDirectory.entries();
             while (zipEntries.hasMoreElements()) {
-                String strEntryName = ((ZipEntry) zipEntries.nextElement()).getName();
-                if (integrityHashType != null && strEntryName.endsWith(integrityHashType)) {
+                ZipEntry zipEntry = (ZipEntry) zipEntries.nextElement();
+
+                SOSFileEntry sosFileEntry = new SOSFileEntry(EntryType.ZIP);
+                sosFileEntry.setDirectory(zipEntry.isDirectory());
+                sosFileEntry.setFilename(zipEntry.getName());
+                sosFileEntry.setFilesize(zipEntry.getSize());
+                sosFileEntry.setParentPath(folder);
+
+                if (integrityHashType != null && sosFileEntry.getFilename().endsWith(integrityHashType)) {
                     continue;
                 }
-                Matcher matcher = pattern.matcher(strEntryName);
+                Matcher matcher = pattern.matcher(sosFileEntry.getFilename());
                 if (matcher.find()) {
-                    objV.add(strEntryName);
+                    list.add(sosFileEntry);
                 }
             }
-            strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
-        return strS;
+        return list;
     }
 
     @Override
-    public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
-        String[] strS = null;
+    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+        List<SOSFileEntry> list = new ArrayList<>();
         try {
-            Vector<String> objV = new Vector<String>();
             Pattern pattern = Pattern.compile(regexp, flag);
             Enumeration<?> zipEntries = objWorkingDirectory.entries();
             while (zipEntries.hasMoreElements()) {
-                String strEntryName = ((ZipEntry) zipEntries.nextElement()).getName();
-                Matcher matcher = pattern.matcher(strEntryName);
+                ZipEntry zipEntry = (ZipEntry) zipEntries.nextElement();
+                Matcher matcher = pattern.matcher(zipEntry.getName());
                 if (matcher.find()) {
-                    objV.add(strEntryName);
+                    SOSFileEntry sosFileEntry = new SOSFileEntry(EntryType.ZIP);
+                    sosFileEntry.setDirectory(zipEntry.isDirectory());
+                    sosFileEntry.setFilename(zipEntry.getName());
+                    sosFileEntry.setFilesize(zipEntry.getSize());
+                    sosFileEntry.setParentPath(folder);
+                    list.add(sosFileEntry);
                 }
             }
-            strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
-        return strS;
+        return list;
     }
 
     @Override
@@ -670,11 +666,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
-    }
-
-    @Override
     public void reconnect(SOSConnection2OptionsAlternate options) {
         //
     }
@@ -692,6 +683,12 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SOSFileEntry getFileEntry(final String pathname) throws Exception {
+        notImplemented();
         return null;
     }
 

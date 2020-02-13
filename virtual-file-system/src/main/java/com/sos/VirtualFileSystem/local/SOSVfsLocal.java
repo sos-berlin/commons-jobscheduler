@@ -1,10 +1,14 @@
 package com.sos.VirtualFileSystem.local;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -15,9 +19,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
-import com.sos.JSHelper.io.SOSFilelistFilter;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
@@ -30,7 +32,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.shell.CmdShell;
@@ -46,7 +49,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     private final OutputStream objOutputStream = null;
     private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
     private String strReplyString = "";
-    private File objWorkingDirectory = null;
     private CmdShell objCmdShell = null;
     private boolean simulateShell = false;
 
@@ -87,7 +89,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         File fleFile = new File(pstrPathName);
         if (fleFile.exists()) {
             if (fleFile.isDirectory()) {
-                objWorkingDirectory = new File(pstrPathName);
+                // objWorkingDirectory = new File(pstrPathName);
             } else {
                 flgResult = false;
             }
@@ -161,18 +163,18 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void delete(final String pathname) throws IOException {
+    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
         File objF = new File(getRealFileName(pathname));
         objF.delete();
     }
 
     @Override
-    public SOSFileList dir(final SOSFolderName pobjFolderName) {
+    public List<SOSFileEntry> dir(final SOSFolderName pobjFolderName) {
         return null;
     }
 
     @Override
-    public SOSFileList dir(final String pathname, final int flag) {
+    public List<SOSFileEntry> dir(final String pathname, final int flag) {
         return null;
     }
 
@@ -218,8 +220,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
         }
     }
-    
-    public CmdShell getCmdShell(){
+
+    public CmdShell getCmdShell() {
         if (objCmdShell == null) {
             objCmdShell = new CmdShell();
         }
@@ -277,61 +279,77 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder,
-            String integrityHashType) {
-        String[] strS = null;
+    public SOSFileEntry getFileEntry(final String pathname) throws Exception {
+        Path path = Paths.get(pathname);
+        SOSFileEntry entry = new SOSFileEntry(EntryType.FILESYSTEM);
+        entry.setDirectory(Files.isDirectory(path));
+        entry.setFilename(path.getFileName().toString());
+        entry.setFilesize(path.toFile().length());
+        entry.setParentPath(path.getParent().toString());
+        return entry;
+    }
+
+    @Override
+    public List<SOSFileEntry> listNames(final String pathname, boolean checkIfExists, boolean checkIfIsDirector) throws IOException {
+        File objF = new File(pathname);
+        File[] objA = objF.listFiles();
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
+        for (File file : objA) {
+            SOSFileEntry sosFileEntry = new SOSFileEntry(EntryType.FILESYSTEM);
+            sosFileEntry.setDirectory(file.isDirectory());
+            sosFileEntry.setFilename(file.getName());
+            sosFileEntry.setFilesize(file.length());
+            sosFileEntry.setParentPath(file.getParent());
+            list.add(sosFileEntry);
+        }
+        return list;
+    }
+
+    @Override
+    public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder,
+            boolean checkIfExists, String integrityHashType) {
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         try {
             Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
-            Vector<String> objV = new Vector<String>(objA.size());
             for (File objF : objA) {
+                if (objF.isDirectory()) {
+                    continue;
+                }
                 if (integrityHashType != null && objF.getName().endsWith(integrityHashType)) {
                     continue;
                 }
-                if (!objF.isDirectory()) {
-                    objV.add(objF.getPath());
-                }
+                SOSFileEntry entry = new SOSFileEntry(EntryType.FILESYSTEM);
+                entry.setFilename(objF.getName());
+                entry.setFilesize(objF.length());
+                entry.setDirectory(objF.isDirectory());
+                entry.setParentPath(objF.getParent());
+                list.add(entry);
             }
-            strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
-        return strS;
+        return list;
     }
 
-    private Vector<File> getFilelistVector(final String folder, final String regexp, final int RegExpFlag) throws Exception {
-        Vector<File> filelist = new Vector<File>();
-        if (folder == null || folder.isEmpty()) {
-            throw new FileNotFoundException("empty directory not allowed!!");
-        }
-        File f = new File(folder);
-        if (!f.exists()) {
-            throw new FileNotFoundException("directory does not exist: " + folder);
-        }
-        filelist = new Vector<File>();
-        File[] files = f.listFiles(new SOSFilelistFilter(regexp, RegExpFlag));
-        for (File file : files) {
-            if (file.isFile()) {
-                filelist.add(file);
-            }
-        }
-        return filelist;
-    }
-
-    private Vector<File> getFilelistVector(final String folder, final String regexp, final int flag, final boolean withSubFolder) throws Exception {
-        Vector<File> filelist = new Vector<File>();
-        File file = null;
-        File[] subDir = null;
-        file = new File(folder);
-        subDir = file.listFiles();
-        filelist.addAll(getFilelistVector(folder, regexp, flag));
-        if (withSubFolder) {
-            for (File element : subDir) {
-                if (element.isDirectory()) {
-                    filelist.addAll(getFilelistVector(element.getPath(), regexp, flag, true));
+    @Override
+    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder) {
+        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
+        try {
+            Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
+            for (File objF : objA) {
+                if (objF.isDirectory()) {
+                    SOSFileEntry entry = new SOSFileEntry(EntryType.FILESYSTEM);
+                    entry.setFilename(objF.getName());
+                    entry.setFilesize(objF.length());
+                    entry.setDirectory(objF.isDirectory());
+                    entry.setParentPath(objF.getParent());
+                    list.add(entry);
                 }
             }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
-        return filelist;
+        return list;
     }
 
     @Override
@@ -354,24 +372,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     @Override
     public long getFileSize(final String strFileName) {
         return 0;
-    }
-
-    @Override
-    public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder) {
-        String[] strS = null;
-        try {
-            Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
-            Vector<String> objV = new Vector<String>(objA.size());
-            for (File objF : objA) {
-                if (objF.isDirectory()) {
-                    objV.add(objF.getAbsolutePath());
-                }
-            }
-            strS = objV.toArray(new String[objV.size()]);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-        return strS;
     }
 
     @Override
@@ -444,18 +444,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public String[] listNames(final String pathname) throws IOException {
-        File objF = new File(pathname);
-        File[] objA = objF.listFiles();
-        String[] strT = new String[objA.length];
-        int i = 0;
-        for (File file : objA) {
-            strT[i++] = file.getAbsolutePath();
-        }
-        return strT;
-    }
-
-    @Override
     public void login(final String strUserName, final String strPassword) {
         //
     }
@@ -484,25 +472,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public Vector<String> nList() throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public Vector<String> nList(final boolean recursive) throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public Vector<String> nList(final String pathname) {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
+    public List<SOSFileEntry> nList(final String pathname, final boolean flgRecurseSubFolder, boolean checkIfExists) {
         notImplemented();
         return null;
     }
@@ -545,12 +515,10 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         int lngBufferSize = 1024;
         byte[] buffer = new byte[lngBufferSize];
         int intBytesTransferred;
-        long totalBytes = 0;
         try {
             synchronized (this) {
                 while ((intBytesTransferred = objFI.read(buffer)) != -1) {
                     objOS.write(buffer, 0, intBytesTransferred);
-                    totalBytes += intBytesTransferred;
                 }
                 objFI.close();
                 objOS.flush();
@@ -625,11 +593,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
         notImplemented();
-    }
-
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
     }
 
     @Override

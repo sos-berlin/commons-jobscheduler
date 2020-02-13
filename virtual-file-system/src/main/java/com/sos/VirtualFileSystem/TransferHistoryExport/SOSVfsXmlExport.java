@@ -59,8 +59,12 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
             writeItem("md5", jadeTransferDetailExportData.getMd5());
             writeItem("status", jadeTransferDetailExportData.getStatus());
             writeItem("status_text", jadeTransferDetailExportData.getStatusText());
-            writeItem("start_time", jadeTransferDetailExportData.getStartTime());
-            writeItem("end_time", jadeTransferDetailExportData.getEndTime());
+
+            Date startTime = jadeTransferDetailExportData.getStartTime() == null ? null : Date.from(jadeTransferDetailExportData.getStartTime());
+            Date endTime = jadeTransferDetailExportData.getEndTime() == null ? null : Date.from(jadeTransferDetailExportData.getEndTime());
+
+            writeItem("start_time", startTime);
+            writeItem("end_time", endTime);
             writeItem("modified_by", jadeTransferDetailExportData.getModifiedBy());
             writeItem("modified", jadeTransferDetailExportData.getModified());
             writeItem("created_by", jadeTransferDetailExportData.getCreatedBy());

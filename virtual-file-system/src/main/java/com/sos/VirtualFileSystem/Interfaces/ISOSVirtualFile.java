@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/** @author KB */
 public interface ISOSVirtualFile {
 
     public void deleteFile() throws Exception;
 
-    public void putFile(final File fleFile) throws Exception;
+    public void putFile(final File file) throws Exception;
 
-    public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception;
+    public void putFile(final ISOSVirtualFile file) throws Exception;
 
-    public void putFile(final String strFileName) throws Exception;
+    public void putFile(final String path) throws Exception;
 
     public ISOSVirtualFile getFile() throws Exception;
 
@@ -23,7 +22,7 @@ public interface ISOSVirtualFile {
 
     public String getModificationTime();
 
-    public void setFilePermissions(final Integer pintNewPermission) throws Exception;
+    public void setFilePermissions(final Integer permissions) throws Exception;
 
     public boolean fileExists() throws Exception;
 
@@ -37,17 +36,17 @@ public interface ISOSVirtualFile {
 
     public OutputStream getFileAppendStream();
 
-    public void setModeAppend(final boolean pflgModeAppend);
+    public void setModeAppend(final boolean mode);
 
-    public void setModeRestart(final boolean pflgModeRestart);
+    public void setModeRestart(final boolean mode);
 
-    public void setModeOverwrite(final boolean pflgModeOverwrite);
+    public void setModeOverwrite(final boolean mode);
 
     public InputStream getFileInputStream();
 
-    public boolean delete();
+    public boolean delete(boolean checkIsDirectory);
 
-    public void rename(final String pstrNewFileName);
+    public void rename(final String newPath);
 
     public String getParentVfs();
 
@@ -55,17 +54,17 @@ public interface ISOSVirtualFile {
 
     public ISOSVfsFileTransfer getHandler();
 
-    public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler);
+    public void setHandler(final ISOSVfsFileTransfer handler);
 
     public String getName();
 
-    public void write(byte[] bteBuffer, int intOffset, int intLength);
+    public void write(byte[] buffer, int offset, int length);
 
-    public void write(byte[] bteBuffer);
+    public void write(byte[] buffer);
 
-    public int read(byte[] bteBuffer);
+    public int read(byte[] buffer);
 
-    public int read(byte[] bteBuffer, int intOffset, int intLength);
+    public int read(byte[] buffer, int offset, int length);
 
     public void close();
 
@@ -77,10 +76,10 @@ public interface ISOSVirtualFile {
 
     public String file2String();
 
-    public void string2File(final String pstrContent);
+    public void string2File(final String content);
 
     public long getModificationDateTime();
 
-    public long setModificationDateTime(long pdteDateTime);
+    public long setModificationDateTime(long dateTime);
 
 }

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -37,7 +39,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -77,7 +80,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
         connection2OptionsAlternate = options;
         if (connection2OptionsAlternate == null) {
-            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         proxyHost = connection2OptionsAlternate.proxyHost.getValue();
         proxyPort = connection2OptionsAlternate.proxyPort.value();
@@ -108,7 +111,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             LOGGER.info(SOSVfs_D_133.params(userName));
             logReply();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("authentication"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
         }
     }
 
@@ -168,7 +171,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", remoteFile, localFile, getReplyString())));
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, SOSVfs_E_184.params("getFile", remoteFile, localFile));
+            throw new JobSchedulerException(SOSVfs_E_184.params("getFile", remoteFile, localFile), ex);
         } finally {
             try {
                 if (outputStream != null) {
@@ -295,7 +298,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                 throw new JobSchedulerException(ex);
             }
         } else {
-            logWARN(SOSVfs_D_0103.params(host, port));
+            LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }
     }
 
@@ -345,10 +348,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             if (!isSuccessStatusCode(m.getStatusCode())) {
                 throw new Exception(getHttpMethodExceptionText(m, to));
             }
-            delete(from);
+            delete(from, false);
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, SOSVfs_E_188.params("rename", from, to));
+            throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
         } finally {
             if (is != null) {
                 try {
@@ -365,16 +368,16 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
         }
         reply = "mv OK";
-        logINFO(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
     @Override
-    public void delete(String path) {
+    public void delete(String path, boolean checkIsDirectory) {
         String uri = normalizeHttpPath(path);
         DeleteMethod m = null;
 
         try {
-            if (this.isDirectory(uri)) {
+            if (checkIsDirectory && this.isDirectory(uri)) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(uri));
             }
             m = new DeleteMethod(uri);
@@ -384,7 +387,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, SOSVfs_E_187.params("delete", uri));
+            throw new JobSchedulerException(SOSVfs_E_187.params("delete", uri), ex);
         } finally {
             if (m != null) {
                 try {
@@ -394,7 +397,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
         }
         reply = "rm OK";
-        logINFO(getHostID(SOSVfs_D_181.params("delete", uri, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_D_181.params("delete", uri, getReplyString())));
     }
 
     @Override
@@ -443,8 +446,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             if (lastStatusCode == 404) {
                 return out;
             } else {
-                raiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
-                return null;
+                throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", path), ex);
             }
         } finally {
             raiseJobSchedulerException = true;
@@ -490,8 +492,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             putMethods.put(uri, m);
             return re.getOutputStream();
         } catch (Exception ex) {
-            raiseException(ex, SOSVfs_E_193.params("getOutputStream()", uri));
-            return null;
+            throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", uri), ex);
         }
     }
 
@@ -577,12 +578,18 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String[] listNames(String path) throws IOException {
+    public SOSFileEntry getFileEntry(String pathname) throws Exception {
+        reply = "get OK";
+        return new SOSFileEntry(EntryType.HTTP);// TODO
+    }
+
+    @Override
+    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         if (path.isEmpty()) {
             path = "/";
         }
         reply = "ls OK";
-        return new String[] { path };
+        return new ArrayList<SOSFileEntry>();// TODO
     }
 
     @Override
@@ -597,11 +604,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             return lastInputStreamGetMethod.getResponseBodyAsStream();
         } catch (Exception ex) {
             if (raiseJobSchedulerException) {
-                raiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
+                throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", fileName), ex);
             } else {
                 throw new RuntimeException(ex);
             }
-            return null;
         }
     }
 
@@ -652,11 +658,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
             lastInputStreamGetMethod = null;
         }
-    }
-
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
     }
 
     @Override

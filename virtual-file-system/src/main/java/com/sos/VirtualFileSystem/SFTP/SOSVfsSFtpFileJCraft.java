@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -30,8 +31,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
@@ -53,7 +53,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
             }
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_158.params("getFileInputStream()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
         }
         return objInputStream;
     }
@@ -67,8 +67,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer, offset, length);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("read", fileName));
-            return 0;
+            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
@@ -81,7 +80,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             os.write(buffer, offset, length);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_173.params("write", fileName));
+            throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
     }
 
@@ -90,7 +89,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         try {
             this.getFileOutputStream().write(buffer);
         } catch (IOException e) {
-            raiseException(e, SOSVfs_E_134.params("write()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("write()"), e);
         }
     }
 
@@ -112,7 +111,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
             }
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
         }
         return objOutputStream;
     }

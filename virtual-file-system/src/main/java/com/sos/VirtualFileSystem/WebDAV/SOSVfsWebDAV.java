@@ -7,7 +7,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.HttpsURL;
@@ -27,14 +29,13 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
-/** @ressources webdavclient4j-core-0.92.jar
- * @author Robert Ehrlich */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
@@ -64,7 +65,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
         connection2OptionsAlternate = options;
         if (connection2OptionsAlternate == null) {
-            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
         return this;
@@ -106,7 +107,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             LOGGER.info(SOSVfs_D_133.params(userName));
             this.logReply();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("authentication"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
         }
     }
 
@@ -121,7 +122,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 reply = "disconnect: " + ex;
             }
         }
-        this.logINFO(reply);
+        LOGGER.info(reply);
     }
 
     @Override
@@ -144,8 +145,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     LOGGER.debug(SOSVfs_E_180.params(strSubFolder));
                     break;
                 } else if (res.exists()) {
-                    raiseException(SOSVfs_E_277.params(strSubFolder));
-                    break;
+                    throw new JobSchedulerException(SOSVfs_E_277.params(strSubFolder));
                 }
                 idx--;
             }
@@ -161,7 +161,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             }
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, SOSVfs_E_134.params("[mkdir]"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("[mkdir]"), e);
         } finally {
             if (res != null) {
                 try {
@@ -213,32 +213,49 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String[] listNames(String path) throws IOException {
+    public SOSFileEntry getFileEntry(String path) throws Exception {
+
+        WebdavResource res = getResource(path);
+
+        SOSFileEntry entry = new SOSFileEntry(EntryType.HTTP);
+        entry.setDirectory(res.isCollection());
+        entry.setFilename(res.getName());
+        entry.setFilesize(res.getGetContentLength());
+        entry.setParentPath(res.getPath());
+
+        reply = "get OK";
+        return entry;
+    }
+
+    @Override
+    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         WebdavResource res = null;
         try {
+            List<SOSFileEntry> list = new ArrayList<>();
             if (path.isEmpty()) {
                 path = ".";
             }
             res = this.getResource(path);
-            if (!res.exists()) {
-                return null;
+            if (checkIfExists && !res.exists()) {
+                return list;
             }
-            if (!res.isCollection()) {
+            if (checkIfIsDirectory && !res.isCollection()) {
                 reply = "ls OK";
-                return new String[] { path };
+                return list;
             }
             WebdavResource[] lsResult = res.listWebdavResources();
-            String[] result = new String[lsResult.length];
-            String curDir = getCurrentPath();
             for (int i = 0; i < lsResult.length; i++) {
-                WebdavResource entry = lsResult[i];
-                result[i] = entry.getPath();
-                if (result[i].startsWith(curDir)) {
-                    result[i] = result[i].substring(curDir.length());
-                }
+                WebdavResource file = lsResult[i];
+
+                SOSFileEntry entry = new SOSFileEntry(EntryType.HTTP);
+                entry.setDirectory(file.isCollection());
+                entry.setFilename(file.getName());
+                entry.setFilesize(file.getGetContentLength());
+                entry.setParentPath(path);
+                list.add(entry);
             }
             reply = "ls OK";
-            return result;
+            return list;
         } catch (Exception e) {
             reply = e.toString();
             return null;
@@ -298,13 +315,13 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 }
                 remoteFileSize = transferFile.length();
                 reply = "get OK";
-                logINFO(getHostID(SOSVfs_I_182.params("getFile", sourceLocation, localFile, getReplyString())));
+                LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", sourceLocation, localFile, getReplyString())));
             } else {
                 throw new Exception(res.getStatusMessage());
             }
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, SOSVfs_E_184.params("getFile", sourceLocation, localFile));
+            throw new JobSchedulerException(SOSVfs_E_184.params("getFile", sourceLocation, localFile), ex);
         } finally {
             try {
                 if (res != null) {
@@ -319,30 +336,28 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
     @Override
     public long putFile(final String localFile, String remoteFile) {
-        long size = 0;
         try {
             remoteFile = getWebdavRessourcePath(remoteFile);
             remoteFile = this.normalizePath(remoteFile);
             if (davClient.putMethod(remoteFile, new File(localFile))) {
                 reply = "put OK";
-                logINFO(getHostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
+                LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
                 return this.size(remoteFile);
             } else {
                 throw new Exception(getStatusMessage(davClient));
             }
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, SOSVfs_E_185.params("putFile()", localFile, remoteFile));
+            throw new JobSchedulerException(SOSVfs_E_185.params("putFile()", localFile, remoteFile), e);
         }
-        return size;
     }
 
     @Override
-    public void delete(String path) {
+    public void delete(String path, boolean checkIsDirectory) {
         try {
             path = getWebdavRessourcePath(path);
             path = this.normalizePath(path);
-            if (this.isDirectory(path)) {
+            if (checkIsDirectory && this.isDirectory(path)) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
             if (!davClient.deleteMethod(path)) {
@@ -350,10 +365,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             }
         } catch (Exception ex) {
             reply = ex.toString();
-            raiseException(ex, SOSVfs_E_187.params("delete", path));
+            throw new JobSchedulerException(SOSVfs_E_187.params("delete", path), ex);
         }
         reply = "rm OK";
-        logINFO(getHostID(SOSVfs_D_181.params("delete", path, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_D_181.params("delete", path, getReplyString())));
     }
 
     @Override
@@ -370,10 +385,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             }
         } catch (Exception e) {
             reply = e.toString();
-            raiseException(e, SOSVfs_E_188.params("rename", from, to));
+            throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
         }
         reply = "mv OK";
-        logINFO(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
     @Override
@@ -387,8 +402,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             path = getWebdavRessourcePath(path);
             return davClient.getMethodData(path);
         } catch (Exception ex) {
-            raiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
-            return null;
+            throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", path), ex);
         }
     }
 
@@ -399,8 +413,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             res = this.getResource(path, false);
             return new SOSVfsWebDAVOutputStream(res);
         } catch (Exception ex) {
-            raiseException(ex, SOSVfs_E_193.params("getOutputStream()", path));
-            return null;
+            throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", path), ex);
         } finally {
             try {
                 if (res != null) {
@@ -429,7 +442,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 return false;
             }
         } catch (Exception ex) {
-            raiseException(ex, SOSVfs_E_193.params("cwd", path));
+            throw new JobSchedulerException(SOSVfs_E_193.params("cwd", path), ex);
         }
         return true;
     }
@@ -466,7 +479,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
         return dateTime;
     }
-    
+
     public long getModificationTimeStamp(final String path) throws Exception {
         WebdavResource res = null;
         try {
@@ -514,7 +527,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 logReply();
             }
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("getCurrentPath"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("getCurrentPath"), e);
         }
 
         return currentDirectory;
@@ -661,8 +674,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().getValue(),
-                    authenticationOptions.getAuthFile().getValue()), ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().getValue(), authenticationOptions.getAuthFile()
+                    .getValue()), ex);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -680,8 +693,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
         if (SOSString.isEmpty(msg)) {
             msg = "no details provided.";
-            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0
-                    && !connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
+            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0 && !connection2OptionsAlternate.acceptUntrustedCertificate
+                    .value()) {
                 msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
             }
         }
@@ -703,11 +716,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         if (!this.isConnected()) {
             this.logReply();
         } else {
-            logWARN(SOSVfs_D_0103.params(host, port));
+            LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }
     }
 
-    
     @Override
     public OutputStream getOutputStream() {
         return null;
@@ -716,11 +728,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     @Override
     public InputStream getInputStream() {
         return null;
-    }
-
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
     }
 
     @Override

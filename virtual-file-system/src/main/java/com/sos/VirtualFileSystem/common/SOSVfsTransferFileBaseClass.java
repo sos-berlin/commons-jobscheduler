@@ -13,12 +13,11 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 
-    protected String fileName = EMPTY_STRING;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferFileBaseClass.class);
+    protected String fileName = EMPTY_STRING;
 
     public SOSVfsTransferFileBaseClass() {
         super("SOSVirtualFileSystem");
@@ -32,22 +31,21 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 
     @Override
     public boolean fileExists() {
-        boolean flgResult = false;
-        logDEBUG(SOSVfs_D_156.params(fileName));
+        boolean result = false;
         if (objVFSHandler.getFileSize(fileName) >= 0) {
-            flgResult = true;
+            result = true;
         }
-        logDEBUG(SOSVfs_D_157.params(flgResult, fileName));
-        return flgResult;
+        LOGGER.debug(String.format("[%s]%s", fileName, result));
+        return result;
     }
 
     @Override
-    public boolean delete() {
+    public boolean delete(boolean checkIsDirectory) {
         try {
-            objVFSHandler.delete(fileName);
+            objVFSHandler.delete(fileName, checkIsDirectory);
         } catch (Exception e) {
             SOSVfs_E_158.get();
-            raiseException(e, SOSVfs_E_158.params("delete()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("delete()", fileName),e);
         }
         return true;
     }
@@ -59,7 +57,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
             fileName = adjustRelativePathName(fileName);
             objO = objVFSHandler.getAppendFileStream(fileName);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_158.params("getFileAppendStream()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("getFileAppendStream()", fileName), e);
         }
         return objO;
     }
@@ -75,7 +73,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
                 }
             }
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_158.params("getFileInputStream()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
         }
         return objInputStream;
     }
@@ -90,7 +88,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
                 }
             }
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
+            throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
         }
         return objOutputStream;
     }
@@ -110,7 +108,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             lngFileSize = objVFSHandler.getFileSize(fileName);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("getFileSize()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
         }
         return lngFileSize;
     }
@@ -146,7 +144,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             flgResult = !this.fileExists();
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("notExists()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("notExists()"), e);
         }
         return flgResult;
     }
@@ -182,7 +180,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             strT = objVFSHandler.getModificationTime(fileName);
         } catch (Exception e) {
-            raiseException(e, SOSVfs_E_134.params("getModificationTime()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("getModificationTime()"), e);
         }
         return strT;
     }
@@ -223,7 +221,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             this.getFileOutputStream().flush();
         } catch (IOException e) {
-            raiseException(e, SOSVfs_E_134.params("flush()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("flush()"), e);
         }
     }
 
@@ -248,45 +246,13 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             this.getFileOutputStream().write(bteBuffer);
         } catch (IOException e) {
-            raiseException(e, SOSVfs_E_134.params("write()"));
+            throw new JobSchedulerException(SOSVfs_E_134.params("write()"), e);
         }
     }
 
     @Override
     public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
         notImplemented();
-    }
-
-    protected void raiseException(final Exception e, final String msg) {
-        LOGGER.error(msg + " (" + e.getMessage() + ")");
-        throw new JobSchedulerException(msg, e);
-    }
-
-    protected void raiseException(final String msg) {
-        LOGGER.error(msg);
-        throw new JobSchedulerException(msg);
-    }
-
-    private String getLogPrefix() {
-        StackTraceElement ste = Thread.currentThread().getStackTrace()[3];
-        String[] classNameArr = ste.getClassName().split("\\.");
-        return "(" + classNameArr[classNameArr.length - 1] + "::" + ste.getMethodName() + ") ";
-    }
-
-    protected void logINFO(final Object msg) {
-        LOGGER.info(this.getLogPrefix() + msg);
-    }
-
-    protected void logDEBUG(final Object msg) {
-        LOGGER.debug(this.getLogPrefix() + msg);
-    }
-
-    protected void logWARN(final Object msg) {
-        LOGGER.warn(this.getLogPrefix() + msg);
-    }
-
-    protected void logERROR(final Object msg) {
-        LOGGER.error(this.getLogPrefix() + msg);
     }
 
     @Override

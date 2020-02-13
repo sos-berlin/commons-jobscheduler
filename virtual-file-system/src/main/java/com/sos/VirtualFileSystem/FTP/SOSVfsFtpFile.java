@@ -47,10 +47,10 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public boolean delete() {
+    public boolean delete(boolean chekIsDirectory) {
         final String conMethodName = CLASSNAME + "::delete";
         try {
-            objVFSHandler.delete(strFileName);
+            objVFSHandler.delete(strFileName, chekIsDirectory);
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
