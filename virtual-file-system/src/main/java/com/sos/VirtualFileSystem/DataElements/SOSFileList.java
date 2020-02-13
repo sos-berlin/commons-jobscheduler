@@ -24,6 +24,9 @@ import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.util.SOSDate;
+import sos.util.SOSString;
+
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFileList extends SOSVfsMessageCodes {
 
@@ -51,11 +54,13 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private long counterBytesTransferred = 0;
     private long counterRecordsInResultSetFile = 0;
     private String lastErrorMessage;
+    private int connectionErrorRetryInterval = 0;// in seconds
 
     public SOSFileList(SOSFTPOptions opt, IJobSchedulerEventHandler handler) {
         super(SOSVfsConstants.strBundleBaseName);
         options = opt;
         eventHandler = handler;
+        setConnectionErrorRetryInterval();
     }
 
     public void create(final List<SOSFileEntry> entries, int maxFiles) {
@@ -544,6 +549,21 @@ public class SOSFileList extends SOSVfsMessageCodes {
 
     public IJobSchedulerEventHandler getEventHandler() {
         return eventHandler;
+    }
+
+    private void setConnectionErrorRetryInterval() {
+        String val = options.connection_error_retry_interval.getValue();
+        if (!SOSString.isEmpty(val)) {
+            try {
+                connectionErrorRetryInterval = SOSDate.resolveAge("s", val).intValue();
+            } catch (Exception ex) {
+                LOGGER.warn(String.format("[serConnectionErrorRetryInterval]%s", ex.toString()), ex);
+            }
+        }
+    }
+
+    public int getConnectionErrorRetryInterval() {
+        return connectionErrorRetryInterval;
     }
 
 }

@@ -292,7 +292,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     endTime = Instant.now();
                 } catch (Exception e) {
                     // e.printStackTrace();
-                    if (count == parent.getOptions().connection_error_max_retry.value()) {
+                    if (count == parent.getOptions().connection_error_retry_count_max.value() || parent.getOptions().connection_error_retry_count_max
+                            .value() < 1) {
                         LOGGER.error(String.format("[%s]%s", fileHandlerSourceFileName, e.toString()), e);
                         run = false;
                         throw e;
@@ -378,12 +379,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         while (run) {
             try {
                 LOGGER.info("----------------------------------------------------");
-                LOGGER.info(String.format("[%s][%s] connection lost. wait %ss and try reconnect %s of %s ...", range, fileName, parent
-                        .getOptions().connection_error_retry_wait_interval.value(), count, parent.getOptions().connection_error_max_retry.value()));
+                LOGGER.info(String.format("[%s][%s] connection lost. wait %s and try reconnect %s of %s ...", range, fileName, parent
+                        .getOptions().connection_error_retry_interval.getValue(), count, parent.getOptions().connection_error_retry_count_max
+                                .value()));
                 LOGGER.info("----------------------------------------------------");
-                if (parent.getOptions().connection_error_retry_wait_interval.value() > 0) {
+                if (parent.getConnectionErrorRetryInterval() > 0) {
                     try {
-                        Thread.sleep(parent.getOptions().connection_error_retry_wait_interval.value() * 1_000);
+                        Thread.sleep(parent.getConnectionErrorRetryInterval() * 1_000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -392,7 +394,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 return transfer.getFileHandle(fileName);
             } catch (Throwable e) {
                 LOGGER.warn(e.toString(), e);
-                if (count == parent.getOptions().connection_error_max_retry.value()) {
+                if (count == parent.getOptions().connection_error_retry_count_max.value()) {
                     run = false;
                 }
                 count++;
