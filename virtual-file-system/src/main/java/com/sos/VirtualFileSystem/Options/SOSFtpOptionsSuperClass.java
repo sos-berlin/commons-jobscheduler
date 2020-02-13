@@ -1743,6 +1743,14 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionInteger jump_server_alive_count_max = new SOSOptionInteger(this, CLASSNAME + ".jump_server_alive_count_max",
             "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
 
+    @JSOptionDefinition(name = "jump_session_connect_timeout", description = "Sets the interval for session connect", key = "jump_session_connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_session_connect_timeout = new SOSOptionString(this, CLASSNAME + ".jump_session_connect_timeout",
+            "Sets the interval for session connect", "", "", false);
+
+    @JSOptionDefinition(name = "jump_channel_connect_timeout", description = "Sets the interval for channel connect", key = "jump_channel_connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_channel_connect_timeout = new SOSOptionString(this, CLASSNAME + ".jump_channel_connect_timeout",
+            "Sets the interval for cannel connect", "", "", false);
+
     @JSOptionDefinition(name = "local_dir", description = "local_dir Local directory into which or from which", key = "local_dir", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName localDir = new SOSOptionFolderName(this, CLASSNAME + ".local_dir",
             "local_dir Local directory into which or from which", "", "", false);
