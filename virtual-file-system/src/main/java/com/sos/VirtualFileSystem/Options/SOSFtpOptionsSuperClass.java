@@ -2582,12 +2582,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.xmlUpdate = xmlUpdate;
     }
 
-    @JSOptionDefinition(name = "connection_error_max_retry", description = "The connection_error_max_retry", key = "connection_error_max_retry", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger connection_error_max_retry = new SOSOptionInteger(this, CLASSNAME + ".connection_error_max_retry",
-            "The connection_error_max_retry", "3", "3", false);
+    @JSOptionDefinition(name = "connection_error_retry_count_max", description = "The connection_error_retry_count_max", key = "connection_error_retry_count_max", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger connection_error_retry_count_max = new SOSOptionInteger(this, CLASSNAME + ".connection_error_retry_count_max",
+            "The connection_error_retry_count_max", "3", "3", false);
 
-    @JSOptionDefinition(name = "connection_error_retry_wait_interval", description = "The connection_error_retry_wait_interval in seconds", key = "connection_error_retry_wait_interval", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger connection_error_retry_wait_interval = new SOSOptionInteger(this, CLASSNAME + ".connection_error_retry_wait_interval",
-            "The connection_error_retry_wait_interval", "0", "0", false);
+    @JSOptionDefinition(name = "connection_error_retry_interval", description = "The connection_error_retry_interval in seconds", key = "connection_error_retry_interval", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionString connection_error_retry_interval = new SOSOptionString(this, CLASSNAME + ".connection_error_retry_interval",
+            "The connection_error_retry_interval", "0s", "0s", false);
 
 }
