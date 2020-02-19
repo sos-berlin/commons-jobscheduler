@@ -499,14 +499,28 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         }
         String stdErr = "";
-        // try {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
-                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName,true);
-                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+                LOGGER.debug("tempFileName to delete: " + tempFileName);
+                String postCommandDelete = null;
+                if (objOptions.postCommandDelete.isDirty()) {
+                    postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tempFileName);
+                } else {
+                    if (flgIsWindowsShell) {
+                        postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tempFileName);
+                    } else {
+                        postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tempFileName, tempFileName);
+                    }
+                }
+                try {
+                    LOGGER.debug("postCommandDelete: " + postCommandDelete);
+                    prePostCommandVFSHandler.executeCommand(postCommandDelete);
+                } catch (Exception e) {
+                    LOGGER.error(String.format("error ocurred deleting %1$s: ", tmpFileName), e);
+                }
             }
+            tempFilesToDelete.clear();
         }
-        // } catch (Exception e) {}
         tempFilesToDelete = null;
         try {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
