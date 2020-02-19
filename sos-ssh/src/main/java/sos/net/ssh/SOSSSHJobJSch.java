@@ -518,7 +518,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
             tempFilesToDelete.clear();
         }
-        tempFilesToDelete = null;
         try {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
             if (prePostCommandVFSHandler.getExitCode() == 0) {
