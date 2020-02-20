@@ -214,7 +214,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     LOGGER.debug(SOSVfs_D_138.params(host, getReplyString()));
                 }
             } else {
-                LOGGER.info("not connected, logout useless.");
+                if (isDebugEnabled) {
+                    LOGGER.debug("not connected, logout useless.");
+                }
             }
         } catch (Exception e) {
             LOGGER.warn(SOSVfs_W_140.get() + e.getMessage(), e);
