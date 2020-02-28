@@ -15,7 +15,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
 
     @Override
     public boolean fileExists() {
-        Long fs = objVFSHandler.getFileSize(fileName);
+        Long fs = getHandler().getFileSize(fileName);
         return fs >= 0;
     }
 
@@ -49,13 +49,13 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
     @Override
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
-            if (objOutputStream == null) {
-                objOutputStream = objVFSHandler.getOutputStream(fileName);
+            if (getOutputStream() == null) {
+                setOutputStream(getHandler().getOutputStream(fileName));
             }
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
-            objOutputStream.write(buffer, offset, length);
+            getOutputStream().write(buffer, offset, length);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
@@ -64,13 +64,13 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
     @Override
     public void write(final byte[] buffer) {
         try {
-            if (objOutputStream == null) {
-                objOutputStream = objVFSHandler.getOutputStream(fileName);
+            if (getOutputStream() == null) {
+                setOutputStream(getHandler().getOutputStream(fileName));
             }
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
-            objOutputStream.write(buffer);
+            getOutputStream().write(buffer);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
@@ -79,24 +79,24 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
     @Override
     public void closeInput() {
         super.closeInput();
-        ((SOSVfsHTTP) objVFSHandler).resetLastInputStreamGetMethod();
+        ((SOSVfsHTTP) getHandler()).resetLastInputStreamGetMethod();
     }
 
     @Override
     public void closeOutput() {
         try {
-            if (objOutputStream != null) {
-                objOutputStream.flush();
-                objOutputStream.close();
+            if (getOutputStream() != null) {
+                getOutputStream().flush();
+                getOutputStream().close();
 
-                ((SOSVfsHTTP) objVFSHandler).put(fileName);
+                ((SOSVfsHTTP) getHandler()).put(fileName);
             }
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         } finally {
-            objOutputStream = null;
+            setOutputStream(null);
         }
     }
 }

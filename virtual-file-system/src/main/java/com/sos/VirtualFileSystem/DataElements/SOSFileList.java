@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
+import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSDate;
@@ -33,15 +33,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileList.class);
     private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(VFSFactory.getLoggerName());
 
-    public static int LOG_INFO_STEP = 1_000;
-
-    public ISOSVfsFileTransfer sourceFileTransfer = null;
-    public ISOSVfsFileTransfer targetFileTransfer = null;
-
-    private final HashMap<String, String> subFolders = new HashMap<>();
+    private ISOSVfsFileTransfer sourceClient = null;
+    private ISOSVfsFileTransfer targetClient = null;
     private SOSFTPOptions options = null;
     private IJobSchedulerEventHandler eventHandler = null;
-    private List<SOSFileListEntry> fileListEntries = new Vector<>();
+    private List<SOSFileListEntry> fileListEntries = new ArrayList<>();
+    private final HashMap<String, String> subFolders = new HashMap<>();
     private boolean transferCountersCounted = false;
     private boolean resultSetFileCreated = false;
     private long sumFileSizes = 0L;
@@ -54,13 +51,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private long counterBytesTransferred = 0;
     private long counterRecordsInResultSetFile = 0;
     private String lastErrorMessage;
-    private int connectionErrorRetryInterval = 0;// in seconds
+    private int retryCountMax = 0;
+    private int retryInterval = 0;// in seconds
 
     public SOSFileList(SOSFTPOptions opt, IJobSchedulerEventHandler handler) {
-        super(SOSVfsConstants.strBundleBaseName);
+        super(SOSVfsConstants.BUNDLE_NAME);
         options = opt;
         eventHandler = handler;
-        setConnectionErrorRetryInterval();
+        setRetrySettings();
     }
 
     public void create(final List<SOSFileEntry> entries, int maxFiles) {
@@ -83,7 +81,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 
     public SOSFileListEntry add(final SOSFileEntry fileEntry) {
         if (fileListEntries == null) {
-            fileListEntries = new Vector<SOSFileListEntry>();
+            fileListEntries = new ArrayList<SOSFileListEntry>();
         }
         SOSFileListEntry entry = new SOSFileListEntry(fileEntry);
         entry.setParent(this);
@@ -232,16 +230,11 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 return;
             }
 
-            String msg = "delete source files";
+            String msg = SOSVfs_D_208.get();
             LOGGER.info(msg);
             JADE_REPORT_LOGGER.info(msg);
-            boolean filesDeleted = false;
             for (SOSFileListEntry entry : fileListEntries) {
                 if (entry.getTransferStatus().equals(TransferStatus.transferred)) {
-                    if (!filesDeleted) {
-                        filesDeleted = true;
-                        LOGGER.debug(SOSVfs_D_208.get());
-                    }
                     entry.deleteSourceFile();
                 }
             }
@@ -280,7 +273,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
             if (options.resultSetFileName.isDirty() && options.resultSetFileName.isNotEmpty()) {
                 resultSetFile = options.resultSetFileName.getJSFile();
                 if ("getlist".equalsIgnoreCase(options.getDmzOption("operation")) && !options.getDmzOption("resultfile").isEmpty()) {
-                    ISOSVirtualFile jumpResultSetFile = sourceFileTransfer.getFileHandle(options.getDmzOption("resultfile"));
+                    ISOSVirtualFile jumpResultSetFile = sourceClient.getFileHandle(options.getDmzOption("resultfile"));
                     if (jumpResultSetFile.fileExists()) {
                         counterRecordsInResultSetFile = writeResultSetFileFromJumpFile(resultSetFile, jumpResultSetFile);
                     }
@@ -389,13 +382,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 atomicFileName = makeFullPathName(options.targetDir.getValue(), entry.getTargetAtomicFileName());
                 if (isNotEmpty(entry.getTargetAtomicFileName())) {
                     try {
-                        ISOSVirtualFile atomicFile = targetFileTransfer.getFileHandle(atomicFileName);
+                        ISOSVirtualFile atomicFile = targetClient.getFileHandle(atomicFileName);
                         if (atomicFile.fileExists()) {
                             atomicFile.delete(false);
+
+                            msg = SOSVfs_D_212.params(atomicFileName);
+                            LOGGER.info(msg);
+                            JADE_REPORT_LOGGER.info(msg);
                         }
-                        msg = SOSVfs_D_212.params(atomicFileName);
-                        LOGGER.info(msg);
-                        JADE_REPORT_LOGGER.info(msg);
                         entry.setTargetAtomicFileName(EMPTY_STRING);
                         entry.setStatus(TransferStatus.setBack);
                     } catch (Exception e) {
@@ -404,12 +398,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 }
                 if (!entry.isTargetFileExists()) {
                     try {
-                        String strTargetFilename = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
-                        ISOSVirtualFile targetFile = targetFileTransfer.getFileHandle(strTargetFilename);
+                        String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
+                        ISOSVirtualFile targetFile = targetClient.getFileHandle(path);
                         if (targetFile.fileExists()) {
                             targetFile.delete(false);
                         }
-                        msg = SOSVfs_D_212.params(targetFile.getName());
+                        msg = SOSVfs_D_212.params(SOSVfsTransferBaseClass.normalizePath(targetFile.getName()));
                         LOGGER.info(msg);
                         JADE_REPORT_LOGGER.info(msg);
                         entry.setStatus(TransferStatus.setBack);
@@ -532,11 +526,19 @@ public class SOSFileList extends SOSVfsMessageCodes {
     }
 
     public ISOSVfsFileTransfer getTargetClient() {
-        return targetFileTransfer;
+        return targetClient;
+    }
+
+    public void setTargetClient(ISOSVfsFileTransfer val) {
+        targetClient = val;
     }
 
     public ISOSVfsFileTransfer getSourceClient() {
-        return sourceFileTransfer;
+        return sourceClient;
+    }
+
+    public void setSourceClient(ISOSVfsFileTransfer val) {
+        sourceClient = val;
     }
 
     public String getLastErrorMessage() {
@@ -551,19 +553,24 @@ public class SOSFileList extends SOSVfsMessageCodes {
         return eventHandler;
     }
 
-    private void setConnectionErrorRetryInterval() {
+    private void setRetrySettings() {
         String val = options.connection_error_retry_interval.getValue();
         if (!SOSString.isEmpty(val)) {
             try {
-                connectionErrorRetryInterval = SOSDate.resolveAge("s", val).intValue();
+                retryInterval = SOSDate.resolveAge("s", val).intValue();
             } catch (Exception ex) {
                 LOGGER.warn(String.format("[serConnectionErrorRetryInterval]%s", ex.toString()), ex);
             }
         }
+        retryCountMax = options.connection_error_retry_count_max.value() < 0 ? 0 : options.connection_error_retry_count_max.value();
     }
 
-    public int getConnectionErrorRetryInterval() {
-        return connectionErrorRetryInterval;
+    public int getRetryCountMax() {
+        return retryCountMax;
+    }
+
+    public int getRetryInterval() {
+        return retryInterval;
     }
 
 }

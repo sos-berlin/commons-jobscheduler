@@ -35,27 +35,28 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public InputStream getFileInputStream() {
         try {
-            if (objInputStream == null) {
+            if (getInputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
                 int transferMode = ChannelSftp.OVERWRITE;
-                if (flgModeAppend) {
+                if (isModeAppend()) {
                     transferMode = ChannelSftp.APPEND;
-                } else if (flgModeRestart) {
+                } else if (isModeRestart()) {
                     transferMode = ChannelSftp.RESUME;
                 }
-                SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
-                objInputStream = handler.getClient().get(fileName, transferMode);
-                if (objInputStream == null) {
-                    objVFSHandler.openInputFile(fileName);
+                SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
+                setInputStream(handler.getClient().get(fileName, transferMode));
+                if (getInputStream() == null) {
+                    getHandler().openInputFile(fileName);
                 }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
         }
-        return objInputStream;
+        return getInputStream();
     }
 
     @Override
@@ -96,24 +97,24 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     @Override
     public OutputStream getFileOutputStream() {
         try {
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 fileName = super.adjustRelativePathName(fileName);
                 int transferMode = ChannelSftp.OVERWRITE;
-                if (flgModeAppend) {
+                if (isModeAppend()) {
                     transferMode = ChannelSftp.APPEND;
-                } else if (flgModeRestart) {
+                } else if (isModeRestart()) {
                     transferMode = ChannelSftp.RESUME;
                 }
-                SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
-                objOutputStream = handler.getClient().put(fileName, transferMode);
-                if (objOutputStream == null) {
-                    objVFSHandler.openOutputFile(fileName);
+                SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
+                setOutputStream(handler.getClient().put(fileName, transferMode));
+                if (getOutputStream() == null) {
+                    getHandler().openOutputFile(fileName);
                 }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
         }
-        return objOutputStream;
+        return getOutputStream();
     }
 
     @Override
@@ -121,7 +122,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         String path = "";
         try {
             path = adjustRelativePathName(fileName);
-            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
             SftpATTRS attrs = handler.getAttributes(path);
             if (attrs == null) {
                 throw new Exception("SftpATTRS is null");
@@ -136,7 +137,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     @Override
     public long setModificationDateTime(final long timestamp) {
         try {
-            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+            SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
             int mTime = (int) (timestamp / 1000L);
             handler.getClient().setMtime(adjustRelativePathName(fileName), mTime);
             return timestamp;

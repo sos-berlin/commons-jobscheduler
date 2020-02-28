@@ -235,8 +235,8 @@ public class TextArea extends StyledText {
             String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
             objShell.setCommand(strCommandString);
             objShell.run();
-            if (objShell.getCC() != 0) {
-                throw new JobSchedulerException(String.format("Command '%1$s' returns with error '%2$s'", strCommandString, objShell.getCC()));
+            if (objShell.getExitValue() != 0) {
+                throw new JobSchedulerException(String.format("Command '%1$s' returns with error '%2$s'", strCommandString, objShell.getExitValue()));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(e);

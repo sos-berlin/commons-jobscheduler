@@ -13,50 +13,50 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAVFile.class);
-    private String strFileName = null;
+    private String fileName = null;
 
-    public SOSVfsWebDAVFile(final String pstrFileName) {
-        super(pstrFileName);
-        strFileName = pstrFileName;
+    public SOSVfsWebDAVFile(final String path) {
+        super(path);
+        fileName = path;
     }
 
     @Override
-    public int read(final byte[] bteBuffer) {
+    public int read(final byte[] buffer) {
         try {
             InputStream is = this.getFileInputStream();
             if (is == null) {
                 throw new JobSchedulerException(SOSVfs_E_177.get());
             }
-            return is.read(bteBuffer);
+            return is.read(buffer);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
     @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public int read(final byte[] buffer, final int offset, final int length) {
         try {
             InputStream is = this.getFileInputStream();
             if (is == null) {
                 throw new Exception(SOSVfs_E_177.get());
             }
-            return is.read(bteBuffer, intOffset, intLength);
+            return is.read(buffer, offset, length);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
     @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public void write(final byte[] buffer, final int offset, final int length) {
         try {
-            if (objOutputStream == null) {
-                objOutputStream = objVFSHandler.getOutputStream(strFileName);
+            if (getOutputStream() == null) {
+                setOutputStream(getHandler().getOutputStream(fileName));
             }
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
-            objOutputStream.write(bteBuffer, intOffset, intLength);
-            ((SOSVfsWebDAVOutputStream) objOutputStream).put();
+            getOutputStream().write(buffer, offset, length);
+            ((SOSVfsWebDAVOutputStream) getOutputStream()).put();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
@@ -65,14 +65,14 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
     @Override
     public void write(final byte[] bteBuffer) {
         try {
-            if (objOutputStream == null) {
-                objOutputStream = objVFSHandler.getOutputStream(strFileName);
+            if (getOutputStream() == null) {
+                setOutputStream(getHandler().getOutputStream(fileName));
             }
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
-            objOutputStream.write(bteBuffer);
-            ((SOSVfsWebDAVOutputStream) objOutputStream).put();
+            getOutputStream().write(bteBuffer);
+            ((SOSVfsWebDAVOutputStream) getOutputStream()).put();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
@@ -87,7 +87,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
     @Override
     public long getModificationDateTime() {
         try {
-            SOSVfsWebDAV handler = (SOSVfsWebDAV) objVFSHandler;
+            SOSVfsWebDAV handler = (SOSVfsWebDAV) getHandler();
             return handler.getModificationTimeStamp(fileName);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

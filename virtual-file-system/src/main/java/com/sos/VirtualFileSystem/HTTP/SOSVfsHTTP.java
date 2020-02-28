@@ -433,8 +433,8 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     private ByteArrayOutputStream getOutputStream4Append(String path) throws Exception {
         // @TODO original Name
-        path = path.replace(objOptions.atomicPrefix.getValue(), "");
-        path = path.replace(objOptions.atomicSuffix.getValue(), "");
+        path = path.replace(getOptions().atomicPrefix.getValue(), "");
+        path = path.replace(getOptions().atomicSuffix.getValue(), "");
 
         InputStream source = null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -454,7 +454,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
         try {
             if (source != null) {
-                byte[] buffer = new byte[objOptions.bufferSize.value()];
+                byte[] buffer = new byte[getOptions().bufferSize.value()];
                 int bytesTransferred;
                 while ((bytesTransferred = source.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesTransferred);
@@ -482,7 +482,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         try {
             PutMethod m = new PutMethod(uri);
             SOSVfsHTTPRequestEntity re = null;
-            if (objOptions.appendFiles.value()) {
+            if (getOptions().appendFiles.value()) {
                 re = new SOSVfsHTTPRequestEntity(getOutputStream4Append(path));
             } else {
                 re = new SOSVfsHTTPRequestEntity();

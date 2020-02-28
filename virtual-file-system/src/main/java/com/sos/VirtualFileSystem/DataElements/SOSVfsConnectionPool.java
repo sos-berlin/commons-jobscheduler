@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 
-/** @author KB */
 public class SOSVfsConnectionPool {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsConnectionPool.class);
@@ -19,8 +18,8 @@ public class SOSVfsConnectionPool {
         //
     }
 
-    public void add(final ISOSVFSHandler pobjHandler) {
-        list.add(pobjHandler);
+    public void add(final ISOSVFSHandler handler) {
+        list.add(handler);
     }
 
     public void clear() {
@@ -36,10 +35,10 @@ public class SOSVfsConnectionPool {
     }
 
     public ISOSVFSHandler getUnused() {
-        for (ISOSVFSHandler objHandler : list) {
-            if (!objHandler.isLocked()) {
-                objHandler.lock();
-                return objHandler;
+        for (ISOSVFSHandler handler : list) {
+            if (!handler.isLocked()) {
+                handler.lock();
+                return handler;
             }
         }
         return null;
@@ -47,14 +46,14 @@ public class SOSVfsConnectionPool {
 
     public ISOSVFSHandler logout() {
         if (list != null) {
-            for (ISOSVFSHandler objHandler : list) {
+            for (ISOSVFSHandler handler : list) {
                 try {
-                    objHandler.closeSession();
+                    handler.closeSession();
                 } catch (Exception e) {
-                    LOGGER.error(e.getMessage());
+                    LOGGER.error(e.toString(), e);
                 }
-                objHandler.setLogin(false);
-                objHandler.release();
+                handler.setLogin(false);
+                handler.release();
             }
         }
         return null;

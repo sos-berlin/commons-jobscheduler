@@ -1,20 +1,16 @@
 package com.sos.VirtualFileSystem.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 
-    protected boolean flgIsLocked = false;
-    protected boolean flgLoggedIn = false;
-    protected boolean flgConnected = false;
-    protected SOSFTPOptions objOptions = null;
-    protected List<SOSFileEntry> sosFileEntries = null;
-    private enuSourceOrTarget intSourceOrTarget = enuSourceOrTarget.isUndefined;
+    private SOSFTPOptions options = null;
+    private enuSourceOrTarget sourceOrTarget = enuSourceOrTarget.isUndefined;
+    private boolean isLocked = false;
+    private boolean loggedIn = false;
+    private boolean connected = false;
 
     public static enum enuSourceOrTarget {
         isUndefined, isSource, isTarget
@@ -22,69 +18,68 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 
     public SOSVfsBaseClass() {
         super("SOSVirtualFileSystem");
-        sosFileEntries = new ArrayList<SOSFileEntry>();
     }
 
     public boolean isConnected() {
-        return flgConnected;
+        return connected;
     }
 
     public boolean isLocked() {
-        return flgIsLocked;
+        return isLocked;
     }
 
     public boolean isLoggedin() {
-        return flgLoggedIn;
+        return loggedIn;
     }
 
     public boolean isSource() {
-        if (intSourceOrTarget == enuSourceOrTarget.isSource) {
+        if (sourceOrTarget.equals(enuSourceOrTarget.isSource)) {
             return true;
         }
         return false;
     }
 
     public boolean isTarget() {
-        if (intSourceOrTarget == enuSourceOrTarget.isTarget) {
+        if (sourceOrTarget.equals(enuSourceOrTarget.isTarget)) {
             return true;
         }
         return false;
     }
 
     public void lock() {
-        flgIsLocked = true;
+        isLocked = true;
     }
 
     final public SOSFTPOptions getOptions() {
-        return objOptions;
+        return options;
     }
 
-    public void getOptions(final SOSFTPOptions pobjOptions) {
-        objOptions = pobjOptions;
+    public void getOptions(final SOSFTPOptions opt) {
+        options = opt;
     }
 
     public void release() {
-        flgIsLocked = false;
+        isLocked = false;
     }
 
-    public void setConnected(final boolean pflgIsConnected) {
-        flgConnected = pflgIsConnected;
+    public void setConnected(final boolean val) {
+        connected = val;
     }
 
-    public void setLogin(final boolean pflgIsLogin) {
-        flgIsLocked = pflgIsLogin;
+    public void setLogin(final boolean val) {
+        isLocked = val;
     }
 
     public void setSource() {
-        intSourceOrTarget = enuSourceOrTarget.isSource;
+        sourceOrTarget = enuSourceOrTarget.isSource;
     }
 
     public void setTarget() {
-        intSourceOrTarget = enuSourceOrTarget.isTarget;
+        sourceOrTarget = enuSourceOrTarget.isTarget;
     }
 
     final public enuSourceOrTarget sourceOrTarget() {
-        return intSourceOrTarget;
+        return sourceOrTarget;
     }
 
 }

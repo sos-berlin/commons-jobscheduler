@@ -23,16 +23,15 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         super("SOSVirtualFileSystem");
     }
 
-    public SOSVfsTransferFileBaseClass(final String pFileName) {
+    public SOSVfsTransferFileBaseClass(final String path) {
         this();
-        String name = pFileName;
-        fileName = adjustFileSeparator(name);
+        fileName = adjustFileSeparator(path);
     }
 
     @Override
     public boolean fileExists() {
         boolean result = false;
-        if (objVFSHandler.getFileSize(fileName) >= 0) {
+        if (getHandler().getFileSize(fileName) >= 0) {
             result = true;
         }
         LOGGER.debug(String.format("[%s]%s", fileName, result));
@@ -42,10 +41,10 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     @Override
     public boolean delete(boolean checkIsDirectory) {
         try {
-            objVFSHandler.delete(fileName, checkIsDirectory);
+            getHandler().delete(fileName, checkIsDirectory);
         } catch (Exception e) {
             SOSVfs_E_158.get();
-            throw new JobSchedulerException(SOSVfs_E_158.params("delete()", fileName),e);
+            throw new JobSchedulerException(SOSVfs_E_158.params("delete()", fileName), e);
         }
         return true;
     }
@@ -55,7 +54,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         OutputStream objO = null;
         try {
             fileName = adjustRelativePathName(fileName);
-            objO = objVFSHandler.getAppendFileStream(fileName);
+            objO = getHandler().getAppendFileStream(fileName);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileAppendStream()", fileName), e);
         }
@@ -65,36 +64,36 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     @Override
     public InputStream getFileInputStream() {
         try {
-            if (objInputStream == null) {
+            if (getInputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                objInputStream = objVFSHandler.getInputStream(fileName);
-                if (objInputStream == null) {
-                    objVFSHandler.openInputFile(fileName);
+                setInputStream(getHandler().getInputStream(fileName));
+                if (getInputStream() == null) {
+                    getHandler().openInputFile(fileName);
                 }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
         }
-        return objInputStream;
+        return getInputStream();
     }
 
     @Override
     public OutputStream getFileOutputStream() {
         try {
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                if (objOutputStream == null) {
-                    objVFSHandler.openOutputFile(fileName);
+                if (getOutputStream() == null) {
+                    getHandler().openOutputFile(fileName);
                 }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
         }
-        return objOutputStream;
+        return getOutputStream();
     }
 
-    protected String adjustRelativePathName(final String pstrPathName) {
-        return pstrPathName.replaceAll("\\\\", "/");
+    protected String adjustRelativePathName(final String path) {
+        return path.replaceAll("\\\\", "/");
     }
 
     @Override
@@ -106,7 +105,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     public long getFileSize() {
         long lngFileSize = -1;
         try {
-            lngFileSize = objVFSHandler.getFileSize(fileName);
+            lngFileSize = getHandler().getFileSize(fileName);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
         }
@@ -130,7 +129,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 
     @Override
     public boolean isDirectory() {
-        return objVFSHandler.isDirectory(fileName);
+        return getHandler().isDirectory(fileName);
     }
 
     @Override
@@ -140,45 +139,45 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 
     @Override
     public boolean notExists() {
-        boolean flgResult = false;
+        boolean result = false;
         try {
-            flgResult = !this.fileExists();
+            result = !this.fileExists();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("notExists()"), e);
         }
-        return flgResult;
+        return result;
     }
 
     @Override
-    public void putFile(final File fleFile) {
+    public void putFile(final File path) {
         notImplemented();
     }
 
     @Override
-    public void putFile(final String strFileName) {
+    public void putFile(final String path) {
         notImplemented();
     }
 
     @Override
-    public void rename(final String pstrNewFileName) {
-        objVFSHandler.rename(fileName, pstrNewFileName);
+    public void rename(final String newPath) {
+        getHandler().rename(fileName, newPath);
     }
 
     @Override
-    public void setFilePermissions(final Integer pintNewPermission) {
+    public void setFilePermissions(final Integer val) {
         notImplemented();
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler) {
-        objVFSHandler = pobjVFSHandler;
+    public void setHandler(final ISOSVfsFileTransfer handler) {
+        super.setHandler(handler);
     }
 
     @Override
     public String getModificationTime() {
         String strT = "";
         try {
-            strT = objVFSHandler.getModificationTime(fileName);
+            strT = getHandler().getModificationTime(fileName);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("getModificationTime()"), e);
         }
@@ -194,9 +193,9 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     @Override
     public void closeInput() {
         try {
-            if (objInputStream != null) {
-                objInputStream.close();
-                objInputStream = null;
+            if (getInputStream() != null) {
+                getInputStream().close();
+                setInputStream(null);
             }
         } catch (Exception ex) {
             //
@@ -206,10 +205,10 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     @Override
     public void closeOutput() {
         try {
-            if (objOutputStream != null) {
-                objOutputStream.flush();
-                objOutputStream.close();
-                objOutputStream = null;
+            if (getOutputStream() != null) {
+                getOutputStream().flush();
+                getOutputStream().close();
+                setOutputStream(null);
             }
         } catch (Exception ex) {
             //
@@ -226,37 +225,37 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     }
 
     @Override
-    public int read(final byte[] bteBuffer) {
+    public int read(final byte[] buffer) {
         return 0;
     }
 
     @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public int read(final byte[] buffer, final int offset, final int length) {
         return 0;
     }
 
     @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public void write(final byte[] buffer, final int offset, final int length) {
         //
     }
 
     @Override
-    public void write(final byte[] bteBuffer) {
+    public void write(final byte[] buffer) {
         notImplemented();
         try {
-            this.getFileOutputStream().write(bteBuffer);
+            this.getFileOutputStream().write(buffer);
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("write()"), e);
         }
     }
 
     @Override
-    public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
+    public void putFile(final ISOSVirtualFile file) throws Exception {
         notImplemented();
     }
 
     @Override
-    public long setModificationDateTime(final long pdteDateTime) {
+    public long setModificationDateTime(final long dateTime) {
         return 0;
     }
 

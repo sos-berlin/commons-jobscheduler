@@ -18,16 +18,14 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSVfsCommonFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
-    private static final long serialVersionUID = -6693187904489763940L;
-    private static final String CLASSNAME = "SOSVfsZipFileEntry";
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsZipFileEntry.class);
-    private ZipEntry objZipEntry = null;
+    private static final String CLASSNAME = "SOSVfsZipFileEntry";
+    private ZipEntry zipEntry = null;
 
-    public SOSVfsZipFileEntry(final String pstrFileName) {
+    public SOSVfsZipFileEntry(final String path) {
         super();
     }
 
@@ -55,39 +53,37 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public InputStream getFileInputStream() {
-        final String methodName = CLASSNAME + "::getFileInputStream";
-        String strEntryName = "";
+        String entryName = "";
         try {
-            if (objInputStream == null) {
-                if (objVFSHandler == null) {
+            if (getInputStream() == null) {
+                if (getHandler() == null) {
                     throw new JobSchedulerException("objVFSHandler == null");
                 }
-                if (objZipEntry == null) {
+                if (zipEntry == null) {
                     throw new JobSchedulerException("objZipEntry == null");
                 }
-                strEntryName = objZipEntry.getName();
-                objInputStream = objVFSHandler.getInputStream(objZipEntry.getName());
-                LOGGER.debug(SOSVfs_D_207.params(strEntryName));
+                entryName = zipEntry.getName();
+                setInputStream(getHandler().getInputStream(zipEntry.getName()));
+                LOGGER.debug(SOSVfs_D_207.params(entryName));
             }
         } catch (Exception e) {
-            String strT = SOSVfs_E_134.params(methodName);
-            LOGGER.error(strT, e);
-            throw new JobSchedulerException(strT, e);
+            String msg = SOSVfs_E_134.params(CLASSNAME + "::getFileInputStream");
+            LOGGER.error(msg, e);
+            throw new JobSchedulerException(msg, e);
         }
-        return objInputStream;
+        return getInputStream();
     }
 
     @Override
     public OutputStream getFileOutputStream() {
-        final String methodName = CLASSNAME + "::getFileOutputStream";
         try {
-            if (objOutputStream == null) {
-                objOutputStream = objVFSHandler.getOutputStream(objZipEntry.getName());
+            if (getOutputStream() == null) {
+                setOutputStream(getHandler().getOutputStream(zipEntry.getName()));
             }
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileOutputStream"), e);
         }
-        return objOutputStream;
+        return getOutputStream();
     }
 
     @Override
@@ -97,24 +93,24 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public long getFileSize() {
-        return objZipEntry.getSize();
+        return zipEntry.getSize();
     }
 
     @Override
     public String getModificationTime() {
-        Date dteModificationTime = new Date(objZipEntry.getTime());
-        return new JSDataElementDateTime(dteModificationTime).getFormattedValue();
+        Date date = new Date(zipEntry.getTime());
+        return new JSDataElementDateTime(date).getFormattedValue();
     }
 
     @Override
     public String getName() {
-        return objZipEntry.getName();
+        return zipEntry.getName();
     }
 
     @Override
     public String getParentVfs() {
         notImplemented();
-        return objZipEntry.getName();
+        return zipEntry.getName();
     }
 
     @Override
@@ -125,13 +121,11 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public boolean isDirectory() {
-        boolean flgResult = false;
-        if (objZipEntry != null) {
-            flgResult = objZipEntry.isDirectory();
+        if (zipEntry != null) {
+            return zipEntry.isDirectory();
         } else {
-            flgResult = true;
+            return true;
         }
-        return flgResult;
     }
 
     @Override
@@ -145,36 +139,36 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     }
 
     @Override
-    public void putFile(final File pfleFile) throws Exception {
+    public void putFile(final File file) throws Exception {
         JSToolBox.notImplemented();
     }
 
     @Override
-    public void putFile(final String pstrFileName) throws Exception {
+    public void putFile(final String path) throws Exception {
         JSToolBox.notImplemented();
     }
 
     @Override
-    public void rename(final String pstrNewFileName) {
+    public void rename(final String newPath) {
         notImplemented();
     }
 
     @Override
-    public void setFilePermissions(final Integer pintNewPermission) throws Exception {
+    public void setFilePermissions(final Integer val) throws Exception {
         JSToolBox.notImplemented();
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler) {
-        this.objVFSHandler = pobjVFSHandler;
+    public void setHandler(final ISOSVfsFileTransfer val) {
+        super.setHandler(val);
     }
 
     @Override
     public void close() {
-        if (objOutputStream != null) {
+        if (getOutputStream() != null) {
             this.closeOutput();
         } else {
-            if (objInputStream != null) {
+            if (getInputStream() != null) {
                 this.closeInput();
             }
         }
@@ -182,110 +176,99 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public void closeInput() {
-        final String methodName = CLASSNAME + "::closeInput";
         try {
-            if (objInputStream != null) {
-                objInputStream.close();
+            if (getInputStream() != null) {
+                getInputStream().close();
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::closeInput"), e);
         } finally {
-            objInputStream = null;
+            setInputStream(null);
         }
     }
 
     @Override
     public void closeOutput() {
-        final String methodName = CLASSNAME + "::closeOutput";
         try {
-            if (objEntryOutputStream == null) {
+            if (getEntryOutputStream() == null) {
                 return;
             }
-            objEntryOutputStream.flush();
-            objEntryOutputStream.closeEntry();
+            getEntryOutputStream().flush();
+            getEntryOutputStream().closeEntry();
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::closeOutput"), e);
         } finally {
-            objOutputStream = null;
+            setOutputStream(null);
         }
     }
 
     @Override
     public void flush() {
-        final String methodName = CLASSNAME + "::flush";
         try {
             this.getFileOutputStream().flush();
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::flush"), e);
         }
     }
 
     @Override
-    public int read(final byte[] bteBuffer) {
-        final String methodName = CLASSNAME + "::read";
-        int lngBytesRed = 0;
+    public int read(final byte[] buffer) {
         try {
-            lngBytesRed = this.getFileInputStream().read(bteBuffer);
+            return this.getFileInputStream().read(buffer);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
-        }
-        return lngBytesRed;
-    }
-
-    @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String methodName = CLASSNAME + "::read";
-        int lngBytesRed = 0;
-        try {
-            lngBytesRed = this.getFileInputStream().read(bteBuffer, intOffset, intLength);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
-        }
-        return lngBytesRed;
-    }
-
-    @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String methodName = CLASSNAME + "::write";
-        try {
-            this.getFileOutputStream().write(bteBuffer, intOffset, intLength);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
         }
     }
 
     @Override
-    public void write(final byte[] bteBuffer) {
-        final String methodName = CLASSNAME + "::write";
+    public int read(final byte[] buffer, final int offset, final int length) {
         try {
-            this.getFileOutputStream().write(bteBuffer);
+            return this.getFileInputStream().read(buffer, offset, length);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
         }
     }
 
-    public void setZipEntry(final ZipEntry objZE) {
-        objZipEntry = objZE;
+    @Override
+    public void write(final byte[] buffer, final int offset, final int length) {
+        try {
+            this.getFileOutputStream().write(buffer, offset, length);
+        } catch (IOException e) {
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::write"), e);
+        }
+    }
+
+    @Override
+    public void write(final byte[] buffer) {
+        try {
+            this.getFileOutputStream().write(buffer);
+        } catch (IOException e) {
+            LOGGER.error(e.toString(), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::write"), e);
+        }
+    }
+
+    public void setZipEntry(final ZipEntry val) {
+        zipEntry = val;
     }
 
     public ZipEntry getZipEntry() {
-        return objZipEntry;
+        return zipEntry;
     }
 
     @Override
-    public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
+    public void putFile(final ISOSVirtualFile file) throws Exception {
         notImplemented();
     }
 
     @Override
-    public void setModeAppend(final boolean pflgModeAppend) {
+    public void setModeAppend(final boolean val) {
         notImplemented();
     }
 
@@ -295,7 +278,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     }
 
     @Override
-    public long setModificationDateTime(final long pdteDateTime) {
+    public long setModificationDateTime(final long val) {
         return 0;
     }
 

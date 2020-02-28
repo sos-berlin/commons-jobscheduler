@@ -410,8 +410,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
                 objZE.setComment("created by com.sos.SOSVirtualFileSystem.SOSVfsZip, locale " + Locale.getDefault());
                 objZE.setMethod(ZipEntry.DEFLATED);
                 objZipOutputStream.putNextEntry(objZE);
-                objF.objOutputStream = objZipOutputStream;
-                objF.objEntryOutputStream = objZipOutputStream;
+                objF.setOutputStream(objZipOutputStream);
+                objF.setEntryOutputStream(objZipOutputStream);
                 objF.setHandler(this);
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());

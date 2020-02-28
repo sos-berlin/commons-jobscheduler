@@ -46,7 +46,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setUrl(final SOSOptionUrl pstrValue) {
+    public ISOSDataProviderOptions setUrl(final SOSOptionUrl val) {
         return this;
     }
 
@@ -59,8 +59,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setInclude(final String pstrValue) {
-        include.setValue(pstrValue);
+    public ISOSDataProviderOptions setInclude(final String val) {
+        include.setValue(val);
         return this;
     }
 
@@ -74,8 +74,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setUseZlibCompression(final SOSOptionBoolean pstrValue) {
-        useZlibCompression = pstrValue;
+    public ISOSDataProviderOptions setUseZlibCompression(final SOSOptionBoolean val) {
+        useZlibCompression = val;
         return this;
     }
 
@@ -89,8 +89,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setZlibCompressionLevel(final SOSOptionInteger pstrValue) {
-        zlibCompressionLevel = pstrValue;
+    public ISOSDataProviderOptions setZlibCompressionLevel(final SOSOptionInteger val) {
+        zlibCompressionLevel = val;
         return this;
     }
 
@@ -135,8 +135,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setMakeDirs(final String pstrValue) {
-        makeDirs.setValue(pstrValue);
+    public ISOSDataProviderOptions setMakeDirs(final String val) {
+        makeDirs.setValue(val);
         return this;
     }
 
@@ -154,8 +154,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setPlatform(final String pstrValue) {
-        platform.setValue(pstrValue);
+    public ISOSDataProviderOptions setPlatform(final String val) {
+        platform.setValue(val);
         return this;
     }
 
@@ -169,8 +169,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setReplacement(final SOSOptionString pReplacement) {
-        replacement = pReplacement;
+    public void setReplacement(final SOSOptionString val) {
+        replacement = val;
     }
 
     public SOSOptionString replaceWith = (SOSOptionString) replacement.setAlias(CLASSNAME + ".ReplaceWith");
@@ -185,8 +185,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setReplacing(final SOSOptionRegExp pReplacing) {
-        replacing = pReplacing;
+    public void setReplacing(final SOSOptionRegExp val) {
+        replacing = val;
     }
 
     public SOSOptionRegExp replaceWhat = (SOSOptionRegExp) replacing.setAlias(CLASSNAME + ".ReplaceWhat");
@@ -201,8 +201,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setStrictHostKeyChecking(final String pstrValue) {
-        strictHostKeyChecking.setValue(pstrValue);
+    public void setStrictHostKeyChecking(final String val) {
+        strictHostKeyChecking.setValue(val);
     }
 
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
@@ -215,8 +215,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setTfnPostCommand(final SOSOptionString pstrValue) {
-        tfnPostCommand = pstrValue;
+    public ISOSDataProviderOptions setTfnPostCommand(final SOSOptionString val) {
+        tfnPostCommand = val;
         return this;
     }
 
@@ -230,8 +230,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setPostCommand(final String pstrValue) {
-        postCommand.setValue(pstrValue);
+    public ISOSDataProviderOptions setPostCommand(final String val) {
+        postCommand.setValue(val);
         return this;
     }
 
@@ -248,8 +248,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setPreCommand(final String pstrValue) {
-        preCommand.setValue(pstrValue);
+    public ISOSDataProviderOptions setPreCommand(final String val) {
+        preCommand.setValue(val);
         return this;
     }
 
@@ -267,8 +267,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setFtpsProtocol(final String pstrValue) {
-        ftpsProtocol.setValue(pstrValue);
+    public ISOSDataProviderOptions setFtpsProtocol(final String val) {
+        ftpsProtocol.setValue(val);
         return this;
     }
 
@@ -283,8 +283,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public ISOSDataProviderOptions setLoadClassName(final String pstrValue) {
-        loadClassName.setValue(pstrValue);
+    public ISOSDataProviderOptions setLoadClassName(final String val) {
+        loadClassName.setValue(val);
         return this;
     }
 
@@ -297,8 +297,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setJavaClassPath(final SOSOptionString pJavaClassPath) {
-        javaClassPath = pJavaClassPath;
+    public void setJavaClassPath(final SOSOptionString val) {
+        javaClassPath = val;
     }
 
     @JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", mandatory = false)
@@ -310,8 +310,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setHost(final SOSOptionHostName pHost) {
-        host = pHost;
+    public void setHost(final SOSOptionHostName val) {
+        host = val;
     }
 
     public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias(CLASSNAME + ".HostName");
@@ -327,8 +327,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setPassiveMode(final SOSOptionBoolean pPassiveMode) {
-        passiveMode = pPassiveMode;
+    public void setPassiveMode(final SOSOptionBoolean val) {
+        passiveMode = val;
     }
 
     public SOSOptionBoolean ftpTransferModeIsPassive = (SOSOptionBoolean) passiveMode.setAlias(CLASSNAME + ".FTPTransferModeIsPassive");
@@ -345,8 +345,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setPort(final SOSOptionPortNumber pPort) {
-        port = pPort;
+    public void setPort(final SOSOptionPortNumber val) {
+        port = val;
     }
 
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", type = "SOSOptionStringValueList", mandatory = true)
@@ -360,8 +360,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setProtocol(final SOSOptionTransferType pProtocol) {
-        protocol = pProtocol;
+    public void setProtocol(final SOSOptionTransferType val) {
+        protocol = val;
     }
 
     public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.setAlias(CLASSNAME + ".TransferProtocol");
@@ -377,8 +377,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setTransferMode(final SOSOptionTransferMode pTransferMode) {
-        transferMode = pTransferMode;
+    public void setTransferMode(final SOSOptionTransferMode val) {
+        transferMode = val;
     }
 
     @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
@@ -398,8 +398,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setPassword(final SOSOptionPassword pPassword) {
-        password = pPassword;
+    public void setPassword(final SOSOptionPassword val) {
+        password = val;
     }
 
     @JSOptionDefinition(name = "passphrase", description = "Passphrase", key = "passphrase", type = "SOSOptionPassword", mandatory = false)
@@ -423,9 +423,9 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         this();
     }
 
-    public SOSConnection2OptionsSuperClass(final HashMap<String, String> jsSettings) throws Exception {
+    public SOSConnection2OptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        this.setAllOptions(jsSettings);
+        this.setAllOptions(settings);
     }
 
     @Override
@@ -445,8 +445,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void commandLineArgs(final String[] pstrArgs) {
-        super.commandLineArgs(pstrArgs);
+    public void commandLineArgs(final String[] args) {
+        super.commandLineArgs(args);
         this.setAllOptions(super.objSettings);
     }
 
@@ -461,8 +461,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setAuthFile(final SOSOptionInFileName pSshAuthFile) {
-        sshAuthFile = pSshAuthFile;
+    public void setAuthFile(final SOSOptionInFileName val) {
+        sshAuthFile = val;
     }
 
     @JSOptionDefinition(name = "ssh_auth_method", description = "This parameter specifies the authentication method", key = "ssh_auth_method", type = "SOSOptionStringValueList", mandatory = false)
@@ -476,8 +476,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setAuthMethod(final SOSOptionAuthenticationMethod pSshAuthMethod) {
-        sshAuthMethod = pSshAuthMethod;
+    public void setAuthMethod(final SOSOptionAuthenticationMethod val) {
+        sshAuthMethod = val;
     }
 
     @JSOptionDefinition(name = "preferred_authentications", description = "This parameter specifies preferred authentication methods,e.g password,publickey,...", key = "preferred_authentications", type = "SOSOptionString", mandatory = false)
@@ -489,8 +489,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
             "This parameter specifies the required authentication methods", "", "", false);
 
     @Override
-    public void setUser(final SOSOptionUserName pobjUser) {
-        user.setValue(pobjUser.getValue());
+    public void setUser(final SOSOptionUserName val) {
+        user.setValue(val.getValue());
     }
 
     @JSOptionDefinition(name = "ftps_client_security", description = "FTPS Client Security", key = "ftps_client_secutity", type = "SOSOptionFTPSClientSecurity", mandatory = false)
@@ -552,8 +552,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return proxyHost;
     }
 
-    public void setProxyHost(final SOSOptionHostName pProxyHost) {
-        proxyHost = pProxyHost;
+    public void setProxyHost(final SOSOptionHostName val) {
+        proxyHost = val;
     }
 
     @JSOptionDefinition(name = "proxy_port", description = "Port-Number to be used for a proxy", key = "proxy_port", type = "SOSOptionPortNumber", mandatory = false)
@@ -576,8 +576,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return proxyUser;
     }
 
-    public void setProxyUser(final SOSOptionUserName pProxyUser) {
-        proxyUser = pProxyUser;
+    public void setProxyUser(final SOSOptionUserName val) {
+        proxyUser = val;
     }
 
     @JSOptionDefinition(name = "proxy_password", description = "Password to be used for a proxy", key = "proxy_password", type = "SOSOptionPassword", mandatory = false)
@@ -588,8 +588,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return proxyPassword;
     }
 
-    public void setProxyPassword(final SOSOptionPassword pProxyPassword) {
-        proxyPassword = pProxyPassword;
+    public void setProxyPassword(final SOSOptionPassword val) {
+        proxyPassword = val;
     }
 
     @JSOptionDefinition(name = "domain", description = "Domain", key = "domain", type = "SOSOptionString", mandatory = false)
@@ -601,8 +601,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @Override
-    public void setDomain(final SOSOptionString pDomain) {
-        domain = pDomain;
+    public void setDomain(final SOSOptionString val) {
+        domain = val;
     }
 
     @JSOptionDefinition(name = "keystore_type", description = "keystore type", key = "keystore_type", type = "SOSOptionKeyStoreType", mandatory = false)
@@ -649,8 +649,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return raiseExceptionOnError;
     }
 
-    public void setRaiseExceptionOnError(final SOSOptionBoolean raiseExceptionOnError) {
-        this.raiseExceptionOnError = raiseExceptionOnError;
+    public void setRaiseExceptionOnError(final SOSOptionBoolean val) {
+        raiseExceptionOnError = val;
     }
 
     @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", type = "SOSOptionString", mandatory = false)
@@ -661,8 +661,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return ignoreError;
     }
 
-    public void setIgnoreError(final SOSOptionBoolean ignoreError) {
-        this.ignoreError = ignoreError;
+    public void setIgnoreError(final SOSOptionBoolean val) {
+        ignoreError = val;
     }
 
     @JSOptionDefinition(name = "configuration_files", description = "List of the app configuration files separated by semicolon", key = "configuration_files", type = "SOSOptionString", mandatory = false)
@@ -685,8 +685,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         return useKeyAgent;
     }
 
-    public void setUseKeyAgent(final SOSOptionBoolean useKeyAgent) {
-        this.useKeyAgent = useKeyAgent;
+    public void setUseKeyAgent(final SOSOptionBoolean val) {
+        useKeyAgent = val;
     }
 
     @JSOptionDefinition(name = "session_connect_timeout", description = "Sets the interval for session connect", key = "session_connect_timeout", type = "SOSOptionString", mandatory = false)

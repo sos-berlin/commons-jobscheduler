@@ -14,75 +14,105 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISOSVirtualFile {
 
-    protected ISOSVfsFileTransfer objVFSHandler = null;
-    protected InputStream objInputStream = null;
-    public OutputStream objOutputStream = null;
-    public ZipOutputStream objEntryOutputStream = null;
+    private ISOSVfsFileTransfer handler = null;
+    private InputStream inputStream = null;
+    private OutputStream outputStream = null;
+    private ZipOutputStream entryOutputStream = null;
 
-    protected boolean flgModeAppend = false;  // Append Mode for output file
-    protected boolean flgModeRestart = false;
-    protected boolean flgModeOverwrite = true;
+    private boolean modeAppend = false;  // Append Mode for output file
+    private boolean modeRestart = false;
 
     public SOSVfsCommonFile() {
         //
     }
 
-    public SOSVfsCommonFile(final String pstrBundleBaseName) {
-        super(pstrBundleBaseName);
+    public SOSVfsCommonFile(final String name) {
+        super(name);
     }
 
-    /** \brief getHandler
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
+    @Override
+    public void setHandler(final ISOSVfsFileTransfer val) {
+        handler = val;
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream is) {
+        inputStream = is;
+    }
+
+    public OutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    public void setOutputStream(OutputStream os) {
+        outputStream = os;
+    }
+
+    public ZipOutputStream getEntryOutputStream() {
+        return entryOutputStream;
+    }
+
+    public void setEntryOutputStream(ZipOutputStream os) {
+        entryOutputStream = os;
+    }
+
     @Override
     public ISOSVfsFileTransfer getHandler() {
-        return objVFSHandler;
+        return handler;
     }
 
     @Override
     public String file2String() {
-        InputStream objFI = this.getFileInputStream();
-        if (objFI == null) {
+        InputStream is = this.getFileInputStream();
+        if (is == null) {
             throw new JobSchedulerException(SOSVfs_E_177);
         }
-        StringBuffer strB = new StringBuffer((int) this.getFileSize());
-        int lngBufferSize = 1024;
-        byte[] buffer = new byte[lngBufferSize];
-        int intBytesTransferred;
+        StringBuilder sb = new StringBuilder((int) this.getFileSize());
+        byte[] buffer = new byte[1024];
+        int bytes;
         try {
-            while ((intBytesTransferred = objFI.read(buffer)) != -1) {
-                strB.append(new String(buffer).substring(0, intBytesTransferred));
+            while ((bytes = is.read(buffer)) != -1) {
+                sb.append(new String(buffer).substring(0, bytes));
             }
-            objFI.close();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.get("File2String()"), e);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
         }
-        return strB.toString();
+        return sb.toString();
     }
 
     @Override
-    public void string2File(final String pstrContent) {
-
+    public void string2File(final String content) {
+        OutputStream os = null;
         try {
-            OutputStream objOS = this.getFileOutputStream();
-            objOS.write(pstrContent.getBytes());
-            objOS.close();
+            os = this.getFileOutputStream();
+            os.write(content.getBytes());
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_130.get("String2File"), e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 
     @Override
-    public void putFile(final File fleFile) throws Exception {
+    public void putFile(final File file) throws Exception {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void putFile(final String strFileName) throws Exception {
+    public void putFile(final String path) throws Exception {
         // TODO Auto-generated method stub
     }
 
@@ -105,7 +135,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public void setFilePermissions(final Integer pintNewPermission) throws Exception {
+    public void setFilePermissions(final Integer val) throws Exception {
         // TODO Auto-generated method stub
     }
 
@@ -158,7 +188,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public void rename(final String pstrNewFileName) {
+    public void rename(final String newPath) {
         // TODO Auto-generated method stub
     }
 
@@ -175,34 +205,29 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public String getName() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public void write(final byte[] buffer, final int offset, final int length) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void write(final byte[] bteBuffer) {
+    public void write(final byte[] buffer) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public int read(final byte[] bteBuffer) {
+    public int read(final byte[] buffer) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public int read(final byte[] buffer, final int offset, final int length) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -227,44 +252,37 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
         // TODO Auto-generated method stub
     }
 
-    /** \brief deleteFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @throws Exception */
     @Override
     public void deleteFile() {
         this.delete(true);
     }
 
-    /** \brief getFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return
-     * @throws Exception */
     @Override
     public ISOSVirtualFile getFile() {
         return this;
     }
 
     @Override
-    public void setModeAppend(final boolean pflgModeAppend) {
-        flgModeAppend = pflgModeAppend;
+    public void setModeAppend(final boolean val) {
+        modeAppend = val;
+    }
+
+    public boolean isModeAppend() {
+        return modeAppend;
     }
 
     @Override
-    public void setModeRestart(final boolean pflgModeRestart) {
-        flgModeRestart = pflgModeRestart;
+    public void setModeRestart(final boolean val) {
+        modeRestart = val;
+    }
+
+    public boolean isModeRestart() {
+        return modeRestart;
     }
 
     @Override
-    public void setModeOverwrite(final boolean pflgModeOverwrite) {
-        flgModeOverwrite = pflgModeOverwrite;
+    public void setModeOverwrite(final boolean val) {
+
     }
 
 }

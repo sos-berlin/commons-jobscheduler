@@ -4,7 +4,6 @@ import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass.enuSourceOrTarget;
 
-/** @author KB */
 public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
 
     public void doPostLoginOperations();
@@ -27,15 +26,15 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
 
     public SOSFTPOptions getOptions();
 
-    public void getOptions(final SOSFTPOptions pobjOptions);
+    public void getOptions(final SOSFTPOptions options);
 
     public void release();
 
-    public void setConnected(final boolean pflgIsConnected);
+    public void setConnected(final boolean isConnected);
 
-    public void setJSJobUtilites(JSJobUtilities pobjJSJobUtilities);
+    public void setJSJobUtilites(JSJobUtilities utilities);
 
-    public void setLogin(final boolean pflgIsLogin);
+    public void setLogin(final boolean isLogin);
 
     public void setSource();
 
@@ -44,5 +43,5 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
     public enuSourceOrTarget sourceOrTarget();
 
     public void setSimulateShell(boolean simulateShell);
-    
+
 }

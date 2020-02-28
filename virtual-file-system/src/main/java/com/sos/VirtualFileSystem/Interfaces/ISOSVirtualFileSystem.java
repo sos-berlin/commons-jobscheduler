@@ -12,12 +12,12 @@ public interface ISOSVirtualFileSystem {
 
     public ISOSSession getSession();
 
-    public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException;
+    public ISOSVirtualFolder mkdir(final SOSFolderName folderName) throws IOException;
 
-    public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException;
+    public boolean rmdir(final SOSFolderName folderName) throws IOException;
 
-    public List<SOSFileEntry> dir(SOSFolderName pobjFolderName);
+    public List<SOSFileEntry> dir(SOSFolderName folderName);
 
-    public List<SOSFileEntry> dir(String pathname, int flag);
+    public List<SOSFileEntry> dir(String path, int flag);
 
 }
