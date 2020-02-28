@@ -2,7 +2,7 @@ package com.sos.JSHelper.interfaces;
 
 import com.sos.JSHelper.Options.JSOptionsClass;
 
-public interface IJadeEngine extends Runnable {
+public interface IJadeEngine {
 
     public abstract void execute() throws Exception;
 
@@ -13,8 +13,5 @@ public interface IJadeEngine extends Runnable {
     public abstract void logout();
 
     public abstract void setJadeOptions(JSOptionsClass pobjOptions);
-
-    @Override
-    public abstract void run();
 
 }

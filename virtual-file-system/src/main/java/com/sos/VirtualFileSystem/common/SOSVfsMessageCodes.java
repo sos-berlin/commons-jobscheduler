@@ -402,8 +402,8 @@ public class SOSVfsMessageCodes extends JSToolBox {
         super("SOSVirtualFileSystem");
     }
 
-    public SOSVfsMessageCodes(final String pstrBundleBaseName) {
-        super(pstrBundleBaseName);
+    public SOSVfsMessageCodes(final String bundleName) {
+        super(bundleName);
     }
 
 }

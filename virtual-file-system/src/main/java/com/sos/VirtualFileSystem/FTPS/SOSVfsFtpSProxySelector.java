@@ -28,11 +28,6 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
     private String proxyUser;
     private String proxyPassword;
 
-    /** @param protocol
-     * @param host
-     * @param port
-     * @param user
-     * @param password */
     public SOSVfsFtpSProxySelector(Protocol protocol, String host, int port, String user, String password) {
         proxyProtocol = protocol;
         proxyHost = host;
@@ -79,8 +74,8 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         if (uri == null || addr == null || ex == null) {
             throw new IllegalArgumentException("Arguments can't be null.");
         }
-        throw new UnsupportedOperationException(String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(),
-                ex.toString()));
+        throw new UnsupportedOperationException(String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(), ex
+                .toString()));
     }
 
 }

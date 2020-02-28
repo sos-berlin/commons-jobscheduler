@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.DataElements;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,42 +12,41 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.exception.SOSYadeSourceConnectionException;
 import com.sos.exception.SOSYadeTargetConnectionException;
 
-/** @author KB */
 public class SOSVfsConnectionFactory {
 
-    protected SOSFTPOptions objOptions = null;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsConnectionFactory.class);
-    private SOSVfsConnectionPool objConnPoolSource = null;
-    private SOSVfsConnectionPool objConnPoolTarget = null;
+    private SOSVfsConnectionPool source = null;
+    private SOSVfsConnectionPool target = null;
+    private SOSFTPOptions options = null;
 
-    public SOSVfsConnectionFactory(final SOSFTPOptions pobjOptions) {
-        this.objOptions = pobjOptions;
+    public SOSVfsConnectionFactory(final SOSFTPOptions opt) {
+        options = opt;
     }
 
     public SOSVfsConnectionPool getSourcePool() {
-        return objConnPoolSource;
+        return source;
     }
 
     public SOSVfsConnectionPool getTargetPool() {
-        return objConnPoolTarget;
+        return target;
     }
 
     public void createConnectionPool() throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
-        if (objConnPoolSource != null && objOptions.pollingServer.isTrue()) {
+        if (source != null && options.pollingServer.isTrue()) {
             LOGGER.debug("use existing connection pool");
         } else {
             int intMaxParallelTransfers = 1;
-            if (objOptions.concurrentTransfer.isTrue()) {
-                intMaxParallelTransfers = objOptions.maxConcurrentTransfers.value() + 1;
+            if (options.concurrentTransfer.isTrue()) {
+                intMaxParallelTransfers = options.maxConcurrentTransfers.value() + 1;
             }
-            if (objConnPoolSource == null || objOptions.reuseConnection.isFalse()) {
+            if (source == null || options.reuseConnection.isFalse()) {
                 LOGGER.debug("create connection pool");
-                objConnPoolSource = new SOSVfsConnectionPool();
-                objConnPoolTarget = new SOSVfsConnectionPool();
+                source = new SOSVfsConnectionPool();
+                target = new SOSVfsConnectionPool();
                 for (int i = 0; i < intMaxParallelTransfers; i++) {
-                    objConnPoolSource.add(getVfsHandler(true));
-                    if (objOptions.isNeedTargetClient()) {
-                        objConnPoolTarget.add(getVfsHandler(false));
+                    source.add(getVfsHandler(true));
+                    if (options.isNeedTargetClient()) {
+                        target.add(getVfsHandler(false));
                     }
                 }
             } else {
@@ -57,29 +55,28 @@ public class SOSVfsConnectionFactory {
         }
     }
 
-    private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException,
-        SOSYadeTargetConnectionException {
+    private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
         ISOSVFSHandler handler = null;
         try {
-            SOSConnection2OptionsAlternate options;
+            SOSConnection2OptionsAlternate optionsAlternate;
             String dataType;
             if (isSource) {
-                options = objOptions.getConnectionOptions().getSource();
-                dataType = objOptions.getDataSourceType();
+                optionsAlternate = options.getConnectionOptions().getSource();
+                dataType = options.getDataSourceType();
             } else {
-                options = objOptions.getConnectionOptions().getTarget();
-                dataType = objOptions.getDataTargetType();
+                optionsAlternate = options.getConnectionOptions().getTarget();
+                dataType = options.getDataTargetType();
             }
-            options.loadClassName.setIfNotDirty(objOptions.getConnectionOptions().loadClassName);
-            VFSFactory.setConnectionOptions(options);
+            optionsAlternate.loadClassName.setIfNotDirty(options.getConnectionOptions().loadClassName);
+            VFSFactory.setConnectionOptions(optionsAlternate);
             handler = prepareVFSHandler(handler, dataType, isSource);
             ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
             try {
-                handler.connect(options);
-                handler.authenticate(options);
-                handleClient(client, options, isSource);
+                handler.connect(optionsAlternate);
+                handler.authenticate(optionsAlternate);
+                handleClient(client, optionsAlternate, isSource);
             } catch (Exception e) {
-                SOSConnection2OptionsAlternate alternatives = options.getAlternatives();
+                SOSConnection2OptionsAlternate alternatives = optionsAlternate.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
@@ -88,16 +85,16 @@ public class SOSVfsConnectionFactory {
                     try {
                         client.disconnect();
                     } catch (Exception ce) {
-                        LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()));
+                        LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
                     handler = prepareVFSHandler(handler, alternatives.protocol.getValue(), isSource);
                     client = (ISOSVfsFileTransfer) handler;
                     handler.connect(alternatives);
                     handler.authenticate(alternatives);
-                    options.alternateOptionsUsed.value(true);
+                    optionsAlternate.alternateOptionsUsed.value(true);
                     handleClient(client, alternatives, isSource);
                 } else {
-                    LOGGER.error(String.format("Connection failed : %s", e.toString()));
+                    LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
                     LOGGER.debug(String.format("alternate options are not defined"));
                     throw e;
                 }
@@ -120,7 +117,7 @@ public class SOSVfsConnectionFactory {
 
     private ISOSVFSHandler prepareVFSHandler(ISOSVFSHandler handler, final String dataType, final boolean isSource) throws Exception {
         handler = VFSFactory.getHandler(dataType);
-        handler.getOptions(objOptions);
+        handler.getOptions(options);
         if (isSource) {
             handler.setSource();
         } else {
@@ -129,29 +126,29 @@ public class SOSVfsConnectionFactory {
         return handler;
     }
 
-    private void handleClient(ISOSVfsFileTransfer client, SOSConnection2OptionsAlternate options, boolean isSource) throws Exception {
-        if (options.directory.isDirty()) {
+    private void handleClient(ISOSVfsFileTransfer client, SOSConnection2OptionsAlternate optionsAlternate, boolean isSource) throws Exception {
+        if (optionsAlternate.directory.isDirty()) {
             if (isSource) {
-                objOptions.sourceDir = options.directory;
-                objOptions.localDir = options.directory;
+                options.sourceDir = optionsAlternate.directory;
+                options.localDir = optionsAlternate.directory;
             } else {
-                objOptions.targetDir = options.directory;
-                objOptions.remoteDir = options.directory;
+                options.targetDir = optionsAlternate.directory;
+                options.remoteDir = optionsAlternate.directory;
             }
         }
-        if (objOptions.passiveMode.value() || options.passiveMode.isTrue()) {
+        if (options.passiveMode.value() || optionsAlternate.passiveMode.isTrue()) {
             client.passive();
         }
-        if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
-            client.transferMode(options.transferMode);
+        if (optionsAlternate.transferMode.isDirty() && optionsAlternate.transferMode.isNotEmpty()) {
+            client.transferMode(optionsAlternate.transferMode);
         } else {
-            client.transferMode(objOptions.transferMode);
+            client.transferMode(options.transferMode);
         }
     }
 
     public void clear() {
-        objConnPoolSource.clear();
-        objConnPoolTarget.clear();
+        source.clear();
+        target.clear();
     }
 
 }

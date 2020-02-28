@@ -1,10 +1,8 @@
 package com.sos.VirtualFileSystem.zip;
 
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class JSNotImplementedException extends JobSchedulerException {
 

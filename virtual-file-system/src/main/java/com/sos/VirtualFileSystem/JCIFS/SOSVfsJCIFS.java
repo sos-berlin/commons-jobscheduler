@@ -326,15 +326,21 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
-        SmbFile f = getSmbFile(this.normalizePath(pathname));
+        SmbFile file = getSmbFile(normalizePath(pathname));
+        if (file == null) {
+            return null;
+        }
+        SOSFileEntry entry = getFileEntry(file, file.getParent());
+        return entry;
+    }
 
+    private SOSFileEntry getFileEntry(SmbFile file, String parentPath) throws Exception {
         SOSFileEntry entry = new SOSFileEntry(EntryType.SMB);
-        entry.setDirectory(f.isDirectory());
-        entry.setFilename(f.getName());
-        entry.setFilesize(f.length());
-        entry.setParentPath(f.getPath());// TODO
-
-        reply = "get OK";
+        entry.setDirectory(file.isDirectory());
+        entry.setFilename(file.getName());
+        entry.setFilesize(file.length());
+        //entry.setLastModified(file.getLastModified());
+        entry.setParentPath(parentPath);
         return entry;
     }
 
@@ -342,7 +348,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         SmbFile smbFile = null;
         try {
-            List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
+            List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("%s[listNames]%s", logPrefix, path));
             }
@@ -351,30 +357,23 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             }
 
             smbFile = getSmbFile(normalizePath(path));
-            // TODO skip checks: currently will not occur due previous isDirectory check
-            if (!smbFile.exists()) {
-                throw new JobSchedulerException(SOSVfs_E_226.params(path));
+            if (checkIfExists && !smbFile.exists()) {
+                return result;
             }
             if (checkIfIsDirectory && !smbFile.isDirectory()) {
                 reply = "ls OK";
-                return list;
+                return result;
             }
 
             path = path.endsWith("/") ? path : path + "/";
-            SmbFile[] smbFiles = smbFile.listFiles();
-            for (int i = 0; i < smbFiles.length; i++) {
-                SmbFile file = smbFiles[i];
-
-                SOSFileEntry entry = new SOSFileEntry(EntryType.SMB);
-                entry.setDirectory(file.isDirectory());
-                entry.setFilename(file.getName());
-                entry.setFilesize(file.length());
-                entry.setParentPath(path);
-                list.add(entry);
+            SmbFile[] list = smbFile.listFiles();
+            for (int i = 0; i < list.length; i++) {
+                SmbFile file = list[i];
+                result.add(getFileEntry(file, path));
 
             }
             reply = "ls OK";
-            return list;
+            return result;
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
@@ -693,10 +692,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     protected String getCurrentPath() {
         return currentDirectory;
-    }
-
-    private String normalizePath(final String path) {
-        return path.replaceAll("\\\\", "/");
     }
 
     private String getSmbFilePath(String path) {

@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Listener.JSListener;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @JSOptionClass(name = "SOSConnection2Options", description = "Options for a connection to an uri (server, site, e.g.)")
@@ -12,7 +11,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
 
     private static final long serialVersionUID = 6485361196241983182L;
-    private final String strAlternativePrefix = "";
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
     private SOSConnection2OptionsAlternate alternativeOptions = null;
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
@@ -33,16 +31,10 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
         //
     }
 
-    @Deprecated
-    public SOSConnection2Options(final JSListener listener) {
-        this();
-        this.registerMessageListener(listener);
-    }
-
-    public SOSConnection2Options(final HashMap<String, String> pobjJSSettings) throws Exception {
-        super(pobjJSSettings);
+    public SOSConnection2Options(final HashMap<String, String> settings) throws Exception {
+        super(settings);
         initChildOptions();
-        setPrefixedValues(pobjJSSettings);
+        setPrefixedValues(settings);
     }
 
     private void initChildOptions() {
@@ -132,5 +124,5 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
     public void setTarget(final SOSConnection2OptionsAlternate val) {
         targetOptions = val;
     }
-    
+
 }

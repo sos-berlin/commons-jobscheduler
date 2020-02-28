@@ -232,14 +232,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public void mkdir(final String path) {
         try {
             String p = path.replaceAll("//+", "/").replaceFirst("/$", "");
-            SOSOptionFolderName objF = new SOSOptionFolderName(path);
+            SOSOptionFolderName folderName = new SOSOptionFolderName(path);
             reply = "mkdir OK";
             if (isDebugEnabled) {
                 LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", p)));
             }
-            String[] subfolders = objF.getSubFolderArrayReverse();
+            String[] subfolders = folderName.getSubFolderArrayReverse();
             int idx = subfolders.length;
-            for (String subFolder : objF.getSubFolderArrayReverse()) {
+            for (String subFolder : folderName.getSubFolderArrayReverse()) {
                 SftpATTRS attributes = getAttributes(subFolder);
                 if (attributes != null && attributes.isDir()) {
                     if (isDebugEnabled) {
@@ -252,7 +252,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 idx--;
             }
-            subfolders = objF.getSubFolderArray();
+            subfolders = folderName.getSubFolderArray();
             for (int i = idx; i < subfolders.length; i++) {
                 this.getClient().mkdir(subfolders[i]);
                 if (isDebugEnabled) {
@@ -320,7 +320,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public long size(String filename) throws Exception {
-        filename = this.resolvePathname(filename);
+        filename = normalizePath(filename);
         long size = -1;
         SftpATTRS attributes = getAttributes(filename);
         if (attributes != null) {
@@ -350,35 +350,41 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
         Path path = Paths.get(pathname);
-
         SftpATTRS attrs = getAttributes(path.toString());
+        if (attrs != null && !attrs.isDir()) {
+            Path parent = Paths.get(pathname).getParent();
+            return getFileEntry(attrs, path.getFileName().toString(), parent == null ? null : parent.toString());
+        }
+        return null;
+    }
+
+    private SOSFileEntry getFileEntry(SftpATTRS attrs, String fileName, String parentPath) {
         SOSFileEntry entry = new SOSFileEntry(EntryType.FILESYSTEM);
         entry.setDirectory(attrs.isDir());
-        entry.setFilename(path.getFileName().toString());
+        entry.setFilename(fileName);
         entry.setFilesize(attrs.getSize());
-        entry.setParentPath(path.getParent().toString());
-
-        reply = "get OK";
+        entry.setLastModified(attrs.getMTime());
+        entry.setParentPath(parentPath);
         return entry;
     }
 
     @Override
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
-        path = resolvePathname(path);
+        path = normalizePath(path);
         try {
-            List<SOSFileEntry> list = new ArrayList<>();
+            List<SOSFileEntry> result = new ArrayList<>();
             if (path.isEmpty()) {
                 path = ".";
             }
-            if (checkIfExists && !this.fileExists(path)) {
-                return null;
+            if (checkIfExists && !fileExists(path)) {
+                return result;
             }
             if (checkIfIsDirectory && !isDirectory(path)) {
                 reply = "ls OK";
-                return list;
+                return result;
             }
 
-            final Vector<LsEntry> lsResult = new Vector<LsEntry>();
+            final Vector<LsEntry> list = new Vector<LsEntry>();
             LsEntrySelector selector = new LsEntrySelector() {
 
                 public int select(LsEntry entry) {
@@ -386,30 +392,24 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (filename.equals(".") || filename.equals("..")) {
                         return CONTINUE;
                     } else {
-                        lsResult.addElement(entry);
+                        list.addElement(entry);
                     }
                     return CONTINUE;
                 }
             };
             this.getClient().ls(path, selector);
-            int size = lsResult.size();
+            int size = list.size();
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("[%s][ls] %s files or folders", path, size));
             }
 
             for (int i = 0; i < size; i++) {
-                LsEntry file = lsResult.get(i);
-
-                SOSFileEntry entry = new SOSFileEntry(EntryType.FILESYSTEM);
-                entry.setDirectory(file.getAttrs().isDir());
-                entry.setFilename(file.getFilename());
-                entry.setFilesize(file.getAttrs().getSize());
-                entry.setParentPath(path);
-                list.add(entry);
+                LsEntry file = list.get(i);
+                result.add(getFileEntry(file.getAttrs(), file.getFilename(), path));
             }
             reply = "ls OK";
-            return list;
+            return result;
         } catch (Exception e) {
             reply = e.toString();
             return null;
@@ -418,7 +418,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) {
-        String sourceLocation = this.resolvePathname(remoteFile);
+        String sourceLocation = normalizePath(remoteFile);
         File transferFile = null;
         long remoteFileSize = -1;
         FileOutputStream fos = null;
@@ -454,7 +454,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public long putFile(final String localFile, final String remoteFile) {
         try {
-            this.getClient().put(localFile, this.resolvePathname(remoteFile), ChannelSftp.OVERWRITE);
+            this.getClient().put(localFile, normalizePath(remoteFile), ChannelSftp.OVERWRITE);
             reply = "put OK";
             LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
             return this.size(remoteFile);
@@ -481,10 +481,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void rename(String from, String to) {
-        from = this.resolvePathname(from);
-        to = this.resolvePathname(to);
+        from = normalizePath(from);
+        to = normalizePath(to);
         try {
-            this.getClient().rename(from, to);
+            getClient().rename(from, to);
         } catch (Exception e) {
             reply = e.toString();
             throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
@@ -676,16 +676,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public boolean changeWorkingDirectory(String pathname) {
         try {
-            pathname = this.resolvePathname(pathname);
-            if (!this.fileExists(pathname)) {
+            pathname = normalizePath(pathname);
+            if (!fileExists(pathname)) {
                 reply = String.format("Filepath '%1$s' does not exist.", pathname);
                 return false;
             }
-            if (!this.isDirectory(pathname)) {
+            if (!isDirectory(pathname)) {
                 reply = String.format("Filepath '%1$s' is not a directory.", pathname);
                 return false;
             }
-            this.getClient().cd(pathname);
+            getClient().cd(pathname);
             reply = "cwd OK";
         } catch (Exception ex) {
             throw new JobSchedulerException(SOSVfs_E_193.params("cwd", pathname), ex);

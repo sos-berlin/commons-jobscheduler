@@ -8,7 +8,6 @@ import com.sos.JSHelper.Options.SOSOptionIntegerArray;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
 
-/** @author KB */
 public interface ISOSShellOptions {
 
     public abstract SOSOptionCommandString getCommand();

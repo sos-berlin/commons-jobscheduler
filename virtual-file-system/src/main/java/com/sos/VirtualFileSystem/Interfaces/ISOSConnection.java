@@ -4,7 +4,6 @@ import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 
-/** @author KB */
 public interface ISOSConnection {
 
     public ISOSConnection connect() throws Exception;

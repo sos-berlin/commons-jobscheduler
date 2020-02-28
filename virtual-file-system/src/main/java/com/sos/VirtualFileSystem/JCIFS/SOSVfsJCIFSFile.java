@@ -16,44 +16,44 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsJCIFSFile.class);
 
-    public SOSVfsJCIFSFile(final String pstrFileName) {
-        super(pstrFileName);
+    public SOSVfsJCIFSFile(final String path) {
+        super(path);
     }
 
     @Override
-    public int read(final byte[] bteBuffer) {
+    public int read(final byte[] buffer) {
         try {
-            InputStream is = this.getFileInputStream();
+            InputStream is = getFileInputStream();
             if (is == null) {
                 throw new JobSchedulerException(SOSVfs_E_177.get());
             }
-            return is.read(bteBuffer);
+            return is.read(buffer);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
     @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public int read(final byte[] buffer, final int offset, final int length) {
         try {
             InputStream is = getFileInputStream();
             if (is == null) {
                 throw new Exception(SOSVfs_E_177.get());
             }
-            return is.read(bteBuffer, intOffset, intLength);
+            return is.read(buffer, offset, length);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
         }
     }
 
     @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+    public void write(final byte[] buffer, final int offset, final int length) {
         try {
             OutputStream os = getFileOutputStream();
             if (os == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
-            os.write(bteBuffer, intOffset, intLength);
+            os.write(buffer, offset, length);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_173.params("write", fileName), e);
         }
@@ -71,24 +71,24 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     @Override
     public OutputStream getFileOutputStream() {
         try {
-            if (objOutputStream == null) {
+            if (getOutputStream() == null) {
                 fileName = super.adjustRelativePathName(fileName);
-                SOSVfsJCIFS objJ = (SOSVfsJCIFS) objVFSHandler;
-                objOutputStream = objJ.getOutputStream(fileName);
-                if (objOutputStream == null) {
-                    objVFSHandler.openOutputFile(fileName);
+                SOSVfsJCIFS handler = (SOSVfsJCIFS) getHandler();
+                setOutputStream(handler.getOutputStream(fileName));
+                if (getOutputStream() == null) {
+                    getHandler().openOutputFile(fileName);
                 }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
         }
-        return objOutputStream;
+        return getOutputStream();
     }
 
     @Override
     public long setModificationDateTime(final long timeStamp) {
         try {
-            SOSVfsJCIFS handler = (SOSVfsJCIFS) objVFSHandler;
+            SOSVfsJCIFS handler = (SOSVfsJCIFS) getHandler();
             handler.setModificationTimeStamp(fileName, timeStamp);
             return timeStamp;
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     @Override
     public long getModificationDateTime() {
         try {
-            SOSVfsJCIFS handler = (SOSVfsJCIFS) objVFSHandler;
+            SOSVfsJCIFS handler = (SOSVfsJCIFS) getHandler();
             return handler.getModificationTimeStamp(fileName);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

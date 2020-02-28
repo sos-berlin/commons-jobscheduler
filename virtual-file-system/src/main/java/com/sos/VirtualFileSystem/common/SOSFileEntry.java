@@ -11,38 +11,48 @@ public class SOSFileEntry {
 
     private static final String FILE = "File";
     private static final String FOLDER = "Folder";
+
+    private EntryType type;
     private String filename;
     private long filesize;
     private boolean directory;
+    private long lastModified = -1;
     private String parentPath;
-    private EntryType type;
 
-    public SOSFileEntry(final EntryType entryType) {
-        type = entryType;
+    public SOSFileEntry(final EntryType val) {
+        type = val;
     }
 
     public String getFilename() {
         return filename;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFilename(String val) {
+        filename = val;
     }
 
     public long getFilesize() {
         return filesize;
     }
 
-    public void setFilesize(long filesize) {
-        this.filesize = filesize;
+    public void setFilesize(long val) {
+        filesize = val;
     }
 
     public boolean isDirectory() {
         return directory;
     }
 
-    public void setDirectory(boolean directory) {
-        this.directory = directory;
+    public void setDirectory(boolean val) {
+        directory = val;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long val) {
+        lastModified = val;
     }
 
     public String getParentPath() {
