@@ -68,7 +68,6 @@ public class SOSVfsConnectionFactory {
                 dataType = options.getDataTargetType();
             }
             optionsAlternate.loadClassName.setIfNotDirty(options.getConnectionOptions().loadClassName);
-            VFSFactory.setConnectionOptions(optionsAlternate);
             handler = prepareVFSHandler(handler, dataType, isSource);
             ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
             try {

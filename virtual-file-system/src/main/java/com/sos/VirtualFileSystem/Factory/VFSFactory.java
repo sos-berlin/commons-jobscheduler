@@ -1,15 +1,11 @@
 package com.sos.VirtualFileSystem.Factory;
 
-import java.io.File;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.VirtualFileSystem.FTP.SOSVfsFtp;
 import com.sos.VirtualFileSystem.FTPS.SOSVfsFtpS;
@@ -18,7 +14,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.JCIFS.SOSVfsJCIFS;
 import com.sos.VirtualFileSystem.JMS.SOSVfsJms;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.WebDAV.SOSVfsWebDAV;
@@ -43,7 +38,6 @@ public class VFSFactory extends SOSVfsMessageCodes {
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") }, msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
     private static String PARENT_LOGGER_NAME = "";
     private static ClassLoader CLASS_LOADER = null;
-    private static SOSConnection2OptionsAlternate OPTIONS = null;
 
     public VFSFactory() {
         super(SOSVfsConstants.BUNDLE_NAME);
@@ -143,9 +137,4 @@ public class VFSFactory extends SOSVfsMessageCodes {
         }
         return handler;
     }
-
-    public static void setConnectionOptions(final SOSConnection2OptionsAlternate options) {
-        OPTIONS = options;
-    }
-
 }

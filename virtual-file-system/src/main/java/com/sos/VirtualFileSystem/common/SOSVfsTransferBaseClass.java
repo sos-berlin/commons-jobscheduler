@@ -123,7 +123,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
         if (recLevel == 0) {
             directoryListing = new ArrayList<SOSFileEntry>();
-            this.doPWD();
+            doPWD();
         }
         List<SOSFileEntry> entries = null;
         path = path.trim();

@@ -11,41 +11,33 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
-import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
-import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
+import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSFile;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
+public class SOSVfsLocal extends SOSVfsTransferBaseClass {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
     private final InputStream inputStream = null;
     private final OutputStream outputStream = null;
     private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
-    private String reply = "";
     private CmdShell cmdShell = null;
     private boolean simulateShell = false;
 
@@ -65,19 +57,9 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void ascii() {
-        //
-    }
-
-    @Override
     public ISOSConnection authenticate(final ISOSAuthenticationOptions options) throws Exception {
-        reply = "230 Login successful.";
+        reply = "Login successful";
         return this;
-    }
-
-    @Override
-    public void binary() {
-        //
     }
 
     @Override
@@ -93,33 +75,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void close() {
-        //
-    }
-
-    @Override
     public void closeConnection() throws Exception {
         reply = "ok";
     }
 
     @Override
-    public void closeInput() {
-        //
-    }
-
-    @Override
-    public void closeOutput() {
-        //
-    }
-
-    @Override
     public void closeSession() throws Exception {
-        reply = "221 Goodbye.";
-    }
-
-    @Override
-    public void completePendingCommand() {
-        //
+        reply = "Goodbye";
     }
 
     @Override
@@ -130,18 +92,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public ISOSConnection connect(final ISOSConnectionOptions options) throws Exception {
-        this.connect();
+        connect();
         return this;
     }
 
     @Override
     public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
         connection2OptionsAlternate = options;
-        return null;
-    }
-
-    @Override
-    public ISOSConnection connect(final ISOSDataProviderOptions options) throws Exception {
         return null;
     }
 
@@ -157,28 +114,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
-        File file = new File(getRealFileName(pathname));
+        File file = new File(pathname);
         file.delete();
-    }
-
-    @Override
-    public List<SOSFileEntry> dir(final SOSFolderName folderName) {
-        return null;
-    }
-
-    @Override
-    public List<SOSFileEntry> dir(final String pathname, final int flag) {
-        return null;
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        //
-    }
-
-    @Override
-    public void doPostLoginOperations() {
-        //
     }
 
     @Override
@@ -222,16 +159,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void flush() {
-        //
-    }
-
-    @Override
-    public OutputStream getAppendFileStream(final String strFileName) {
-        return null;
-    }
-
-    @Override
     public ISOSConnection getConnection() {
         return null;
     }
@@ -247,11 +174,6 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public long getFile(final String remoteFile, final String localFile) throws Exception {
-        return 0;
-    }
-
-    @Override
     public long getFile(final String sourceFileName, final String targetFileName, final boolean append) throws Exception {
         long size = 0;
         if (!append) {
@@ -259,7 +181,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             size = file.length();
             file.copy(targetFileName);
         } else {
-            size = this.appendFile(sourceFileName, targetFileName);
+            size = appendFile(sourceFileName, targetFileName);
         }
         return size;
     }
@@ -358,63 +280,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public Vector<ISOSVirtualFile> getFiles() {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public Vector<ISOSVirtualFile> getFiles(final String string) {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public long getFileSize(final String strFileName) {
-        return 0;
-    }
-
-    @Override
-    public ISOSVFSHandler getHandler() {
-        return this;
-    }
-
-    @Override
     public InputStream getInputStream() {
         return inputStream;
     }
 
     @Override
-    public InputStream getInputStream(final String fileName) {
-        return null;
-    }
-
-    @Override
-    public String getModificationTime(final String fileName) {
-        return null;
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return null;
-    }
-
-    @Override
     public OutputStream getOutputStream(final String fileName) {
-        return null;
-    }
-
-    private String getRealFileName(final String pathname) {
-        return pathname;
-    }
-
-    @Override
-    public String getReplyString() {
-        return reply;
-    }
-
-    @Override
-    public ISOSSession getSession() {
         return null;
     }
 
@@ -439,24 +310,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public boolean isNegativeCommandCompletion() {
-        return false;
-    }
-
-    @Override
-    public void login(final String user, final String password) {
+    public void logout() {
         //
-    }
-
-    @Override
-    public void logout() throws IOException {
-        //
-    }
-
-    @Override
-    public ISOSVirtualFolder mkdir(final SOSFolderName folderName) throws IOException {
-        new File(folderName.getValue()).mkdir();
-        return null;
     }
 
     @Override
@@ -472,34 +327,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public List<SOSFileEntry> nList(final String pathname, final boolean recursive, boolean checkIfExists) {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public void openInputFile(final String fileName) {
-        notImplemented();
-    }
-
-    @Override
-    public void openOutputFile(final String fileName) {
-        notImplemented();
-    }
-
-    @Override
     public ISOSSession openSession(final ISOSShellOptions options) throws Exception {
         return null;
-    }
-
-    @Override
-    public int passive() {
-        return 0;
-    }
-
-    @Override
-    public void put(final String localFile, final String remoteFile) {
-        //
     }
 
     @Override
@@ -547,69 +376,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public long putFile(final String localFile, final OutputStream os) {
-        return 0;
-    }
-
-    @Override
-    public long putFile(final String localFile, final String remoteFile) throws Exception {
-        return 0;
-    }
-
-    @Override
-    public int read(final byte[] buffer) {
-        return 0;
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        return 0;
-    }
-
-    @Override
-    public boolean remoteIsWindowsShell() {
-        return false;
-    }
-
-    @Override
-    public void rename(final String fileName, final String newFileName) {
-        //
-    }
-
-    @Override
-    public boolean rmdir(final SOSFolderName folderName) throws IOException {
-        new File(folderName.getValue()).delete();
-        return true;
-    }
-
-    @Override
     public void rmdir(final String folderName) throws IOException {
         new File(folderName).delete();
     }
 
     @Override
-    public void setJSJobUtilites(final JSJobUtilities utilities) {
-        //
-    }
-
-    @Override
-    public void setLogin(final boolean isLogin) {
-        //
-    }
-
-    @Override
     public ISOSVirtualFile transferMode(final SOSOptionTransferMode mode) {
         return null;
-    }
-
-    @Override
-    public void write(final byte[] buffer) {
-        notImplemented();
-    }
-
-    @Override
-    public void write(final byte[] buffer, final int offset, final int length) {
-        notImplemented();
     }
 
     @Override
@@ -623,13 +396,17 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void setSimulateShell(boolean simulateShell) {
-        this.simulateShell = simulateShell;
+    public void setSimulateShell(boolean val) {
+        simulateShell = val;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        return outputStream;
     }
 
     @Override
     public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
