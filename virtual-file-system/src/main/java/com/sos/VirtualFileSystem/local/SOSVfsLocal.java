@@ -402,7 +402,7 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
 
     @Override
     public OutputStream getOutputStream() {
-       return outputStream;
+        return outputStream;
     }
 
     @Override
