@@ -11,43 +11,41 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.JSHelper.io.Files.JSTextFile;
 
-/** @author JS */
 public class SOSMsg {
 
-    protected static final Logger logger = LoggerFactory.getLogger(SOSMsg.class);
-    protected String strLastMsgKey = "";
-    protected String strControlName = "";
-    protected String strControlParent = "";
-    protected int intVerbosityLevel = 0;
-    protected enuMsgTypes enuMsgType = enuMsgTypes.undefined;
-    protected int curVerbosityLevel = 0;
-    protected String strMessageCode = null;
-    protected Messages Messages = null;
-    protected boolean flgFullMessageReported = false;
-    private static final String PROPERTY_EXTENSION_F1 = ".f1";
-    private static JSTextFile objMissingCodesPropertiesFile = null;
-    private static HashMap<String, String> objMC = new HashMap<String, String>();
-    public static final String conEnvironmentVariableSOS_LOCALE = "SOS_LOCALE";
-    public static final String conPropertyExtensionTOOLTIP = ".tooltip";
-    public static final String conPropertyExtensionShortText = ".shorttext";
-    public static final String conPropertyExtensionLABEL = ".label";
-    public static final String conPropertyExtensionICon = ".icon";
-    public static final String conPropertyExtensionAccelerator = ".acc";
-    public static int VerbosityLevel = 0;
-    public static boolean flgShowFullMessageText = false;
+    private static final Logger lOGGER = LoggerFactory.getLogger(SOSMsg.class);
 
-    public enum enuMsgTypes {
+    private static JSTextFile MISSING_CODES_FILE = null;
+    private static HashMap<String, String> CODES = new HashMap<String, String>();
+    private static final String PROPERTY_EXTENSION_F1 = ".f1";
+    private static final String ENV_VAR_SOS_LOCALE = "SOS_LOCALE";
+    private static final String EXTENSION_TOOLTIP = ".tooltip";
+    private static final String EXTENSION_LABEL = ".label";
+    private static final String EXTENSION_ICON = ".icon";
+    private static final String EXTENSION_ACC = ".acc";
+    private static boolean SHOW_FULL_MESSAGE_TEXT = false;
+
+    private enum MsgTypes {
         undefined, error, info, fatal, debug, warning, text, trace, label;
     }
 
-    public SOSMsg(final String pstrMessageCode) {
-        strMessageCode = pstrMessageCode;
+    private MsgTypes type = MsgTypes.undefined;
+    private Messages messages = null;
+    private String controlName = "";
+    private String controlParent = "";
+    private int verbosityLevel = 0;
+    private int curVerbosityLevel = 0;
+    private String code = null;
+    private boolean fullMessageReported = false;
+
+    public SOSMsg(final String messageCode) {
+        code = messageCode;
         setMsgType();
     }
 
-    public SOSMsg(final String pstrMessageCode, final int pintVerbosityLevel) {
-        this(pstrMessageCode);
-        intVerbosityLevel = pintVerbosityLevel;
+    public SOSMsg(final String messageCode, final int level) {
+        this(messageCode);
+        verbosityLevel = level;
     }
 
     public void toLog() {
@@ -55,138 +53,135 @@ public class SOSMsg {
     }
 
     private void setMsgType() {
-        enuMsgType = enuMsgTypes.undefined;
-        if (strMessageCode.indexOf("_E_") != -1) {
-            enuMsgType = enuMsgTypes.error;
-        } else if (strMessageCode.indexOf("_F_") != -1) {
-            enuMsgType = enuMsgTypes.fatal;
-        } else if (strMessageCode.indexOf("_D_") != -1) {
-            enuMsgType = enuMsgTypes.debug;
-        } else if (strMessageCode.indexOf("_I_") != -1) {
-            enuMsgType = enuMsgTypes.info;
-        } else if (strMessageCode.indexOf("_W_") != -1) {
-            enuMsgType = enuMsgTypes.warning;
-        } else if (strMessageCode.indexOf("_T_") != -1) {
-            enuMsgType = enuMsgTypes.text;
-        } else if (strMessageCode.indexOf("_L_") != -1) {
-            enuMsgType = enuMsgTypes.label;
-        } else if (strMessageCode.indexOf("_R_") != -1) {
-            enuMsgType = enuMsgTypes.trace;
+        type = MsgTypes.undefined;
+        if (code.indexOf("_E_") != -1) {
+            type = MsgTypes.error;
+        } else if (code.indexOf("_F_") != -1) {
+            type = MsgTypes.fatal;
+        } else if (code.indexOf("_D_") != -1) {
+            type = MsgTypes.debug;
+        } else if (code.indexOf("_I_") != -1) {
+            type = MsgTypes.info;
+        } else if (code.indexOf("_W_") != -1) {
+            type = MsgTypes.warning;
+        } else if (code.indexOf("_T_") != -1) {
+            type = MsgTypes.text;
+        } else if (code.indexOf("_L_") != -1) {
+            type = MsgTypes.label;
+        } else if (code.indexOf("_R_") != -1) {
+            type = MsgTypes.trace;
         }
     }
 
-    public void toLog(final Object... pstrArgs) {
-        String strT = Messages.getMsg(strMessageCode, pstrArgs);
-        strT = getFullMessage(strT);
-        write2Log(strT);
+    public void toLog(final Object... args) {
+        write2Log(getFullMessage(messages.getMsg(code, args)));
     }
 
-    private void write2Log(final String pstrLogMsg) {
-        switch (enuMsgType) {
+    private void write2Log(final String msg) {
+        switch (type) {
         case error:
-            logger.error(pstrLogMsg);
+            lOGGER.error(msg);
             break;
         case fatal:
-            logger.error(pstrLogMsg);
-            throw new JobSchedulerException(pstrLogMsg);
+            lOGGER.error(msg);
+            throw new JobSchedulerException(msg);
         case warning:
-            if (logger.isWarnEnabled()) {
-                logger.warn(pstrLogMsg);
+            if (lOGGER.isWarnEnabled()) {
+                lOGGER.warn(msg);
             }
             break;
         case debug:
-            if (logger.isDebugEnabled()) {
+            if (lOGGER.isDebugEnabled()) {
                 checkVerbosityLevel();
-                if (intVerbosityLevel <= curVerbosityLevel) {
-                    logger.debug(pstrLogMsg);
+                if (verbosityLevel <= curVerbosityLevel) {
+                    lOGGER.debug(msg);
                 }
             }
             break;
         case info:
         case text:
         case undefined:
-            logger.info(pstrLogMsg);
+            lOGGER.info(msg);
             break;
         case trace:
-            logger.trace(pstrLogMsg);
+            lOGGER.trace(msg);
             break;
         default:
-            logger.info(pstrLogMsg);
+            lOGGER.info(msg);
             break;
         }
     }
 
     public String icon() {
-        String key = strMessageCode.trim().replaceAll(" ", "");
-        String strI = Messages.getLabel(key + conPropertyExtensionICon);
-        if (strI == null) {
-            strI = "noIcon";
+        String key = code.trim().replaceAll(" ", "");
+        String label = messages.getLabel(key + EXTENSION_ICON);
+        if (label == null) {
+            label = "noIcon";
         }
-        return strI;
+        return label;
     }
 
     public String accelerator() {
-        String key = strMessageCode.trim().replaceAll(" ", "");
-        String strI = Messages.getLabel(key + conPropertyExtensionAccelerator);
-        if (strI == null) {
-            strI = "";
+        String key = code.trim().replaceAll(" ", "");
+        String label = messages.getLabel(key + EXTENSION_ACC);
+        if (label == null) {
+            label = "";
         }
-        return strI;
+        return label;
     }
 
-    private String getLabel(final String pstrDefaultValue) {
-        String key = strMessageCode.trim().replaceAll(" ", "");
+    private String getLabel(final String defaultValue) {
+        String key = code.trim().replaceAll(" ", "");
         try {
-            strLastMsgKey = key;
-            String msg = Messages.getLabel(key + conPropertyExtensionLABEL);
+            String msg = messages.getLabel(key + EXTENSION_LABEL);
             if (msg == null) {
-                msg = Messages.getLabel(key + ".Label");
+                msg = messages.getLabel(key + ".Label");
                 if (msg == null) {
-                    msg = Messages.getLabel(key.toLowerCase() + conPropertyExtensionLABEL);
+                    msg = messages.getLabel(key.toLowerCase() + EXTENSION_LABEL);
                     if (msg == null) {
-                        msg = Messages.getLabel(key.toLowerCase() + ".Label");
+                        msg = messages.getLabel(key.toLowerCase() + ".Label");
                         if (msg == null) {
-                            msg = Messages.getLabel(key);
+                            msg = messages.getLabel(key);
                         }
                     }
                 }
             }
-            String strT = strMessageCode;
+            String result = code;
             if (msg == null) {
-                strT = "??" + strMessageCode + "??";
-                strT = pstrDefaultValue;
+                result = "??" + code + "??";
+                result = defaultValue;
                 handleMissingCodes();
             } else {
-                strT = msg;
+                result = msg;
             }
-            return strT;
+            return result;
         } catch (Exception e) {
-            return strMessageCode;
+            return code;
         }
     }
 
     private void handleMissingCodes() {
-        if (objMissingCodesPropertiesFile == null) {
-            objMissingCodesPropertiesFile = new JSTextFile(JSFile.getTempdir(), "MissingCodes.properties");
+        if (MISSING_CODES_FILE == null) {
+            MISSING_CODES_FILE = new JSTextFile(JSFile.getTempdir(), "MissingCodes.properties");
         }
-        if (objMC.get(strMessageCode) == null) {
+        if (CODES.get(code) == null) {
             try {
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".label = " + strMessageCode);
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".tooltip = " + strMessageCode);
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".shorttext = " + strMessageCode);
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".F1 = ");
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".F10 = ");
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".icon = ");
-                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".acc = ");
+                MISSING_CODES_FILE.writeLine(code + ".label = " + code);
+                MISSING_CODES_FILE.writeLine(code + ".tooltip = " + code);
+                MISSING_CODES_FILE.writeLine(code + ".shorttext = " + code);
+                MISSING_CODES_FILE.writeLine(code + ".F1 = ");
+                MISSING_CODES_FILE.writeLine(code + ".F10 = ");
+                MISSING_CODES_FILE.writeLine(code + ".icon = ");
+                MISSING_CODES_FILE.writeLine(code + ".acc = ");
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                lOGGER.error(e.getMessage(), e);
             }
-            objMC.put(strMessageCode, "");
+            CODES.put(code, "");
         }
     }
 
     public String label() {
-        String key = strMessageCode.trim().replaceAll(" ", "");
+        String key = code.trim().replaceAll(" ", "");
         return getLabel(key);
     }
 
@@ -196,22 +191,21 @@ public class SOSMsg {
 
     public String tooltip() {
         try {
-            strLastMsgKey = strMessageCode;
-            String msg = Messages.getTooltip(strMessageCode + conPropertyExtensionTOOLTIP);
+            String msg = messages.getTooltip(code + EXTENSION_TOOLTIP);
             if (msg == null) {
-                msg = Messages.getTooltip("tooltip." + strMessageCode.toLowerCase());
+                msg = messages.getTooltip("tooltip." + code.toLowerCase());
                 if (msg == null) {
-                    msg = Messages.getTooltip(strMessageCode.toLowerCase() + conPropertyExtensionTOOLTIP);
+                    msg = messages.getTooltip(code.toLowerCase() + EXTENSION_TOOLTIP);
                     if (msg == null) {
-                        msg = Messages.getTooltip("tooltip." + strMessageCode);
+                        msg = messages.getTooltip("tooltip." + code);
                         if (msg == null) {
-                            msg = Messages.getTooltip(strMessageCode + ".Tooltip");
+                            msg = messages.getTooltip(code + ".Tooltip");
                             if (msg == null) {
-                                msg = Messages.getTooltip("Tooltip." + strMessageCode.toLowerCase());
+                                msg = messages.getTooltip("Tooltip." + code.toLowerCase());
                                 if (msg == null) {
-                                    msg = Messages.getTooltip(strMessageCode.toLowerCase() + ".Tooltip");
+                                    msg = messages.getTooltip(code.toLowerCase() + ".Tooltip");
                                     if (msg == null) {
-                                        msg = Messages.getTooltip("Tooltip." + strMessageCode);
+                                        msg = messages.getTooltip("Tooltip." + code);
                                     }
                                 }
                             }
@@ -220,158 +214,166 @@ public class SOSMsg {
                 }
             }
             if ("none".equals(msg.trim())) {
-                msg = strMessageCode + ": sorry, no tooltip available yet";
+                msg = code + ": sorry, no tooltip available yet";
             }
-            String strLoc = strControlParent + "." + strControlName;
-            if (!".".equals(strLoc)) {
-                msg = strLoc + " -> " + msg;
+            String control = controlParent + "." + controlName;
+            if (!".".equals(control)) {
+                msg = control + " -> " + msg;
             }
             return msg;
         } catch (Exception e) {
-            return strMessageCode;
+            return code;
         }
     }
 
     public String getF1() {
-        String key = strMessageCode.trim().replaceAll(" ", "");
+        String key = code.trim().replaceAll(" ", "");
         try {
-            String msg = Messages.getLabel(key + ".F1");
+            String msg = messages.getLabel(key + ".F1");
             if (msg == null) {
-                msg = Messages.getLabel(key.toLowerCase() + ".F1");
+                msg = messages.getLabel(key.toLowerCase() + ".F1");
                 if (msg == null) {
-                    msg = Messages.getLabel(key + PROPERTY_EXTENSION_F1);
+                    msg = messages.getLabel(key + PROPERTY_EXTENSION_F1);
                     if (msg == null) {
-                        msg = Messages.getLabel(key.toLowerCase() + PROPERTY_EXTENSION_F1);
+                        msg = messages.getLabel(key.toLowerCase() + PROPERTY_EXTENSION_F1);
                         if (msg == null) {
-                            msg = Messages.getLabel(key);
+                            msg = messages.getLabel(key);
                         }
                     }
                 }
             }
             return msg != null && !"".equals(msg) ? msg : key;
         } catch (Exception e) {
-            return strMessageCode;
+            return code;
         }
     }
 
     public String get() {
-        String strT = "";
-        if (!flgFullMessageReported) {
-            strT = getFullMessage();
+        if (!fullMessageReported) {
+            return getFullMessage();
         } else {
-            strT = Messages.getMsg(strMessageCode);
+            return messages.getMsg(code);
         }
-        return strT;
     }
 
-    public String get(final Exception pobjEx) {
-        String strT = "";
-        String strM = pobjEx.getMessage();
-        if (!flgFullMessageReported) {
-            strT = getFullMessage();
+    public String get(final Exception ex) {
+        if (!fullMessageReported) {
+            return getFullMessage();
         } else {
-            strT = Messages.getMsg(strMessageCode, strM);
+            return messages.getMsg(code, ex.getMessage());
         }
-        return strT;
     }
 
     public String getFullMessage() {
-        String strMsgText = Messages.getMsg(strMessageCode);
-        return getFullMessage(strMsgText);
+        return getFullMessage(messages.getMsg(code));
     }
 
-    private String getFullMessage(final String pstrMsgText) {
-        String strT = pstrMsgText;
-        if (flgShowFullMessageText && !flgFullMessageReported) {
-            switch (enuMsgType) {
+    private String getFullMessage(final String msg) {
+        StringBuilder sb = new StringBuilder(msg);
+        if (SHOW_FULL_MESSAGE_TEXT && !fullMessageReported) {
+            switch (type) {
             case error:
             case fatal:
             case warning:
-                String strMsgDesc = Messages.getLabel(strMessageCode + ".description");
-                if (strMsgDesc == null) {
-                    strMsgDesc = "*** no detailed description available ***";
+                String desc = messages.getLabel(code + ".description");
+                if (desc == null) {
+                    desc = "*** no detailed description available ***";
                 }
-                String strMsgReason = Messages.getLabel(strMessageCode + ".reason");
-                if (strMsgReason == null) {
-                    strMsgReason = "*** no detailed explanation available ***";
+                String reason = messages.getLabel(code + ".reason");
+                if (reason == null) {
+                    reason = "*** no detailed explanation available ***";
                 }
-                strT = pstrMsgText + "\n\n" + "DESCRIPTION" + "\n" + strMsgDesc + "\n\n" + "REASON" + "\n" + strMsgReason;
-                flgFullMessageReported = true;
+                sb.append("\n\n").append("DESCRIPTION").append("\n").append(desc).append("\n\n").append("REASON").append("\n").append(reason);
+                fullMessageReported = true;
                 break;
             default:
                 break;
             }
         }
-        return strT;
+        return sb.toString();
     }
 
-    public String get(final Object... pstrArgs) {
-        return getFullMessage(Messages.getMsg(strMessageCode, pstrArgs));
+    public String get(final Object... args) {
+        return getFullMessage(messages.getMsg(code, args));
     }
 
-    public String getFullMessage(final Object... pstrArgs) {
-        boolean flgT = flgShowFullMessageText;
-        flgShowFullMessageText = true;
-        String strT = Messages.getMsg(strMessageCode, pstrArgs);
-        strT = getFullMessage(strT);
-        strT = String.format(strT, pstrArgs);
-        flgShowFullMessageText = flgT;
-        return strT;
+    public String getFullMessage(final Object... args) {
+        boolean full = SHOW_FULL_MESSAGE_TEXT;
+        SHOW_FULL_MESSAGE_TEXT = true;
+        String msg = messages.getMsg(code, args);
+        msg = String.format(getFullMessage(msg), args);
+        SHOW_FULL_MESSAGE_TEXT = full;
+        return msg;
     }
 
-    public String params(final Object... pstrArgs) {
-        String msg = Messages.getLabel(strMessageCode + conPropertyExtensionLABEL);
+    public String params(final Object... args) {
+        String msg = messages.getLabel(code + EXTENSION_LABEL);
         if (msg == null) {
-            msg = Messages.getLabel(strMessageCode.toLowerCase() + conPropertyExtensionLABEL);
+            msg = messages.getLabel(code.toLowerCase() + EXTENSION_LABEL);
         }
         if (msg != null) {
             try {
-                msg = String.format(msg, pstrArgs);
+                msg = String.format(msg, args);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                lOGGER.error(e.getMessage(), e);
             }
         } else {
-            msg = Messages.getMsg(strMessageCode, pstrArgs);
+            msg = messages.getMsg(code, args);
         }
         return msg;
     }
 
-    public String params(final String[] pstrArgs) {
-        String msg = Messages.getLabel(strMessageCode + conPropertyExtensionLABEL);
+    public String params(final String[] args) {
+        String msg = messages.getLabel(code + EXTENSION_LABEL);
         if (msg == null) {
-            msg = Messages.getLabel(strMessageCode.toLowerCase() + conPropertyExtensionLABEL);
+            msg = messages.getLabel(code.toLowerCase() + EXTENSION_LABEL);
         }
-        String strT = "";
-        for (String string : pstrArgs) {
-            strT += " " + string;
+        StringBuilder sb = new StringBuilder();
+        for (String string : args) {
+            sb.append(" ").append(string);
         }
         if (msg != null) {
-            msg = String.format(msg, strT);
+            msg = String.format(msg, sb.toString());
         } else {
-            msg = Messages.getMsg(strMessageCode, strT);
+            msg = messages.getMsg(code, sb.toString());
         }
         return msg;
     }
 
-    public String paramsNoKey(final Object... pstrArgs) {
-        return String.format(Messages.getLabel(strMessageCode), pstrArgs);
+    public String paramsNoKey(final Object... args) {
+        return String.format(messages.getLabel(code), args);
     }
 
-    protected void setMessageResource(final String pstrResourceBundleName) {
-        String strSOSLocale = System.getenv(conEnvironmentVariableSOS_LOCALE);
-        if (strSOSLocale == null) {
-            Messages = new Messages(pstrResourceBundleName, Locale.getDefault());
+    protected void setMessageResource(final String val) {
+        String locale = System.getenv(ENV_VAR_SOS_LOCALE);
+        if (locale == null) {
+            messages = new Messages(val, Locale.getDefault());
         } else {
-            Messages = new Messages(pstrResourceBundleName, new Locale(strSOSLocale));
+            messages = new Messages(val, new Locale(locale));
         }
     }
 
-    protected void setMessageResource(final String pstrResourceBundleName, final String pstrLocale) {
-        Messages = new Messages(pstrResourceBundleName, new Locale(pstrLocale));
+    protected void setMessageResource(final String bundleName, final String locale) {
+        messages = new Messages(bundleName, new Locale(locale));
     }
 
     protected void checkVerbosityLevel() {
         //
     }
 
+    public void setVerbosityLevel(int val) {
+        verbosityLevel = val;
+    }
+
+    public void setCurVerbosityLevel(int val) {
+        curVerbosityLevel = val;
+    }
+
+    public void setMessages(Messages val) {
+        messages = val;
+    }
+
+    public Messages getMessages() {
+        return messages;
+    }
 }

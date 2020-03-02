@@ -371,12 +371,29 @@ public class SOSFileList extends SOSVfsMessageCodes {
             LOGGER.info(msg);
             JADE_REPORT_LOGGER.info(msg);
             for (SOSFileListEntry entry : fileListEntries) {
-                if (!options.transactional.value() && entry.getTransferStatus().equals(TransferStatus.transferred)) {
+                TransferStatus transferStatus = entry.getTransferStatus();
+
+                if (LOGGER.isDebugEnabled()) {
+                    String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
+                    LOGGER.debug(String.format("[%s][target][%s][atomic=%s][%s]", entry.getTransferNumber(), SOSVfsTransferBaseClass.normalizePath(
+                            path), entry.getTargetAtomicFileName(), transferStatus));
+                }
+                if (!options.transactional.value() && transferStatus.equals(TransferStatus.transferred)) {
+                    if (LOGGER.isDebugEnabled()) {
+                        String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
+                        LOGGER.debug(String.format("[%s][target][%s][skip][transactional=false][%s]", entry.getTransferNumber(),
+                                SOSVfsTransferBaseClass.normalizePath(path), transferStatus));
+                    }
                     continue;
                 }
                 entry.setStatus(TransferStatus.transfer_aborted);
                 String atomicFileName = entry.getTargetAtomicFileName();
                 if (atomicFileName.isEmpty()) {
+                    if (LOGGER.isDebugEnabled()) {
+                        String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
+                        LOGGER.debug(String.format("[%s][target][%s][skip][transactional=true]atomicFileName is empty", entry.getTransferNumber(),
+                                SOSVfsTransferBaseClass.normalizePath(path)));
+                    }
                     continue;
                 }
                 atomicFileName = makeFullPathName(options.targetDir.getValue(), entry.getTargetAtomicFileName());
@@ -396,7 +413,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                         LOGGER.error(e.toString());
                     }
                 }
-                if (!entry.isTargetFileExists()) {
+                if (transferStatus.equals(TransferStatus.transferred)) {
                     try {
                         String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
                         ISOSVirtualFile targetFile = targetClient.getFileHandle(path);
@@ -408,7 +425,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                         JADE_REPORT_LOGGER.info(msg);
                         entry.setStatus(TransferStatus.setBack);
                     } catch (Exception e) {
-                        LOGGER.error(e.toString());
+                        LOGGER.error(e.toString(), e);
                     }
                 }
                 if (entry.hasTargetChecksumFile()) {

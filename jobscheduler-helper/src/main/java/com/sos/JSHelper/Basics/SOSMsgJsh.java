@@ -13,11 +13,8 @@ public class SOSMsgJsh extends SOSMsg {
 
     public SOSMsgJsh(final String pstrMessageCode) {
         super(pstrMessageCode);
-        if (Messages == null) {
+        if (getMessages() == null) {
             super.setMessageResource("com_sos_JSHelper_Messages");
-            Messages = super.Messages;
-        } else {
-            super.Messages = Messages;
         }
     }
 
