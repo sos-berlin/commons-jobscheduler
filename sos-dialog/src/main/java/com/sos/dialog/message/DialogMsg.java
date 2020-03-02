@@ -11,9 +11,9 @@ public class DialogMsg extends SOSMsg {
         super(adjustMsgCode(pstrMessageCode));
         if (objDialogMessages == null) {
             super.setMessageResource("DialogMessages");
-            objDialogMessages = super.Messages;
+            objDialogMessages = super.getMessages();
         } else {
-            super.Messages = objDialogMessages;
+            setMessages(objDialogMessages);
         }
     }
 
@@ -31,5 +31,5 @@ public class DialogMsg extends SOSMsg {
     public void openHelp(final String helpKey) {
         //
     }
-    
+
 }

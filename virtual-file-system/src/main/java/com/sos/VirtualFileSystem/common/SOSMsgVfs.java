@@ -9,11 +9,8 @@ public class SOSMsgVfs extends SOSMsg {
 
     public SOSMsgVfs(String msg) {
         super(msg);
-        if (this.Messages == null) {
+        if (getMessages() == null) {
             super.setMessageResource("SOSVirtualFileSystem");
-            this.Messages = super.Messages;
-        } else {
-            super.Messages = this.Messages;
         }
     }
 

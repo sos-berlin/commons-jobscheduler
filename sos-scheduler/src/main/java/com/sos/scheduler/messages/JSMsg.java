@@ -1,37 +1,29 @@
-/**
- *
- */
 package com.sos.scheduler.messages;
 
 import com.sos.localization.SOSMsg;
 
-/** @author KB */
 public class JSMsg extends SOSMsg {
 
-    public static int VerbosityLevel = 0;
+    private static int VERBOSITY_LEVEL = 0;
 
-    /** @param pstrMessageCode */
-    public JSMsg(final String pstrMessageCode) {
-        super(pstrMessageCode);
+    public JSMsg(final String messageCode) {
+        super(messageCode);
 
-        if (Messages == null) {
+        if (getMessages() == null) {
             super.setMessageResource("com_sos_scheduler_messages");
-            Messages = super.Messages;
-        } else {
-            super.Messages = Messages;
         }
 
-        intVerbosityLevel = VerbosityLevel;
-        curVerbosityLevel = VerbosityLevel;
+        setVerbosityLevel(VERBOSITY_LEVEL);
+        setCurVerbosityLevel(VERBOSITY_LEVEL);
     }
 
-    public JSMsg(final String pstrMessageCode, final int pintVerbosityLevel) {
-        this(pstrMessageCode);
-        intVerbosityLevel = pintVerbosityLevel;
+    public JSMsg(final String messageCode, final int verbosityLevel) {
+        this(messageCode);
+        setVerbosityLevel(verbosityLevel);
     }
 
     @Override
     protected void checkVerbosityLevel() {
-        super.curVerbosityLevel = VerbosityLevel;
+        setCurVerbosityLevel(VERBOSITY_LEVEL);
     }
 }

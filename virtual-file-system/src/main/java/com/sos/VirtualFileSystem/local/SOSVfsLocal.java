@@ -157,8 +157,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
-        File objF = new File(getRealFileName(pathname));
-        objF.delete();
+        File file = new File(getRealFileName(pathname));
+        file.delete();
     }
 
     @Override
@@ -303,6 +303,9 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         }
 
         File[] list = dir.listFiles();
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s][listFiles] %s files or folders", pathname, list.length));
+        }
         for (File file : list) {
             result.add(getFileEntry(file));
         }
@@ -315,6 +318,9 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
         try {
             Vector<File> list = SOSFile.getFolderlist(folder, regexp, flag, recursive);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s][getFolderlist] %s files or folders", folder, list.size()));
+            }
             for (File file : list) {
                 if (file.isDirectory()) {
                     continue;

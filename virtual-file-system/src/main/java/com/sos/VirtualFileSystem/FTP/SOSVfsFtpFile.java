@@ -344,7 +344,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             SOSVfsFtp handler = (SOSVfsFtp) getHandler();
             Date d = new Date(dateTime);
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-            handler.Client().setModificationTime(fileName, df.format(d));
+            handler.getClient().setModificationTime(fileName, df.format(d));
             return dateTime;
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);

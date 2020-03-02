@@ -54,57 +54,61 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         super();
     }
 
-    protected String getHostID(final String msg) {
-        return "(" + userName + "@" + host + ":" + port + ") " + msg;
-    }
-
     @Override
-    public int passive() {
-        return 0;
-    }
-
-    @Override
-    public String doPWD() {
+    public void logout() {
         try {
-            LOGGER.debug(SOSVfs_D_141.params("pwd."));
-            return this.getCurrentPath();
+            if (isConnected()) {
+                disconnect();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(SOSVfs_D_138.params(host, getReplyString()));
+                }
+            } else {
+                LOGGER.info("not connected, logout useless.");
+            }
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("pwd"), e);
+            LOGGER.warn(SOSVfs_W_140.get() + e.getMessage(), e);
         }
-    }
-
-    protected String getCurrentPath() {
-        return null;
-    }
-
-    protected boolean logReply() {
-        reply = getReplyString();
-        if (!reply.trim().isEmpty()) {
-            LOGGER.debug(reply);
-        }
-        return true;
     }
 
     @Override
-    public boolean isNegativeCommandCompletion() {
-        int x = 0;
-        return x > 300;
+    public void reconnect(SOSConnection2OptionsAlternate options) {
+        if (!isConnected()) {
+            try {
+                connect(options);
+                authenticate(options);
+                if (options.passiveMode.value()) {
+                    passive();
+                }
+                if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
+                    transferMode(options.transferMode);
+                }
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new JobSchedulerException(e);
+            }
+        }
     }
 
     @Override
-    public void completePendingCommand() {
-        //
-    }
-
-    public void setStrictHostKeyChecking(final String val) {
-
-    }
-
-    public boolean isNotHiddenFile(final String fileName) {
-        if (fileName == null || ".".equals(fileName) || "..".equals(fileName) || fileName.endsWith("/..") || fileName.endsWith("/.")) {
-            return false;
+    public void closeConnection() throws Exception {
+        if (isConnected()) {
+            disconnect();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(SOSVfs_D_125.params(host));
+            }
+            logReply();
         }
-        return true;
+    }
+
+    @Override
+    public List<SOSFileEntry> dir(final SOSFolderName folderName) {
+        try {
+            return getFilenames(folderName.getValue(), false, 0, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }//
     }
 
     @Override
@@ -116,320 +120,38 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         }
     }
 
-    @Override
-    public boolean isDirectory(final String filename) {
-        LOGGER.info("not implemented yet");
-        return false;
-    }
-
-    @Override
-    public List<SOSFileEntry> listNames(final String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
-        LOGGER.info("not implemented yet");
-        return null;
-    }
-
-    public String getResponse() {
-        return this.getReplyString();
-    }
-
-    protected String trimResponseCode(final String response) throws Exception {
-        if (response.length() < 5) {
-            return response;
+    private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
+        if (recLevel == 0) {
+            directoryListing = new ArrayList<SOSFileEntry>();
+            this.doPWD();
         }
-        return response.substring(4).trim();
-    }
-
-    protected void closeObject(OutputStream os) {
-        try {
-            if (os != null) {
-                os.flush();
-                os.close();
-                os = null;
-            }
-        } catch (Exception e) {
-            //
+        List<SOSFileEntry> entries = null;
+        path = path.trim();
+        if (path.isEmpty()) {
+            path = ".";
         }
-    }
-
-    protected void closeInput(InputStream is) {
         try {
-            if (is != null) {
-                is.close();
-                is = null;
-            }
+            entries = listNames(path, checkIfExists, checkIfExists);
         } catch (IOException e) {
-            //
+            LOGGER.error(e.getMessage(), e);
         }
-
-    }
-
-    @Override
-    public long getFile(final String remoteFile, final String localFile) {
-        long size = 0;
-        try {
-            size = getFile(remoteFile, localFile, false);
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
+        if (entries == null) {
+            return directoryListing;
         }
-        return size;
-    }
-
-    @Override
-    public void put(final String localFile, final String remoteFile) {
-        putFile(localFile, remoteFile);
-    }
-
-    @Override
-    public long putFile(final String localFile, final String remoteFile) {
-        LOGGER.info("not implemented yet");
-        return 0;
-    }
-
-    public long putFile(final String localFile, final OutputStream out) {
-        if (out == null) {
-            throw new JobSchedulerException(SOSVfs_E_147.get());
-        }
-        FileInputStream in = null;
-        long bytesWrittenTotal = 0;
-        try {
-            byte[] buffer = new byte[4096];
-            in = new FileInputStream(new File(localFile));
-            int bytesWritten;
-            synchronized (this) {
-                while ((bytesWritten = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesWritten);
-                    bytesWrittenTotal += bytesWritten;
+        for (SOSFileEntry entry : entries) {
+            if (!isNotHiddenFile(entry.getFilename())) {
+                continue;
+            }
+            if (entry.isDirectory()) {
+                if (recursive) {
+                    recLevel++;
+                    getFilenames(entry.getFullPath(), recursive, recLevel, checkIfExists);
                 }
-            }
-            closeInput(in);
-            closeObject(out);
-            return bytesWrittenTotal;
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_130.params("putFile()"), e);
-        } finally {
-            closeInput(in);
-            closeObject(out);
-        }
-    }
-
-    @Override
-    public long appendFile(final String localFile, final String remoteFile) {
-        notImplemented();
-        return -1;
-    }
-
-    @Override
-    public void ascii() {
-        //
-    }
-
-    @Override
-    public void binary() {
-        //
-    }
-
-    public int cd(final String directory) throws Exception {
-        changeWorkingDirectory(directory);
-        return 1;
-    }
-
-    protected boolean fileExists(final String filename) {
-        return false;
-    }
-
-    @Override
-    public boolean changeWorkingDirectory(final String pathname) throws IOException {
-        LOGGER.info("not implemented yet");
-        return true;
-    }
-
-    public static String normalizePath(String path) {
-        return path.replaceAll("\\\\", "/");
-    }
-
-    @Override
-    public void login(final String user, final String password) {
-
-    }
-
-    @Override
-    public void disconnect() {
-    }
-
-    @Override
-    public String getReplyString() {
-        return reply;
-    }
-
-    @Override
-    public boolean isConnected() {
-        return false;
-    }
-
-    @Override
-    public void logout() {
-        try {
-            if (isConnected()) {
-                disconnect();
-                LOGGER.debug(SOSVfs_D_138.params(host, getReplyString()));
             } else {
-                LOGGER.info("not connected, logout useless.");
+                directoryListing.add(entry);
             }
-        } catch (Exception e) {
-            LOGGER.warn(SOSVfs_W_140.get() + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public ISOSVFSHandler getHandler() {
-        return this;
-    }
-
-    @Override
-    public void executeCommand(final String cmd) throws Exception {
-    }
-
-    @Override
-    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
-        LOGGER.info("not implemented yet");
-    }
-
-    @Override
-    public String createScriptFile(final String content) throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public Integer getExitCode() {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public String getExitSignal() {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) throws Exception {
-        return this;
-    }
-
-    @Override
-    public void closeConnection() throws Exception {
-        if (isConnected()) {
-            disconnect();
-            LOGGER.debug(SOSVfs_D_125.params(host));
-            logReply();
-        }
-    }
-
-    @Override
-    public ISOSConnection connect() throws Exception {
-        notImplemented();
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final ISOSConnectionOptions options) throws Exception {
-        notImplemented();
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final String host, final int port) throws Exception {
-        notImplemented();
-        return this;
-    }
-
-    @Override
-    public void closeSession() throws Exception {
-        this.logout();
-    }
-
-    @Override
-    public ISOSSession openSession(final ISOSShellOptions options) throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public ISOSVirtualFile transferMode(final SOSOptionTransferMode mode) {
-        if (mode.isAscii()) {
-            this.ascii();
-        } else {
-            this.binary();
-        }
-        return null;
-    }
-
-    public SOSFileListEntry getNewVirtualFile(final String fileName) {
-        return new SOSFileListEntry(fileName);
-    }
-
-    @Override
-    public ISOSVirtualFolder mkdir(final SOSFolderName folderName) throws IOException {
-        this.mkdir(folderName.getValue());
-        return null;
-    }
-
-    @Override
-    public boolean rmdir(final SOSFolderName folderName) throws IOException {
-        this.rmdir(folderName.getValue());
-        return true;
-    }
-
-    @Override
-    public ISOSConnection getConnection() {
-        return this;
-    }
-
-    @Override
-    public ISOSSession getSession() {
-        return null;
-    }
-
-    @Override
-    public List<SOSFileEntry> dir(final SOSFolderName folderName) {
-        try {
-            return getFilenames(folderName.getValue(), false, 0, true);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }//
-    }
-
-    @Override
-    public StringBuffer getStdErr() throws Exception {
-        return null;
-    }
-
-    @Override
-    public StringBuffer getStdOut() throws Exception {
-        return null;
-    }
-
-    @Override
-    public boolean remoteIsWindowsShell() {
-        return false;
-    }
-
-    @Override
-    public void setJSJobUtilites(final JSJobUtilities utilities) {
-
-    }
-
-    @Override
-    public ISOSVirtualFile getFileHandle(final String filename) {
-        return null;
+        return directoryListing;
     }
 
     @Override
@@ -470,93 +192,95 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public OutputStream getAppendFileStream(final String fileName) {
+    public long getFile(final String remoteFile, final String localFile) {
+        try {
+            return getFile(remoteFile, localFile, false);
+        } catch (Exception e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return 0;
+    }
+
+    @Override
+    public void put(final String localFile, final String remoteFile) {
+        putFile(localFile, remoteFile);
+    }
+
+    public long putFile(final String localFile, final OutputStream out) {
+        if (out == null) {
+            throw new JobSchedulerException(SOSVfs_E_147.get());
+        }
+        FileInputStream in = null;
+        long bytesWrittenTotal = 0;
+        try {
+            byte[] buffer = new byte[4096];
+            in = new FileInputStream(new File(localFile));
+            int bytesWritten;
+            synchronized (this) {
+                while ((bytesWritten = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesWritten);
+                    bytesWrittenTotal += bytesWritten;
+                }
+            }
+            closeInput(in);
+            closeObject(out);
+            return bytesWrittenTotal;
+        } catch (Exception e) {
+            throw new JobSchedulerException(SOSVfs_E_130.params("putFile()"), e);
+        } finally {
+            closeInput(in);
+            closeObject(out);
+        }
+    }
+
+    public int cd(final String directory) throws Exception {
+        changeWorkingDirectory(directory);
+        return 1;
+    }
+
+    public static String normalizePath(String path) {
+        return path.replaceAll("\\\\", "/");
+    }
+
+    @Override
+    public void closeSession() throws Exception {
+        logout();
+    }
+
+    @Override
+    public ISOSVirtualFile transferMode(final SOSOptionTransferMode mode) {
+        if (mode.isAscii()) {
+            ascii();
+        } else {
+            binary();
+        }
         return null;
     }
 
-    protected long size(final String fileName) throws Exception {
-        LOGGER.info("not implemented yet");
-        return 0;
+    public SOSFileListEntry getNewVirtualFile(final String fileName) {
+        return new SOSFileListEntry(fileName);
+    }
+
+    @Override
+    public ISOSVirtualFolder mkdir(final SOSFolderName folderName) throws IOException {
+        mkdir(folderName.getValue());
+        return null;
+    }
+
+    @Override
+    public boolean rmdir(final SOSFolderName folderName) throws IOException {
+        rmdir(folderName.getValue());
+        return true;
     }
 
     @Override
     public long getFileSize(final String fileName) {
-        long size = 0;
         try {
-            size = size(fileName.replaceAll("\\\\", "/"));
+            return size(normalizePath(fileName));
         } catch (Exception e) {
-            LOGGER.trace(SOSVfs_E_134.params("getFileSize()") + ":" + e.getMessage());
+            LOGGER.trace(SOSVfs_E_134.params("getFileSize") + ":" + e.toString(), e);
         }
-        return size;
-    }
-
-    @Override
-    public InputStream getInputStream(final String fileName) {
-        return null;
-    }
-
-    @Override
-    public String getModificationTime(final String fileName) {
-        LOGGER.info("not implemented yet");
-        return null;
-    }
-
-    @Override
-    public abstract OutputStream getOutputStream(final String fileName);
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void closeInput() {
-    }
-
-    @Override
-    public void closeOutput() {
-    }
-
-    @Override
-    public void flush() {
-    }
-
-    @Override
-    public int read(final byte[] buffer) {
         return 0;
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        return 0;
-    }
-
-    @Override
-    public void write(final byte[] buffer, final int offset, final int length) {
-        LOGGER.info("not implemented yet");
-    }
-
-    @Override
-    public void write(final byte[] buffer) {
-
-    }
-
-    @Override
-    public void openInputFile(final String fileName) {
-
-    }
-
-    @Override
-    public void openOutputFile(final String fileName) {
-    }
-
-    @Override
-    public Vector<ISOSVirtualFile> getFiles(final String string) {
-        return null;
-    }
-
-    @Override
-    public Vector<ISOSVirtualFile> getFiles() {
-        return null;
     }
 
     @Override
@@ -599,6 +323,255 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         }
     }
 
+    protected String getHostID(final String msg) {
+        return "(" + userName + "@" + host + ":" + port + ") " + msg;
+    }
+
+    @Override
+    public String doPWD() {
+        try {
+            LOGGER.debug(SOSVfs_D_141.params("doPWD"));
+            return this.getCurrentPath();
+        } catch (Exception e) {
+            throw new JobSchedulerException(SOSVfs_E_134.params("pwd"), e);
+        }
+    }
+
+    protected boolean logReply() {
+        reply = getReplyString();
+        if (!reply.trim().isEmpty()) {
+            LOGGER.debug(reply);
+        }
+        return true;
+    }
+
+    public boolean isNotHiddenFile(final String fileName) {
+        if (fileName == null || ".".equals(fileName) || "..".equals(fileName) || fileName.endsWith("/..") || fileName.endsWith("/.")) {
+            return false;
+        }
+        return true;
+    }
+
+    protected String trimResponseCode(final String response) throws Exception {
+        if (response.length() < 5) {
+            return response;
+        }
+        return response.substring(4).trim();
+    }
+
+    protected void closeObject(OutputStream os) {
+        try {
+            if (os != null) {
+                os.flush();
+                os.close();
+                os = null;
+            }
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    protected void closeInput(InputStream is) {
+        try {
+            if (is != null) {
+                is.close();
+                is = null;
+            }
+        } catch (IOException e) {
+            //
+        }
+
+    }
+
+    @Override
+    public String getReplyString() {
+        return reply;
+    }
+
+    @Override
+    public ISOSVFSHandler getHandler() {
+        return this;
+    }
+
+    @Override
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) throws Exception {
+        return this;
+    }
+
+    @Override
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
+        return this;
+    }
+
+    @Override
+    public ISOSConnection connect(final ISOSDataProviderOptions options) throws Exception {
+        return null;
+    }
+
+    @Override
+    public ISOSConnection getConnection() {
+        return this;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return false;
+    }
+
+    @Override
+    public ISOSSession getSession() {
+        return null;
+    }
+
+    @Override
+    public void login(final String user, final String password) {
+
+    }
+
+    @Override
+    public void disconnect() {
+    }
+
+    @Override
+    public int passive() {
+        return 0;
+    }
+
+    @Override
+    public void ascii() {
+        //
+    }
+
+    @Override
+    public void binary() {
+        //
+    }
+
+    @Override
+    public void completePendingCommand() {
+        //
+    }
+
+    public void setStrictHostKeyChecking(final String val) {
+
+    }
+
+    @Override
+    public void doPostLoginOperations() {
+
+    }
+
+    @Override
+    public void setJSJobUtilites(final JSJobUtilities utilities) {
+
+    }
+
+    @Override
+    public OutputStream getFileOutputStream() {
+        return null;
+    }
+
+    protected boolean fileExists(final String filename) {
+        return false;
+    }
+
+    @Override
+    public boolean isNegativeCommandCompletion() {
+        return false;
+    }
+
+    @Override
+    public StringBuffer getStdErr() throws Exception {
+        return null;
+    }
+
+    @Override
+    public StringBuffer getStdOut() throws Exception {
+        return null;
+    }
+
+    @Override
+    public boolean remoteIsWindowsShell() {
+        return false;
+    }
+
+    @Override
+    public ISOSVirtualFile getFileHandle(final String filename) {
+        return null;
+    }
+
+    @Override
+    public int read(final byte[] buffer) {
+        return 0;
+    }
+
+    @Override
+    public int read(final byte[] buffer, final int offset, final int length) {
+        return 0;
+    }
+
+    @Override
+    public void write(final byte[] buffer) {
+
+    }
+
+    @Override
+    public void flush() {
+    }
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public OutputStream getAppendFileStream(final String fileName) {
+        return null;
+    }
+
+    @Override
+    public InputStream getInputStream(final String fileName) {
+        return null;
+    }
+
+    @Override
+    public abstract OutputStream getOutputStream(final String fileName);
+
+    @Override
+    public void openInputFile(final String fileName) {
+
+    }
+
+    @Override
+    public void openOutputFile(final String fileName) {
+    }
+
+    @Override
+    public void closeInput() {
+    }
+
+    @Override
+    public void closeOutput() {
+    }
+
+    @Override
+    public Vector<ISOSVirtualFile> getFiles(final String string) {
+        return null;
+    }
+
+    @Override
+    public Vector<ISOSVirtualFile> getFiles() {
+        return null;
+    }
+
+    @Override
+    public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
+        return 0;
+    }
+
+    protected String getCurrentPath() {
+        return null;
+    }
+
     @Override
     public void mkdir(final String pathname) throws IOException {
         LOGGER.info("not implemented yet");
@@ -615,89 +588,110 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
-        return 0;
-    }
-
-    @Override
     public void rename(final String from, final String to) {
         LOGGER.info("not implemented yet");
     }
 
-    private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
-        if (recLevel == 0) {
-            directoryListing = new ArrayList<SOSFileEntry>();
-            this.doPWD();
-        }
-        List<SOSFileEntry> entries = null;
-        path = path.trim();
-        if (path.isEmpty()) {
-            path = ".";
-        }
-        try {
-            entries = listNames(path, checkIfExists, checkIfExists);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        if (entries == null) {
-            return directoryListing;
-        }
-        for (SOSFileEntry entry : entries) {
-            if (!isNotHiddenFile(entry.getFilename())) {
-                continue;
-            }
-            /** if (currentFile.indexOf("/") == -1) { currentFile = path + "/" + currentFile; currentFile = currentFile.replaceAll("//+", "/"); } if
-             * (this.isDirectory(currentFile)) { if (recurseSubFolders) { recLevel++; this.getFilenames(currentFile, recurseSubFolders, recLevel); } } else {
-             * directoryListing.add(currentFile); } */
-            if (entry.isDirectory()) {
-                if (recursive) {
-                    recLevel++;
-                    getFilenames(entry.getFullPath(), recursive, recLevel, checkIfExists);
-                }
-            } else {
-                directoryListing.add(entry);
-            }
-        }
-        return directoryListing;
+    @Override
+    public boolean changeWorkingDirectory(final String pathname) throws IOException {
+        LOGGER.info("not implemented yet");
+        return true;
     }
 
     @Override
-    public void doPostLoginOperations() {
-
+    public void executeCommand(final String cmd) throws Exception {
+        LOGGER.info("not implemented yet");
     }
 
     @Override
-    public ISOSConnection connect(final ISOSDataProviderOptions options) throws Exception {
+    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
+        LOGGER.info("not implemented yet");
+    }
+
+    protected long size(final String fileName) throws Exception {
+        LOGGER.info("not implemented yet");
+        return 0;
+    }
+
+    @Override
+    public boolean isDirectory(final String filename) {
+        LOGGER.info("not implemented yet");
+        return false;
+    }
+
+    @Override
+    public String getModificationTime(final String fileName) {
+        LOGGER.info("not implemented yet");
         return null;
     }
 
     @Override
-    public OutputStream getFileOutputStream() {
+    public List<SOSFileEntry> listNames(final String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
+        LOGGER.info("not implemented yet");
         return null;
     }
 
     @Override
-    public void reconnect(SOSConnection2OptionsAlternate options) {
-        if (!isConnected()) {
-            try {
-                connect(options);
-                authenticate(options);
-                if (options.passiveMode.value()) {
-                    passive();
-                }
-                if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
-                    transferMode(options.transferMode);
-                }
-            } catch (JobSchedulerException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new JobSchedulerException(e);
-            }
-        }
+    public long putFile(final String localFile, final String remoteFile) {
+        LOGGER.info("not implemented yet");
+        return 0;
+    }
+
+    @Override
+    public void write(final byte[] buffer, final int offset, final int length) {
+        LOGGER.info("not implemented yet");
+    }
+
+    @Override
+    public ISOSConnection connect() throws Exception {
+        notImplemented();
+        return this;
+    }
+
+    @Override
+    public ISOSConnection connect(final ISOSConnectionOptions options) throws Exception {
+        notImplemented();
+        return this;
+    }
+
+    @Override
+    public ISOSConnection connect(final String host, final int port) throws Exception {
+        notImplemented();
+        return this;
+    }
+
+    @Override
+    public ISOSSession openSession(final ISOSShellOptions options) throws Exception {
+        notImplemented();
+        return null;
     }
 
     @Override
     public List<SOSFileEntry> dir(String pathname, int flag) {
+        notImplemented();
+        return null;
+    }
+
+    @Override
+    public long appendFile(final String localFile, final String remoteFile) {
+        notImplemented();
+        return -1;
+    }
+
+    @Override
+    public String createScriptFile(final String content) throws Exception {
+        notImplemented();
+        return null;
+    }
+
+    @Override
+    public Integer getExitCode() {
+        notImplemented();
+        return null;
+    }
+
+    @Override
+    public String getExitSignal() {
         notImplemented();
         return null;
     }

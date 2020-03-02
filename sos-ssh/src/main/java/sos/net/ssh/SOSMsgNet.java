@@ -10,11 +10,8 @@ public class SOSMsgNet extends SOSMsg {
     public SOSMsgNet(final String pstrMessageCode) {
         super(pstrMessageCode);
 
-        if (Messages == null) {
+        if (getMessages() == null) {
             super.setMessageResource("com_sos_net_messages");
-            Messages = super.Messages;
-        } else {
-            super.Messages = Messages;
         }
     }
 }
