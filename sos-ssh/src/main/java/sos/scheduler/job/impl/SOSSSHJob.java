@@ -339,9 +339,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 executorService.shutdownNow();
             }
         }
-            if(vfsHandler != null && ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec() != null) {
-                ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("KILL");
-            }
+
     }
 
     private void clearOutput() {
@@ -597,10 +595,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             } catch (Exception e) {
                 LOGGER.warn(e.toString(), e);
             }
-                    LOGGER.debug("Error closing connection from prePostCommandVFSHandler - second try", e1);
-                }
-            }
-
         }
     }
 
