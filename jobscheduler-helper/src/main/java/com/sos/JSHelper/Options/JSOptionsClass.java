@@ -1034,7 +1034,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strCurrentNodeName;
     }
 
-    public JSOptionsClass setCurrentNodeName(final String pstrCurrentNodeName) throws Exception {
+    public JSOptionsClass setCurrentNodeName(final String pstrCurrentNodeName) {
         strCurrentNodeName = pstrCurrentNodeName;
         return this;
     }

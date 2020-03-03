@@ -2,13 +2,18 @@ package sos.scheduler.job;
 
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHExecutionError;
+import sos.scheduler.job.impl.SOSSSHReadPidFileJob;
 
 public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHReadPidFileJobJSAdapter.class);
 
     private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
     private HashMap<String, String> allParams;
@@ -19,7 +24,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.error(stackTrace2String(e));
+            LOGGER.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -30,27 +35,28 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
         allParams.putAll(getParameters());
         SOSSSHJobOptions options = null;
         try {
-            SOSSSHJob2 sshJob = new SOSSSHReadPidFileJob();
-            ((SOSSSHReadPidFileJob) sshJob).setTempPidFileName(allParams.get(PID_FILE_NAME_KEY));
-            logger.debug("SOSSSHReadPidFileJob instantiated!");
-            options = sshJob.getOptions();
+            SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob();
+            job.setJSJobUtilites(this);
+            job.setTempPidFileName(allParams.get(PID_FILE_NAME_KEY));
+
+            options = job.getOptions();
             options.setCurrentNodeName(this.getCurrentNodeName(false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
-            sshJob.setJSJobUtilites(this);
             options.checkMandatory();
-            sshJob.execute();
+
+            job.execute(false);
         } catch (Exception e) {
-            if (options.raiseExceptionOnError.value()) {
+            if (options != null && options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        logger.debug(this.stackTrace2String(e));
+                        LOGGER.debug(stackTrace2String(e));
                     } else {
-                        logger.error(this.stackTrace2String(e));
+                        LOGGER.error(stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.stackTrace2String(e));
+                    LOGGER.error(stackTrace2String(e), e);
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }

@@ -76,29 +76,33 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private final static int DEFAULT_CONNECTION_TIMEOUT = 30_000; // 0,5 minutes
-    private Channel sshConnection = null;
-    private Session sshSession = null;
-    private ChannelSftp sftpClient = null;
+
     private JSch secureChannel = null;
-    private Map environmentVariables = null;
+    private Session sshSession = null;
+    private Channel sshConnection = null;
+    private ChannelSftp channelSftp = null;
+    private ChannelExec channelExec = null;
+    // proxy
+    private SOSOptionProxyProtocol proxyProtocol = null;
+    private Map<String, String> environmentVariables = null;
+
     private Integer exitCode;
     private String exitSignal;
-    private StringBuffer outContent;
-    private StringBuffer errContent;
+    private StringBuilder outContent;
+    private StringBuilder errContent;
+
     private boolean isRemoteWindowsShell = false;
     private boolean isUnix = false;
     private boolean isOSChecked = false;
-    // proxy
-    private SOSOptionProxyProtocol proxyProtocol = null;
-    private String proxyHost = null;
+    private boolean simulateShell = false;
+
     private int proxyPort = 0;
+    private int sessionConnectTimeout = 0;
+    private int channelConnectTimeout = 0; // default 20sek
+    private String proxyHost = null;
     private String proxyUser = null;
     private String proxyPassword = null;
-    private boolean simulateShell = false;
-    private ChannelExec channelExec = null;
     private final String lineSeparator = System.getProperty("line.separator");
-    private int sessionConnectTimeout = 0;
-    private int channelConnectTimeout = 0; // default 20sek?
 
     public SOSVfsSFtpJCraft() {
         super();
@@ -177,17 +181,29 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public void disconnect() {
         reply = "disconnect OK";
-        if (sftpClient != null) {
+        if (channelSftp != null) {
             try {
-                sftpClient.exit();
-                if (sftpClient.isConnected()) {
-                    sftpClient.disconnect();
+                channelSftp.exit();
+                if (channelSftp.isConnected()) {
+                    channelSftp.disconnect();
                 }
-                sftpClient = null;
+                channelSftp = null;
             } catch (Exception ex) {
                 reply = "disconnect: " + ex;
             }
         }
+
+        if (channelExec != null) {
+            try {
+                if (channelExec.isConnected()) {
+                    channelExec.disconnect();
+                }
+                channelExec = null;
+            } catch (Exception ex) {
+                reply = "disconnect: " + ex;
+            }
+        }
+
         if (sshConnection != null) {
             try {
                 if (sshConnection.getSession() != null) {
@@ -223,7 +239,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public boolean isConnected() {
-        return sftpClient != null && sftpClient.isConnected();
+        return channelSftp != null && channelSftp.isConnected();
     }
 
     @Override
@@ -546,7 +562,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
             channelExec.connect();
-            outContent = new StringBuffer();
+            outContent = new StringBuilder();
             byte[] tmp = new byte[1024];
             while (true) {
                 while (out.available() > 0) {
@@ -572,7 +588,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 LOGGER.info(String.format("[stdout]%s", outContent.toString().trim()));
             }
             errReader = new BufferedReader(new InputStreamReader(err));
-            errContent = new StringBuffer();
+            errContent = new StringBuilder();
             while (true) {
                 String line = errReader.readLine();
                 if (line == null) {
@@ -1013,17 +1029,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     public ChannelSftp getClient() {
-        if (sftpClient == null) {
+        if (channelSftp == null) {
             try {
                 if (sshConnection == null) {
                     throw new JobSchedulerException(SOSVfs_E_190.params("sshConnection Object"));
                 }
-                sftpClient = (ChannelSftp) sshConnection;
+                channelSftp = (ChannelSftp) sshConnection;
             } catch (Exception e) {
                 throw new JobSchedulerException(SOSVfs_E_196.get(), e);
             }
         }
-        return sftpClient;
+        return channelSftp;
     }
 
     private void doConnect(final String phost, final int pport) {
@@ -1107,7 +1123,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } else {
             sshConnection.connect();
         }
-        sftpClient = (ChannelSftp) sshConnection;
+        channelSftp = (ChannelSftp) sshConnection;
     }
 
     @Override
@@ -1125,12 +1141,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return null;
     }
 
-    public StringBuffer getStdErr() throws Exception {
+    public StringBuilder getStdErr() throws Exception {
         return errContent;
     }
 
     @Override
-    public StringBuffer getStdOut() throws Exception {
+    public StringBuilder getStdOut() throws Exception {
         return outContent;
     }
 
@@ -1206,8 +1222,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void setSimulateShell(boolean simulateShell) {
-        this.simulateShell = simulateShell;
+    public void setSimulateShell(boolean val) {
+        simulateShell = val;
     }
 
     public ChannelExec getChannelExec() {

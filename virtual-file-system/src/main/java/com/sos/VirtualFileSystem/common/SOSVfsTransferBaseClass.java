@@ -481,12 +481,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public StringBuffer getStdErr() throws Exception {
+    public StringBuilder getStdErr() throws Exception {
         return null;
     }
 
     @Override
-    public StringBuffer getStdOut() throws Exception {
+    public StringBuilder getStdOut() throws Exception {
         return null;
     }
 

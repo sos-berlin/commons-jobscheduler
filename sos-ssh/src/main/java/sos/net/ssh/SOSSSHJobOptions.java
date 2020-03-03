@@ -4,13 +4,10 @@ import java.util.HashMap;
 
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
-@I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 
     private static final long serialVersionUID = 2072083231341151442L;
@@ -22,12 +19,6 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 
     private void init() {
         objParentClass = this.getClass();
-    }
-
-    @Deprecated
-    public SOSSSHJobOptions(final JSListener pobjListener) {
-        super(pobjListener);
-        init();
     }
 
     public SOSSSHJobOptions(final HashMap<String, String> JSSettings) throws Exception {
