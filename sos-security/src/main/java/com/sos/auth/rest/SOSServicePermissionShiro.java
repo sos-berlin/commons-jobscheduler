@@ -44,6 +44,8 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
 
+import sos.util.SOSSerializerUtil;
+
 @Path("/security")
 public class SOSServicePermissionShiro {
 
@@ -454,6 +456,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
+        currentUser.getCurrentSubject().getSession().setAttribute("username_joc_permissions", SOSSerializerUtil.object2toString(sosPermissionJocCockpitMasters));
 
         currentUser.initFolders();
 
@@ -466,6 +469,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+        currentUser.getCurrentSubject().getSession().setAttribute("username_command_permissions", SOSSerializerUtil.object2toString(sosPermissionCommandsMasters));
 
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
