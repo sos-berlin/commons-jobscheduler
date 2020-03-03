@@ -1,12 +1,13 @@
-package sos.net.ssh;
+package sos.scheduler.job.impl;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,32 +15,34 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
+import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
-import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.exception.SOSSSHAutoDetectionException;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
+import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
+import sos.util.SOSString;
 
-@I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
-public class SOSSSHJobJSch extends SOSSSHJob2 {
+public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
-    protected ISOSVFSHandler prePostCommandVFSHandler = null;
-    protected ISOSVFSHandler vfsHandler;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJobJSch.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob.class);
+
+    public static final String PARAM_EXIT_SIGNAL = "exit_signal";
+    public static final String PARAM_EXIT_CODE = "exit_code";
+    public static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
+
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
     private static final String DEFAULT_LINUX_DELIMITER = ";";
     private static final String DEFAULT_WINDOWS_DELIMITER = "&";
@@ -51,124 +54,171 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private static final String DEFAULT_LINUX_POST_COMMAND_READ = "test -r %s && cat %s; exit 0";
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; exit 0";
+
+    private SOSVfsSFtpJCraft handler;
+    private SOSVfsSFtpJCraft prePostCommandHandler = null;
+    private SOSConnection2OptionsAlternate handlerOptions;
+    private SOSConnection2OptionsAlternate prePostCommandHandlerOptions;
+    private SOSVfsEnv envVars = new SOSVfsEnv();
+    private Future<Void> commandExecution;
+
+    private Map<String, String> returnValues = new HashMap<String, String>();
+    private Map<String, String> schedulerEnvVars;
+    private List<String> tempFilesToDelete = new ArrayList<String>();
+    private StringBuilder stdout;
+    private StringBuilder stderr;
+    private String[] commands = {};
+
     private String tempFileName;
     private String resolvedTempFileName;
     private String pidFileName;
-    private String ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
-    private Map allParams = null;
-    private Map<String, String> returnValues = new HashMap<String, String>();
-    private Map schedulerEnvVars;
-    private Future<Void> commandExecution;
-    private SOSVfsEnv envVars = new SOSVfsEnv();
+    private String getPidCommand = DEFAULT_LINUX_GET_PID_COMMAND;
+    private boolean isWindowsShell = false;
+    private boolean disableRaiseException = false;
 
-    @Override
-    public ISOSVFSHandler getVFSSSH2Handler() {
-        try {
-            vfsHandler = VFSFactory.getHandler("SSH2.JSCH");
-        } catch (Exception e) {
-            throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize VFS", e);
-        }
-        return vfsHandler;
+    public SOSSSHJob() {
+        super(new SOSSSHJobOptions());
+
+        handler = new SOSVfsSFtpJCraft();
+        prePostCommandHandler = new SOSVfsSFtpJCraft();
+
+        UUID uuid = UUID.randomUUID();
+        tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
     }
 
-    private void openPrePostCommandsSession() {
+    public void connect(boolean disableRaiseExceptionOnError) {
         try {
-            if (!prePostCommandVFSHandler.isConnected()) {
-                SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raiseExceptionOnError.value(false);
-                prePostCommandVFSHandler.connect(postAlternateOptions);
+            if (!handler.isConnected()) {
+                disableRaiseException = disableRaiseExceptionOnError;
+
+                if (handlerOptions == null) {
+                    setHandlerOptions(objOptions);
+                    handlerOptions.checkMandatory();
+                }
+                handler.connect(handlerOptions);
+                handler.authenticate(handlerOptions);
+
+                isWindowsShell = handler.remoteIsWindowsShell();
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("handler connection established. isWindowsShell=%s", isWindowsShell));
+                }
             }
-            prePostCommandVFSHandler.authenticate(objOptions);
-            LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
+            throw new SSHConnectionError("Error occured during handler connection/authentication: " + e.toString(), e);
         }
-        prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
+
     }
 
-    @Override
-    public String getTempFileName() {
-        return tempFileName;
+    private void connectPrePostCommandHandler() {
+        try {
+            if (!prePostCommandHandler.isConnected()) {
+                if (prePostCommandHandlerOptions == null) {
+                    if (disableRaiseException) {
+                        prePostCommandHandlerOptions = handlerOptions;
+                    } else {
+                        prePostCommandHandlerOptions = (SOSConnection2OptionsAlternate) SerializationUtils.clone(handlerOptions);
+                        prePostCommandHandlerOptions.raiseExceptionOnError.value(false);
+                        prePostCommandHandlerOptions.ignoreError.value(true);
+                    }
+                }
+                prePostCommandHandler.connect(prePostCommandHandlerOptions);
+                prePostCommandHandler.authenticate(prePostCommandHandlerOptions);
+                LOGGER.debug("prePostCommandHandler connection established");
+            }
+        } catch (Exception e) {
+            throw new SSHConnectionError("Error occured during prePostCommandHandler connection/authentication: " + e.toString(), e);
+        }
     }
 
-    @Override
-    public StringBuffer getStdErr() throws Exception {
-        return vfsHandler.getStdErr();
+    public void disconnect() {
+        if (prePostCommandHandler.isConnected()) {
+            try {
+                prePostCommandHandler.disconnect();
+                LOGGER.debug("***** prePostCommandHandler disconnected! *****");
+            } catch (Exception e) {
+                throw new SSHConnectionError("problems closing connection", e);
+            }
+        }
+        if (handler.isConnected()) {
+            try {
+                handler.disconnect();
+                LOGGER.debug("***** handler disconnected! *****");
+            } catch (Exception e) {
+                throw new SSHConnectionError("problems closing connection", e);
+            }
+        }
     }
 
-    @Override
-    public StringBuffer getStdOut() throws Exception {
-        return vfsHandler.getStdOut();
+    public void execute(boolean disableRaiseExceptionOnError) throws Exception {
+
     }
 
-    @Override
-    public SOSSSHJob2 execute() throws Exception {
-        clear();
-        boolean flgScriptFileCreated = false;
-        vfsHandler.setJSJobUtilites(objJSJobUtilities);
+    public void execute() throws Exception {
+        clearOutput();
+
+        handler.setJSJobUtilites(objJSJobUtilities);
         String executedCommand = "";
         ExecutorService executorService = null;
         Future<Void> sendSignalExecution = null;
         try {
-            if (!isConnected) {
-                this.connect();
-            }
+            connect(false);
+
             // first check if windows is running on the remote host
             checkOsAndShell();
-            flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
+            isWindowsShell = handler.remoteIsWindowsShell();
             if (objOptions.command.isNotEmpty()) {
-                strCommands2Execute = objOptions.command.values();
+                commands = objOptions.command.values();
             } else {
                 if (objOptions.isScript()) {
-                    strCommands2Execute = new String[1];
-                    String strTemp = objOptions.commandScript.getValue();
+                    commands = new String[1];
+                    String commandScript = objOptions.commandScript.getValue();
                     if (objOptions.commandScript.IsEmpty()) {
-                        strTemp = objOptions.commandScriptFile.getJSFile().file2String();
+                        commandScript = objOptions.commandScriptFile.getJSFile().file2String();
                     }
-                    strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
-                    strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
-                    add2Files2Delete(strCommands2Execute[0]);
-                    flgScriptFileCreated = true;
-                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.getValue();
+                    commandScript = objJSJobUtilities.replaceSchedulerVars(commandScript);
+                    commands[0] = handler.createScriptFile(commandScript);
+                    add2Files2Delete(commands[0]);
+                    commands[0] += " " + objOptions.commandScriptParam.getValue();
                 } else {
-                    throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
+                    throw new SSHMissingCommandError("neither commands nor script(file) specified");
                 }
             }
             envVars.setGlobalEnvs(new HashMap<String, String>());
             envVars.setLocalEnvs(new HashMap<String, String>());
             setReturnValuesEnvVar();
-            for (String strCmd : strCommands2Execute) {
-                executedCommand = strCmd;
+            for (String cmd : commands) {
+                executedCommand = cmd;
                 LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
                 String preCommand = null;
                 if (objOptions.createEnvironmentVariables.value()) {
                     if (objOptions.autoDetectOS.value()) {
                         setSOSVfsEnvs();
                     } else if (objOptions.postCommandDelete.getValue().contains("del")) {
-                        final boolean oldFlg = flgIsWindowsShell;
-                        flgIsWindowsShell = true;
+                        final boolean oldFlg = isWindowsShell;
+                        isWindowsShell = true;
                         setSOSVfsEnvs();
                         // only if autoDetectOS is false flgIsWindowsShell is not trustworthy when callingsetReturnValuesEnvVar();
                         // we have to set the env var explicitely here
                         envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
-                        flgIsWindowsShell = oldFlg;
+                        isWindowsShell = oldFlg;
                     } else {
                         preCommand = getPreCommand();
                     }
                 }
                 try {
-                    strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    LOGGER.info(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                    vfsHandler.setSimulateShell(objOptions.simulateShell.value());
+                    cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
+                    LOGGER.info(String.format("executing remote command: %s", cmd));
+                    handler.setSimulateShell(objOptions.simulateShell.value());
                     executorService = Executors.newFixedThreadPool(2);
                     String completeCommand = null;
                     if (objOptions.autoDetectOS.value()) {
-                        completeCommand = strCmd;
+                        completeCommand = cmd;
                     } else {
                         if (preCommand != null) {
-                            completeCommand = preCommand + strCmd;
+                            completeCommand = preCommand + cmd;
                         } else {
-                            completeCommand = strCmd;
+                            completeCommand = cmd;
                         }
                     }
                     final String cmdToExecute = completeCommand;
@@ -178,11 +228,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         public Void call() throws Exception {
                             LOGGER.debug("***** Command Execution started! *****");
                             if (objOptions.autoDetectOS.value()) {
-                                vfsHandler.executeCommand(cmdToExecute, envVars);
+                                handler.executeCommand(cmdToExecute, envVars);
                             } else if (objOptions.postCommandDelete.getValue().contains("del")) {
-                                vfsHandler.executeCommand(cmdToExecute, envVars);
+                                handler.executeCommand(cmdToExecute, envVars);
                             } else {
-                                vfsHandler.executeCommand(cmdToExecute);
+                                handler.executeCommand(cmdToExecute);
                             }
                             LOGGER.debug("***** Command Execution finished! *****");
                             return null;
@@ -205,7 +255,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                                     } catch (InterruptedException e) {
                                     }
                                 }
-                                ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("CONT");
+                                handler.getChannelExec().sendSignal("CONT");
                             }
                             return null;
                         }
@@ -213,8 +263,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     sendSignalExecution = executorService.submit(sendSignal);
                     // wait until command execution is finished
                     commandExecution.get();
-                    executorService.shutdownNow();
-                    objJSJobUtilities.setJSParam(conExit_code, "0");
+                    objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, "0");
                     checkStdOut();
                     checkStdErr();
                     checkExitCode();
@@ -254,29 +303,31 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
-                String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"" + e.getMessage() + " " + e
+                String msg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"" + e.getMessage() + " " + e
                         .getCause();
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
-                        LOGGER.debug(this.stackTrace2String(e));
-                        LOGGER.debug(strErrMsg, e);
+                        LOGGER.debug(stackTrace2String(e));
+                        LOGGER.debug(msg, e);
                     } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        LOGGER.error(strErrMsg, e);
-                        throw new SSHExecutionError(strErrMsg, e);
+                        LOGGER.error(stackTrace2String(e));
+                        LOGGER.error(msg, e);
+                        throw new SSHExecutionError(msg, e);
                     }
                 } else {
-                    LOGGER.error(this.stackTrace2String(e));
-                    LOGGER.error(strErrMsg, e);
-                    throw new SSHExecutionError(strErrMsg, e);
+                    LOGGER.error(stackTrace2String(e));
+                    LOGGER.error(msg, e);
+                    throw new SSHExecutionError(msg, e);
                 }
             }
         } finally {
-            if (vfsHandler.getStdOut() != null) {
-                vfsHandler.getStdOut().setLength(0);
+            disconnect();
+
+            if (handler.getStdOut() != null) {
+                handler.getStdOut().setLength(0);
             }
-            if (vfsHandler.getStdErr() != null) {
-                vfsHandler.getStdErr().setLength(0);
+            if (handler.getStdErr() != null) {
+                handler.getStdErr().setLength(0);
             }
             if (executorService != null) {
                 if (commandExecution != null) {
@@ -287,73 +338,105 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 executorService.shutdownNow();
             }
-            if (keepConnected == false) {
-                disconnect();
-            }
+        }
             if(vfsHandler != null && ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec() != null) {
                 ((SOSVfsSFtpJCraft) vfsHandler).getChannelExec().sendSignal("KILL");
             }
-        }
-        return this;
     }
 
-    @Override
-    public void disconnect() {
-        if (isConnected) {
-            try {
-                if (prePostCommandVFSHandler != null) {
-                    LOGGER.debug("***** prePostCommandVFSHandler disconnecting... *****");
-                    prePostCommandVFSHandler.closeConnection();
-                    prePostCommandVFSHandler.closeSession();
-                    LOGGER.debug("***** prePostCommandVFSHandler disconnected! *****");
-                }
-                LOGGER.debug("***** vfsHandler disconnecting... *****");
-                vfsHandler.closeConnection();
-                vfsHandler.closeSession();
-                LOGGER.debug("***** vfsHandler disconnected! *****");
-            } catch (Exception e) {
-                throw new SSHConnectionError("problems closing connection", e);
-            }
-            isConnected = false;
-        }
+    private void clearOutput() {
+        stdout = new StringBuilder();
+        stderr = new StringBuilder();
     }
 
-    private void add2Files2Delete(final String fileNameToDelete) {
-        if (tempFilesToDelete == null) {
-            tempFilesToDelete = new Vector<String>();
-        }
-        tempFilesToDelete.add(fileNameToDelete);
-        LOGGER.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
-    }
-
-    @Override
-    public SOSSSHJob2 connect() {
-        getVFS();
+    public void checkStdOut() {
         try {
-            SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            alternateOptions.checkMandatory();
-            vfsHandler.connect(alternateOptions);
-            vfsHandler.authenticate(alternateOptions);
-            LOGGER.debug("connection established");
+            stdout.append(handler.getStdOut());
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
+            LOGGER.error(stackTrace2String(e));
+            throw new JobSchedulerException(e.getMessage(), e);
         }
-        isConnected = true;
-        preparePostCommandHandler();
-        return this;
     }
 
-    @Override
-    public void generateTemporaryFilename() {
-        UUID uuid = UUID.randomUUID();
-        tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
+    public void checkStdErr() {
+        try {
+            stderr.append(handler.getStdErr());
+        } catch (Exception e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        if (stderr.length() > 0) {
+            if (objOptions.ignoreStderr.value()) {
+                LOGGER.info("[output to stderr is ignored]" + stderr);
+            } else {
+                String msg = "[remote execution reports error]" + stderr;
+                LOGGER.error(msg);
+                if (objOptions.raiseExceptionOnError.value()) {
+                    throw new SSHExecutionError(msg);
+                }
+            }
+        }
     }
 
-    @Override
+    public Integer checkExitCode() {
+        objJSJobUtilities.setJSParam("exit_code_ignored", "false");
+
+        Integer exitCode = handler.getExitCode();
+        if (isNotNull(exitCode)) {
+            objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, exitCode.toString());
+            if (!exitCode.equals(new Integer(0))) {
+                if (objOptions.ignoreError.isTrue() || objOptions.ignoreExitCode.getValues().contains(exitCode)) {
+                    LOGGER.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + exitCode);
+
+                    objJSJobUtilities.setJSParam("exit_code_ignored", "true");
+                } else {
+                    if (objOptions.raiseExceptionOnError.value()) {
+                        if (stdout.length() > 0) {
+                            LOGGER.info(stdout.toString());
+                        }
+                    }
+                    String msg = "SOS-SSH-E-150: remote command terminated with exit code: " + exitCode;
+                    objJSJobUtilities.setCC(exitCode);
+                    if (objOptions.raiseExceptionOnError.isTrue()) {
+                        if (objOptions.ignoreError.value()) {
+                            LOGGER.info(msg);
+                        } else {
+                            LOGGER.error(msg);
+                        }
+                        throw new SSHExecutionError(msg);
+                    }
+                }
+            }
+        }
+        return exitCode;
+    }
+
+    public String changeExitSignal() {
+        String signal = handler.getExitSignal();
+        if (isNotEmpty(signal)) {
+            objJSJobUtilities.setJSParam(PARAM_EXIT_SIGNAL, signal);
+
+            if (objOptions.ignoreSignal.isTrue()) {
+                LOGGER.info("SOS-SSH-I-130: exit signal is ignored due to option-settings: " + signal);
+            } else {
+                throw new SSHExecutionError("SOS-SSH-E-140: remote command terminated with exit signal: " + signal);
+            }
+        } else {
+            objJSJobUtilities.setJSParam(PARAM_EXIT_SIGNAL, "");
+        }
+        return signal;
+    }
+
+    public void add2Files2Delete(final String file) {
+        if (!SOSString.isEmpty(file)) {
+            tempFilesToDelete.add(file);
+            LOGGER.debug(String.format("file %s marked for deletion", file));
+        }
+    }
+
     public String getPreCommand() {
         String delimiter;
         String preCommand = objOptions.getPreCommand().getValue();
-        if (flgIsWindowsShell) {
+        if (isWindowsShell) {
             delimiter = DEFAULT_WINDOWS_DELIMITER;
             if (objOptions.getPreCommand().isNotDirty()) {
                 preCommand = DEFAULT_WINDOWS_PRE_COMMAND;
@@ -367,7 +450,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            strb.append(ssh_job_get_pid_command).append(delimiter).append(ssh_job_get_pid_command);
+            strb.append(getPidCommand).append(delimiter).append(getPidCommand);
             strb.append(" >> ").append(pidFileName).append(delimiter);
         }
         if (objOptions.tempDirectory.isDirty()) {
@@ -389,7 +472,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             resolvedTempFileName = tempFileName;
         }
         if (objOptions.autoDetectOS.value()) {
-            if (flgIsWindowsShell) {
+            if (isWindowsShell) {
                 envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
             } else {
                 envVars.getLocalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
@@ -413,7 +496,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         LOGGER.debug("*******************************");
                     }
                     envVarValue = envVarValue.replaceAll("\"", "\\\"");
-                    if (!flgIsWindowsShell) {
+                    if (!isWindowsShell) {
                         envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
                         envVars.getLocalEnvs().put(keyVal, envVarValue);
                     } else {
@@ -425,72 +508,46 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     }
 
     private String resolveTempFileName(String tempDir, String filename) {
-        if (flgIsWindowsShell) {
+        if (isWindowsShell) {
             return Paths.get(tempDir, filename).toString().replace('/', '\\');
         } else {
             return Paths.get(tempDir, filename).toString().replace('\\', '/');
         }
     }
 
-    private String getEnvCommand() {
-        String delimiter;
-        if (flgIsWindowsShell) {
-            delimiter = DEFAULT_WINDOWS_DELIMITER;
-        } else {
-            delimiter = DEFAULT_LINUX_DELIMITER;
-        }
-        StringBuilder sb = new StringBuilder();
-        if (schedulerEnvVars != null) {
-            for (Object key : schedulerEnvVars.keySet()) {
-                if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
-                    String envVarValue = schedulerEnvVars.get(key).toString();
-                    if (key.toString().contains("()")) {
-                        LOGGER.debug("*******************************");
-                        LOGGER.debug("  KEY BEFORE REPLACEMENT: " + key);
-                        LOGGER.debug("*******************************");
-                    }
-                    String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}|\\p{Space}", "_");
-                    if (!key.toString().equalsIgnoreCase(keyVal)) {
-                        LOGGER.debug("  KEY AFTER REPLACEMENT: " + keyVal);
-                        LOGGER.debug("*******************************");
-                    }
-                    envVarValue = envVarValue.replaceAll("\"", "\\\"");
-                    // do not wrap between ' because it would cause problems under windows,
-                    // use the pre-command format instead
-                    // envVarValue = "'" + envVarValue + "'";
-                    if (!flgIsWindowsShell) {
-                        envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
-                    }
-                    if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
-                        sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
-                        sb.append(delimiter);
+    public void deleteTempFiles(SOSVfsSFtpJCraft handler) {
+        if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
+            for (String file : tempFilesToDelete) {
+                LOGGER.debug("file to delete: " + file);
+
+                String cmd = null;
+                if (objOptions.postCommandDelete.isDirty()) {
+                    cmd = String.format(objOptions.postCommandDelete.getValue(), file);
+                } else {
+                    if (isWindowsShell) {
+                        cmd = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, file);
+                    } else {
+                        cmd = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, file, file);
                     }
                 }
+                try {
+                    LOGGER.debug("cmd: " + cmd);
+                    handler.executeCommand(cmd);
+                } catch (Exception e) {
+                    LOGGER.error(String.format("error ocurred deleting %1$s: ", file), e);
+                }
             }
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public void preparePostCommandHandler() {
-        if (prePostCommandVFSHandler == null) {
-            try {
-                prePostCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
-            } catch (Exception e) {
-                throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize second VFS", e);
-            }
+            tempFilesToDelete.clear();
         }
     }
 
-    @Override
     public void processPostCommands(String tmpFileName) {
-        openPrePostCommandsSession();
         String postCommandRead = null;
         if (objOptions.postCommandRead.isDirty()) {
             postCommandRead = String.format(objOptions.postCommandRead.getValue(), tmpFileName);
         } else {
             try {
-                if (flgIsWindowsShell) {
+                if (isWindowsShell) {
                     postCommandRead = String.format(DEFAULT_WINDOWS_POST_COMMAND_READ, tmpFileName, tmpFileName);
                 } else {
                     postCommandRead = String.format(DEFAULT_LINUX_POST_COMMAND_READ, tmpFileName, tmpFileName);
@@ -498,34 +555,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             } catch (Exception e) {
             }
         }
-        String stdErr = "";
-        if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
-            for (String tempFileName : tempFilesToDelete) {
-                LOGGER.debug("tempFileName to delete: " + tempFileName);
-                String postCommandDelete = null;
-                if (objOptions.postCommandDelete.isDirty()) {
-                    postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tempFileName);
-                } else {
-                    if (flgIsWindowsShell) {
-                        postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tempFileName);
-                    } else {
-                        postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tempFileName, tempFileName);
-                    }
-                }
-                try {
-                    LOGGER.debug("postCommandDelete: " + postCommandDelete);
-                    prePostCommandVFSHandler.executeCommand(postCommandDelete);
-                } catch (Exception e) {
-                    LOGGER.error(String.format("error ocurred deleting %1$s: ", tmpFileName), e);
-                }
-            }
-            tempFilesToDelete.clear();
-        }
+
+        connectPrePostCommandHandler();
+        deleteTempFiles(prePostCommandHandler);
         try {
-            prePostCommandVFSHandler.executeCommand(postCommandRead);
-            if (prePostCommandVFSHandler.getExitCode() == 0) {
-                if (!prePostCommandVFSHandler.getStdOut().toString().isEmpty()) {
-                    BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
+            prePostCommandHandler.executeCommand(postCommandRead);
+            if (prePostCommandHandler.getExitCode() == 0) {
+                if (!prePostCommandHandler.getStdOut().toString().isEmpty()) {
+                    BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandHandler.getStdOut())));
                     String line = null;
                     while ((line = reader.readLine()) != null) {
                         Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
@@ -533,116 +570,109 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                             String key = regExMatcher.group(1).trim();
                             String value = regExMatcher.group(2).trim();
                             returnValues.put(key, value);
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug(String.format("[return value]%s=%s", key, value));
+                            }
                         }
                     }
                     String postCommandDelete = null;
                     if (objOptions.postCommandDelete.isDirty()) {
                         postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tmpFileName);
                     } else {
-                        if (flgIsWindowsShell) {
+                        if (isWindowsShell) {
                             postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tmpFileName);
                         } else {
                             postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tmpFileName);
                         }
                     }
-                    prePostCommandVFSHandler.executeCommand(postCommandDelete);
+                    prePostCommandHandler.executeCommand(postCommandDelete);
                 }
             }
         } catch (Exception e) {
             // prevent Exception to show in case of postCommandDelete errors
         } finally {
             try {
-                LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closing... *****");
-                prePostCommandVFSHandler.closeConnection();
-                prePostCommandVFSHandler.closeSession();
+                prePostCommandHandler.disconnect();
                 LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
             } catch (Exception e) {
-                LOGGER.debug("Error closing connection from prePostCommandVFSHandler", e);
+                LOGGER.warn(e.toString(), e);
             }
-            if (prePostCommandVFSHandler.isConnected()) {
-                try {
-                    prePostCommandVFSHandler.closeConnection();
-                    prePostCommandVFSHandler.closeSession();
-                } catch (Exception e1) {
                     LOGGER.debug("Error closing connection from prePostCommandVFSHandler - second try", e1);
                 }
             }
+
         }
     }
 
-    public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
-        SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-        alternateOptions.strictHostKeyChecking.value(options.strictHostKeyChecking.value());
-        alternateOptions.host.setValue(options.getHost().getValue());
-        alternateOptions.port.value(options.getPort().value());
-        alternateOptions.user.setValue(options.getUser().getValue());
-        alternateOptions.password.setValue(options.getPassword().getValue());
-        alternateOptions.passphrase.setValue(options.passphrase.getValue());
-        alternateOptions.authMethod.setValue(options.authMethod.getValue());
-        alternateOptions.authFile.setValue(options.authFile.getValue());
-        alternateOptions.protocol.setValue(enuTransferTypes.ssh2);
+    private void setHandlerOptions(SOSSSHJobOptions jobOptions) {
+        handlerOptions = new SOSConnection2OptionsAlternate();
+        handlerOptions.strictHostKeyChecking.value(jobOptions.strictHostKeyChecking.value());
+        handlerOptions.host.setValue(jobOptions.getHost().getValue());
+        handlerOptions.port.value(jobOptions.getPort().value());
+        handlerOptions.user.setValue(jobOptions.getUser().getValue());
+        handlerOptions.password.setValue(jobOptions.getPassword().getValue());
+        handlerOptions.passphrase.setValue(jobOptions.passphrase.getValue());
+        handlerOptions.authMethod.setValue(jobOptions.authMethod.getValue());
+        handlerOptions.authFile.setValue(jobOptions.authFile.getValue());
+        handlerOptions.protocol.setValue(enuTransferTypes.ssh2);
 
-        alternateOptions.proxyProtocol.setValue(options.getProxyProtocol().getValue());
-        alternateOptions.proxyHost.setValue(options.getProxyHost().getValue());
-        alternateOptions.proxyPort.value(options.getProxyPort().value());
-        alternateOptions.proxyUser.setValue(options.getProxyUser().getValue());
-        alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
-        alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
-        alternateOptions.ignoreError.value(options.getIgnoreError().value());
+        handlerOptions.proxyProtocol.setValue(jobOptions.getProxyProtocol().getValue());
+        handlerOptions.proxyHost.setValue(jobOptions.getProxyHost().getValue());
+        handlerOptions.proxyPort.value(jobOptions.getProxyPort().value());
+        handlerOptions.proxyUser.setValue(jobOptions.getProxyUser().getValue());
+        handlerOptions.proxyPassword.setValue(jobOptions.getProxyPassword().getValue());
+        if (disableRaiseException) {
+            handlerOptions.raiseExceptionOnError.value(false);
+            handlerOptions.ignoreError.value(true);
+        } else {
+            handlerOptions.raiseExceptionOnError.value(jobOptions.getRaiseExceptionOnError().value());
+            handlerOptions.ignoreError.value(jobOptions.getIgnoreError().value());
+        }
 
-        if (options.credential_store_filename.isNotEmpty()) {
+        if (jobOptions.credential_store_filename.isNotEmpty()) {
             SOSCredentialStoreOptions csOptions = new SOSCredentialStoreOptions();
             csOptions.useCredentialStore.setValue("true");
-            csOptions.credentialStoreFileName.setValue(options.credential_store_filename.getValue());
-            csOptions.credentialStoreKeyFileName.setValue(options.credential_store_key_filename.getValue());
-            csOptions.credentialStorePassword.setValue(options.credential_store_password.getValue());
-            csOptions.credentialStoreKeyPath.setValue(options.credential_store_entry_path.getValue());
-            alternateOptions.setCredentialStore(csOptions);
-            alternateOptions.checkCredentialStoreOptions();
-            
-            mapBackOptionsFromCS(alternateOptions);
+            csOptions.credentialStoreFileName.setValue(jobOptions.credential_store_filename.getValue());
+            csOptions.credentialStoreKeyFileName.setValue(jobOptions.credential_store_key_filename.getValue());
+            csOptions.credentialStorePassword.setValue(jobOptions.credential_store_password.getValue());
+            csOptions.credentialStoreKeyPath.setValue(jobOptions.credential_store_entry_path.getValue());
+            handlerOptions.setCredentialStore(csOptions);
+            handlerOptions.checkCredentialStoreOptions();
+
+            mapBackOptionsFromCS(handlerOptions);
         }
 
         if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile
                 .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
-            alternateOptions.setWithoutSFTPChannel(false);
+            handlerOptions.setWithoutSFTPChannel(false);
         } else {
-            alternateOptions.setWithoutSFTPChannel(true);
+            handlerOptions.setWithoutSFTPChannel(true);
         }
-        return alternateOptions;
-    }
-    
-    private void mapBackOptionsFromCS (SOSConnection2OptionsAlternate alternateOptions) {
-        objOptions.host.setValue(alternateOptions.host.getValue());
-        objOptions.port.setValue(alternateOptions.port.getValue());
-        objOptions.user.setValue(alternateOptions.user.getValue());
-        objOptions.password.setValue(alternateOptions.password.getValue());
-        objOptions.passphrase.setValue(alternateOptions.passphrase.getValue());
-        
-        objOptions.proxyHost.setValue(alternateOptions.proxyHost.getValue());
-        objOptions.proxyPort.setValue(alternateOptions.proxyPort.getValue());
-        objOptions.proxyUser.setValue(alternateOptions.proxyUser.getValue());
-        objOptions.proxyPassword.setValue(alternateOptions.proxyPassword.getValue());
     }
 
-    public String getPidFileName() {
-        return pidFileName;
-    }
+    private void mapBackOptionsFromCS(SOSConnection2OptionsAlternate options) {
+        objOptions.host.setValue(options.host.getValue());
+        objOptions.port.setValue(options.port.getValue());
+        objOptions.user.setValue(options.user.getValue());
+        objOptions.password.setValue(options.password.getValue());
+        objOptions.passphrase.setValue(options.passphrase.getValue());
 
-    public void setPidFileName(String pidFileName) {
-        this.pidFileName = pidFileName;
+        objOptions.proxyHost.setValue(options.proxyHost.getValue());
+        objOptions.proxyPort.setValue(options.proxyPort.getValue());
+        objOptions.proxyUser.setValue(options.proxyUser.getValue());
+        objOptions.proxyPassword.setValue(options.proxyPassword.getValue());
     }
 
     private void readGetPidCommandFromPropertiesFile() {
         if (objOptions.sshJobGetPidCommand.isDirty() && !objOptions.sshJobGetPidCommand.getValue().isEmpty()) {
-            ssh_job_get_pid_command = objOptions.sshJobGetPidCommand.getValue();
+            getPidCommand = objOptions.sshJobGetPidCommand.getValue();
             LOGGER.debug("Command to receive PID of the active shell from Job Parameter used!");
         } else {
-            if (flgIsWindowsShell) {
-                ssh_job_get_pid_command = DEFAULT_WINDOWS_GET_PID_COMMAND;
+            if (isWindowsShell) {
+                getPidCommand = DEFAULT_WINDOWS_GET_PID_COMMAND;
                 LOGGER.debug("Default Windows command used to receive PID of the active shell!");
             } else {
-                ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
+                getPidCommand = DEFAULT_LINUX_GET_PID_COMMAND;
                 LOGGER.debug("Default Linux command used to receive PID of the active shell!");
             }
         }
@@ -662,7 +692,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         strb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
         SOSCommandResult commandResult = null;
         try {
-            commandResult = vfsHandler.executePrivateCommand(cmdToExecute);
+            commandResult = handler.executePrivateCommand(cmdToExecute);
             if (commandResult.getExitCode() == 0) {
                 // command uname was execute successfully -> OS is Unix like
                 if (commandResult.getStdOut().toString().toLowerCase().contains("linux") || commandResult.getStdOut().toString().toLowerCase()
@@ -671,7 +701,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                         || commandResult.getStdOut().toString().toLowerCase().contains("sunos") || commandResult.getStdOut().toString().toLowerCase()
                                 .contains("freebsd")) {
                     if (forceAutoDetection) {
-                        flgIsWindowsShell = false;
+                        isWindowsShell = false;
                     }
                     LOGGER.info("*** Command uname was executed successfully, remote OS and shell are Unix like! ***");
                 } else if (commandResult.getStdOut().toString().toLowerCase().contains("cygwin")) {
@@ -679,19 +709,19 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     // unix commands have to be used
                     LOGGER.info("*** Command uname was executed successfully, remote OS is Windows with cygwin and shell is Unix like! ***");
                     if (forceAutoDetection) {
-                        flgIsWindowsShell = false;
+                        isWindowsShell = false;
                     }
                 } else {
                     LOGGER.info("*** Command uname was executed successfully, but the remote OS was not determined, Unix like shell is assumed! ***");
                     if (forceAutoDetection) {
-                        flgIsWindowsShell = false;
+                        isWindowsShell = false;
                     }
                 }
             } else if (commandResult.getExitCode() == 9009 || commandResult.getExitCode() == 1) {
                 // call of uname under Windows OS delivers exit code 9009 or exit code 1 and target shell cmd.exe
                 // the exit code depends on the remote SSH implementation
                 if (forceAutoDetection) {
-                    flgIsWindowsShell = true;
+                    isWindowsShell = true;
                 }
                 LOGGER.info("*** execute Command uname failed with exit code 1 or 9009, remote OS is Windows with cmd shell! ***");
             } else if (commandResult.getExitCode() == 127) {
@@ -699,13 +729,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 // command uname is not installed by default through CopSSH installation
                 LOGGER.info("*** execute Command uname failed with exit code 127, remote OS is Windows with cygwin and shell is Unix like! ***");
                 if (forceAutoDetection) {
-                    flgIsWindowsShell = false;
+                    isWindowsShell = false;
                 }
             } else {
                 if (forceAutoDetection) {
                     throw new SOSSSHAutoDetectionException(strb.toString());
                 } else {
-                    flgIsWindowsShell = false;
+                    isWindowsShell = false;
                     LOGGER.info(strb.toString());
                 }
             }
@@ -713,26 +743,60 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             if (forceAutoDetection) {
                 throw new SOSSSHAutoDetectionException(strb.toString());
             } else {
-                flgIsWindowsShell = false;
+                isWindowsShell = false;
                 LOGGER.error(strb.toString(), e);
             }
         }
     }
 
-    public void setAllParams(Map allParams) {
-        this.allParams = allParams;
+    public List<Integer> getParamPids() {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("PIDs from param: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
+        }
+
+        String[] param = null;
+        if (objOptions.getItem(PARAM_PIDS_TO_KILL) != null && objOptions.getItem(PARAM_PIDS_TO_KILL).length() > 0) {
+            param = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+        }
+        List<Integer> pids = new ArrayList<Integer>();
+        if (param != null) {
+            for (String pid : param) {
+                if (pid != null && !pid.isEmpty()) {
+                    pids.add(Integer.parseInt(pid));
+                } else {
+                    LOGGER.debug("PID is empty!");
+                }
+            }
+        }
+        return pids;
     }
 
     public Map<String, String> getReturnValues() {
         return returnValues;
     }
 
-    public Map getSchedulerEnvVars() {
-        return schedulerEnvVars;
+    public void setSchedulerEnvVars(Map<String, String> val) {
+        schedulerEnvVars = val;
     }
 
-    public void setSchedulerEnvVars(Map schedulerEnvVars) {
-        this.schedulerEnvVars = schedulerEnvVars;
+    public SOSVfsSFtpJCraft getHandler() {
+        return handler;
+    }
+
+    public SOSVfsSFtpJCraft getPrePostCommandHandler() {
+        return prePostCommandHandler;
+    }
+
+    public boolean isWindowsShell() {
+        return isWindowsShell;
+    }
+
+    public String getPidFileName() {
+        return pidFileName;
+    }
+
+    public void setPidFileName(String val) {
+        pidFileName = val;
     }
 
 }

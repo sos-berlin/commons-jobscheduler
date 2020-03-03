@@ -320,15 +320,15 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     public String stackTrace2String(final Exception e) {
-        String strT = null;
         if (isNotNull(e)) {
-            strT = e.getMessage() + "\n";
-            final StackTraceElement arrStack[] = e.getStackTrace();
-            for (final StackTraceElement objS : arrStack) {
-                strT += objS.toString() + "\n";
+            StringBuilder sb = new StringBuilder(e.getMessage()).append("\n");
+            final StackTraceElement stacks[] = e.getStackTrace();
+            for (final StackTraceElement stack : stacks) {
+                sb.append(stack.toString()).append("\n");
             }
+            return sb.toString();
         }
-        return strT;
+        return null;
     }
 
     protected JSJobUtilities getJSJobUtilities() {

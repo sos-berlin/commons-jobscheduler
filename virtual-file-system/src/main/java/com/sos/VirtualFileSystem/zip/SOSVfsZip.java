@@ -333,13 +333,13 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public StringBuffer getStdErr() throws Exception {
-        return new StringBuffer();
+    public StringBuilder getStdErr() throws Exception {
+        return new StringBuilder();
     }
 
     @Override
-    public StringBuffer getStdOut() throws Exception {
-        return new StringBuffer();
+    public StringBuilder getStdOut() throws Exception {
+        return new StringBuilder();
     }
 
     @Override

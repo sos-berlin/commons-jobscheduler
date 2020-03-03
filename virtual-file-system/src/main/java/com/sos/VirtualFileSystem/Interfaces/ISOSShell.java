@@ -11,9 +11,9 @@ public interface ISOSShell {
 
     public void executeCommand(String cmd, SOSVfsEnv env) throws Exception;
 
-    public StringBuffer getStdErr() throws Exception;
+    public StringBuilder getStdErr() throws Exception;
 
-    public StringBuffer getStdOut() throws Exception;
+    public StringBuilder getStdOut() throws Exception;
 
     public Integer getExitCode();
 

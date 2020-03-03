@@ -1,4 +1,4 @@
-package sos.scheduler.job;
+package sos.scheduler.job.impl;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -10,18 +10,10 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sos.net.ssh.SOSSSHJob2;
-import sos.net.ssh.SOSSSHJobJSch;
-import sos.net.ssh.exceptions.SSHConnectionError;
-import sos.net.ssh.exceptions.SSHExecutionError;
-
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.i18n.annotation.I18NResourceBundle;
-
-@I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
-public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
+public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHTerminateRemotePidJob.class);
+
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String PID_PLACEHOLDER = "${pid}";
     private static final String USER_PLACEHOLDER = "${user}";
@@ -32,52 +24,14 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
     private String ssh_job_terminate_pid_command = "kill -15 " + PID_PLACEHOLDER;// default
     private List<Integer> allPids = new ArrayList<Integer>();
 
-    private void openSession() {
-        try {
-            if (!vfsHandler.isConnected()) {
-                SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raiseExceptionOnError.value(false);
-                vfsHandler.connect(postAlternateOptions);
-            }
-            vfsHandler.authenticate(objOptions);
-            LOGGER.debug("connection for kill commands established");
-        } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
-        }
-        vfsHandler.setJSJobUtilites(objJSJobUtilities);
-    }
-
     @Override
-    public SOSSSHJob2 connect() {
-        getVFS();
-        getOptions().checkMandatory();
-        try {
-            SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.connect(alternateOptions);
-            vfsHandler.authenticate(objOptions);
-            LOGGER.debug("connection established");
-        } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
-        }
-        flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
-        getTerminateCommandFromJobParameters();
-        isConnected = true;
-        return this;
-    }
-
-    @Override
-    public SOSSSHJob2 execute() throws Exception {
-        vfsHandler.setJSJobUtilites(objJSJobUtilities);
+    public void execute() {
         boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
         boolean configuredIgnoreError = objOptions.ignoreError.value();
-        objOptions.raiseExceptionOnError.value(false);
-        objOptions.ignoreError.value(true);
-        openSession();
         List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder();
         try {
-            if (!isConnected) {
-                this.connect();
-            }
+            connect(true);
+            getTerminateCommandFromJobParameters();
             LOGGER.debug("try to kill remote PIDs");
             for (Integer pid : pidsToKillFromOrder) {
                 allPids.add(pid);
@@ -87,24 +41,12 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
                 processTerminateCommand(pid);
             }
         } catch (Exception e) {
-            if (objOptions.raiseExceptionOnError.value()) {
-                if (objOptions.ignoreError.value()) {
-                    if (objOptions.ignoreStderr.value()) {
-                        LOGGER.debug(this.stackTrace2String(e));
-                    } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e, e);
-                    }
-                } else {
-                    LOGGER.error(this.stackTrace2String(e));
-                    throw new SSHExecutionError("Exception raised: " + e, e);
-                }
-            }
+            // ignore due disableRaiseExceptionOnError=true
         } finally {
+            disconnect();
             objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
             objOptions.ignoreError.value(configuredIgnoreError);
         }
-        return this;
     }
 
     private List<Integer> getPidsToKillFromOrder() {
@@ -117,10 +59,9 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
     }
 
     private void processTerminateCommand(Integer pid) {
-        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean configuredIgnoreError = objOptions.ignoreError.value();
-        objOptions.raiseExceptionOnError.value(false);
-        objOptions.ignoreError.value(true);
+        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
+        boolean ignoreError = objOptions.ignoreError.value();
+
         LOGGER.debug("Sending terminate command: " + ssh_job_terminate_pid_command + " with ${pid}=" + pid);
         String terminateCommand = null;
         if (ssh_job_terminate_pid_command.contains(PID_PLACEHOLDER)) {
@@ -132,38 +73,23 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
         if (ssh_job_terminate_pid_command.contains(COMMAND_PLACEHOLDER)) {
             terminateCommand = terminateCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
         }
-        String stdErr = "";
         try {
-            vfsHandler.executeCommand(terminateCommand);
+            getHandler().executeCommand(terminateCommand);
         } catch (Exception e) {
             // check if command was processed correctly
-            if (vfsHandler.getExitCode() != 0) {
+            if (getHandler().getExitCode() != 0) {
                 try {
-                    stdErr = vfsHandler.getStdErr().toString();
+                    String stdErr = getHandler().getStdErr().toString();
                     if (stdErr.contains("No such process")) {
                         LOGGER.debug("meanwhile the remote process is not available anymore!");
-                    } else {
-                        if (objOptions.raiseExceptionOnError.value()) {
-                            if (objOptions.ignoreError.value()) {
-                                if (objOptions.ignoreStderr.value()) {
-                                    LOGGER.debug("error occured while trying to execute command");
-                                } else {
-                                    LOGGER.error("error occured while trying to execute command");
-                                    throw new SSHExecutionError("Exception raised: " + e, e);
-                                }
-                            } else {
-                                LOGGER.error("error occured while trying to execute command");
-                                throw new SSHExecutionError("Exception raised: " + e, e);
-                            }
-                        }
                     }
-                } catch (Exception e1) {
-                    LOGGER.debug("error occured while reading remote stderr");
+                } catch (Exception ex) {
+                    LOGGER.debug("error occured while reading remote stderr" + ex.toString(), ex);
                 }
             }
         } finally {
-            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
-            objOptions.ignoreError.value(configuredIgnoreError);
+            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
+            objOptions.ignoreError.value(ignoreError);
         }
 
     }
@@ -173,7 +99,7 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
             ssh_job_terminate_pid_command = objOptions.sshJobTerminatePidCommand.getValue();
             LOGGER.debug("Commands to terminate from Job Parameter used!");
         } else {
-            if (flgIsWindowsShell) {
+            if (isWindowsShell()) {
                 ssh_job_terminate_pid_command = DEFAULT_WINDOWS_TERMINATE_PID_COMMAND;
                 LOGGER.debug("Default Windows commands used to terminate PID!");
             } else {
@@ -184,10 +110,8 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
     }
 
     private boolean executeGetAllChildProcesses(Integer pPid) {
-        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean configuredIgnoreError = objOptions.ignoreError.value();
-        objOptions.raiseExceptionOnError.value(false);
-        objOptions.ignoreError.value(true);
+        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
+        boolean ignoreError = objOptions.ignoreError.value();
         try {
             String command;
             if (objOptions.getSshJobGetChildProcessesCommand().getValue().contains(PID_PLACEHOLDER)) {
@@ -196,8 +120,8 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
                 command = objOptions.getSshJobGetChildProcessesCommand().getValue();
             }
             LOGGER.debug("***Execute read children of pid command!***");
-            vfsHandler.executeCommand(command);
-            BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
+            getHandler().executeCommand(command);
+            BufferedReader reader = new BufferedReader(new StringReader(new String(getHandler().getStdOut())));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 // get the first line via a regex matcher,
@@ -220,11 +144,11 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
             }
             return true;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.toString(), e);
             return false;
         } finally {
-            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
-            objOptions.ignoreError.value(configuredIgnoreError);
+            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
+            objOptions.ignoreError.value(ignoreError);
         }
     }
 
