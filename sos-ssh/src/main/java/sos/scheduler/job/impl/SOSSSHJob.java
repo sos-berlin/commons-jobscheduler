@@ -245,7 +245,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                         @Override
                         public Void call() throws Exception {
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(1_000);
                             } catch (InterruptedException e) {
                             }
                             while (!commandExecution.isDone()) {
