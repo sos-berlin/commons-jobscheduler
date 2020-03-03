@@ -245,11 +245,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                         @Override
                         public Void call() throws Exception {
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(1_000);
                             } catch (InterruptedException e) {
                             }
                             while (!commandExecution.isDone()) {
-                                for (int i = 0; i < 600; i++) {
+                                for (int i = 0; i < 10; i++) {
                                     try {
                                         Thread.sleep(100);
                                     } catch (InterruptedException e) {
@@ -339,6 +339,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 executorService.shutdownNow();
             }
         }
+
     }
 
     private void clearOutput() {
@@ -594,7 +595,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             } catch (Exception e) {
                 LOGGER.warn(e.toString(), e);
             }
-
         }
     }
 
