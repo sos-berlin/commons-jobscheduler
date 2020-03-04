@@ -21,10 +21,15 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
     private List<Integer> pids = new ArrayList<Integer>();
     private String tempPidFileName;
 
+    public SOSSSHReadPidFileJob() {
+        super();
+        disableRaiseException(false);// ?
+    }
+
     @Override
-    public void execute(boolean disableRaiseExceptionOnError) throws Exception {
+    public void execute() throws Exception {
         try {
-            connect(disableRaiseExceptionOnError);
+            connect();
 
             add2Files2Delete(tempPidFileName);
             try {
@@ -79,7 +84,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                 }
             }
 
-            connect(disableRaiseExceptionOnError);
+            connect();
             deleteTempFiles(getHandler());
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {

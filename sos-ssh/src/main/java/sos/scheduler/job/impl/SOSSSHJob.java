@@ -79,79 +79,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public SOSSSHJob() {
         super(new SOSSSHJobOptions());
 
-        handler = new SOSVfsSFtpJCraft();
-        prePostCommandHandler = new SOSVfsSFtpJCraft();
-
-        UUID uuid = UUID.randomUUID();
-        tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
-    }
-
-    public void connect(boolean disableRaiseExceptionOnError) {
-        try {
-            if (!handler.isConnected()) {
-                disableRaiseException = disableRaiseExceptionOnError;
-
-                if (handlerOptions == null) {
-                    setHandlerOptions(objOptions);
-                    handlerOptions.checkMandatory();
-                }
-                handler.connect(handlerOptions);
-                handler.authenticate(handlerOptions);
-
-                isWindowsShell = handler.remoteIsWindowsShell();
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(String.format("handler connection established. isWindowsShell=%s", isWindowsShell));
-                }
-            }
-        } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during handler connection/authentication: " + e.toString(), e);
-        }
-
-    }
-
-    private void connectPrePostCommandHandler() {
-        try {
-            if (!prePostCommandHandler.isConnected()) {
-                if (prePostCommandHandlerOptions == null) {
-                    if (disableRaiseException) {
-                        prePostCommandHandlerOptions = handlerOptions;
-                    } else {
-                        prePostCommandHandlerOptions = (SOSConnection2OptionsAlternate) SerializationUtils.clone(handlerOptions);
-                        prePostCommandHandlerOptions.raiseExceptionOnError.value(false);
-                        prePostCommandHandlerOptions.ignoreError.value(true);
-                    }
-                }
-                prePostCommandHandler.connect(prePostCommandHandlerOptions);
-                prePostCommandHandler.authenticate(prePostCommandHandlerOptions);
-                LOGGER.debug("prePostCommandHandler connection established");
-            }
-        } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during prePostCommandHandler connection/authentication: " + e.toString(), e);
-        }
-    }
-
-    public void disconnect() {
-        if (prePostCommandHandler.isConnected()) {
-            try {
-                prePostCommandHandler.disconnect();
-                LOGGER.debug("***** prePostCommandHandler disconnected! *****");
-            } catch (Exception e) {
-                throw new SSHConnectionError("problems closing connection", e);
-            }
-        }
-        if (handler.isConnected()) {
-            try {
-                handler.disconnect();
-                LOGGER.debug("***** handler disconnected! *****");
-            } catch (Exception e) {
-                throw new SSHConnectionError("problems closing connection", e);
-            }
-        }
-    }
-
-    public void execute(boolean disableRaiseExceptionOnError) throws Exception {
-
+        init();
+        disableRaiseException(false);
     }
 
     public void execute() throws Exception {
@@ -162,7 +91,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         ExecutorService executorService = null;
         Future<Void> sendSignalExecution = null;
         try {
-            connect(false);
+            connect();
 
             // first check if windows is running on the remote host
             checkOsAndShell();
@@ -340,6 +269,75 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
         }
 
+    }
+
+    public void connect() {
+        try {
+            if (!handler.isConnected()) {
+                if (handlerOptions == null) {
+                    setHandlerOptions(objOptions);
+                    handlerOptions.checkMandatory();
+                }
+                handler.connect(handlerOptions);
+                handler.authenticate(handlerOptions);
+
+                isWindowsShell = handler.remoteIsWindowsShell();
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("handler connection established. isWindowsShell=%s", isWindowsShell));
+                }
+            }
+        } catch (Exception e) {
+            throw new SSHConnectionError("Error occured during handler connection/authentication: " + e.toString(), e);
+        }
+
+    }
+
+    private void connectPrePostCommandHandler() {
+        try {
+            if (!prePostCommandHandler.isConnected()) {
+                if (prePostCommandHandlerOptions == null) {
+                    if (disableRaiseException) {
+                        prePostCommandHandlerOptions = handlerOptions;
+                    } else {
+                        prePostCommandHandlerOptions = (SOSConnection2OptionsAlternate) SerializationUtils.clone(handlerOptions);
+                        prePostCommandHandlerOptions.raiseExceptionOnError.value(false);
+                        prePostCommandHandlerOptions.ignoreError.value(true);
+                    }
+                }
+                prePostCommandHandler.connect(prePostCommandHandlerOptions);
+                prePostCommandHandler.authenticate(prePostCommandHandlerOptions);
+                LOGGER.debug("prePostCommandHandler connection established");
+            }
+        } catch (Exception e) {
+            throw new SSHConnectionError("Error occured during prePostCommandHandler connection/authentication: " + e.toString(), e);
+        }
+    }
+
+    public void disconnect() {
+        if (prePostCommandHandler.isConnected()) {
+            try {
+                prePostCommandHandler.disconnect();
+                LOGGER.debug("***** prePostCommandHandler disconnected! *****");
+            } catch (Exception e) {
+                throw new SSHConnectionError("problems closing connection", e);
+            }
+        }
+        if (handler.isConnected()) {
+            try {
+                handler.disconnect();
+                LOGGER.debug("***** handler disconnected! *****");
+            } catch (Exception e) {
+                throw new SSHConnectionError("problems closing connection", e);
+            }
+        }
+    }
+
+    private void init() {
+        handler = new SOSVfsSFtpJCraft();
+        prePostCommandHandler = new SOSVfsSFtpJCraft();
+
+        tempFileName = "sos-ssh-return-values-" + UUID.randomUUID() + ".txt";
     }
 
     private void clearOutput() {
@@ -793,4 +791,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         pidFileName = val;
     }
 
+    public void disableRaiseException(boolean val) {
+        disableRaiseException = val;
+    }
 }
