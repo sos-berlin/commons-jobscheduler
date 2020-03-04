@@ -21,7 +21,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -290,16 +289,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public StringBuilder getStdErr() throws Exception {
-        return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder getStdOut() throws Exception {
-        return new StringBuilder();
-    }
-
-    @Override
     public boolean isConnected() {
         return true;
     }
@@ -404,10 +393,4 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     public OutputStream getOutputStream() {
         return outputStream;
     }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        return null;
-    }
-
 }

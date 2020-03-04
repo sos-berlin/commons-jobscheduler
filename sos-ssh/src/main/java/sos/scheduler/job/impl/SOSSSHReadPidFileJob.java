@@ -21,11 +21,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
     private List<Integer> pids = new ArrayList<Integer>();
     private String tempPidFileName;
 
-    public SOSSSHReadPidFileJob() {
-        super();
-        disableRaiseException(false);// ?
-    }
-
     @Override
     public void execute() throws Exception {
         try {
@@ -60,7 +55,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                         }
                     }
                 }
-                checkStdOut();
+                addStdOut();
                 checkStdErr();
                 checkExitCode();
                 changeExitSignal();
@@ -68,14 +63,14 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                 if (objOptions.raiseExceptionOnError.value()) {
                     if (objOptions.ignoreError.value()) {
                         if (objOptions.ignoreStderr.value()) {
-                            LOGGER.debug(this.stackTrace2String(e));
+                            LOGGER.debug(stackTrace2String(e));
                         } else {
-                            LOGGER.error(this.stackTrace2String(e));
-                            throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
+                            LOGGER.error(stackTrace2String(e));
+                            throw new SSHExecutionError(e.toString(), e);
                         }
                     } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
+                        LOGGER.error(stackTrace2String(e));
+                        throw new SSHExecutionError(e.toString(), e);
                     }
                 }
             } finally {

@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
+
 public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHTerminateRemotePidJob.class);
@@ -21,18 +23,12 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
     private static final String DEFAULT_LINUX_TERMINATE_PID_COMMAND = "kill -15 " + PID_PLACEHOLDER;
     private static final String DEFAULT_WINDOWS_TERMINATE_PID_COMMAND = "taskkill /pid " + PID_PLACEHOLDER + " /FI \"USERNAME eq " + USER_PLACEHOLDER
             + "\" /FI \"IMAGENAME eq " + COMMAND_PLACEHOLDER + "\"";
-    private String ssh_job_terminate_pid_command = "kill -15 " + PID_PLACEHOLDER;// default
-    private List<Integer> allPids = new ArrayList<Integer>();
 
-    public SOSSSHTerminateRemotePidJob() {
-        super();
-        disableRaiseException(true);
-    }
+    private List<Integer> allPids = new ArrayList<Integer>();
+    private String terminatePidCommand = "kill -15 " + PID_PLACEHOLDER;// default
 
     @Override
-    public void execute() {
-        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean configuredIgnoreError = objOptions.ignoreError.value();
+    public void execute() throws Exception {
         List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder();
         try {
             connect();
@@ -46,11 +42,9 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
                 processTerminateCommand(pid);
             }
         } catch (Exception e) {
-            // ignore due disableRaiseExceptionOnError=true
+            throw e;
         } finally {
             disconnect();
-            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
-            objOptions.ignoreError.value(configuredIgnoreError);
         }
     }
 
@@ -64,69 +58,58 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
     }
 
     private void processTerminateCommand(Integer pid) {
-        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean ignoreError = objOptions.ignoreError.value();
+        LOGGER.debug("Sending terminate command: " + terminatePidCommand + " with ${pid}=" + pid);
+        String cmd = null;
+        if (terminatePidCommand.contains(PID_PLACEHOLDER)) {
+            cmd = terminatePidCommand.replace(PID_PLACEHOLDER, pid.toString());
+        }
+        if (terminatePidCommand.contains(USER_PLACEHOLDER)) {
+            cmd = cmd.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
+        }
+        if (terminatePidCommand.contains(COMMAND_PLACEHOLDER)) {
+            cmd = cmd.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
+        }
 
-        LOGGER.debug("Sending terminate command: " + ssh_job_terminate_pid_command + " with ${pid}=" + pid);
-        String terminateCommand = null;
-        if (ssh_job_terminate_pid_command.contains(PID_PLACEHOLDER)) {
-            terminateCommand = ssh_job_terminate_pid_command.replace(PID_PLACEHOLDER, pid.toString());
-        }
-        if (ssh_job_terminate_pid_command.contains(USER_PLACEHOLDER)) {
-            terminateCommand = terminateCommand.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
-        }
-        if (ssh_job_terminate_pid_command.contains(COMMAND_PLACEHOLDER)) {
-            terminateCommand = terminateCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
-        }
+        SOSCommandResult result = null;
         try {
-            getHandler().executeCommand(terminateCommand);
+            result = getHandler().executeResultCommand(cmd);
         } catch (Exception e) {
-            // check if command was processed correctly
-            if (getHandler().getExitCode() != 0) {
-                try {
-                    String stdErr = getHandler().getStdErr().toString();
-                    if (stdErr.contains("No such process")) {
-                        LOGGER.debug("meanwhile the remote process is not available anymore!");
-                    }
-                } catch (Exception ex) {
-                    LOGGER.debug("error occured while reading remote stderr" + ex.toString(), ex);
+            LOGGER.error(e.toString(), e);
+        } finally {
+            if (result != null && result.getExitCode() != 0) {
+                if (result.getStdErr().toString().contains("No such process")) {
+                    LOGGER.debug("meanwhile the remote process is not available anymore!");
                 }
             }
-        } finally {
-            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
-            objOptions.ignoreError.value(ignoreError);
         }
-
     }
 
     private void getTerminateCommandFromJobParameters() {
         if (objOptions.sshJobTerminatePidCommand.isDirty() && !objOptions.sshJobTerminatePidCommand.getValue().isEmpty()) {
-            ssh_job_terminate_pid_command = objOptions.sshJobTerminatePidCommand.getValue();
+            terminatePidCommand = objOptions.sshJobTerminatePidCommand.getValue();
             LOGGER.debug("Commands to terminate from Job Parameter used!");
         } else {
             if (isWindowsShell()) {
-                ssh_job_terminate_pid_command = DEFAULT_WINDOWS_TERMINATE_PID_COMMAND;
+                terminatePidCommand = DEFAULT_WINDOWS_TERMINATE_PID_COMMAND;
                 LOGGER.debug("Default Windows commands used to terminate PID!");
             } else {
-                ssh_job_terminate_pid_command = DEFAULT_LINUX_TERMINATE_PID_COMMAND;
+                terminatePidCommand = DEFAULT_LINUX_TERMINATE_PID_COMMAND;
                 LOGGER.debug("Default Linux commands used to terminate PID!");
             }
         }
     }
 
     private boolean executeGetAllChildProcesses(Integer pPid) {
-        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean ignoreError = objOptions.ignoreError.value();
         try {
-            String command;
+            String cmd;
             if (objOptions.getSshJobGetChildProcessesCommand().getValue().contains(PID_PLACEHOLDER)) {
-                command = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, pPid.toString());
+                cmd = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, pPid.toString());
             } else {
-                command = objOptions.getSshJobGetChildProcessesCommand().getValue();
+                cmd = objOptions.getSshJobGetChildProcessesCommand().getValue();
             }
             LOGGER.debug("***Execute read children of pid command!***");
-            getHandler().executeCommand(command);
-            BufferedReader reader = new BufferedReader(new StringReader(new String(getHandler().getStdOut())));
+            SOSCommandResult result = getHandler().executeResultCommand(cmd);
+            BufferedReader reader = new BufferedReader(new StringReader(new String(result.getStdOut())));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 // get the first line via a regex matcher,
@@ -151,9 +134,6 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             return false;
-        } finally {
-            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
-            objOptions.ignoreError.value(ignoreError);
         }
     }
 

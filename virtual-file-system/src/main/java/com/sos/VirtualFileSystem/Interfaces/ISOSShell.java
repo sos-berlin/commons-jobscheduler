@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 
 public interface ISOSShell {
@@ -11,16 +10,14 @@ public interface ISOSShell {
 
     public void executeCommand(String cmd, SOSVfsEnv env) throws Exception;
 
-    public StringBuilder getStdErr() throws Exception;
+    public StringBuilder getStdErr();
 
-    public StringBuilder getStdOut() throws Exception;
+    public StringBuilder getStdOut();
 
     public Integer getExitCode();
 
     public String getExitSignal();
 
     public String createScriptFile(final String content) throws Exception;
-
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception;
 
 }

@@ -38,7 +38,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
@@ -662,18 +661,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public boolean isSimulateShell() {
-        return this.simulateShell;
+        return simulateShell;
     }
 
     @Override
-    public void setSimulateShell(boolean simulateShell) {
-        this.simulateShell = simulateShell;
+    public void setSimulateShell(boolean val) {
+        simulateShell = val;
     }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

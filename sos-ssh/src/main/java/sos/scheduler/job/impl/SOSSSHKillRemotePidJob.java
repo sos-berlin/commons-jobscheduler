@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
+
 public class SOSSSHKillRemotePidJob extends SOSSSHJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillRemotePidJob.class);
@@ -24,15 +26,8 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJob {
     private List<Integer> allPids = new ArrayList<Integer>();
     private String killPidCommand = "kill -9 " + PID_PLACEHOLDER;
 
-    public SOSSSHKillRemotePidJob() {
-        super();
-        disableRaiseException(true);
-    }
-
     @Override
-    public void execute() {
-        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean ignoreError = objOptions.ignoreError.value();
+    public void execute() throws Exception {
         List<Integer> pids = getParamPids();
         try {
             connect();
@@ -47,37 +42,34 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJob {
                 processKillCommand(pid);
             }
         } catch (Exception e) {
-            // ignore due raiseExceptionOnError=true
+            throw e;
         } finally {
             disconnect();
-            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
-            objOptions.ignoreError.value(ignoreError);
         }
     }
 
     private void processKillCommand(Integer pid) {
         LOGGER.debug("Sending kill command: " + killPidCommand + " with ${pid}=" + pid);
-        String killCommand = null;
+        String cmd = null;
         if (killPidCommand.contains(PID_PLACEHOLDER)) {
-            killCommand = killPidCommand.replace(PID_PLACEHOLDER, pid.toString());
+            cmd = killPidCommand.replace(PID_PLACEHOLDER, pid.toString());
         }
         if (killPidCommand.contains(USER_PLACEHOLDER)) {
-            killCommand = killCommand.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
+            cmd = cmd.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
         }
         if (killPidCommand.contains(COMMAND_PLACEHOLDER)) {
-            killCommand = killCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
+            cmd = cmd.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
         }
+
+        SOSCommandResult result = null;
         try {
-            getHandler().executeCommand(killCommand);
+            result = getHandler().executeResultCommand(cmd);
         } catch (Exception e) {
-            if (getHandler().getExitCode() != 0) {
-                try {
-                    String stdErr = getHandler().getStdErr().toString();
-                    if (stdErr.contains("No such process")) {
-                        LOGGER.debug("meanwhile the remote process is not available anymore!");
-                    }
-                } catch (Exception ex) {
-                    LOGGER.debug("error occured while reading remote stderr" + ex.toString(), ex);
+            LOGGER.error(e.toString(), e);
+        } finally {
+            if (result != null && result.getExitCode() != 0) {
+                if (result.getStdErr().toString().contains("No such process")) {
+                    LOGGER.debug("meanwhile the remote process is not available anymore!");
                 }
             }
         }
@@ -99,19 +91,16 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJob {
     }
 
     private boolean executeGetAllChildProcesses(Integer processId) {
-        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean ignoreError = objOptions.ignoreError.value();
-
         try {
-            String command;
+            String cmd;
             if (objOptions.getSshJobGetChildProcessesCommand().getValue().contains(PID_PLACEHOLDER)) {
-                command = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, processId.toString());
+                cmd = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, processId.toString());
             } else {
-                command = objOptions.getSshJobGetChildProcessesCommand().getValue();
+                cmd = objOptions.getSshJobGetChildProcessesCommand().getValue();
             }
             LOGGER.debug("***Execute read children of pid command!***");
-            getHandler().executeCommand(command);
-            BufferedReader reader = new BufferedReader(new StringReader(new String(getHandler().getStdOut())));
+            SOSCommandResult result = getHandler().executeResultCommand(cmd);
+            BufferedReader reader = new BufferedReader(new StringReader(new String(result.getStdOut())));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 // get the first line via a regex matcher,
@@ -136,9 +125,6 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJob {
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             return false;
-        } finally {
-            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
-            objOptions.ignoreError.value(ignoreError);
         }
     }
 

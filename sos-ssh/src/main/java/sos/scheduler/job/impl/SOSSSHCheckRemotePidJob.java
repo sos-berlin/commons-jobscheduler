@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 
 public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
 
@@ -17,17 +18,9 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
 
     private String activeProcessesCommand = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
     private String pids = null;
-    
-    public SOSSSHCheckRemotePidJob() {
-        super();
-        disableRaiseException(true);
-    }
 
     @Override
-    public void execute() {
-        boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
-        boolean ignoreError = objOptions.ignoreError.value();
-
+    public void execute() throws Exception {
         List<Integer> paramPids = getParamPids();
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
@@ -42,8 +35,8 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
                 if (activeProcessesCommand.contains("${pid}")) {
                     checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
                 }
-                getHandler().executeCommand(checkPidCommand);
-                if (getHandler().getExitCode() == 0) {
+                SOSCommandResult result = getHandler().executeResultCommand(checkPidCommand);
+                if (result.getExitCode() == 0) {
                     pidsStillRunning.add(pid);
                     LOGGER.debug("PID " + pid + " is still running");
                 } else {
@@ -74,11 +67,9 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
                 objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
             }
         } catch (Exception e) {
-            // ignore due disableRaiseExceptionOnError=true
+            throw e;
         } finally {
             disconnect();
-            objOptions.raiseExceptionOnError.value(raiseExeptionOnError);
-            objOptions.ignoreError.value(ignoreError);
         }
     }
 

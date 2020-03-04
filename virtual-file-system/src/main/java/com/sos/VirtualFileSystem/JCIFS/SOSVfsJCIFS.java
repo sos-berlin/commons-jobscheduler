@@ -22,7 +22,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -339,7 +338,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         entry.setDirectory(file.isDirectory());
         entry.setFilename(file.getName());
         entry.setFilesize(file.length());
-        //entry.setLastModified(file.getLastModified());
+        // entry.setLastModified(file.getLastModified());
         entry.setParentPath(parentPath);
         return entry;
     }
@@ -735,10 +734,4 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public void setSimulateShell(boolean val) {
         simulateShell = val;
     }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        return null;
-    }
-
 }

@@ -105,7 +105,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         return showTaskAnswerXml.contains("state=\"running");
     }
 
-    private SOSSSHCheckRemotePidJob executeCheckPids(String nodeName) {
+    private SOSSSHCheckRemotePidJob executeCheckPids(String nodeName) throws Exception {
         SOSSSHCheckRemotePidJob job = new SOSSSHCheckRemotePidJob();
         job.setJSJobUtilites(this);
         if (LOGGER.isDebugEnabled()) {
@@ -121,7 +121,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         return job;
     }
 
-    private SOSSSHKillRemotePidJob executeKillPids(String nodeName) {
+    private SOSSSHKillRemotePidJob executeKillPids(String nodeName) throws Exception {
         SOSSSHKillRemotePidJob job = new SOSSSHKillRemotePidJob();
         job.setJSJobUtilites(this);
         if (LOGGER.isDebugEnabled()) {
@@ -137,7 +137,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         return job;
     }
 
-    private SOSSSHTerminateRemotePidJob executeTerminatePids(String nodeName) {
+    private SOSSSHTerminateRemotePidJob executeTerminatePids(String nodeName) throws Exception {
         SOSSSHTerminateRemotePidJob job = new SOSSSHTerminateRemotePidJob();
         job.setJSJobUtilites(this);
         if (LOGGER.isDebugEnabled()) {
