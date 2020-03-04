@@ -36,14 +36,12 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
@@ -333,12 +331,12 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public StringBuilder getStdErr() throws Exception {
+    public StringBuilder getStdErr() {
         return new StringBuilder();
     }
 
     @Override
-    public StringBuilder getStdOut() throws Exception {
+    public StringBuilder getStdOut() {
         return new StringBuilder();
     }
 
@@ -672,18 +670,12 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 
     @Override
     public boolean isSimulateShell() {
-        return this.simulateShell;
+        return simulateShell;
     }
 
     @Override
-    public void setSimulateShell(boolean simulateShell) {
-        this.simulateShell = simulateShell;
-    }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+    public void setSimulateShell(boolean val) {
+        simulateShell = val;
     }
 
     @Override

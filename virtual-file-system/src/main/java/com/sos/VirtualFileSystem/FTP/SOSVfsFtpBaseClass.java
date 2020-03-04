@@ -49,7 +49,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
@@ -1406,13 +1405,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public void write(final byte[] buffer, final int offset, final int length) {
         //
     }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+  
     @Override
     public final ISOSSession openSession(final ISOSShellOptions options) throws Exception {
         notImplemented();
@@ -1435,13 +1428,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public StringBuilder getStdErr() throws Exception {
-        return null;
+    public StringBuilder getStdErr(){
+        return new StringBuilder();
     }
 
     @Override
-    public StringBuilder getStdOut() throws Exception {
-        return null;
+    public StringBuilder getStdOut(){
+        return new StringBuilder();
     }
 
     @Override

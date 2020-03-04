@@ -71,13 +71,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     private String pidFileName;
     private String getPidCommand = DEFAULT_LINUX_GET_PID_COMMAND;
     private boolean isWindowsShell = false;
-    private boolean disableRaiseException = false;
 
     public SOSSSHJob() {
         super(new SOSSSHJobOptions());
 
         init();
-        disableRaiseException(false);
     }
 
     public void execute() throws Exception {
@@ -190,12 +188,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     // wait until command execution is finished
                     commandExecution.get();
                     objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, "0");
-                    checkStdOut();
+                    addStdOut();
                     checkStdErr();
                     checkExitCode();
                     changeExitSignal();
                 } catch (Exception e) {
-                    checkStdOut();
+                    addStdOut();
                     checkStdErr();
                     checkExitCode();
                     changeExitSignal();
@@ -246,12 +244,9 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         } finally {
             disconnect();
 
-            if (handler.getStdOut() != null) {
-                handler.getStdOut().setLength(0);
-            }
-            if (handler.getStdErr() != null) {
-                handler.getStdErr().setLength(0);
-            }
+            handler.resetStdOut();
+            handler.resetStdErr();
+
             if (executorService != null) {
                 if (commandExecution != null) {
                     commandExecution.cancel(true);
@@ -309,13 +304,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         stderr = new StringBuilder();
     }
 
-    public void checkStdOut() {
-        try {
-            stdout.append(handler.getStdOut());
-        } catch (Exception e) {
-            LOGGER.error(stackTrace2String(e));
-            throw new JobSchedulerException(e.toString(), e);
-        }
+    public void addStdOut() {
+        stdout.append(handler.getStdOut());
     }
 
     public void checkStdErr() {
@@ -492,7 +482,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
                 try {
                     LOGGER.debug("cmd: " + cmd);
-                    handler.executePrivateCommand(cmd);
+                    handler.executeResultCommand(cmd);
                 } catch (Exception e) {
                     LOGGER.error(String.format("error ocurred deleting %1$s: ", file), e);
                 }
@@ -520,7 +510,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             connect();
             deleteTempFiles();
 
-            SOSCommandResult result = handler.executePrivateCommand(postCommandRead);
+            SOSCommandResult result = handler.executeResultCommand(postCommandRead);
             if (result.getExitCode() == 0) {
                 if (!result.getStdOut().toString().isEmpty()) {
                     BufferedReader reader = new BufferedReader(new StringReader(new String(result.getStdOut())));
@@ -548,7 +538,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     }
 
                     connect();
-                    SOSCommandResult deleteResult = handler.executePrivateCommand(postCommandDelete);
+                    SOSCommandResult deleteResult = handler.executeResultCommand(postCommandDelete);
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug(String.format("[delete result][exitCode=%s][stdOut=%s][stdErr]", deleteResult.getExitCode(), deleteResult
                                 .getStdOut(), deleteResult.getStdErr()));
@@ -576,13 +566,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         handlerOptions.proxyPort.value(jobOptions.getProxyPort().value());
         handlerOptions.proxyUser.setValue(jobOptions.getProxyUser().getValue());
         handlerOptions.proxyPassword.setValue(jobOptions.getProxyPassword().getValue());
-        if (disableRaiseException) {
-            handlerOptions.raiseExceptionOnError.value(false);
-            handlerOptions.ignoreError.value(true);
-        } else {
-            handlerOptions.raiseExceptionOnError.value(jobOptions.getRaiseExceptionOnError().value());
-            handlerOptions.ignoreError.value(jobOptions.getIgnoreError().value());
-        }
+        handlerOptions.raiseExceptionOnError.value(jobOptions.getRaiseExceptionOnError().value());
+        handlerOptions.ignoreError.value(jobOptions.getIgnoreError().value());
 
         if (jobOptions.credential_store_filename.isNotEmpty()) {
             SOSCredentialStoreOptions csOptions = new SOSCredentialStoreOptions();
@@ -647,7 +632,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         strb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
         SOSCommandResult commandResult = null;
         try {
-            commandResult = handler.executePrivateCommand(cmdToExecute);
+            commandResult = handler.executeResultCommand(cmdToExecute);
             if (commandResult.getExitCode() == 0) {
                 // command uname was execute successfully -> OS is Unix like
                 if (commandResult.getStdOut().toString().toLowerCase().contains("linux") || commandResult.getStdOut().toString().toLowerCase()
@@ -748,9 +733,5 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public void setPidFileName(String val) {
         pidFileName = val;
-    }
-
-    public void disableRaiseException(boolean val) {
-        disableRaiseException = val;
     }
 }

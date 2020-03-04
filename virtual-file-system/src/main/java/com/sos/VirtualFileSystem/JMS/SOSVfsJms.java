@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 
@@ -226,12 +225,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         // not implemented, no need
         return null;
     }
-
-    @Override
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    
 
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {

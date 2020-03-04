@@ -481,16 +481,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public StringBuilder getStdErr() throws Exception {
-        return null;
-    }
-
-    @Override
-    public StringBuilder getStdOut() throws Exception {
-        return null;
-    }
-
-    @Override
     public boolean remoteIsWindowsShell() {
         return false;
     }
@@ -692,6 +682,18 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public String getExitSignal() {
+        notImplemented();
+        return null;
+    }
+
+    @Override
+    public StringBuilder getStdOut() {
+        notImplemented();
+        return null;
+    }
+
+    @Override
+    public StringBuilder getStdErr() {
         notImplemented();
         return null;
     }

@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
@@ -85,12 +84,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private ChannelExec channelExec = null;
     // proxy
     private SOSOptionProxyProtocol proxyProtocol = null;
-    private Map<String, String> environmentVariables = null;
 
     private Integer exitCode;
     private String exitSignal;
-    private StringBuilder outContent;
-    private StringBuilder errContent;
+    private StringBuilder stdOut;
+    private StringBuilder stdErr;
 
     private boolean isRemoteWindowsShell = false;
     private boolean isUnix = false;
@@ -563,7 +561,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
             channelExec.connect();
-            outContent = new StringBuilder();
+            stdOut = new StringBuilder();
             byte[] tmp = new byte[1024];
             while (true) {
                 while (out.available() > 0) {
@@ -571,7 +569,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (i < 0) {
                         break;
                     }
-                    outContent.append(new String(tmp, 0, i));
+                    stdOut.append(new String(tmp, 0, i));
                 }
                 if (channelExec.isClosed()) {
                     exitCode = channelExec.getExitStatus();
@@ -584,32 +582,32 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
             boolean isErrorExitCode = exitCode != null && !exitCode.equals(new Integer(0));
-            if (!isErrorExitCode && outContent.length() > 0) {
+            if (!isErrorExitCode && stdOut.length() > 0) {
                 LOGGER.info(String.format("[%s]", cmd));
-                LOGGER.info(String.format("[stdout]%s", outContent.toString().trim()));
+                LOGGER.info(String.format("[stdout]%s", stdOut.toString().trim()));
             }
             errReader = new BufferedReader(new InputStreamReader(err));
-            errContent = new StringBuilder();
+            stdErr = new StringBuilder();
             while (true) {
                 String line = errReader.readLine();
                 if (line == null) {
                     break;
                 }
-                errContent.append(line + lineSeparator);
+                stdErr.append(line + lineSeparator);
             }
             if (isErrorExitCode) {
                 StringBuffer msg = new StringBuffer("[" + cmd + "]");
-                if (outContent.length() > 0) {
-                    msg.append("[stdout=" + outContent.toString().trim() + "]");
+                if (stdOut.length() > 0) {
+                    msg.append("[stdout=" + stdOut.toString().trim() + "]");
                 }
-                if (errContent.length() > 0) {
-                    msg.append("[stderr=" + errContent.toString().trim() + "]");
+                if (stdErr.length() > 0) {
+                    msg.append("[stderr=" + stdErr.toString().trim() + "]");
                 }
                 msg.append("remote command terminated with the exit code " + exitCode.toString());
                 throw new JobSchedulerException(msg.toString());
             } else {
-                if (errContent.length() > 0) {
-                    LOGGER.info(String.format("[%s][stderr]%s", cmd, errContent.toString().trim()));
+                if (stdErr.length() > 0) {
+                    LOGGER.info(String.format("[%s][stderr]%s", cmd, stdErr.toString().trim()));
                 }
             }
             reply = "OK";
@@ -656,10 +654,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         }
-    }
-
-    public void setEnvironmentVariables(Map<String, String> envVariables) {
-        this.environmentVariables = envVariables;
     }
 
     @Override
@@ -1142,13 +1136,20 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return null;
     }
 
-    public StringBuilder getStdErr() throws Exception {
-        return errContent;
+    public StringBuilder getStdErr() {
+        return stdErr;
     }
 
-    @Override
-    public StringBuilder getStdOut() throws Exception {
-        return outContent;
+    public void resetStdErr() {
+        stdErr = new StringBuilder();
+    }
+
+    public StringBuilder getStdOut() {
+        return stdOut;
+    }
+
+    public void resetStdOut() {
+        stdOut = new StringBuilder();
     }
 
     @Override
@@ -1199,7 +1200,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public boolean remoteIsWindowsShell() {
         executeCommand("echo %ComSpec%");
-        if (outContent.toString().indexOf("cmd.exe") > -1) {
+        if (stdOut.toString().indexOf("cmd.exe") > -1) {
             if (isDebugEnabled) {
                 LOGGER.debug(SOSVfs_D_237.get());
             }
@@ -1235,7 +1236,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (!isOSChecked) {
             String cmd = "echo %ComSpec%";
             try {
-                SOSCommandResult result = executePrivateCommand(cmd);
+                SOSCommandResult result = executeResultCommand(cmd);
                 String stdout = result.getStdOut().toString();
                 if (stdout.indexOf("cmd.exe") > -1) {
                     isUnix = false;
@@ -1260,7 +1261,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return isUnix;
     }
 
-    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+    public SOSCommandResult executeResultCommand(String cmd) throws Exception {
         ChannelExec channel = null;
         InputStream in = null;
         InputStream err = null;
