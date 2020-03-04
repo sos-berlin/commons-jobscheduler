@@ -11,7 +11,7 @@ import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.scheduler.job.impl.SOSSSHReadPidFileJob;
 
-public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHReadPidFileJobJSAdapter.class);
 
