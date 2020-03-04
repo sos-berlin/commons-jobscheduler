@@ -135,18 +135,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         alternateOptionsUsed.setValue(val);
         return this;
     }
-
-    @JSOptionDefinition(name = "withoutSFTPChannel", description = "Alternate Options used for connection without additional SFTPChannel", key = "withoutSFTPChannel", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean withoutSFTPChannel = new SOSOptionBoolean(this, CLASSNAME + "withoutSFTPChannel", "", "false", "false", false);
-
-    public SOSOptionBoolean getWithoutSFTPChannel() {
-        return withoutSFTPChannel;
-    }
-
-    public SOSConnection2OptionsAlternate setWithoutSFTPChannel(boolean value) {
-        this.withoutSFTPChannel.value(value);
-        return this;
-    }
+   
 
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "alternate_")
     private SOSConnection2OptionsAlternate objAlternativeOptions = null;
