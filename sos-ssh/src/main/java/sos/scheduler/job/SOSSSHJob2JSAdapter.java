@@ -20,7 +20,7 @@ import sos.spooler.Job_chain;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
-public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
+public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2JSAdapter.class);
 

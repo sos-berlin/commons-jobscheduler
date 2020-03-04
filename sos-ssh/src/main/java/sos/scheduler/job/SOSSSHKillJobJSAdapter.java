@@ -13,7 +13,7 @@ import sos.scheduler.job.impl.SOSSSHCheckRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHKillRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHTerminateRemotePidJob;
 
-public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillJobJSAdapter.class);
 
