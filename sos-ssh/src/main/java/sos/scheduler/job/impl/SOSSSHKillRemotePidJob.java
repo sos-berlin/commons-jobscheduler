@@ -24,13 +24,18 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJob {
     private List<Integer> allPids = new ArrayList<Integer>();
     private String killPidCommand = "kill -9 " + PID_PLACEHOLDER;
 
+    public SOSSSHKillRemotePidJob() {
+        super();
+        disableRaiseException(true);
+    }
+
     @Override
     public void execute() {
         boolean raiseExeptionOnError = objOptions.raiseExceptionOnError.value();
         boolean ignoreError = objOptions.ignoreError.value();
         List<Integer> pids = getParamPids();
         try {
-            connect(true);
+            connect();
             getKillCommandFromJobParameters();
 
             LOGGER.debug("try to kill remote PIDs");

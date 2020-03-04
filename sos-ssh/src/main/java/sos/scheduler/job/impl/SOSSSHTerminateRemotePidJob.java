@@ -24,13 +24,18 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
     private String ssh_job_terminate_pid_command = "kill -15 " + PID_PLACEHOLDER;// default
     private List<Integer> allPids = new ArrayList<Integer>();
 
+    public SOSSSHTerminateRemotePidJob() {
+        super();
+        disableRaiseException(true);
+    }
+
     @Override
     public void execute() {
         boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
         boolean configuredIgnoreError = objOptions.ignoreError.value();
         List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder();
         try {
-            connect(true);
+            connect();
             getTerminateCommandFromJobParameters();
             LOGGER.debug("try to kill remote PIDs");
             for (Integer pid : pidsToKillFromOrder) {

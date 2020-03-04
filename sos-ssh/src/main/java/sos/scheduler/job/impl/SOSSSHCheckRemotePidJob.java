@@ -17,6 +17,11 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
 
     private String activeProcessesCommand = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
     private String pids = null;
+    
+    public SOSSSHCheckRemotePidJob() {
+        super();
+        disableRaiseException(true);
+    }
 
     @Override
     public void execute() {
@@ -26,7 +31,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
         List<Integer> paramPids = getParamPids();
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
-            connect(true);
+            connect();
             readCheckIfProcessesIsStillActiveCommandFromPropertiesFile();
 
             for (Integer pid : paramPids) {
