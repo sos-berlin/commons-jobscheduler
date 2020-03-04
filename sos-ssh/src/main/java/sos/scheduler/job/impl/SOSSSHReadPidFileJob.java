@@ -85,7 +85,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
             }
 
             connect();
-            deleteTempFiles(getHandler());
+            deleteTempFiles();
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
                 if (objOptions.ignoreError.value()) {

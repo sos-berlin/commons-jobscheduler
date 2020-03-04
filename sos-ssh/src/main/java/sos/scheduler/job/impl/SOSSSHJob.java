@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
@@ -55,9 +55,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; exit 0";
 
     private SOSVfsSFtpJCraft handler;
-    private SOSVfsSFtpJCraft prePostCommandHandler = null;
     private SOSConnection2OptionsAlternate handlerOptions;
-    private SOSConnection2OptionsAlternate prePostCommandHandlerOptions;
     private SOSVfsEnv envVars = new SOSVfsEnv();
     private Future<Void> commandExecution;
 
@@ -284,39 +282,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during handler connection/authentication: " + e.toString(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.toString(), e);
         }
 
-    }
-
-    private void connectPrePostCommandHandler() {
-        try {
-            if (!prePostCommandHandler.isConnected()) {
-                if (prePostCommandHandlerOptions == null) {
-                    if (disableRaiseException) {
-                        prePostCommandHandlerOptions = handlerOptions;
-                    } else {
-                        setPrePostCommandHandlerOptionsHandlerOptions();
-                    }
-                }
-                prePostCommandHandler.connect(prePostCommandHandlerOptions);
-                prePostCommandHandler.authenticate(prePostCommandHandlerOptions);
-                LOGGER.debug("prePostCommandHandler connection established");
-            }
-        } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during prePostCommandHandler connection/authentication: " + e.toString(), e);
-        }
     }
 
     public void disconnect() {
-        if (prePostCommandHandler.isConnected()) {
-            try {
-                prePostCommandHandler.disconnect();
-                LOGGER.debug("***** prePostCommandHandler disconnected! *****");
-            } catch (Exception e) {
-                throw new SSHConnectionError("problems closing connection", e);
-            }
-        }
         if (handler.isConnected()) {
             try {
                 handler.disconnect();
@@ -329,7 +300,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     private void init() {
         handler = new SOSVfsSFtpJCraft();
-        prePostCommandHandler = new SOSVfsSFtpJCraft();
 
         tempFileName = "sos-ssh-return-values-" + UUID.randomUUID() + ".txt";
     }
@@ -505,7 +475,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    public void deleteTempFiles(SOSVfsSFtpJCraft handler) {
+    public void deleteTempFiles() {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String file : tempFilesToDelete) {
                 LOGGER.debug("file to delete: " + file);
@@ -522,7 +492,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
                 try {
                     LOGGER.debug("cmd: " + cmd);
-                    handler.executeCommand(cmd);
+                    handler.executePrivateCommand(cmd);
                 } catch (Exception e) {
                     LOGGER.error(String.format("error ocurred deleting %1$s: ", file), e);
                 }
@@ -546,13 +516,14 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
         }
 
-        connectPrePostCommandHandler();
-        deleteTempFiles(prePostCommandHandler);
         try {
-            prePostCommandHandler.executeCommand(postCommandRead);
-            if (prePostCommandHandler.getExitCode() == 0) {
-                if (!prePostCommandHandler.getStdOut().toString().isEmpty()) {
-                    BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandHandler.getStdOut())));
+            connect();
+            deleteTempFiles();
+
+            SOSCommandResult result = handler.executePrivateCommand(postCommandRead);
+            if (result.getExitCode() == 0) {
+                if (!result.getStdOut().toString().isEmpty()) {
+                    BufferedReader reader = new BufferedReader(new StringReader(new String(result.getStdOut())));
                     String line = null;
                     while ((line = reader.readLine()) != null) {
                         Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
@@ -575,18 +546,17 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                             postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tmpFileName);
                         }
                     }
-                    prePostCommandHandler.executeCommand(postCommandDelete);
+
+                    connect();
+                    SOSCommandResult deleteResult = handler.executePrivateCommand(postCommandDelete);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format("[delete result][exitCode=%s][stdOut=%s][stdErr]", deleteResult.getExitCode(), deleteResult
+                                .getStdOut(), deleteResult.getStdErr()));
+                    }
                 }
             }
         } catch (Exception e) {
             // prevent Exception to show in case of postCommandDelete errors
-        } finally {
-            try {
-                prePostCommandHandler.disconnect();
-                LOGGER.debug("[processPostCommand] prePostCommandVFSHandler connection closed! *****");
-            } catch (Exception e) {
-                LOGGER.warn(e.toString(), e);
-            }
         }
     }
 
@@ -600,7 +570,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         handlerOptions.passphrase.setValue(jobOptions.passphrase.getValue());
         handlerOptions.authMethod.setValue(jobOptions.authMethod.getValue());
         handlerOptions.authFile.setValue(jobOptions.authFile.getValue());
-        handlerOptions.protocol.setValue(enuTransferTypes.ssh2);
 
         handlerOptions.proxyProtocol.setValue(jobOptions.getProxyProtocol().getValue());
         handlerOptions.proxyHost.setValue(jobOptions.getProxyHost().getValue());
@@ -630,36 +599,10 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
         if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile
                 .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
-            handlerOptions.setWithoutSFTPChannel(false);
+            handlerOptions.protocol.setValue(TransferTypes.ssh.name());
         } else {
-            handlerOptions.setWithoutSFTPChannel(true);
+            handlerOptions.protocol.setValue(TransferTypes.sftp.name());
         }
-    }
-
-    private void setPrePostCommandHandlerOptionsHandlerOptions() {
-        prePostCommandHandlerOptions = new SOSConnection2OptionsAlternate();
-        prePostCommandHandlerOptions.strictHostKeyChecking.value(handlerOptions.strictHostKeyChecking.value());
-        prePostCommandHandlerOptions.host.setValue(handlerOptions.host.getValue());
-        prePostCommandHandlerOptions.port.value(handlerOptions.port.value());
-        prePostCommandHandlerOptions.user.setValue(handlerOptions.user.getValue());
-        prePostCommandHandlerOptions.password.setValue(handlerOptions.password.getValue());
-        prePostCommandHandlerOptions.passphrase.setValue(handlerOptions.passphrase.getValue());
-        prePostCommandHandlerOptions.authMethod.setValue(handlerOptions.authMethod.getValue());
-        prePostCommandHandlerOptions.authFile.setValue(handlerOptions.authFile.getValue());
-        prePostCommandHandlerOptions.protocol.setValue(handlerOptions.protocol.getValue());
-
-        prePostCommandHandlerOptions.proxyProtocol.setValue(handlerOptions.proxyProtocol.getValue());
-        prePostCommandHandlerOptions.proxyHost.setValue(handlerOptions.proxyHost.getValue());
-        prePostCommandHandlerOptions.proxyPort.value(handlerOptions.proxyPort.value());
-        prePostCommandHandlerOptions.proxyUser.setValue(handlerOptions.proxyUser.getValue());
-        prePostCommandHandlerOptions.proxyPassword.setValue(handlerOptions.proxyPassword.getValue());
-
-        prePostCommandHandlerOptions.setWithoutSFTPChannel(handlerOptions.getWithoutSFTPChannel().value());
-
-        handlerOptions.raiseExceptionOnError.value(false);
-        handlerOptions.ignoreError.value(true);
-
-        // credential store options already resolved by handler
     }
 
     private void mapBackOptionsFromCS(SOSConnection2OptionsAlternate options) {
@@ -793,10 +736,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public SOSVfsSFtpJCraft getHandler() {
         return handler;
-    }
-
-    public SOSVfsSFtpJCraft getPrePostCommandHandler() {
-        return prePostCommandHandler;
     }
 
     public boolean isWindowsShell() {

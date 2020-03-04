@@ -22,7 +22,7 @@ import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
-import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassPath;
@@ -87,31 +87,28 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
     };
 
-    public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes type) {
+    public SOSFTPOptions(final TransferTypes type) {
         super();
         switch (type) {
         case webdav:
             authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             getSource().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             getTarget().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav.getText());
-            getSource().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav
-                    .getText());
-            getTarget().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav
-                    .getText());
+            protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
+            getSource().protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
+            getTarget().protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             getSource().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             getTarget().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         case http:
+        case https:
             authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             getSource().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             getTarget().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.getText(), SOSOptionTransferType.enuTransferTypes.http.getText());
-            getSource().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.getText(), SOSOptionTransferType.enuTransferTypes.http
-                    .getText());
-            getTarget().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.getText(), SOSOptionTransferType.enuTransferTypes.http
-                    .getText());
+            protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
+            getSource().protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
+            getTarget().protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             getSource().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             getTarget().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
@@ -121,12 +118,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
     }
 
-    public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes source, final SOSOptionTransferType.enuTransferTypes target) {
+    public SOSFTPOptions(final TransferTypes source, final TransferTypes target) {
         super();
         switch (source) {
         case webdav:
             authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav.getText());
+            protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         default:
@@ -144,38 +141,37 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         super(settings);
     }
 
-    private void changeDefaults(final SOSOptionTransferType.enuTransferTypes type, final SOSConnection2OptionsAlternate options) {
+    private void changeDefaults(final TransferTypes type, final SOSConnection2OptionsAlternate options) {
         switch (type) {
-        case webdav:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            options.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.getText(), SOSOptionTransferType.enuTransferTypes.webdav
-                    .getText());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
+        case sftp:
+            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            options.protocol.changeDefaults(TransferTypes.sftp.name(), TransferTypes.sftp.name());
+            options.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
+            break;
+        case ssh:
+            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            options.protocol.changeDefaults(TransferTypes.ssh.name(), TransferTypes.ssh.name());
+            options.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
             break;
         case local:
-        case file:
             options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.local.getText(), SOSOptionTransferType.enuTransferTypes.local
-                    .getText());
+            options.protocol.changeDefaults(TransferTypes.local.name(), TransferTypes.local.name());
             options.port.changeDefaults(0, 0);
             break;
         case ftp:
             options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftp.getText(), SOSOptionTransferType.enuTransferTypes.ftp
-                    .getText());
+            options.protocol.changeDefaults(TransferTypes.ftp.name(), TransferTypes.ftp.name());
             options.port.changeDefaults(SOSOptionPortNumber.conPort4FTP, SOSOptionPortNumber.conPort4FTP);
-            break;
-        case sftp:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.sftp.getText(), SOSOptionTransferType.enuTransferTypes.sftp
-                    .getText());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
             break;
         case ftps:
             options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftps.getText(), SOSOptionTransferType.enuTransferTypes.ftps
-                    .getText());
+            options.protocol.changeDefaults(TransferTypes.ftps.name(), TransferTypes.ftps.name());
             options.port.changeDefaults(SOSOptionPortNumber.conPort4FTPS, SOSOptionPortNumber.conPort4FTPS);
+            break;
+        case webdav:
+            options.authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            options.protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
+            options.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         default:
             break;
@@ -373,13 +369,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     private void setDefaultAuth(final SOSOptionTransferType type, final SOSConnection2OptionsAlternate options) {
-        enuTransferTypes transferType = type.getEnum();
-        if ((transferType == enuTransferTypes.http || transferType == enuTransferTypes.https || transferType == enuTransferTypes.webdav)
-                && !options.authMethod.isDirty() && !options.sshAuthMethod.isDirty()) {
+        TransferTypes transferType = type.getEnum();
+        if ((type.isHTTP() || transferType.equals(TransferTypes.webdav)) && !options.authMethod.isDirty() && !options.sshAuthMethod.isDirty()) {
             options.authMethod.setValue(enuAuthenticationMethods.url);
             options.sshAuthMethod.setValue(enuAuthenticationMethods.url);
         }
-        if (transferType == enuTransferTypes.local) {
+        if (transferType.equals(TransferTypes.local)) {
             options.user.setValue(System.getProperty("user.name"));
             options.user.setNotDirty();
             user.setValue(System.getProperty("user.name"));
@@ -388,7 +383,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     private void setDefaultHostPort(final SOSOptionTransferType type, final SOSOptionPortNumber port, final SOSOptionHostName host) {
-        enuTransferTypes transferType = type.getEnum();
+        TransferTypes transferType = type.getEnum();
         switch (transferType) {
         case sftp:
             port.setDefaultValue("" + SOSOptionPortNumber.conPort4SFTP);
@@ -397,7 +392,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             port.setDefaultValue("" + SOSOptionPortNumber.conPort4FTP);
             break;
         case zip:
-        case file:
         case local:
             port.setDefaultValue("0");
             if (host.isNotDirty() || "localhost".equalsIgnoreCase(host.getValue()) || "127.0.0.1".equalsIgnoreCase(host.getValue())) {
@@ -808,7 +802,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
             targetType = protocol.getValue();
             if (targetType.isEmpty()) {
-                targetType = enuTransferTypes.local.getText();
+                targetType = TransferTypes.local.name();
             }
             copyValue(sourceDir, localDir);
             copyValue(targetDir, remoteDir);
@@ -816,7 +810,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             copyValue(getTarget().directory, remoteDir);
             changeOptions(getConnectionOptions().getTarget());
         } else if (OPERATION_RECEIVE.equalsIgnoreCase(operation.getValue())) {
-            targetType = enuTransferTypes.local.getText();
+            targetType = TransferTypes.local.name();
             copyValue(sourceDir, remoteDir);
             copyValue(targetDir, localDir);
             copyValue(getSource().directory, remoteDir);
@@ -825,7 +819,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         } else {
             targetType = getConnectionOptions().getTarget().protocol.getValue();
             if (targetType.isEmpty()) {
-                targetType = enuTransferTypes.local.getText();
+                targetType = TransferTypes.local.name();
             }
             changeDirValues();
         }
@@ -881,7 +875,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public String getDataSourceType() {
         String sourceType = "";
         if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
-            sourceType = enuTransferTypes.local.getText();
+            sourceType = TransferTypes.local.name();
             changeDirValues();
             SOSConnection2OptionsAlternate options = getConnectionOptions().getSource();
             options.host.setValue(SOSOptionHostName.getLocalHost());
@@ -905,7 +899,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         } else if (OPERATION_RECEIVE.equalsIgnoreCase(operation.getValue())) {
             sourceType = protocol.getValue();
             if (sourceType.isEmpty()) {
-                sourceType = enuTransferTypes.local.getText();
+                sourceType = TransferTypes.local.name();
             }
             changeDirValues4Receive();
             SOSConnection2OptionsAlternate options = getConnectionOptions().getSource();
@@ -920,7 +914,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             options = getConnectionOptions().getTarget();
             options.host.setValue(SOSOptionHostName.getLocalHost());
             options.port.value(0);
-            options.protocol.setValue(enuTransferTypes.local.getText());
+            options.protocol.setValue(TransferTypes.local.name());
 
             SOSConnection2OptionsSuperClass alternate = options.getAlternatives();
             alternate.host.setValue(alternativeHost.getValue());
@@ -930,7 +924,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         } else {
             sourceType = this.getConnectionOptions().getSource().protocol.getValue();
             if (sourceType.isEmpty()) {
-                sourceType = enuTransferTypes.local.getText();
+                sourceType = TransferTypes.local.name();
             }
             changeDirValues();
         }

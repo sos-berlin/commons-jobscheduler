@@ -53,6 +53,7 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -925,8 +926,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             LOGGER.info(msg.toString());
 
             sshSession.connect();
-            if (!connection2OptionsAlternate.getWithoutSFTPChannel().value()) {
-                this.createSftpClient();
+            if (connection2OptionsAlternate.protocol.getValue().equals(TransferTypes.sftp.name())) {
+                createSftpClient();
             }
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
