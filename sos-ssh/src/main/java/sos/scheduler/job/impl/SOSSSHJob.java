@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,13 +204,13 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     if (objOptions.raiseExceptionOnError.value()) {
                         if (objOptions.ignoreError.value()) {
                             if (objOptions.ignoreStderr.value()) {
-                                LOGGER.debug(this.stackTrace2String(e));
+                                LOGGER.debug(stackTrace2String(e));
                             } else {
-                                LOGGER.error(this.stackTrace2String(e));
+                                LOGGER.error(stackTrace2String(e));
                                 throw new SSHExecutionError("Exception raised: " + e, e);
                             }
                         } else {
-                            LOGGER.error(this.stackTrace2String(e));
+                            LOGGER.error(stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
                     }
@@ -237,14 +236,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
                         LOGGER.debug(stackTrace2String(e));
-                        LOGGER.debug(msg, e);
                     } else {
                         LOGGER.error(stackTrace2String(e));
-                        LOGGER.error(msg, e);
                         throw new SSHExecutionError(msg, e);
                     }
                 } else {
-                    LOGGER.error(stackTrace2String(e));
                     LOGGER.error(msg, e);
                     throw new SSHExecutionError(msg, e);
                 }
@@ -300,9 +296,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     if (disableRaiseException) {
                         prePostCommandHandlerOptions = handlerOptions;
                     } else {
-                        prePostCommandHandlerOptions = (SOSConnection2OptionsAlternate) SerializationUtils.clone(handlerOptions);
-                        prePostCommandHandlerOptions.raiseExceptionOnError.value(false);
-                        prePostCommandHandlerOptions.ignoreError.value(true);
+                        setPrePostCommandHandlerOptionsHandlerOptions();
                     }
                 }
                 prePostCommandHandler.connect(prePostCommandHandlerOptions);
@@ -350,7 +344,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             stdout.append(handler.getStdOut());
         } catch (Exception e) {
             LOGGER.error(stackTrace2String(e));
-            throw new JobSchedulerException(e.getMessage(), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 
@@ -640,6 +634,32 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         } else {
             handlerOptions.setWithoutSFTPChannel(true);
         }
+    }
+
+    private void setPrePostCommandHandlerOptionsHandlerOptions() {
+        prePostCommandHandlerOptions = new SOSConnection2OptionsAlternate();
+        prePostCommandHandlerOptions.strictHostKeyChecking.value(handlerOptions.strictHostKeyChecking.value());
+        prePostCommandHandlerOptions.host.setValue(handlerOptions.host.getValue());
+        prePostCommandHandlerOptions.port.value(handlerOptions.port.value());
+        prePostCommandHandlerOptions.user.setValue(handlerOptions.user.getValue());
+        prePostCommandHandlerOptions.password.setValue(handlerOptions.password.getValue());
+        prePostCommandHandlerOptions.passphrase.setValue(handlerOptions.passphrase.getValue());
+        prePostCommandHandlerOptions.authMethod.setValue(handlerOptions.authMethod.getValue());
+        prePostCommandHandlerOptions.authFile.setValue(handlerOptions.authFile.getValue());
+        prePostCommandHandlerOptions.protocol.setValue(handlerOptions.protocol.getValue());
+
+        prePostCommandHandlerOptions.proxyProtocol.setValue(handlerOptions.proxyProtocol.getValue());
+        prePostCommandHandlerOptions.proxyHost.setValue(handlerOptions.proxyHost.getValue());
+        prePostCommandHandlerOptions.proxyPort.value(handlerOptions.proxyPort.value());
+        prePostCommandHandlerOptions.proxyUser.setValue(handlerOptions.proxyUser.getValue());
+        prePostCommandHandlerOptions.proxyPassword.setValue(handlerOptions.proxyPassword.getValue());
+
+        prePostCommandHandlerOptions.setWithoutSFTPChannel(handlerOptions.getWithoutSFTPChannel().value());
+
+        handlerOptions.raiseExceptionOnError.value(false);
+        handlerOptions.ignoreError.value(true);
+
+        // credential store options already resolved by handler
     }
 
     private void mapBackOptionsFromCS(SOSConnection2OptionsAlternate options) {
