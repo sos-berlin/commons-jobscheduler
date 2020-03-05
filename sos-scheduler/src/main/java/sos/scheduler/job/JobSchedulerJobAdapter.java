@@ -1,6 +1,5 @@
 package sos.scheduler.job;
 
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_D_0070;
 import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
@@ -217,7 +216,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected HashMap<String, String> getJobOrOrderParameters() {
         try {
             HashMap<String, String> jobOrOrderParameters = new HashMap<String, String>();
-            jobOrOrderParameters.putAll(getTaskParams());
+            jobOrOrderParameters.putAll(getTaskParams(spooler_task.params()));
             if (isJobchain() && hasOrderParameters()) {
                 jobOrOrderParameters.putAll(convertVariableSet2HashMap(getOrderParams()));
             }
@@ -233,20 +232,15 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public HashMap<String, String> getParameters() {
         return getJobOrOrderParameters();
     }
-
-    protected HashMap<String, String> getTaskParams() {
-        if (taskParams == null) {
-            taskParams = convertVariableSet2HashMap(spooler_task.params());
-        }
-        return taskParams;
-    }
+    
 
     @Deprecated
     private Order getOrder() {
         return spooler_task.order();
     }
 
-    protected Variable_set getOrderParams() {
+    @Deprecated
+    private Variable_set getOrderParams() {
         Order o = getOrder();
         if (o == null) {
             return null;
@@ -264,11 +258,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public void setJSParam(final String pstrKey, final String pstrValue) {
-        if (isNotNull(getTaskParams())) {
-            getTaskParams().put(pstrKey, pstrValue);
+        Variable_set taskParams = spooler_task.params();
+        
+        HashMap<String,String> params = getTaskParams(taskParams);
+        if (params != null) {
+            params.put(pstrKey, pstrValue);
         }
 
-        Variable_set taskParams = spooler_task.params();
         if (taskParams != null) {
             taskParams.set_var(pstrKey, pstrValue);
         }
@@ -281,6 +277,14 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             schedulerParameters.put(pstrKey, pstrValue);
         }
     }
+    
+    public HashMap<String, String> getTaskParams(Variable_set schedulerTaskParams) {
+        if (taskParams == null) {
+            taskParams = convertVariableSet2HashMap(schedulerTaskParams);
+        }
+        return taskParams;
+    }
+    
 
     @Override
     public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
@@ -405,17 +409,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private boolean isJobchain() {
         return isNotNull(getOrder());
     }
-
-    public String setOrderParameter(final String pstrParameterName, final String pstrParameterValue) {
-        if (isJobchain()) {
-            Variable_set params = getOrderParams();
-            if (isNotNull(params)) {
-                params.set_var(pstrParameterName, pstrParameterValue);
-                JSJ_D_0010.toLog(pstrParameterName, pstrParameterValue);
-            }
-        }
-        return pstrParameterValue;
-    }
+    
 
     public boolean isNotNull(final Object pobjObject) {
         return pobjObject != null;

@@ -11,6 +11,8 @@ import sos.net.ssh.SOSSSHJobOptions;
 import sos.scheduler.job.impl.SOSSSHCheckRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHKillRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHTerminateRemotePidJob;
+import sos.spooler.Order;
+import sos.spooler.Variable_set;
 
 public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
 
@@ -41,7 +43,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
 
     private boolean doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getParameters());
+        allParams.putAll(getJobOrOrderParameters());
         boolean taskIsActive = true;
         boolean timeoutAfterKillIsSet = false;
         if (allParams.get(PARAM_SSH_JOB_TASK_ID) != null && !allParams.get(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
@@ -58,7 +60,13 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         SOSSSHCheckRemotePidJob job = executeCheckPids(currentNodeName);
         if (job.getPids() != null) {
             LOGGER.trace(job.getPids());
-            getOrderParams().set_var(PARAM_PIDS_TO_KILL, job.getPids());
+            Order order = spooler_task.order();
+            if (order != null) {
+                Variable_set orderParams = order.params();
+                if (orderParams != null) {
+                    orderParams.set_var(PARAM_PIDS_TO_KILL, job.getPids());
+                }
+            }
         }
         String runningPids = spooler_task.order().params().value(PARAM_PIDS_TO_KILL);
         if (taskIsActive && runningPids != null && !runningPids.isEmpty()) {
