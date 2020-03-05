@@ -54,7 +54,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
     private void doProcessing() throws Exception {
         Variable_set taskParams = spooler_task.params();
         Variable_set orderParams = null;
-        boolean isOrderJob = isOrderJob();
+        boolean isOrderJob = spooler_task.job().order_queue() != null;
         if (isOrderJob) {
             orderParams = spooler_task.order().params();
             orderParams.set_var(EXIT_SIGNAL, "");

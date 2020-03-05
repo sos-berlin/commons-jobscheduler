@@ -229,6 +229,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
+    @Deprecated
     public HashMap<String, String> getParameters() {
         return getJobOrOrderParameters();
     }
@@ -240,7 +241,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return taskParams;
     }
 
-    protected Order getOrder() {
+    @Deprecated
+    private Order getOrder() {
         return spooler_task.order();
     }
 
@@ -265,8 +267,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (isNotNull(getTaskParams())) {
             getTaskParams().put(pstrKey, pstrValue);
         }
-        if (isNotNull(spooler_task.params())) {
-            spooler_task.params().set_var(pstrKey, pstrValue);
+
+        Variable_set taskParams = spooler_task.params();
+        if (taskParams != null) {
+            taskParams.set_var(pstrKey, pstrValue);
         }
         if (hasOrderParameters()) {
             if (isNotNull(getOrderParams())) {
@@ -390,10 +394,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return spooler.execute_xml(pstrJSXmlCommand);
     }
 
-    public boolean isOrderJob() {
-        return isJobchain();
-    }
-
     @Override
     public void setNextNodeState(final String pstrNodeName) {
         if (isJobchain()) {
@@ -401,7 +401,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
-    public boolean isJobchain() {
+    @Deprecated
+    private boolean isJobchain() {
         return isNotNull(getOrder());
     }
 
@@ -590,8 +591,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return eventHandler;
     }
 
-    public void setEventHandler(IJobSchedulerEventHandler eventHandler) {
-        this.eventHandler = eventHandler;
+    public void setEventHandler(IJobSchedulerEventHandler val) {
+        eventHandler = val;
     }
 
     @Override
