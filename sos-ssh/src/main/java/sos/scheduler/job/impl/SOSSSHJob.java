@@ -582,11 +582,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             mapBackOptionsFromCS(handlerOptions);
         }
 
-        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || objOptions.commandScriptFile
-                .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty()) {
-            handlerOptions.protocol.setValue(TransferTypes.ssh.name());
-        } else {
+        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || (objOptions.commandScriptFile
+                .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty())) {
             handlerOptions.protocol.setValue(TransferTypes.sftp.name());
+        } else {
+            handlerOptions.protocol.setValue(TransferTypes.ssh.name());
         }
     }
 
