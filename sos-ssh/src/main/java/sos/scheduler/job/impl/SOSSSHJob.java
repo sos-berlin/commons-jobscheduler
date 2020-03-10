@@ -20,11 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
+import com.sos.VirtualFileSystem.common.SOSShellInfo;
+import com.sos.VirtualFileSystem.common.SOSShellInfo.Shell;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.exception.SOSSSHAutoDetectionException;
 
@@ -56,15 +57,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     private SOSVfsSFtpJCraft handler;
     private SOSConnection2OptionsAlternate handlerOptions;
-    private SOSVfsEnv envVars = new SOSVfsEnv();
-    private Future<Void> commandExecution;
 
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map<String, String> schedulerEnvVars;
     private List<String> tempFilesToDelete = new ArrayList<String>();
     private StringBuilder stdout;
     private StringBuilder stderr;
-    private String[] commands = {};
 
     private String tempFileName;
     private String resolvedTempFileName;
@@ -82,15 +80,14 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         clearOutput();
 
         handler.setJSJobUtilites(objJSJobUtilities);
-        String executedCommand = "";
-        ExecutorService executorService = null;
-        Future<Void> sendSignalExecution = null;
+
         try {
             connect();
 
             // first check if windows is running on the remote host
             checkOsAndShell();
-            isWindowsShell = handler.remoteIsWindowsShell();
+
+            String[] commands = {};
             if (objOptions.command.isNotEmpty()) {
                 commands = objOptions.command.values();
             } else {
@@ -99,6 +96,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     String commandScript = objOptions.commandScript.getValue();
                     if (objOptions.commandScript.IsEmpty()) {
                         commandScript = objOptions.commandScriptFile.getJSFile().file2String();
+                        LOGGER.info(String.format("[command_script_file]%s", objOptions.commandScriptFile.getValue()));
                     }
                     commandScript = objJSJobUtilities.replaceSchedulerVars(commandScript);
                     commands[0] = handler.createScriptFile(commandScript);
@@ -108,117 +106,79 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     throw new SSHMissingCommandError("neither commands nor script(file) specified");
                 }
             }
+
+            handler.setSimulateShell(objOptions.simulateShell.value());
+
+            SOSVfsEnv envVars = new SOSVfsEnv();
             envVars.setGlobalEnvs(new HashMap<String, String>());
             envVars.setLocalEnvs(new HashMap<String, String>());
-            setReturnValuesEnvVar();
+            setReturnValuesEnvVar(envVars);
+
+            LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
+
             for (String cmd : commands) {
-                executedCommand = cmd;
-                LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
                 String preCommand = null;
                 if (objOptions.createEnvironmentVariables.value()) {
                     if (objOptions.autoDetectOS.value()) {
-                        setSOSVfsEnvs();
+                        setSOSVfsEnvs(envVars, isWindowsShell);
                     } else if (objOptions.postCommandDelete.getValue().contains("del")) {
-                        final boolean oldFlg = isWindowsShell;
-                        isWindowsShell = true;
-                        setSOSVfsEnvs();
+                        setSOSVfsEnvs(envVars, true);
                         // only if autoDetectOS is false flgIsWindowsShell is not trustworthy when callingsetReturnValuesEnvVar();
                         // we have to set the env var explicitely here
                         envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
-                        isWindowsShell = oldFlg;
                     } else {
                         preCommand = getPreCommand();
                     }
                 }
+
+                ExecutorService executorService = null;
+                Future<Void> commandExecution = null;
+                Future<Void> sendSignalExecution = null;
+                Exception exception = null;
                 try {
                     cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
-                    LOGGER.info(String.format("executing remote command: %s", cmd));
-                    handler.setSimulateShell(objOptions.simulateShell.value());
-                    executorService = Executors.newFixedThreadPool(2);
-                    String completeCommand = null;
-                    if (objOptions.autoDetectOS.value()) {
-                        completeCommand = cmd;
-                    } else {
+                    if (!objOptions.autoDetectOS.value()) {
                         if (preCommand != null) {
-                            completeCommand = preCommand + cmd;
-                        } else {
-                            completeCommand = cmd;
+                            cmd = preCommand + cmd;
                         }
                     }
-                    final String cmdToExecute = completeCommand;
-                    Callable<Void> runCompleteCmd = new Callable<Void>() {
 
-                        @Override
-                        public Void call() throws Exception {
-                            LOGGER.debug("***** Command Execution started! *****");
-                            if (objOptions.autoDetectOS.value()) {
-                                handler.executeCommand(cmdToExecute, envVars);
-                            } else if (objOptions.postCommandDelete.getValue().contains("del")) {
-                                handler.executeCommand(cmdToExecute, envVars);
-                            } else {
-                                handler.executeCommand(cmdToExecute);
-                            }
-                            LOGGER.debug("***** Command Execution finished! *****");
-                            return null;
-                        }
-                    };
+                    executorService = Executors.newFixedThreadPool(2);
+                    commandExecution = executeCommand(executorService, cmd, envVars);
+                    sendSignalExecution = sendSignalCommand(executorService, commandExecution);
 
-                    commandExecution = executorService.submit(runCompleteCmd);
-                    Callable<Void> sendSignal = new Callable<Void>() {
-
-                        @Override
-                        public Void call() throws Exception {
-                            try {
-                                Thread.sleep(1_000);
-                            } catch (InterruptedException e) {
-                            }
-                            while (!commandExecution.isDone()) {
-                                for (int i = 0; i < 10; i++) {
-                                    try {
-                                        Thread.sleep(100);
-                                    } catch (InterruptedException e) {
-                                    }
-                                }
-                                handler.getChannelExec().sendSignal("CONT");
-                            }
-                            return null;
-                        }
-                    };
-                    sendSignalExecution = executorService.submit(sendSignal);
                     // wait until command execution is finished
                     commandExecution.get();
                     objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, "0");
-                    addStdOut();
-                    checkStdErr();
-                    checkExitCode();
-                    changeExitSignal();
+
                 } catch (Exception e) {
-                    addStdOut();
-                    checkStdErr();
-                    checkExitCode();
-                    changeExitSignal();
-                    if (objOptions.raiseExceptionOnError.value()) {
-                        if (objOptions.ignoreError.value()) {
-                            if (objOptions.ignoreStderr.value()) {
-                                LOGGER.debug(stackTrace2String(e));
-                            } else {
-                                LOGGER.error(stackTrace2String(e));
-                                throw new SSHExecutionError("Exception raised: " + e, e);
-                            }
-                        } else {
-                            LOGGER.error(stackTrace2String(e));
-                            throw new SSHExecutionError("Exception raised: " + e, e);
-                        }
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format("[%s]%s", cmd, e.toString()), e);
                     }
+                    exception = e;
                 } finally {
-                    if (executorService != null) {
-                        if (commandExecution != null) {
-                            commandExecution.cancel(true);
+                    close(executorService, commandExecution, sendSignalExecution);
+
+                    try {
+                        addStdOut();
+                        checkStdErr();
+                        checkExitCode();
+                        changeExitSignal();
+
+                    } catch (Exception ex) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug(String.format("[%s]%s", cmd, ex.toString()), ex);
                         }
-                        if (sendSignalExecution != null) {
-                            sendSignalExecution.cancel(true);
+                        exception = ex;
+                    }
+
+                    if (exception != null && objOptions.raiseExceptionOnError.value()) {
+                        if (!objOptions.ignoreError.value()) {
+                            throw new SSHExecutionError(String.format("[%s]%s", cmd, exception.toString()), exception);
                         }
-                        executorService.shutdownNow();
+                        if (!objOptions.ignoreStderr.value()) {
+                            throw new SSHExecutionError(String.format("[%s]%s", cmd, exception.toString()), exception);
+                        }
                     }
                 }
             }
@@ -227,15 +187,9 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
-                String msg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"" + e.getMessage() + " " + e
-                        .getCause();
+                String msg = "SOS-SSH-E-120: error occurred processing ssh command: " + e.getMessage() + " " + e.getCause();
                 if (objOptions.ignoreError.value()) {
-                    if (objOptions.ignoreStderr.value()) {
-                        LOGGER.debug(stackTrace2String(e));
-                    } else {
-                        LOGGER.error(stackTrace2String(e));
-                        throw new SSHExecutionError(msg, e);
-                    }
+                    LOGGER.debug(stackTrace2String(e));
                 } else {
                     LOGGER.error(msg, e);
                     throw new SSHExecutionError(msg, e);
@@ -246,35 +200,99 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
             handler.resetStdOut();
             handler.resetStdErr();
+        }
 
-            if (executorService != null) {
+    }
+
+    private Future<Void> executeCommand(ExecutorService executor, String cmd, SOSVfsEnv envVars) throws Exception {
+        Callable<Void> runCompleteCmd = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                LOGGER.debug("***** Command Execution started! *****:" + cmd);
+                if (objOptions.autoDetectOS.value()) {
+                    handler.executeCommand(cmd, envVars);
+                } else if (objOptions.postCommandDelete.getValue().contains("del")) {
+                    handler.executeCommand(cmd, envVars);
+                } else {
+                    handler.executeCommand(cmd);
+                }
+                LOGGER.debug("***** Command Execution finished! *****");
+                return null;
+            }
+        };
+        return executor.submit(runCompleteCmd);
+    }
+
+    private Future<Void> sendSignalCommand(ExecutorService executor, Future<Void> commandExecution) {
+        Callable<Void> sendSignal = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    Thread.sleep(1_000);
+                } catch (InterruptedException e) {
+                }
+                while (!commandExecution.isDone()) {
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    try {
+                        if (handler.getChannelExec() != null) {
+                            if (handler.getChannelExec().isConnected()) {
+                                handler.getChannelExec().sendSignal("CONT");
+                                LOGGER.trace("send signal CONT");
+                            } else {
+                                LOGGER.trace("[send signal CONT][skip]channel not connected");
+                                return null;
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.warn(String.format("[send signal CONT]%s", e.toString()), e);
+                    }
+                }
+                return null;
+            }
+        };
+        return executor.submit(sendSignal);
+    }
+
+    private void close(ExecutorService executor, Future<Void> commandExecution, Future<Void> sendSignalExecution) {
+        try {
+            if (executor != null) {
                 if (commandExecution != null) {
                     commandExecution.cancel(true);
                 }
                 if (sendSignalExecution != null) {
                     sendSignalExecution.cancel(true);
                 }
-                executorService.shutdownNow();
+                executor.shutdownNow();
             }
+        } catch (Throwable e) {
+            LOGGER.warn(e.toString(), e);
         }
-
     }
 
     public void connect() {
         try {
-            if (!handler.isConnected()) {
-                if (handlerOptions == null) {
-                    setHandlerOptions(objOptions);
-                    handlerOptions.checkMandatory();
+            if (handlerOptions == null) {
+                setHandlerOptions(objOptions);
+                handlerOptions.checkMandatory();
+            } else {
+                if (handler.isConnected()) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("handler connected");
+                    }
+                    return;
                 }
-                handler.connect(handlerOptions);
-                handler.authenticate(handlerOptions);
-
-                isWindowsShell = handler.remoteIsWindowsShell();
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(String.format("handler connection established. isWindowsShell=%s", isWindowsShell));
-                }
+            }
+            handler.connect(handlerOptions);
+            handler.authenticate(handlerOptions);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("handler connection established");
             }
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.toString(), e);
@@ -286,10 +304,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (handler.isConnected()) {
             try {
                 handler.disconnect();
-                LOGGER.debug("***** handler disconnected! *****");
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
+        } else {
+            LOGGER.info("not connected, logout useless");
         }
     }
 
@@ -309,11 +328,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     public void checkStdErr() {
-        try {
-            stderr.append(handler.getStdErr());
-        } catch (Exception e) {
-            throw new JobSchedulerException(e.getMessage(), e);
-        }
+        stderr.append(handler.getStdErr());
+
         if (stderr.length() > 0) {
             if (objOptions.ignoreStderr.value()) {
                 LOGGER.info("[output to stderr is ignored]" + stderr);
@@ -413,7 +429,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         return strb.toString();
     }
 
-    private void setReturnValuesEnvVar() {
+    private void setReturnValuesEnvVar(SOSVfsEnv envVars) {
         resolvedTempFileName = null;
         if (objOptions.tempDirectory.isDirty()) {
             resolvedTempFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), tempFileName);
@@ -430,7 +446,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    private void setSOSVfsEnvs() {
+    private void setSOSVfsEnvs(SOSVfsEnv envVars, boolean isWindowsShell) {
         if (schedulerEnvVars != null) {
             for (Object key : schedulerEnvVars.keySet()) {
                 if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
@@ -468,7 +484,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void deleteTempFiles() {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String file : tempFilesToDelete) {
-                LOGGER.debug("file to delete: " + file);
+                LOGGER.debug("[deleteTempFiles]" + file);
 
                 String cmd = null;
                 if (objOptions.postCommandDelete.isDirty()) {
@@ -481,7 +497,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     }
                 }
                 try {
-                    LOGGER.debug("cmd: " + cmd);
+                    LOGGER.debug("[deleteTempFiles]" + cmd);
                     handler.executeResultCommand(cmd);
                 } catch (Exception e) {
                     LOGGER.error(String.format("error ocurred deleting %1$s: ", file), e);
@@ -510,7 +526,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             connect();
             deleteTempFiles();
 
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[postCommandRead]%s", postCommandRead));
+            }
+
             SOSCommandResult result = handler.executeResultCommand(postCommandRead);
+
             if (result.getExitCode() == 0) {
                 if (!result.getStdOut().toString().isEmpty()) {
                     BufferedReader reader = new BufferedReader(new StringReader(new String(result.getStdOut())));
@@ -538,15 +559,13 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     }
 
                     connect();
-                    SOSCommandResult deleteResult = handler.executeResultCommand(postCommandDelete);
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(String.format("[delete result][exitCode=%s][stdOut=%s][stdErr]", deleteResult.getExitCode(), deleteResult
-                                .getStdOut(), deleteResult.getStdErr()));
-                    }
+                    handler.executeResultCommand(postCommandDelete);
                 }
             }
         } catch (Exception e) {
             // prevent Exception to show in case of postCommandDelete errors
+            LOGGER.warn(e.toString(), e);
+
         }
     }
 
@@ -619,74 +638,37 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     private void checkOsAndShell() throws SOSSSHAutoDetectionException {
-        String cmdToExecute = "uname";
         LOGGER.info("*** Checking for remote Operating System and shell! ***");
         boolean forceAutoDetection = objOptions.autoDetectOS.value();
         if (!forceAutoDetection) {
             LOGGER.info("*** parameter 'auto_detect_os' was set to 'false', only checking without setting commands automatically! ***");
         }
-        StringBuilder strb = new StringBuilder();
-        strb.append("Can´t detect OS and shell automatically!\r\n");
-        strb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
-        strb.append("preCommand, postCommandRead and postCommandDelete according to your remote shell!\r\n");
-        strb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
-        SOSCommandResult commandResult = null;
-        try {
-            commandResult = handler.executeResultCommand(cmdToExecute);
-            if (commandResult.getExitCode() == 0) {
-                // command uname was execute successfully -> OS is Unix like
-                if (commandResult.getStdOut().toString().toLowerCase().contains("linux") || commandResult.getStdOut().toString().toLowerCase()
-                        .contains("darwin") || commandResult.getStdOut().toString().toLowerCase().contains("aix") || commandResult.getStdOut()
-                                .toString().toLowerCase().contains("hp-ux") || commandResult.getStdOut().toString().toLowerCase().contains("solaris")
-                        || commandResult.getStdOut().toString().toLowerCase().contains("sunos") || commandResult.getStdOut().toString().toLowerCase()
-                                .contains("freebsd")) {
-                    if (forceAutoDetection) {
-                        isWindowsShell = false;
-                    }
-                    LOGGER.info("*** Command uname was executed successfully, remote OS and shell are Unix like! ***");
-                } else if (commandResult.getStdOut().toString().toLowerCase().contains("cygwin")) {
-                    // OS is Windows but shell is Unix like
-                    // unix commands have to be used
-                    LOGGER.info("*** Command uname was executed successfully, remote OS is Windows with cygwin and shell is Unix like! ***");
-                    if (forceAutoDetection) {
-                        isWindowsShell = false;
-                    }
-                } else {
-                    LOGGER.info("*** Command uname was executed successfully, but the remote OS was not determined, Unix like shell is assumed! ***");
-                    if (forceAutoDetection) {
-                        isWindowsShell = false;
-                    }
-                }
-            } else if (commandResult.getExitCode() == 9009 || commandResult.getExitCode() == 1) {
-                // call of uname under Windows OS delivers exit code 9009 or exit code 1 and target shell cmd.exe
-                // the exit code depends on the remote SSH implementation
-                if (forceAutoDetection) {
-                    isWindowsShell = true;
-                }
-                LOGGER.info("*** execute Command uname failed with exit code 1 or 9009, remote OS is Windows with cmd shell! ***");
-            } else if (commandResult.getExitCode() == 127) {
-                // call of uname under Windows OS with CopSSH (cygwin) and target shell /bin/bash delivers exit code 127
-                // command uname is not installed by default through CopSSH installation
-                LOGGER.info("*** execute Command uname failed with exit code 127, remote OS is Windows with cygwin and shell is Unix like! ***");
-                if (forceAutoDetection) {
-                    isWindowsShell = false;
-                }
-            } else {
-                if (forceAutoDetection) {
-                    throw new SOSSSHAutoDetectionException(strb.toString());
-                } else {
-                    isWindowsShell = false;
-                    LOGGER.info(strb.toString());
-                }
-            }
-        } catch (Exception e) {
+        SOSShellInfo info = handler.getShellInfo();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Can´t detect OS and shell automatically!\r\n");
+        sb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
+        sb.append("preCommand, postCommandRead and postCommandDelete according to your remote shell!\r\n");
+        sb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
+
+        if (info.getCommandError() != null) {
+            sb.append("\r\n").append(info.getCommandError().toString());
             if (forceAutoDetection) {
-                throw new SOSSSHAutoDetectionException(strb.toString());
-            } else {
-                isWindowsShell = false;
-                LOGGER.error(strb.toString(), e);
+                throw new SOSSSHAutoDetectionException(sb.toString(), info.getCommandError());
             }
+            info.setShell(Shell.UNIX);
+        } else if (info.getShell().equals(Shell.UNKNOWN)) {
+            if (forceAutoDetection) {
+                throw new SOSSSHAutoDetectionException(sb.toString());
+            } else {
+                LOGGER.info(sb.toString());
+            }
+            info.setShell(Shell.UNIX);
+        } else {
+            LOGGER.info(info.toString());
         }
+
+        isWindowsShell = info.getShell().equals(Shell.WINDOWS);
     }
 
     public List<Integer> getParamPids() {

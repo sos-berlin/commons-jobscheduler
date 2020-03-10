@@ -481,11 +481,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public boolean remoteIsWindowsShell() {
-        return false;
-    }
-
-    @Override
     public ISOSVirtualFile getFileHandle(final String filename) {
         return null;
     }
@@ -669,19 +664,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public String createScriptFile(final String content) throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
     public Integer getExitCode() {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public String getExitSignal() {
         notImplemented();
         return null;
     }

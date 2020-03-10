@@ -316,18 +316,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public String createScriptFile(final String pstrContent) throws Exception {
-        return EMPTY_STRING;
-    }
-
-    @Override
     public Integer getExitCode() {
         return 0;
-    }
-
-    @Override
-    public String getExitSignal() {
-        return EMPTY_STRING;
     }
 
     @Override
@@ -338,11 +328,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     @Override
     public StringBuilder getStdOut() {
         return new StringBuilder();
-    }
-
-    @Override
-    public boolean remoteIsWindowsShell() {
-        return false;
     }
 
     @Override
