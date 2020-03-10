@@ -1362,11 +1362,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public boolean remoteIsWindowsShell() {
-        return false;
-    }
-
-    @Override
     public void openInputFile(final String fileName) {
         //
     }
@@ -1405,7 +1400,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public void write(final byte[] buffer, final int offset, final int length) {
         //
     }
-  
+
     @Override
     public final ISOSSession openSession(final ISOSShellOptions options) throws Exception {
         notImplemented();
@@ -1428,12 +1423,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public StringBuilder getStdErr(){
+    public StringBuilder getStdErr() {
         return new StringBuilder();
     }
 
     @Override
-    public StringBuilder getStdOut(){
+    public StringBuilder getStdOut() {
         return new StringBuilder();
     }
 
@@ -1448,19 +1443,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public String createScriptFile(final String content) throws Exception {
-        notImplemented();
-        return null;
-    }
-
-    @Override
     public Integer getExitCode() {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public String getExitSignal() {
         notImplemented();
         return null;
     }

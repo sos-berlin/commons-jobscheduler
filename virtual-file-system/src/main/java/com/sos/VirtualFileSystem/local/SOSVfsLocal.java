@@ -107,11 +107,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String createScriptFile(final String pstrContent) throws Exception {
-        return EMPTY_STRING;
-    }
-
-    @Override
     public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
         File file = new File(pathname);
         file.delete();
@@ -165,11 +160,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     @Override
     public Integer getExitCode() {
         return 0;
-    }
-
-    @Override
-    public String getExitSignal() {
-        return EMPTY_STRING;
     }
 
     @Override
