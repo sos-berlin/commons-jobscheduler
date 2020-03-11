@@ -230,8 +230,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (isDebugEnabled) {
             LOGGER.debug("nop logout");
         }
-                    LOGGER.debug("not connected, logout useless.");
-                }
     }
 
     @Override
