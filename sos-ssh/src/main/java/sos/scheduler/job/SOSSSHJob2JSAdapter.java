@@ -1,7 +1,5 @@
 package sos.scheduler.job;
 
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,7 +43,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            LOGGER.error(stackTrace2String(e));
+            LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -226,7 +224,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 

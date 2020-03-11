@@ -175,8 +175,6 @@ public class JSToolBox extends JSListenerClass {
         String strT = "";
         if (!pstrDate.isEmpty() && !pstrTime.isEmpty()) {
             try {
-                long lngTemp = Integer.parseInt(pstrDate);
-                lngTemp = Integer.parseInt(pstrTime);
                 strD = pstrDate.substring(0, 3 + 1) + "-" + pstrDate.substring(4, 5 + 1) + "-" + pstrDate.substring(6, 7 + 1) + "T";
                 strT = pstrTime.substring(0, 1 + 1) + ":" + pstrTime.substring(2, 3 + 1) + ":" + pstrTime.substring(4, 5 + 1);
             } catch (final RuntimeException e) {
@@ -302,15 +300,6 @@ public class JSToolBox extends JSListenerClass {
 
     public void raiseJSException(final String pstrExceptionText) throws Exception {
         throw new JobSchedulerException(pstrExceptionText);
-    }
-
-    public String stackTrace2String(final Exception e) {
-        String strT = e.getMessage() + "\n";
-        final StackTraceElement arrStack[] = e.getStackTrace();
-        for (final StackTraceElement objS : arrStack) {
-            strT += objS.toString() + "\n";
-        }
-        return strT;
     }
 
     public static void notImplemented() {

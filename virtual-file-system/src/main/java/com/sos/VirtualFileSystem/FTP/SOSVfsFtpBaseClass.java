@@ -147,7 +147,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 int altPort = port = connectionOptions.getAlternativePort().value();
                 if (isNotEmpty(altHost) && altPort > 0) {
                     try {
-                        JobSchedulerException.gflgStackTracePrinted = false;
                         connect(altHost, altPort);
                     } catch (Exception e1) {
                         LOGGER.info(SOSVfs_E_0107.params(host, port, e1.getMessage()));

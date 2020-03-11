@@ -68,7 +68,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     public String file2String() {
         InputStream is = this.getFileInputStream();
         if (is == null) {
-            throw new JobSchedulerException(SOSVfs_E_177);
+            throw new JobSchedulerException("input stream is null");
         }
         StringBuilder sb = new StringBuilder((int) this.getFileSize());
         byte[] buffer = new byte[1024];

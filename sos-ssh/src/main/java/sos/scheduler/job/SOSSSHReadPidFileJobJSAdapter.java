@@ -24,7 +24,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            LOGGER.error(stackTrace2String(e));
+            LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -32,7 +32,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
 
     private void doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getParameters());
+        allParams.putAll(getJobOrOrderParameters());
         SOSSSHJobOptions options = null;
         try {
             SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob();
@@ -50,13 +50,11 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
             if (options != null && options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        LOGGER.debug(stackTrace2String(e));
+                        LOGGER.debug(e.toString(), e);
                     } else {
-                        LOGGER.error(stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    LOGGER.error(stackTrace2String(e), e);
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }

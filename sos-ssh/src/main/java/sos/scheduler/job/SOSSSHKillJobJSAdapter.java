@@ -32,7 +32,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
             super.spooler_process();
             successfull = doProcessing();
         } catch (Exception e) {
-            LOGGER.error(stackTrace2String(e));
+            LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
         if (successfull) {

@@ -63,13 +63,11 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                 if (objOptions.raiseExceptionOnError.value()) {
                     if (objOptions.ignoreError.value()) {
                         if (objOptions.ignoreStderr.value()) {
-                            LOGGER.debug(stackTrace2String(e));
+                            LOGGER.debug(e.toString(), e);
                         } else {
-                            LOGGER.error(stackTrace2String(e));
                             throw new SSHExecutionError(e.toString(), e);
                         }
                     } else {
-                        LOGGER.error(stackTrace2String(e));
                         throw new SSHExecutionError(e.toString(), e);
                     }
                 }
@@ -87,11 +85,9 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                     if (objOptions.ignoreStderr.value()) {
                         LOGGER.debug(e.toString(), e);
                     } else {
-                        LOGGER.error(e.toString(), e);
                         throw new SSHExecutionError(e.toString(), e);
                     }
                 } else {
-                    LOGGER.error(e.toString(), e);
                     throw new SSHExecutionError(e.toString(), e);
                 }
             }
