@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
@@ -166,17 +167,20 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                         changeExitSignal();
 
                     } catch (Exception ex) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug(String.format("[%s]%s", cmd, ex.toString()), ex);
-                        }
                         exception = ex;
                     }
 
                     if (exception != null && objOptions.raiseExceptionOnError.value()) {
                         if (!objOptions.ignoreError.value()) {
+                            if (exception instanceof JobSchedulerException) {
+                                throw exception;
+                            }
                             throw new SSHExecutionError(String.format("[%s]%s", cmd, exception.toString()), exception);
                         }
                         if (!objOptions.ignoreStderr.value()) {
+                            if (exception instanceof JobSchedulerException) {
+                                throw exception;
+                            }
                             throw new SSHExecutionError(String.format("[%s]%s", cmd, exception.toString()), exception);
                         }
                     }
@@ -187,12 +191,15 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
-                String msg = "SOS-SSH-E-120: error occurred processing ssh command: " + e.getMessage() + " " + e.getCause();
                 if (objOptions.ignoreError.value()) {
-                    LOGGER.debug(stackTrace2String(e));
+                    LOGGER.debug(e.toString(), e);
                 } else {
-                    LOGGER.error(msg, e);
-                    throw new SSHExecutionError(msg, e);
+                    if (e instanceof JobSchedulerException) {
+                        throw e;
+                    } else {
+                        String msg = "SOS-SSH-E-120: error occurred processing ssh command: " + e.getMessage() + " " + e.getCause();
+                        throw new SSHExecutionError(msg, e);
+                    }
                 }
             }
         } finally {
@@ -330,14 +337,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void checkStdErr() {
         stderr.append(handler.getStdErr());
 
-        if (stderr.length() > 0) {
-            if (objOptions.ignoreStderr.value()) {
-                LOGGER.info("[output to stderr is ignored]" + stderr);
-            } else {
-                String msg = "[remote execution reports error]" + stderr;
-                LOGGER.error(msg);
-                if (objOptions.raiseExceptionOnError.value()) {
-                    throw new SSHExecutionError(msg);
+        if (objOptions.raiseExceptionOnError.value()) {
+            if (stderr.length() > 0) {
+                if (objOptions.ignoreStderr.value()) {
+                    LOGGER.info("output to stderr is ignored");
+                } else {
+                    throw new SSHExecutionError(stderr.toString());
                 }
             }
         }
@@ -355,20 +360,9 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
                     objJSJobUtilities.setJSParam("exit_code_ignored", "true");
                 } else {
-                    if (objOptions.raiseExceptionOnError.value()) {
-                        if (stdout.length() > 0) {
-                            LOGGER.info(stdout.toString());
-                        }
-                    }
-                    String msg = "SOS-SSH-E-150: remote command terminated with exit code: " + exitCode;
                     objJSJobUtilities.setCC(exitCode);
                     if (objOptions.raiseExceptionOnError.isTrue()) {
-                        if (objOptions.ignoreError.value()) {
-                            LOGGER.info(msg);
-                        } else {
-                            LOGGER.error(msg);
-                        }
-                        throw new SSHExecutionError(msg);
+                        throw new SSHExecutionError("SOS-SSH-E-150: remote command terminated with exit code: " + exitCode);
                     }
                 }
             }

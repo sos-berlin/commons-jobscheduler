@@ -1,12 +1,10 @@
 package com.sos.JSHelper.Exceptions;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.SOSMsgJsh;
 
-/** @author KB */
 public class ParametersMissingButRequiredException extends JobSchedulerException {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParametersMissingButRequiredException.class);
@@ -14,11 +12,7 @@ public class ParametersMissingButRequiredException extends JobSchedulerException
 
     public ParametersMissingButRequiredException(final String pstrApplSystem, final String pstrApplDocuUrl) {
         super(new SOSMsgJsh("SOSVfs_E_278").getFullMessage(pstrApplSystem, pstrApplDocuUrl));
-        this.setStatus(JobSchedulerException.ERROR);
-        this.setCategory(CategoryOptions);
-        this.setType(TypeOptionMissing);
-        this.eMailSubject(this.getMessage());
-        LOGGER.error(this.getExceptionText());
+        LOGGER.error(getExceptionText());
     }
 
 }

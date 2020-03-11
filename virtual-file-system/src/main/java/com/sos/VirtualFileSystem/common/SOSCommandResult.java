@@ -33,8 +33,8 @@ public class SOSCommandResult {
     public String toString() {
         StringBuilder sb = new StringBuilder("[").append(_command).append("]");
         sb.append("[exitCode=").append(_exitCode).append("]");
-        sb.append("[stdOut=").append(_stdOut.toString().trim()).append("]");
-        sb.append("[stdErr=").append(_stdErr.toString().trim()).append("]");
+        sb.append("[std:out=").append(_stdOut.toString().trim()).append("]");
+        sb.append("[std:err=").append(_stdErr.toString().trim()).append("]");
         return sb.toString();
     }
 }

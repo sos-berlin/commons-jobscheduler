@@ -151,7 +151,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
             parameterSubstitutor = null;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(e.toString()), e);
         }
         return schedulerParameters;
     }
@@ -175,7 +175,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(e.toString()), e);
         }
     }
 
@@ -232,7 +232,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public HashMap<String, String> getParameters() {
         return getJobOrOrderParameters();
     }
-    
 
     @Deprecated
     private Order getOrder() {
@@ -259,8 +258,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public void setJSParam(final String pstrKey, final String pstrValue) {
         Variable_set taskParams = spooler_task.params();
-        
-        HashMap<String,String> params = getTaskParams(taskParams);
+
+        HashMap<String, String> params = getTaskParams(taskParams);
         if (params != null) {
             params.put(pstrKey, pstrValue);
         }
@@ -277,14 +276,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             schedulerParameters.put(pstrKey, pstrValue);
         }
     }
-    
+
     public HashMap<String, String> getTaskParams(Variable_set schedulerTaskParams) {
         if (taskParams == null) {
             taskParams = convertVariableSet2HashMap(schedulerTaskParams);
         }
         return taskParams;
     }
-    
 
     @Override
     public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
@@ -325,18 +323,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
         }
         return resultString;
-    }
-
-    public String stackTrace2String(final Exception e) {
-        if (isNotNull(e)) {
-            StringBuilder sb = new StringBuilder(e.getMessage()).append("\n");
-            final StackTraceElement stacks[] = e.getStackTrace();
-            for (final StackTraceElement stack : stacks) {
-                sb.append(stack.toString()).append("\n");
-            }
-            return sb.toString();
-        }
-        return null;
     }
 
     protected JSJobUtilities getJSJobUtilities() {
@@ -409,7 +395,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private boolean isJobchain() {
         return isNotNull(getOrder());
     }
-    
 
     public boolean isNotNull(final Object pobjObject) {
         return pobjObject != null;

@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import org.jurr.jsch.bugfix111.JSCH111BugFix;
+import org.omg.CosNaming.IstringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,8 +92,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private StringBuilder stdOut;
     private StringBuilder stdErr;
 
-    // private boolean isWindowsShell = false;
-    // private boolean isShellChecked = false;
     private SOSShellInfo shellInfo = null;
     private boolean simulateShell = false;
 
@@ -228,18 +227,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void logout() {
-        try {
-
-            if (sshSession != null && sshSession.isConnected()) {
-                sshSession.disconnect();
-                if (isDebugEnabled) {
-                    LOGGER.debug(SOSVfs_D_138.params(host, getReplyString()));
-                }
-            } else {
-                LOGGER.info("not connected, logout useless.");
-            }
-        } catch (Exception e) {
-            LOGGER.warn(SOSVfs_W_140.get() + e.toString(), e);
+        if (isDebugEnabled) {
+            LOGGER.debug("nop logout");
         }
     }
 
@@ -523,9 +512,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void executeCommand(String cmd, SOSVfsEnv env) {
-        getShellInfo();
-
-        cmd = cmd.trim();
         channelExec = null;
         exitCode = null;
         InputStream out = null;
@@ -539,7 +525,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             channelExec.setPty(isSimulateShell());
             StringBuilder envs = new StringBuilder();
             if (env != null) {
-                if (env.getGlobalEnvs() != null) {
+                if (env.getGlobalEnvs() != null && env.getGlobalEnvs().size() > 0) {
                     if (isDebugEnabled) {
                         LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
                     }
@@ -547,7 +533,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                         channelExec.setEnv(k, v);
                     });
                 }
-                if (env.getLocalEnvs() != null) {
+                if (env.getLocalEnvs() != null && env.getLocalEnvs().size() > 0) {
+                    getShellInfo();
+
                     env.getLocalEnvs().forEach((k, v) -> {
                         if (shellInfo.getShell().equals(Shell.WINDOWS)) {
                             envs.append(String.format("set %s=%s&", k, v));
@@ -560,7 +548,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     }
                 }
             }
-            cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
+            cmd = cmd.trim().replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
             if (envs.length() > 0) {
                 channelExec.setCommand(envs.toString() + cmd);
             } else {
@@ -593,7 +581,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             boolean isErrorExitCode = exitCode != null && !exitCode.equals(new Integer(0));
             if (!isErrorExitCode && stdOut.length() > 0) {
-                LOGGER.info(String.format("[%s][stdout]%s", cmd, stdOut.toString().trim()));
+                LOGGER.info(String.format("[%s][std:out]%s", cmd, stdOut.toString().trim()));
             }
             errReader = new BufferedReader(new InputStreamReader(err));
             stdErr = new StringBuilder();
@@ -607,16 +595,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             if (isErrorExitCode) {
                 StringBuffer msg = new StringBuffer("[" + cmd + "]");
                 if (stdOut.length() > 0) {
-                    msg.append("[stdout=" + stdOut.toString().trim() + "]");
+                    msg.append("[std:out=" + stdOut.toString().trim() + "]");
                 }
                 if (stdErr.length() > 0) {
-                    msg.append("[stderr=" + stdErr.toString().trim() + "]");
+                    msg.append("[std:err=" + stdErr.toString().trim() + "]");
                 }
                 msg.append("remote command terminated with the exit code " + exitCode.toString());
                 throw new JobSchedulerException(msg.toString());
             } else {
                 if (stdErr.length() > 0) {
-                    LOGGER.info(String.format("[%s][stderr]%s", cmd, stdErr.toString().trim()));
+                    LOGGER.info(String.format("[%s][std:err]%s", cmd, stdErr.toString().trim()));
                 }
             }
             reply = "OK";
@@ -1206,14 +1194,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             try {
                 info.setCommandResult(executeResultCommand(info.getCommand()));
 
-                String stdOut = info.getCommandResult().getStdOut().toString().toLowerCase();
                 switch (info.getCommandResult().getExitCode()) {
                 case 0:
-                    if (stdOut.contains("linux") || stdOut.contains("darwin") || stdOut.contains("aix") || stdOut.contains("hp-ux") || stdOut
-                            .contains("solaris") || stdOut.contains("sunos") || stdOut.contains("freebsd")) {
-                        info.setOS(info.getCommandResult().getStdOut().toString().trim());
+                    String stdOut = info.getCommandResult().getStdOut().toString().trim();
+                    if (stdOut.matches("(?i).*(linux|darwin|aix|hp-ux|solaris|sunos|freebsd).*")) {
+                        info.setOS(stdOut);
                         info.setShell(Shell.UNIX);
-                    } else if (stdOut.contains("cygwin")) {
+                    } else if (stdOut.matches("(?i).*cygwin.*")) {
                         // OS is Windows but shell is Unix like
                         // unix commands have to be used
                         info.setOS(OS.WINDOWS.name());

@@ -63,7 +63,6 @@ public class JSListenerClass implements JSListener {
         message(strT);
         if (expE != null) {
             expE.message(strS);
-            expE.setStatus(JobSchedulerException.ERROR);
             throw expE;
         }
     }
