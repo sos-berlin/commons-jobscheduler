@@ -6,7 +6,13 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
     private TransferTypes type = TransferTypes.local;
 
     public static enum TransferTypes {
-        local, sftp, ssh, ftp, ftps, http, https, webdav, smb, zip, mq, smtp, imap;
+        local(1), ftp(2), ftps(3), sftp(4), http(5), https(6), webdav(7), webdavs(8), smb(9), ssh(100), zip(200), mq(300), smtp(400), imap(500);
+
+        private final int numeric;
+
+        private TransferTypes(int val) {
+            numeric = val;
+        }
 
         public static String[] getArray() {
             String[] arr = new String[TransferTypes.values().length];
@@ -15,6 +21,10 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
                 arr[i++] = type.name();
             }
             return arr;
+        }
+
+        public int numeric() {
+            return numeric;
         }
     }
 
