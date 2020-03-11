@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -34,7 +33,6 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
     private static final String EXIT_CODE = "exit_code";
     private static final String EXIT_SIGNAL = "exit_signal";
 
-    private String pidFileName;
     private String envVarNamePrefix;
 
     @Override
@@ -90,9 +88,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
             LOGGER.trace("Run with watchdog set to: " + options.runWithWatchdog.getValue());
         }
         if (options.runWithWatchdog.value()) {
-            pidFileName = generateTempPidFileName();
-            job.setPidFileName(pidFileName);
-            createOrderForWatchdog();
+            createOrderForWatchdog(job);
         }
         job.execute();
         if (isOrderJob) {
@@ -104,7 +100,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         }
     }
 
-    private void createOrderForWatchdog() {
+    private void createOrderForWatchdog(SOSSSHJob job) {
         LOGGER.trace("createOrderForWatchdog started");
 
         Order order = spooler.create_order();
@@ -116,7 +112,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
             orderParams.merge(spooler_task.order().params());
         }
         orderParams.set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
-        orderParams.set_var(PARAM_PID_FILE_NAME_KEY, pidFileName);
+        orderParams.set_var(PARAM_PID_FILE_NAME_KEY, job.getPidFileName());
         orderParams.set_var(PARAM_SSH_JOB_NAME, spooler_job.name());
         order.set_at("now+15");
         Job_chain chain = null;
@@ -132,11 +128,6 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         chain.add_or_replace_order(order);
 
         LOGGER.trace("order send");
-    }
-
-    private String generateTempPidFileName() {
-        UUID uuid = UUID.randomUUID();
-        return "sos-ssh-pid-" + uuid + ".txt";
     }
 
     public Map<String, String> getSchedulerEnvironmentVariables() {

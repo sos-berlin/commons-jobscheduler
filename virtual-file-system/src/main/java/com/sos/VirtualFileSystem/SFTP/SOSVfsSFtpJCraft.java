@@ -1,7 +1,6 @@
 package com.sos.VirtualFileSystem.SFTP;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -299,7 +297,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    protected boolean fileExists(final String filename) {
+    public boolean fileExists(final String filename) {
         boolean result = false;
         SftpATTRS attributes = getAttributes(filename);
         if (attributes != null) {
@@ -463,19 +461,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public long putFile(final String localFile, final String remoteFile) {
-        try {
-            channelSftp.put(localFile, normalizePath(remoteFile), ChannelSftp.OVERWRITE);
-            reply = "put OK";
-            LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
-            return this.size(remoteFile);
-        } catch (Exception e) {
-            reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_185.params("putFile()", localFile, remoteFile), e);
-        }
-    }
-
-    @Override
     public void delete(final String path, boolean checkIsDirectory) {
         try {
             if (checkIsDirectory && this.isDirectory(path)) {
@@ -522,7 +507,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
             channelExec.setPty(isSimulateShell());
-            StringBuilder envs = new StringBuilder();
+            StringBuilder localEnvs = new StringBuilder();
             if (env != null) {
                 if (env.getGlobalEnvs() != null && env.getGlobalEnvs().size() > 0) {
                     if (isDebugEnabled) {
@@ -537,27 +522,29 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
                     env.getLocalEnvs().forEach((k, v) -> {
                         if (shellInfo.getShell().equals(Shell.WINDOWS)) {
-                            envs.append(String.format("set %s=%s&", k, v));
+                            localEnvs.append(String.format("set %s=%s&", k, v));
                         } else {
-                            envs.append(String.format("export \"%s=%s\";", k, v));
+                            localEnvs.append(String.format("export \"%s=%s\";", k, v));
                         }
                     });
                     if (isDebugEnabled) {
-                        LOGGER.debug(String.format("[set local envs]%s", envs));
+                        LOGGER.debug(String.format("[set local envs]%s", localEnvs));
                     }
                 }
             }
             cmd = cmd.trim().replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
-            if (envs.length() > 0) {
-                channelExec.setCommand(envs.toString() + cmd);
-            } else {
-                channelExec.setCommand(cmd);
+            if (localEnvs.length() > 0) {
+                cmd = localEnvs.toString() + cmd;
             }
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[cmd]%s", cmd));
+            }
+            channelExec.setCommand(cmd);
             channelExec.setInputStream(null);
             channelExec.setErrStream(null);
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
-            channelExec.connect();
+            channelExec.connect(channelConnectTimeout);
             stdOut = new StringBuilder();
             byte[] tmp = new byte[1024];
             while (true) {
@@ -1142,48 +1129,29 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return exitSignal;
     }
 
-    public String createScriptFile(String content) throws Exception {
-        getShellInfo();
-
+    @Override
+    public long putFile(final String source, final String target) {
         try {
-            String commandScript = content;
-            if (!shellInfo.getShell().equals(Shell.WINDOWS)) {
-                commandScript = commandScript.replaceAll("(?m)\r", "");
+            channelSftp.put(source, normalizePath(target), ChannelSftp.OVERWRITE);
+            reply = "put OK";
+            LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", source, target, getReplyString())));
+
+            long size = size(target);
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[put][%s]size=%s", target, size));
             }
-            LOGGER.debug(SOSVfs_I_233.params(content));
-            File tempScriptFile = File.createTempFile("sos-sshscript", getScriptFileNameSuffix());
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempScriptFile)));
-            out.write(commandScript);
-            out.flush();
-            out.close();
-            tempScriptFile.deleteOnExit();
-            putFile(tempScriptFile, 0700);
-            String name = tempScriptFile.getName();
-            if (!shellInfo.getShell().equals(Shell.WINDOWS)) {
-                name = "./" + name;
-            }
-            LOGGER.info(SOSVfs_I_253.params(tempScriptFile.getAbsolutePath()));
-            return name;
+            return size;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw e;
+            reply = e.toString();
+            throw new JobSchedulerException(SOSVfs_E_185.params("putFile()", source, target), e);
         }
     }
 
-    private String getScriptFileNameSuffix() {
-        getShellInfo();
-        if (shellInfo.getShell().equals(Shell.WINDOWS)) {
-            return ".cmd";
-        } else {
-            return ".sh";
-        }
-    }
-
-    private void putFile(File commandFile, Integer chmod) throws Exception {
-        String name = commandFile.getName();
-        channelSftp.put(commandFile.getCanonicalPath(), name);
-        if (chmod != null) {
-            channelSftp.chmod(chmod, name);
+    public void putFile(File source, String target, int chmod) throws Exception {
+        put(source.getCanonicalPath(), target);
+        channelSftp.chmod(chmod, target);
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[put][%s]chmod=%s", target, chmod));
         }
     }
 
@@ -1249,6 +1217,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         SOSCommandResult result = new SOSCommandResult(cmd);
         try {
             cmd = cmd.trim();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[cmd]%s", cmd));
+            }
             channel = (ChannelExec) sshSession.openChannel("exec");
             channel.setPty(isSimulateShell());
             channel.setCommand(cmd);
@@ -1256,7 +1228,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             channel.setErrStream(null);
             in = channel.getInputStream();
             err = channel.getErrStream();
-            channel.connect();
+            channel.connect(channelConnectTimeout);
             byte[] tmp = new byte[1024];
             while (true) {
                 while (in.available() > 0) {
