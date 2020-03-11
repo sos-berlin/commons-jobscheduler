@@ -85,10 +85,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         UUID uuid = UUID.randomUUID();
         returnValuesFileName = "sos-ssh-return-values-" + uuid + ".txt";
         pidFileName = "sos-ssh-pid-" + uuid + ".txt";
+
+        resetOutput();
     }
 
     public void execute() throws Exception {
-        clearOutput();
+        resetOutput();
 
         handler.setJSJobUtilites(objJSJobUtilities);
 
@@ -138,6 +140,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     StringBuilder sb = new StringBuilder(getPidCommand);
                     sb.append(" >> ").append(pidFileName).append(delimiter);
                     preCommand.append(sb);
+
+                    add2Files2Delete(pidFileName);
                 }
                 if (objOptions.createEnvironmentVariables.value()) {
                     if (objOptions.autoDetectOS.value()) {
@@ -160,10 +164,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 Exception exception = null;
                 try {
                     cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
-                    if (!objOptions.autoDetectOS.value()) {
-                        if (preCommand.length() > 0) {
-                            cmd = preCommand.append(cmd).toString();
-                        }
+                    if (preCommand.length() > 0) {
+                        cmd = preCommand.append(cmd).toString();
                     }
 
                     executorService = Executors.newFixedThreadPool(2);
@@ -363,7 +365,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    private void clearOutput() {
+    private void resetOutput() {
         stdout = new StringBuilder();
         stderr = new StringBuilder();
     }

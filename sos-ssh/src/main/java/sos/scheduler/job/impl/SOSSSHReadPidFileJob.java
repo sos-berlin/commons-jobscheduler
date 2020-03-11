@@ -17,24 +17,24 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHReadPidFileJob.class);
 
     private List<Integer> pids = new ArrayList<Integer>();
-    private String tempPidFileName;
+    private String pidFileName;
+
+    public SOSSSHReadPidFileJob(String fileName) {
+        super();
+        pidFileName = fileName;
+    }
 
     @Override
     public void execute() throws Exception {
         try {
             connect();
 
-            add2Files2Delete(tempPidFileName);
             try {
-                String cmd = String.format(objOptions.getPostCommandRead().getValue(), tempPidFileName);
+                String cmd = String.format(objOptions.getPostCommandRead().getValue(), pidFileName);
                 cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
 
-                if (getHandler().fileExists(tempPidFileName)) {
-                    LOGGER.debug(String.format("[read pids]%s", cmd));
-                    getHandler().executeCommand(cmd);
-                } else {
-                    throw new Exception("file not found " + tempPidFileName);
-                }
+                LOGGER.debug(String.format("[read pids]%s", cmd));
+                getHandler().executeCommand(cmd);
 
                 objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, "0");
 
@@ -42,7 +42,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                 BufferedReader reader = new BufferedReader(new StringReader(new String(getHandler().getStdOut())));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
-                    LOGGER.debug(line);
+                    LOGGER.trace(line);
                     Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
                     if (regExMatcher.find()) {
                         pid = regExMatcher.group(1).trim();
@@ -95,9 +95,4 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
             disconnect();
         }
     }
-
-    public void setTempPidFileName(String val) {
-        tempPidFileName = val;
-    }
-
 }
