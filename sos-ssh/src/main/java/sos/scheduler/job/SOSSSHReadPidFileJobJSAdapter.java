@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 import sos.net.ssh.SOSSSHJobOptions;
-import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.scheduler.job.impl.SOSSSHReadPidFileJob;
 
 public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
@@ -52,10 +51,10 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
                     if (options.ignoreStderr.value()) {
                         LOGGER.debug(e.toString(), e);
                     } else {
-                        throw new SSHExecutionError("Exception raised: " + e, e);
+                        throw e;
                     }
                 } else {
-                    throw new SSHExecutionError("Exception raised: " + e, e);
+                    throw e;
                 }
             }
         }

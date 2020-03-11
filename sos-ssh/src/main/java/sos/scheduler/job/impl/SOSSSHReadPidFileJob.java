@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 
-import sos.net.ssh.exceptions.SSHExecutionError;
-
 public class SOSSSHReadPidFileJob extends SOSSSHJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHReadPidFileJob.class);
@@ -29,12 +27,14 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
             add2Files2Delete(tempPidFileName);
             try {
                 String cmd = String.format(objOptions.getPostCommandRead().getValue(), tempPidFileName);
-                LOGGER.debug(String.format("executing remote command: %s", cmd));
-
                 cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
-                LOGGER.debug(String.format("executing remote command: %s", cmd));
-                LOGGER.debug("***Execute read pid file command!***");
-                getHandler().executeCommand(cmd);
+
+                if (getHandler().fileExists(tempPidFileName)) {
+                    LOGGER.debug(String.format("[read pids]%s", cmd));
+                    getHandler().executeCommand(cmd);
+                } else {
+                    throw new Exception("file not found " + tempPidFileName);
+                }
 
                 objJSJobUtilities.setJSParam(PARAM_EXIT_CODE, "0");
 
@@ -65,10 +65,10 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                         if (objOptions.ignoreStderr.value()) {
                             LOGGER.debug(e.toString(), e);
                         } else {
-                            throw new SSHExecutionError(e.toString(), e);
+                            throw e;
                         }
                     } else {
-                        throw new SSHExecutionError(e.toString(), e);
+                        throw e;
                     }
                 }
             } finally {
@@ -85,10 +85,10 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                     if (objOptions.ignoreStderr.value()) {
                         LOGGER.debug(e.toString(), e);
                     } else {
-                        throw new SSHExecutionError(e.toString(), e);
+                        throw e;
                     }
                 } else {
-                    throw new SSHExecutionError(e.toString(), e);
+                    throw e;
                 }
             }
         } finally {

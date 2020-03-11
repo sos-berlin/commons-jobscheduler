@@ -1,6 +1,10 @@
 package sos.scheduler.job.impl;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -65,16 +69,22 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     private StringBuilder stdout;
     private StringBuilder stderr;
 
-    private String tempFileName;
-    private String resolvedTempFileName;
+    private String returnValuesFileName;
+    private String resolvedReturnValuesFileName;
     private String pidFileName;
+
     private String getPidCommand = DEFAULT_LINUX_GET_PID_COMMAND;
     private boolean isWindowsShell = false;
+    private String delimiter;
 
     public SOSSSHJob() {
         super(new SOSSSHJobOptions());
 
-        init();
+        handler = new SOSVfsSFtpJCraft();
+
+        UUID uuid = UUID.randomUUID();
+        returnValuesFileName = "sos-ssh-return-values-" + uuid + ".txt";
+        pidFileName = "sos-ssh-pid-" + uuid + ".txt";
     }
 
     public void execute() throws Exception {
@@ -97,10 +107,11 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     String commandScript = objOptions.commandScript.getValue();
                     if (objOptions.commandScript.IsEmpty()) {
                         commandScript = objOptions.commandScriptFile.getJSFile().file2String();
-                        LOGGER.info(String.format("[command_script_file]%s", objOptions.commandScriptFile.getValue()));
+                        LOGGER.info(String.format("[commandScriptFile]%s", objOptions.commandScriptFile.getValue()));
                     }
                     commandScript = objJSJobUtilities.replaceSchedulerVars(commandScript);
-                    commands[0] = handler.createScriptFile(commandScript);
+                    commands[0] = putCommandScriptFile(commandScript);
+
                     add2Files2Delete(commands[0]);
                     commands[0] += " " + objOptions.commandScriptParam.getValue();
                 } else {
@@ -108,17 +119,26 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
 
-            handler.setSimulateShell(objOptions.simulateShell.value());
-
             SOSVfsEnv envVars = new SOSVfsEnv();
             envVars.setGlobalEnvs(new HashMap<String, String>());
             envVars.setLocalEnvs(new HashMap<String, String>());
             setReturnValuesEnvVar(envVars);
 
-            LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.createEnvironmentVariables.value());
+            handler.setSimulateShell(objOptions.simulateShell.value());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("createEnvironmentVariables=%s, simulateShell=%s, runWithWatchdog=%s",
+                        objOptions.createEnvironmentVariables.value(), handler.isSimulateShell(), objOptions.runWithWatchdog.value()));
+            }
 
             for (String cmd : commands) {
-                String preCommand = null;
+                StringBuilder preCommand = new StringBuilder();
+
+                if (objOptions.runWithWatchdog.value()) {
+                    setGetPidCommand();
+                    StringBuilder sb = new StringBuilder(getPidCommand);
+                    sb.append(" >> ").append(pidFileName).append(delimiter);
+                    preCommand.append(sb);
+                }
                 if (objOptions.createEnvironmentVariables.value()) {
                     if (objOptions.autoDetectOS.value()) {
                         setSOSVfsEnvs(envVars, isWindowsShell);
@@ -126,10 +146,12 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                         setSOSVfsEnvs(envVars, true);
                         // only if autoDetectOS is false flgIsWindowsShell is not trustworthy when callingsetReturnValuesEnvVar();
                         // we have to set the env var explicitely here
-                        envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
-                    } else {
-                        preCommand = getPreCommand();
+                        envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedReturnValuesFileName);
                     }
+                    preCommand = getPreCommand(preCommand);
+                }
+                if (LOGGER.isDebugEnabled() && preCommand.length() > 0) {
+                    LOGGER.debug(String.format("[preCommand]%s", preCommand));
                 }
 
                 ExecutorService executorService = null;
@@ -139,8 +161,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 try {
                     cmd = objJSJobUtilities.replaceSchedulerVars(cmd);
                     if (!objOptions.autoDetectOS.value()) {
-                        if (preCommand != null) {
-                            cmd = preCommand + cmd;
+                        if (preCommand.length() > 0) {
+                            cmd = preCommand.append(cmd).toString();
                         }
                     }
 
@@ -186,8 +208,8 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     }
                 }
             }
-            if (resolvedTempFileName != null) {
-                processPostCommands(resolvedTempFileName);
+            if (resolvedReturnValuesFileName != null) {
+                processPostCommands(resolvedReturnValuesFileName);
             }
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
@@ -209,6 +231,28 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             handler.resetStdErr();
         }
 
+    }
+
+    private String putCommandScriptFile(String content) throws Exception {
+        if (!isWindowsShell) {
+            content = content.replaceAll("(?m)\r", "");
+        }
+
+        File source = File.createTempFile("sos-ssh-script-", isWindowsShell ? ".cmd" : ".sh");
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(source)));
+        out.write(content);
+        out.flush();
+        out.close();
+        source.deleteOnExit();
+
+        LOGGER.info(String.format("[commandScriptFile][tmp file created][%s]%s", source.getCanonicalPath(), content));
+
+        String target = source.getName();
+        if (!isWindowsShell) {
+            target = "./" + target;
+        }
+        handler.putFile(source, target, 0700);
+        return target;
     }
 
     private Future<Void> executeCommand(ExecutorService executor, String cmd, SOSVfsEnv envVars) throws Exception {
@@ -251,7 +295,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                         if (handler.getChannelExec() != null) {
                             if (handler.getChannelExec().isConnected()) {
                                 handler.getChannelExec().sendSignal("CONT");
-                                LOGGER.trace("send signal CONT");
+                                // LOGGER.trace("send signal CONT");
                             } else {
                                 LOGGER.trace("[send signal CONT][skip]channel not connected");
                                 return null;
@@ -317,12 +361,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         } else {
             LOGGER.info("not connected, logout useless");
         }
-    }
-
-    private void init() {
-        handler = new SOSVfsSFtpJCraft();
-
-        tempFileName = "sos-ssh-return-values-" + UUID.randomUUID() + ".txt";
     }
 
     private void clearOutput() {
@@ -393,49 +431,34 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    public String getPreCommand() {
-        String delimiter;
+    public StringBuilder getPreCommand(StringBuilder sb) {
         String preCommand = objOptions.getPreCommand().getValue();
-        if (isWindowsShell) {
-            delimiter = DEFAULT_WINDOWS_DELIMITER;
-            if (objOptions.getPreCommand().isNotDirty()) {
-                preCommand = DEFAULT_WINDOWS_PRE_COMMAND;
-            }
-        } else {
-            delimiter = DEFAULT_LINUX_DELIMITER;
-            if (objOptions.getPreCommand().isNotDirty()) {
-                preCommand = DEFAULT_LINUX_PRE_COMMAND;
-            }
-        }
-        StringBuilder strb = new StringBuilder();
-        if (objOptions.runWithWatchdog.value()) {
-            readGetPidCommandFromPropertiesFile();
-            strb.append(getPidCommand).append(delimiter).append(getPidCommand);
-            strb.append(" >> ").append(pidFileName).append(delimiter);
+        if (objOptions.getPreCommand().isNotDirty()) {
+            preCommand = isWindowsShell ? DEFAULT_WINDOWS_PRE_COMMAND : DEFAULT_LINUX_PRE_COMMAND;
         }
         if (objOptions.tempDirectory.isDirty()) {
-            resolvedTempFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), tempFileName);
+            resolvedReturnValuesFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), returnValuesFileName);
         } else {
-            resolvedTempFileName = tempFileName;
+            resolvedReturnValuesFileName = returnValuesFileName;
         }
-        strb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, resolvedTempFileName));
-        strb.append(delimiter);
-        return strb.toString();
+        sb.append(String.format(preCommand, SCHEDULER_RETURN_VALUES, resolvedReturnValuesFileName));
+        sb.append(delimiter);
+        return sb;
     }
 
     private void setReturnValuesEnvVar(SOSVfsEnv envVars) {
-        resolvedTempFileName = null;
+        resolvedReturnValuesFileName = null;
         if (objOptions.tempDirectory.isDirty()) {
-            resolvedTempFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), tempFileName);
-            LOGGER.debug(String.format("*** resolved tempFileName: %1$s", resolvedTempFileName));
+            resolvedReturnValuesFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), returnValuesFileName);
+            LOGGER.debug(String.format("*** resolved tempFileName: %1$s", resolvedReturnValuesFileName));
         } else {
-            resolvedTempFileName = tempFileName;
+            resolvedReturnValuesFileName = returnValuesFileName;
         }
         if (objOptions.autoDetectOS.value()) {
             if (isWindowsShell) {
-                envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+                envVars.getGlobalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedReturnValuesFileName);
             } else {
-                envVars.getLocalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedTempFileName);
+                envVars.getLocalEnvs().put(SCHEDULER_RETURN_VALUES, resolvedReturnValuesFileName);
             }
         }
     }
@@ -616,18 +639,18 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         objOptions.proxyPassword.setValue(options.proxyPassword.getValue());
     }
 
-    private void readGetPidCommandFromPropertiesFile() {
+    private void setGetPidCommand() {
         if (objOptions.sshJobGetPidCommand.isDirty() && !objOptions.sshJobGetPidCommand.getValue().isEmpty()) {
             getPidCommand = objOptions.sshJobGetPidCommand.getValue();
-            LOGGER.debug("Command to receive PID of the active shell from Job Parameter used!");
         } else {
             if (isWindowsShell) {
                 getPidCommand = DEFAULT_WINDOWS_GET_PID_COMMAND;
-                LOGGER.debug("Default Windows command used to receive PID of the active shell!");
             } else {
                 getPidCommand = DEFAULT_LINUX_GET_PID_COMMAND;
-                LOGGER.debug("Default Linux command used to receive PID of the active shell!");
             }
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[getPidCommand]%s", getPidCommand));
         }
     }
 
@@ -663,6 +686,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
 
         isWindowsShell = info.getShell().equals(Shell.WINDOWS);
+        delimiter = isWindowsShell ? DEFAULT_WINDOWS_DELIMITER : DEFAULT_LINUX_DELIMITER;
     }
 
     public List<Integer> getParamPids() {
@@ -705,9 +729,5 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public String getPidFileName() {
         return pidFileName;
-    }
-
-    public void setPidFileName(String val) {
-        pidFileName = val;
     }
 }
