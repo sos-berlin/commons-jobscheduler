@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.Vector;
 
 import org.jurr.jsch.bugfix111.JSCH111BugFix;
-import org.omg.CosNaming.IstringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
