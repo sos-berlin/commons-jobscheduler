@@ -25,7 +25,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
             connect();
-            readCheckIfProcessesIsStillActiveCommandFromPropertiesFile();
+            setActiveProcessesCommand();
 
             for (Integer pid : paramPids) {
                 String checkPidCommand = null;
@@ -73,18 +73,18 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
         }
     }
 
-    private void readCheckIfProcessesIsStillActiveCommandFromPropertiesFile() {
+    private void setActiveProcessesCommand() {
         if (objOptions.sshJobGetActiveProcessesCommand.isDirty() && !objOptions.sshJobGetActiveProcessesCommand.getValue().isEmpty()) {
             activeProcessesCommand = objOptions.sshJobGetActiveProcessesCommand.getValue();
-            LOGGER.debug("Command to check if PID is still running from Job Parameter used!");
         } else {
             if (isWindowsShell()) {
                 activeProcessesCommand = DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND;
-                LOGGER.debug("Default Windows command used to check if PID is still running!");
             } else {
                 activeProcessesCommand = DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND;
-                LOGGER.debug("Default Linux command used to check if PID is still running!");
             }
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[activeProcessesCommand]%s", activeProcessesCommand));
         }
     }
 

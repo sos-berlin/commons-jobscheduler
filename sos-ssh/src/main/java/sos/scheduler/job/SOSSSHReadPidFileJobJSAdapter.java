@@ -34,9 +34,8 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
         allParams.putAll(getJobOrOrderParameters());
         SOSSSHJobOptions options = null;
         try {
-            SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob();
+            SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob(allParams.get(PID_FILE_NAME_KEY));
             job.setJSJobUtilites(this);
-            job.setTempPidFileName(allParams.get(PID_FILE_NAME_KEY));
 
             options = job.getOptions();
             options.setCurrentNodeName(this.getCurrentNodeName(false));
