@@ -35,10 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import sos.util.SOSDate;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -54,10 +50,12 @@ import com.sos.scheduler.model.objects.Order;
 import com.sos.scheduler.model.objects.Spooler;
 import com.sos.scheduler.model.objects.Spooler.Config;
 
+import sos.util.SOSDate;
+
 /** @author Andreas Liebert */
 public class CronConverter extends JSToolBox {
 
-    protected static Logger logger = LoggerFactory.getLogger(CronConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CronConverter.class);
     protected Pattern cronRegExPattern;
     protected Pattern cronRegExSystemPattern;
     protected Pattern cronRegExAliasPattern;
@@ -145,9 +143,9 @@ public class CronConverter extends JSToolBox {
     }
 
     public static void main(final String[] args) {
-        logger.info("SOS CronConverter - Main");
+        LOGGER.info("SOS CronConverter - Main");
         try {
-//            SOSLogger sosLogger;
+            // SOSLogger sosLogger;
             String sourceFile = "";
             String targetFile = "";
             String changeUser = "";
@@ -179,7 +177,8 @@ public class CronConverter extends JSToolBox {
             Option optLogLevel = OptionBuilder.create(OPTION_VERBOSE);
             OptionBuilder.withArgName("command");
             OptionBuilder.hasArgs();
-            OptionBuilder.withDescription("change user command for -systab=1. 'su' or 'sudo' or define your own command using $SCHEDULER_CRONTAB_USER.");
+            OptionBuilder.withDescription(
+                    "change user command for -systab=1. 'su' or 'sudo' or define your own command using $SCHEDULER_CRONTAB_USER.");
             Option optChangeUser = OptionBuilder.create(OPTION_CHANGEUSER);
             OptionBuilder.withArgName("seconds");
             OptionBuilder.hasArg();
@@ -215,7 +214,7 @@ public class CronConverter extends JSToolBox {
                 sysTab = true;
             }
             targetFile = getWholeArgument(line.getOptionValues(OPTION_TARGET));
-            String ll = line.getOptionValue(OPTION_VERBOSE, "" + SOSStandardLogger.INFO);
+            String ll = line.getOptionValue(OPTION_VERBOSE, "1");
             logLevel = Integer.parseInt(ll);
             if (line.hasOption(optSysTab.getOpt())) {
                 sysTab = "1".equals(line.getOptionValue(optSysTab.getOpt()).trim());
@@ -227,12 +226,12 @@ public class CronConverter extends JSToolBox {
             }
             jobTimeout = line.getOptionValue(OPTION_TIMEOUT);
             if (logLevel == 0) {
-                logLevel = SOSLogger.INFO;
+                logLevel = 1;
             }
-//            sosLogger = new SOSStandardLogger(logLevel);
+            // sosLogger = new SOSStandardLogger(logLevel);
             target = new File(targetFile);
             source = new File(sourceFile);
-            CronConverter cc = new CronConverter(/*sosLogger*/);
+            CronConverter cc = new CronConverter(/* sosLogger */);
             if (jobTimeout != null && !jobTimeout.isEmpty()) {
                 cc.setTimeout(jobTimeout);
             }
@@ -250,9 +249,9 @@ public class CronConverter extends JSToolBox {
             objSchedulerObjectFactory.initMarshaller(Spooler.class);
             Spooler objSchedulerConfig = (Spooler) objSchedulerObjectFactory.unMarshall(target);
             Config objConfig = objSchedulerConfig.getConfig().get(0);
-            logger.debug("" + objConfig.getPort());
-            logger.debug("" + objConfig.getTcpPort());
-            logger.debug("" + objConfig.getUdpPort());
+            LOGGER.debug("" + objConfig.getPort());
+            LOGGER.debug("" + objConfig.getTcpPort());
+            LOGGER.debug("" + objConfig.getUdpPort());
             String strPathName = new File(sourceFile).getParent();
             strPathName += "/live/";
             new File(strPathName).mkdirs();
@@ -262,12 +261,12 @@ public class CronConverter extends JSToolBox {
                     String strJobName = objJob.getName();
                     objJob.setName("");
                     objJob.setParent(objSchedulerObjectFactory);
-                    logger.debug("job name = " + strJobName);
+                    LOGGER.debug("job name = " + strJobName);
                     File fleTargetFile = new File(strPathName + strJobName + JSObjJob.fileNameExtension);
                     objJob.marshal(fleTargetFile);
                 }
             } else {
-                logger.debug("no jobs found");
+                LOGGER.debug("no jobs found");
             }
             JobChains objJobchains = objConfig.getJobChains();
             if (objJobchains != null) {
@@ -275,12 +274,12 @@ public class CronConverter extends JSToolBox {
                     String strJobChainName = objJobchain.getName();
                     objJobchain.setName("");
                     objJobchain.setParent(objSchedulerObjectFactory);
-                    logger.debug("chain name = " + strJobChainName);
+                    LOGGER.debug("chain name = " + strJobChainName);
                     File fleTargetFile = new File(strPathName + strJobChainName + JSObjJobChain.fileNameExtension);
                     objJobchain.marshal(fleTargetFile);
                 }
             } else {
-                logger.debug("no chains found");
+                LOGGER.debug("no chains found");
             }
             Commands objCommands = objConfig.getCommands();
             if (objCommands != null) {
@@ -292,17 +291,17 @@ public class CronConverter extends JSToolBox {
                         JSObjOrder objJSO = new JSObjOrder(objSchedulerObjectFactory);
                         objJSO.getOrderFromXMLString(objOrder.toXMLString());
                         String strOrderFileName = objJSO.createFileName(strPathName);
-                        logger.debug("order name = " + strOrderFileName);
+                        LOGGER.debug("order name = " + strOrderFileName);
                         File fleTargetFile = new File(strOrderFileName);
                         objOrder.marshal(fleTargetFile);
                     }
                 }
             } else {
-                logger.debug("no orders found");
+                LOGGER.debug("no orders found");
             }
-            logger.debug("ready");
+            LOGGER.debug("ready");
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -317,7 +316,7 @@ public class CronConverter extends JSToolBox {
         return value;
     }
 
-    public CronConverter(/*final SOSLogger log*/) throws Exception {
+    public CronConverter(/* final SOSLogger log */) throws Exception {
         docBuilder = docFactory.newDocumentBuilder();
         cronRegExAliasPattern = Pattern.compile(CRON_REGEX_ALIAS);
         cronRegExPattern = Pattern.compile(CRON_REGEX);
@@ -336,7 +335,7 @@ public class CronConverter extends JSToolBox {
     public void cronFile2SchedulerXMLFile(final File cronFile, final File schedulerXML) throws Exception {
         try {
             Document configurationDocument = cronFile2SchedulerXML(cronFile, new HashMap<String, Element>());
-            logger.debug("writing " + schedulerXML.getAbsolutePath());
+            LOGGER.debug("writing " + schedulerXML.getAbsolutePath());
             OutputStream fout = new FileOutputStream(schedulerXML, false);
             OutputStreamWriter out = new OutputStreamWriter(fout, "UTF-8");
             OutputFormat format = new OutputFormat(configurationDocument);
@@ -379,7 +378,7 @@ public class CronConverter extends JSToolBox {
                     continue;
                 }
                 if (skipLines != null && skipLines.contains(strCronLine)) {
-                    logger.debug("Skipping line " + strCronLine);
+                    LOGGER.debug("Skipping line " + strCronLine);
                     lastComment = "";
                     lastCommentJobName = "";
                     lastCommentJobTitle = "";
@@ -395,7 +394,7 @@ public class CronConverter extends JSToolBox {
                     if (jobNameMatcher.matches()) {
                         lastCommentJobName = jobNameMatcher.group(1);
                         lastCommentJobName = lastCommentJobName.replaceAll(" ", "_");
-                        logger.debug("Found job name in comment: " + lastCommentJobName);
+                        LOGGER.debug("Found job name in comment: " + lastCommentJobName);
                         continue;
                     }
                     if (puppetNameMatcher.matches()) {
@@ -404,17 +403,17 @@ public class CronConverter extends JSToolBox {
                             lastCommentJobTitle = lastCommentJobName;
                         }
                         lastCommentJobName = lastCommentJobName.trim().replaceAll(" ", "_");
-                        logger.debug("Found job name in comment: " + lastCommentJobName);
+                        LOGGER.debug("Found job name in comment: " + lastCommentJobName);
                         continue;
                     }
                     if (jobTitleMatcher.matches()) {
                         lastCommentJobTitle = jobTitleMatcher.group(1);
-                        logger.debug("Found job title in comment: " + lastCommentJobTitle);
+                        LOGGER.debug("Found job title in comment: " + lastCommentJobTitle);
                         continue;
                     }
                     if (jobTimeoutMatcher.matches()) {
                         lastCommentJobTimeout = jobTimeoutMatcher.group(1);
-                        logger.debug("Found job timeout in comment: " + lastCommentJobTimeout);
+                        LOGGER.debug("Found job timeout in comment: " + lastCommentJobTimeout);
                         continue;
                     }
                     if (isNotEmpty(lastComment)) {
@@ -427,7 +426,7 @@ public class CronConverter extends JSToolBox {
                 if (environmentMatcher.matches()) {
                     String envName = environmentMatcher.group(1);
                     String envValue = environmentMatcher.group(2);
-                    logger.debug("Found environment variable [" + envName + "]: " + envValue);
+                    LOGGER.debug("Found environment variable [" + envName + "]: " + envValue);
                     if (envValue.startsWith("\"") && envValue.endsWith("\"")) {
                         envValue = envValue.substring(1, envValue.length() - 1);
                     }
@@ -460,7 +459,7 @@ public class CronConverter extends JSToolBox {
                         jobNameChanged = true;
                     }
                     if (jobNameChanged) {
-                        logger.debug("Setting new job name \"" + jobName + "\"");
+                        LOGGER.debug("Setting new job name \"" + jobName + "\"");
                         jobElement.setAttribute(ATTRIBUTE_NAME, jobName);
                     }
                     jobNames.add(jobName);
@@ -575,7 +574,7 @@ public class CronConverter extends JSToolBox {
             addOrderElement.appendChild(createExtension(objOrderDocument));
         }
         Element runTimeElement = objOrderDocument.createElement(TAG_RUN_TIME);
-        logger.debug(strCronLine);
+        LOGGER.debug(strCronLine);
         cronRegExPattern = Pattern.compile(CRON_REGEX);
         Matcher cronRegExMatcher = cronRegExPattern.matcher(strCronLine);
         createRunTime(cronRegExMatcher, runTimeElement);
@@ -596,12 +595,12 @@ public class CronConverter extends JSToolBox {
 
     public Document createJobElement(String cronline, final HashMap<String, String> environmentVariables) throws Exception {
         try {
-            logger.info("processing line: " + cronline);
+            LOGGER.info("processing line: " + cronline);
             Document eleJob = docBuilder.newDocument();
             Element jobElement = eleJob.createElement(TAG_JOB);
             Matcher cronRegExAliasMatcher = cronRegExAliasPattern.matcher(cronline);
             if (cronRegExAliasMatcher.matches()) {
-                logger.debug("Current line matches pattern " + CRON_REGEX_ALIAS);
+                LOGGER.debug("Current line matches pattern " + CRON_REGEX_ALIAS);
                 cronline = convertAlias(cronRegExAliasMatcher);
             }
             Matcher cronRegExMatcher = cronRegExPattern.matcher(cronline);
@@ -634,16 +633,16 @@ public class CronConverter extends JSToolBox {
                 jobElement.appendChild(createExtension(eleJob));
             }
             if (isCreateJobChainJobs() == false) {
-                logger.debug("Creating params element");
+                LOGGER.debug("Creating params element");
                 Element paramsElement = eleJob.createElement("params");
-                logger.debug("Creating param element (command)");
+                LOGGER.debug("Creating param element (command)");
                 Element paramCommandElement = eleJob.createElement("param");
                 paramCommandElement.setAttribute("name", "command");
                 paramCommandElement.setAttribute("value", command);
                 paramsElement.appendChild(paramCommandElement);
                 jobElement.appendChild(paramsElement);
             }
-            logger.debug("Creating script element");
+            LOGGER.debug("Creating script element");
             Element scriptElement = eleJob.createElement(TAG_SCRIPT);
             scriptElement.setAttribute(ATTRIBUTE_LANGUAGE, "shell");
             String script = NEWLINE;
@@ -716,7 +715,7 @@ public class CronConverter extends JSToolBox {
             }
             Vector<Element> childElements = new Vector<Element>();
             Element periodElement = runTimeElement.getOwnerDocument().createElement("period");
-            logger.debug("processing hours [" + hours + "] and minutes [" + minutes + "]");
+            LOGGER.debug("processing hours [" + hours + "] and minutes [" + minutes + "]");
             if (minutes.startsWith("*")) {
                 if ("*".equalsIgnoreCase(minutes)) {
                     // every minute
@@ -737,7 +736,7 @@ public class CronConverter extends JSToolBox {
                     // every hour: keep interval from minutes
                     childElements.add(periodElement);
                 } else {
-                    logger.debug("Found specific hours, creating periods with begin and end.");
+                    LOGGER.debug("Found specific hours, creating periods with begin and end.");
                     String[] hourArray = hours.split(",");
                     for (int i = 0; i < hourArray.length; i++) {
                         String currentHour = hourArray[i];
@@ -824,7 +823,7 @@ public class CronConverter extends JSToolBox {
                     }
                 }
             }
-            logger.debug("processing days [" + days + "]");
+            LOGGER.debug("processing days [" + days + "]");
             boolean monthDaysSet = false;
             if (days.startsWith("*")) {
                 if (!"*".equals(days)) {
@@ -854,9 +853,9 @@ public class CronConverter extends JSToolBox {
                 monthDaysSet = true;
             }
             if (!"*".equals(weekdays) && monthDaysSet) {
-                logger.info("Weekdays will not be processed as days are already set in current line.");
+                LOGGER.info("Weekdays will not be processed as days are already set in current line.");
             } else {
-                logger.debug("processing weekdays [" + weekdays + "]");
+                LOGGER.debug("processing weekdays [" + weekdays + "]");
                 weekdays = replaceDayNames(weekdays);
                 if (weekdays.startsWith("*/")) {
                     throw new JobSchedulerException("Repeat intervals for the weekdays column [" + weekdays
@@ -872,7 +871,7 @@ public class CronConverter extends JSToolBox {
                     childElements.add(weekDaysElement);
                 }
             }
-            logger.debug("processing months [" + months + "]");
+            LOGGER.debug("processing months [" + months + "]");
             if (months.startsWith("*")) {
                 if (!"*".equals(months)) {
                     months = replaceMonthNames(months);
@@ -936,7 +935,7 @@ public class CronConverter extends JSToolBox {
     }
 
     private void addDay(final String day, final Element parentDaysElement, final Vector<Element> childElements) throws Exception {
-        logger.debug("adding day: " + day);
+        LOGGER.debug("adding day: " + day);
         Element dayElement = parentDaysElement.getOwnerDocument().createElement("day");
         dayElement.setAttribute("day", day);
         Iterator<Element> iter = childElements.iterator();
@@ -957,7 +956,7 @@ public class CronConverter extends JSToolBox {
                 String[] range = element.split("[-/]");
                 if (range.length < 2 || range.length > 3) {
                     try {
-                        logger.warn("unknown crontab synthax: " + element);
+                        LOGGER.warn("unknown crontab synthax: " + element);
                     } catch (Exception e) {
                         //
                     }
@@ -1046,7 +1045,7 @@ public class CronConverter extends JSToolBox {
     }
 
     private String convertAlias(final Matcher matcher) throws Exception {
-        logger.debug("Converting alias...");
+        LOGGER.debug("Converting alias...");
         try {
             String alias = matcher.group(1);
             String rest = matcher.group(2);
@@ -1065,7 +1064,7 @@ public class CronConverter extends JSToolBox {
                 result = "@reboot @reboot @reboot @reboot @reboot";
             }
             result += rest;
-            logger.debug("Alias converted to " + result);
+            LOGGER.debug("Alias converted to " + result);
             return result;
         } catch (Exception e) {
             throw new JobSchedulerException("Error converting alias: " + e, e);

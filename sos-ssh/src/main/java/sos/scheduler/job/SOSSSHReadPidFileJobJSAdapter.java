@@ -22,23 +22,23 @@ public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
         try {
             super.spooler_process();
             doProcessing();
+            return getSpoolerProcess().getSuccess();
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
-        return signalSuccess();
     }
 
     private void doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getJobOrOrderParameters());
+        allParams.putAll(getJobOrOrderParameters(getSpoolerProcess().getOrder()));
         SOSSSHJobOptions options = null;
         try {
             SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob(allParams.get(PID_FILE_NAME_KEY));
             job.setJSJobUtilites(this);
 
             options = job.getOptions();
-            options.setCurrentNodeName(this.getCurrentNodeName(false));
+            options.setCurrentNodeName(this.getCurrentNodeName(getSpoolerProcess().getOrder(), false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
             options.checkMandatory();

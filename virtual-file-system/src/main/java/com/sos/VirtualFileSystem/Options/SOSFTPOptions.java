@@ -29,8 +29,6 @@ import com.sos.keepass.SOSKeePassPath;
 
 import sos.configuration.SOSConfiguration;
 import sos.net.mail.options.SOSSmtpMailOptions;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
@@ -569,12 +567,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         settings.checkMandatory();
         profile.checkMandatory();
         HashMap<String, String> map = new HashMap<String, String>();
-        SOSStandardLogger sosLogger = null;
         SOSConfiguration conf = null;
         Properties properties = new Properties();
         try {
             LOGGER.debug(String.format("readSettingsFile: settings=%s", settings.getValue()));
-            sosLogger = new SOSStandardLogger(0);
             getEnvVars();
             conf = new SOSConfiguration(settings.getValue(), profile.getValue());
             Properties profileProps = conf.getParameterAsProperties();
@@ -584,9 +580,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             }
             conf = new SOSConfiguration(settings.getValue(), "globals");
             Properties globalsProps = conf.getParameterAsProperties();
-            globalsProps = resolveIncludes(globalsProps, sosLogger);
+            globalsProps = resolveIncludes(globalsProps);
             properties.putAll(globalsProps);
-            profileProps = resolveIncludes(profileProps, sosLogger);
+            profileProps = resolveIncludes(profileProps);
             properties.putAll(profileProps);
             // Additional Variables
             properties.put("uuid", UUID.randomUUID().toString());
@@ -658,11 +654,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return map;
     }
 
-    private Properties resolveIncludes(Properties props, SOSLogger logger) throws Exception {
-        return resolveIncludes(props, "", logger);
+    private Properties resolveIncludes(Properties props) throws Exception {
+        return resolveIncludes(props, "");
     }
 
-    private Properties resolveIncludes(Properties props, String prefix, SOSLogger logger) throws Exception {
+    private Properties resolveIncludes(Properties props, String prefix) throws Exception {
         Properties allIncludedProps = new Properties();
         SOSConfiguration conf = null;
         if (prefix == null) {
@@ -686,7 +682,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                         String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(include, settings.getValue());
                         throw new JobSchedulerException(strM);
                     }
-                    includedProps = resolveIncludes(includedProps, includePrefix, logger);
+                    includedProps = resolveIncludes(includedProps, includePrefix);
                     allIncludedProps.putAll(includedProps);
                 }
             }

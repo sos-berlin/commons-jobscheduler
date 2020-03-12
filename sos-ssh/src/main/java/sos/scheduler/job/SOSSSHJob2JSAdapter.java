@@ -40,11 +40,11 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         try {
             super.spooler_process();
             doProcessing();
+            return getSpoolerProcess().getSuccess();
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
-        return signalSuccess();
     }
 
     private void doProcessing() throws Exception {
@@ -52,7 +52,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         Variable_set orderParams = null;
         boolean isOrderJob = spooler_task.job().order_queue() != null;
         if (isOrderJob) {
-            orderParams = spooler_task.order().params();
+            orderParams = getSpoolerProcess().getOrder().params();
             orderParams.set_var(EXIT_SIGNAL, "");
             orderParams.set_var(EXIT_CODE, "");
         }
@@ -67,8 +67,8 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         SOSSSHJob job = new SOSSSHJob();
         SOSSSHJobOptions options = job.getOptions();
 
-        options.setCurrentNodeName(this.getCurrentNodeName(true));
-        HashMap<String, String> params = getSchedulerParameterAsProperties();
+        options.setCurrentNodeName(this.getCurrentNodeName(getSpoolerProcess().getOrder(), true));
+        HashMap<String, String> params = getSchedulerParameterAsProperties(getSpoolerProcess().getOrder());
         if (!"false".equalsIgnoreCase(params.get("create_environment_variables"))) {
             Map<String, String> envVars = new HashMap<String, String>();
             Map<String, String> schedulerMasterEnvVars = getSchedulerEnvironmentVariables();
@@ -149,7 +149,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
 
     private Map<String, String> prefixSchedulerEnvVars(Map<String, String> allEnvVars) {
         Map<String, String> envVars = new HashMap<String, String>();
-        String currentNodeName = getCurrentNodeName(false);
+        String currentNodeName = getCurrentNodeName(getSpoolerProcess().getOrder(), false);
         for (String key : allEnvVars.keySet()) {
             String value = allEnvVars.get(key);
             if (value.contains("\"")) {

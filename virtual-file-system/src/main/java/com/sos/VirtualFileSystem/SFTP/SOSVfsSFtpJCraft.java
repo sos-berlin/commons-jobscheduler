@@ -23,6 +23,7 @@ import org.jurr.jsch.bugfix111.JSCH111BugFix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -891,16 +892,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             setChannelConnectTimeout();
             setConfigFromFiles();
 
-            StringBuilder msg = new StringBuilder("[").append(connection2OptionsAlternate.protocol.getValue()).append("]").append(
-                    "SessionConnectTimeout=").append(ms2string(sshSession.getTimeout()));
-            if (sshSession.getServerAliveInterval() > 0) {
-                msg.append(", ServerAliveInterval=").append(ms2string(sshSession.getServerAliveInterval()));
-                msg.append(", ServerAliveCountMax=%s").append(sshSession.getServerAliveCountMax());
-            }
-            if (channelConnectTimeout > 0) {
-                msg.append(", ChannelConnectTimeout=").append(ms2string(channelConnectTimeout));
-            }
-            LOGGER.info(msg.toString());
+            printConnectionInfos();
 
             sshSession.connect();
             if (connection2OptionsAlternate.protocol.getValue().equals(TransferTypes.sftp.name())) {
@@ -913,6 +905,23 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.info(SOSVfs_D_133.params(userName));
         this.logReply();
         return this;
+    }
+
+    private void printConnectionInfos() {
+        List<String> msg = new ArrayList<String>();
+        if (sshSession.getTimeout() > 0) {
+            msg.add("SessionConnectTimeout=" + ms2string(sshSession.getTimeout()));
+        }
+        if (sshSession.getServerAliveInterval() > 0) {
+            msg.add("ServerAliveInterval=" + ms2string(sshSession.getServerAliveInterval()) + ", ServerAliveCountMax=" + sshSession
+                    .getServerAliveCountMax());
+        }
+        if (channelConnectTimeout > 0) {
+            msg.add("ChannelConnectTimeout=" + ms2string(channelConnectTimeout));
+        }
+        if (msg.size() > 0) {
+            LOGGER.info(Joiner.on(", ").join(msg));
+        }
     }
 
     private String ms2string(int val) {
@@ -1009,9 +1018,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void doConnect(final String phost, final int pport) {
         host = phost;
         port = pport;
-        LOGGER.info(SOSVfs_D_0101.params(host, port));
-        if (!this.isConnected()) {
-            this.logReply();
+        LOGGER.info(new StringBuilder("[").append(connection2OptionsAlternate.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(host,
+                port)).toString());
+        if (!isConnected()) {
+            logReply();
         } else {
             LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }

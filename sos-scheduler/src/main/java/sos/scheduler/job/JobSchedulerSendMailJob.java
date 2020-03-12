@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sos.net.SOSMailOrder;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
@@ -16,6 +19,8 @@ import sos.util.SOSDate;
 
 /** @author andreas pueschel */
 public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerSendMailJob.class);
 
     protected List<String> mailOrders = null;
     protected Iterator<String> mailOrderIterator = null;
@@ -38,10 +43,8 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
     public boolean spooler_open() {
         try {
             if (spooler_task.job().order_queue() == null) {
-                this.mailOrders =
-                        this.getConnection().getArrayValue(
-                                "SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"STATUS\"=" + STATE_READY
-                                        + " AND (\"TARGETED\" IS NULL OR \"TARGETED\"<=%now) ORDER BY \"ID\" ASC");
+                this.mailOrders = this.getConnection().getArrayValue("SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"STATUS\"=" + STATE_READY
+                        + " AND (\"TARGETED\" IS NULL OR \"TARGETED\"<=%now) ORDER BY \"ID\" ASC");
                 this.mailOrderIterator = this.mailOrders.iterator();
                 return this.mailOrderIterator.hasNext();
             } else {
@@ -70,7 +73,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
         try {
             mailOrderId = Integer.parseInt(this.mailOrderIterator.next());
             SOSMailOrder mailOrder = new SOSMailOrder(this.sosMailSettings, this.getConnection());
-          
+
             if (mailOrder.getHost() == null || mailOrder.getHost().isEmpty()) {
                 if (!"-queue".equalsIgnoreCase(spooler_log.mail().smtp())) {
                     mailOrder.setHost(spooler_log.mail().smtp());
@@ -115,9 +118,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     try {
                         mailOrder.load(mailOrderId);
                     } catch (Exception e) {
-                        if (this.getLogger() != null) {
-                            this.getLogger().info("failed to load order [" + orderData.var("id") + "]: " + e.getMessage());
-                        }
+                        LOGGER.info("failed to load order [" + orderData.var("id") + "]: " + e.getMessage());
                         return false;
                     }
                 }
@@ -129,9 +130,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                         target.setTime(targetDate);
                         spooler_task.job().set_delay_order_after_setback(1, (target.getTimeInMillis() - System.currentTimeMillis()) / 1000);
                         spooler_task.order().setback();
-                        if (this.getLogger() != null) {
-                            this.getLogger().info("order is set back for target date: " + mailOrder.getTargeted().toString());
-                        }
+                        LOGGER.info("order is set back for target date: " + mailOrder.getTargeted().toString());
                         return false;
                     }
                 }
@@ -144,10 +143,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     throw new Exception("mail order has already been cancelled");
                 }
             } catch (Exception ex) {
-                if (this.getLogger() != null) {
-                    this.getLogger().info(
-                            "mail status [" + mailOrder.getStatus() + "] not applicable for order [" + mailOrder.getId() + "]: " + ex.getMessage());
-                }
+                LOGGER.info("mail status [" + mailOrder.getStatus() + "] not applicable for order [" + mailOrder.getId() + "]: " + ex.getMessage());
                 if (spooler_task.job().order_queue() == null) {
                     return this.mailOrderIterator.hasNext();
                 } else {
@@ -158,10 +154,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                 File mailFile = null;
                 String message = "";
                 if (this.getMailTo() != null && !this.getMailTo().isEmpty()) {
-                    if (this.getLogger() != null) {
-                        this.getLogger().info(
-                                "mail recipients [" + mailOrder.getRecipientsAsString() + "] are replaced by settings: " + this.getMailTo());
-                    }
+                    LOGGER.info("mail recipients [" + mailOrder.getRecipientsAsString() + "] are replaced by settings: " + this.getMailTo());
                     mailOrder.clearRecipients();
                     mailOrder.addRecipient(this.getMailTo());
                 }
@@ -173,22 +166,16 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                 mailOrder.setJobId(spooler_task.id());
                 if (this.isLogOnly()) {
                     message = "mail was NOT sent but stored to file: " + mailFile.getAbsolutePath();
-                    if (this.getLogger() != null) {
-                        this.getLogger().info(message);
-                    }
+                    LOGGER.info(message);
                     message = (message.length() > 250 ? message.substring(message.length() - 250) : message);
                     message = message.replaceAll("'", "''");
                 } else {
                     mailOrder.send();
                 }
-                if (this.getLogger() != null) {
-                    this.getLogger().info(
-                            "mail was " + (this.isLogOnly() ? "processed" : "sent") + " for order " + mailOrderId + " to: "
-                                    + mailOrder.getRecipientsAsString());
-                }
-                if (this.getLogger() != null) {
-                    this.getLogger().debug3("mail was sent with headers: " + mailOrder.dumpHeaders());
-                }
+                LOGGER.info("mail was " + (this.isLogOnly() ? "processed" : "sent") + " for order " + mailOrderId + " to: " + mailOrder
+                        .getRecipientsAsString());
+                LOGGER.debug("mail was sent with headers: " + mailOrder.dumpHeaders());
+
             } catch (Exception ex) {
                 throw new Exception("mail was NOT sent for order " + mailOrderId + ": " + ex.getMessage());
             }
@@ -199,8 +186,8 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
             }
         } catch (Exception e) {
             if (spooler_task.job().order_queue() != null) {
-                spooler_log.warn("error occurred processing mail ["
-                        + ((order != null) ? "job chain: " + order.job_chain().name() + ", order: " + order.id() : "(none)") + "]: " + e.getMessage());
+                spooler_log.warn("error occurred processing mail [" + ((order != null) ? "job chain: " + order.job_chain().name() + ", order: "
+                        + order.id() : "(none)") + "]: " + e.getMessage());
             } else {
                 spooler_log.warn("error occurred processing mail: " + e.getMessage());
             }
