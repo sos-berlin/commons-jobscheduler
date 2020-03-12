@@ -2591,7 +2591,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "connection_error_retry_count_max", description = "The connection_error_retry_count_max", key = "connection_error_retry_count_max", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger connection_error_retry_count_max = new SOSOptionInteger(this, CLASS_NAME + ".connection_error_retry_count_max",
-            "The connection_error_retry_count_max", "3", "3", false);
+            "The connection_error_retry_count_max", "0", "0", false);
 
     @JSOptionDefinition(name = "connection_error_retry_interval", description = "The connection_error_retry_interval in seconds", key = "connection_error_retry_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionString connection_error_retry_interval = new SOSOptionString(this, CLASS_NAME + ".connection_error_retry_interval",
