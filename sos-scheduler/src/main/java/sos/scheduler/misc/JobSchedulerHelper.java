@@ -13,7 +13,6 @@ import sos.spooler.Job;
 import sos.spooler.Job_chain;
 import sos.spooler.Order;
 import sos.spooler.Spooler;
-import sos.util.SOSLogger;
 import sos.xml.SOSXMLXPath;
 
 /** This class helps to do some tasks in Job Scheduler which are inconvenient
@@ -23,11 +22,9 @@ import sos.xml.SOSXMLXPath;
 public class JobSchedulerHelper {
 
     private Spooler spooler;
-    private SOSLogger logger;
     private SimpleDateFormat schedulerDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public JobSchedulerHelper(Spooler spo, SOSLogger log) {
-        this.logger = log;
+    public JobSchedulerHelper(Spooler spo) {
         this.spooler = spo;
     }
 

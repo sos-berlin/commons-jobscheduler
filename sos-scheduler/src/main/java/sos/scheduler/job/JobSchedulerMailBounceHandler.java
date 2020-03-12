@@ -27,6 +27,9 @@ import javax.mail.search.AndTerm;
 import javax.mail.search.HeaderTerm;
 import javax.mail.search.SearchTerm;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sos.net.SOSMail;
 import sos.net.SOSMailAttachment;
 import sos.net.SOSMailReceiver;
@@ -38,6 +41,8 @@ import sos.util.SOSString;
 
 /** @author ghassan beydoun */
 public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerMailBounceHandler.class);
 
     private static final String X_SOSMAIL_DELIVERY_COUNTER_HEADER = "X-SOSMail-delivery-counter";
     private List<Map<String, String>> mailBouncePatternTableList = new ArrayList<Map<String, String>>();
@@ -61,7 +66,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     String protocol = "imap";
     String pop3_user = "";
     String pop3_password = "";
-    boolean mailUseSsl=false;
+    boolean mailUseSsl = false;
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
@@ -73,7 +78,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             if (!super.spooler_init()) {
                 return false;
             }
-            getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+            LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
             this.getJobSettings().setKeysToLowerCase();
             setJobSettings();
             getMailBouncePatterns();
@@ -90,7 +95,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             }
             if (spooler_task.params().var("mail_use_ssl") != null && !spooler_task.params().var("mail_use_ssl").isEmpty()) {
                 if ("true".equalsIgnoreCase(spooler_task.params().var("mail_use_ssl"))) {
-                	mailUseSsl=true;
+                    mailUseSsl = true;
                 }
                 spooler_log.debug6(".. job parameter [mail_use_ssl]: [" + spooler_task.params().var("mail_use_ssl") + "]");
             }
@@ -108,7 +113,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             new File(getBounceDirectory()).mkdirs();
         } catch (Exception e) {
             try {
-                this.getLogger().error(SOSClassUtil.getMethodName() + ": " + e.getMessage());
+                LOGGER.error(SOSClassUtil.getMethodName() + ": " + e.getMessage(), e);
             } catch (Exception ex) {
                 //
             }
@@ -123,8 +128,8 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         Message[] messages = {};
         SOSMimeMessage sosMimeMessage = null;
         try {
-            this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password,mailUseSsl,protocol);
+            LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
+            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password, mailUseSsl, protocol);
             receiver.connect(protocol);
             folder = receiver.openFolder("INBOX", receiver.READ_WRITE);
             if (this.isHandleBouncedMessagesOnly()) {
@@ -132,7 +137,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             } else {
                 messages = folder.getMessages();
             }
-            getLogger().debug5("total found messages: " + messages.length);
+            LOGGER.debug("total found messages: " + messages.length);
             for (int i = 0; i < messages.length; i++) {
                 sosMimeMessage = new SOSMimeMessage(messages[i]);
                 if (sosMimeMessage.isBounce()) {
@@ -168,50 +173,50 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             throw new Exception("[protocol] missing!!");
         }
         protocol = ini.getProperty("protocol");
-        this.getLogger().debug5("..protocol [" + protocol + "]");
+        LOGGER.debug("..protocol [" + protocol + "]");
         if (ini.getProperty("pop3_host") == null) {
             throw new Exception("[pop3_host] missing!!");
         }
         receiverHost = ini.getProperty("pop3_host");
-        this.getLogger().debug5("..receiver host [" + receiverHost + "]");
+        LOGGER.debug("..receiver host [" + receiverHost + "]");
         if (ini.getProperty("smtp_host") == null) {
             throw new Exception("[smtp host] missing!!");
         }
         smtpHost = ini.getProperty("smtp_host");
-        this.getLogger().debug5("..smtp host [" + smtpHost + "]");
+        LOGGER.debug("..smtp host [" + smtpHost + "]");
         if (ini.getProperty("smtp_port") == null) {
             throw new Exception("[smtp port] missing!!");
         }
         smtpPort = ini.getProperty("smtp_port");
-        this.getLogger().debug5("..smtp port [" + smtpPort + "]");
+        LOGGER.debug("..smtp port [" + smtpPort + "]");
         if (ini.getProperty("pop3_user") == null) {
             throw new Exception("[pop3_user] missing!!");
         }
         pop3_user = ini.getProperty("pop3_user");
-        this.getLogger().debug5("..pop3 user [" + pop3_user + "]");
+        LOGGER.debug("..pop3 user [" + pop3_user + "]");
         if (ini.getProperty("pop3_password") == null) {
             throw new Exception("[pop3_password] missing!!");
         }
         pop3_password = ini.getProperty("pop3_password");
-        this.getLogger().debug5("..pop3 password [****]");
+        LOGGER.debug("..pop3 password [****]");
         if (ini.getProperty("forward_subject") == null) {
             throw new Exception("[forward_subject] missing!!");
         }
         forwardSubject = ini.getProperty("forward_subject");
-        this.getLogger().debug5("..forward subject [" + forwardSubject + "]");
+        LOGGER.debug("..forward subject [" + forwardSubject + "]");
     }
 
-//    private void setProxy() {
-//        // set proxy if needed
-//    }
+    // private void setProxy() {
+    // // set proxy if needed
+    // }
 
     public final SearchTerm getBounceSerachTerm() throws Exception {
-        this.getLogger().debug5("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         return new AndTerm(new HeaderTerm("Return-Path", "<>"), new HeaderTerm("Content-Type", "multipart/report"));
     }
 
     public String getPatternAction(SOSMimeMessage sosMimeMessage) throws Exception {
-        this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         String actionPattern = null;
         Matcher matcher = null;
         String inputString = null;
@@ -221,10 +226,10 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             patternId = entry.getKey();
             pattern = entry.getValue();
             matcher = pattern.matcher(inputString);
-            this.getLogger().debug5("..try find string matched [" + inputString + "]" + pattern.pattern());
+            LOGGER.debug("..try find string matched [" + inputString + "]" + pattern.pattern());
             if (matcher.find()) {
-                this.getLogger().debug5("string matched [" + inputString + "]" + pattern.pattern());
-                this.getLogger().info("..pattern captured \"" + pattern.pattern() + "\"");
+                LOGGER.debug("string matched [" + inputString + "]" + pattern.pattern());
+                LOGGER.info("..pattern captured \"" + pattern.pattern() + "\"");
                 break;
             }
         }
@@ -238,14 +243,14 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     }
 
     private void getMailBouncePatterns() throws Exception {
-        this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         StringBuilder query = new StringBuilder();
         query.append("SELECT \"PATTERN_ID\",\"PATTERN\",\"ACTION\",\"MAX_RETRIES\",");
         query.append("\"RETRY_INTERVAL\",\"MAIL_TO\",\"CC_TO\",\"BCC_TO\",\"REPLY_TO\",");
         query.append("\"SUBJECT\",\"SUBJECT_TEMPLATE\",\"SUBJECT_TEMPLATE_TYPE\" FROM ");
         query.append(this.getTableMailBouncePatterns());
         query.append(" ORDER BY \"ORDERING\" ASC");
-        this.getLogger().debug5("..query [" + query + "]");
+        LOGGER.debug("..query [" + query + "]");
         mailBouncePatternTableList.addAll(this.getConnection().getArray(query.toString()));
         if (mailBouncePatternTableList.isEmpty()) {
             throw new Exception(SOSClassUtil.getMethodName() + ": No entries found!!");
@@ -253,18 +258,18 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     }
 
     private void setMailBouncePatterns() throws Exception {
-        this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         patternMap = new LinkedHashMap<String, Pattern>();
         String patternId = "";
         String patternString = "";
         Pattern pattern = null;
         for (Map<String, String> record : mailBouncePatternTableList) {
             if ((record.get("pattern_id") != null) && (record.get("pattern") != null)) {
-                getLogger().debug5(record.get("pattern_id") + "=" + "=" + record.get("pattern"));
+                LOGGER.debug(record.get("pattern_id") + "=" + "=" + record.get("pattern"));
                 patternId = record.get("pattern_id");
                 patternString = record.get("pattern");
                 pattern = Pattern.compile(patternString, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-                this.getLogger().debug6("..pattern \"" + record.get("pattern") + "\" compiled successfully.");
+                LOGGER.trace("..pattern \"" + record.get("pattern") + "\" compiled successfully.");
                 patternMap.put(patternId, pattern);
             }
         }
@@ -274,7 +279,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         String bouncedMailAction = "";
         int bouncedMailStatus = -1;
         Vector<SOSMailAttachment> sosMailAttachmentList = sosMimeMessage.getSosMailAttachments();
-        this.getLogger().info("..bounced message found:");
+        LOGGER.info("..bounced message found:");
         Iterator<SOSMailAttachment> it = sosMailAttachmentList.iterator();
         SOSMailAttachment sosMailAttachment = null;
         for (; it.hasNext();) {
@@ -282,24 +287,23 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             if ("message/rfc822".equalsIgnoreCase(sosMailAttachment.getContentType())) {
                 SOSMimeMessage originalMessage = sosMimeMessage.getAttachedSosMimeMessage(receiver.getSession(), sosMailAttachment.getContent());
                 this.setXSOSMailDeliveryCounterHeader(getXSOSMailDeliveryCounterHeader(originalMessage));
-                this.getLogger().info("....originally message attributes:");
-                this.getLogger().info("....message id [" + originalMessage.getMessageId() + "]");
-                this.getLogger().info("....from [" + originalMessage.getFromAddress() + "]");
-                this.getLogger().info("....sent date [" + originalMessage.getSentDateAsString("yyyy-MM-dd HH:mm:ss") + "]");
+                LOGGER.info("....originally message attributes:");
+                LOGGER.info("....message id [" + originalMessage.getMessageId() + "]");
+                LOGGER.info("....from [" + originalMessage.getFromAddress() + "]");
+                LOGGER.info("....sent date [" + originalMessage.getSentDateAsString("yyyy-MM-dd HH:mm:ss") + "]");
                 setMailId(getMailId(originalMessage.getMessageId()));
                 if (SOSString.isEmpty(getMailId())) {
                     continue;
                 }
                 this.updateTableMails(originalMessage.getMessageId());
                 if (!SOSString.isEmpty(getXSOSMailDeliveryCounterHeader())) {
-                    this.getLogger().info(
-                            "...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
-                                    + this.getXSOSMailDeliveryCounterHeader() + "]");
+                    LOGGER.info("...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " [" + this
+                            .getXSOSMailDeliveryCounterHeader() + "]");
                 }
                 bouncedMailAction = this.getPatternAction(sosMimeMessage);
-                this.getLogger().info("..available pattern action for this bounce [" + bouncedMailAction + "]");
+                LOGGER.info("..available pattern action for this bounce [" + bouncedMailAction + "]");
                 if ("drop".equalsIgnoreCase(bouncedMailAction)) {
-                    this.getLogger().info("..Message with ID [" + sosMimeMessage.getMessageId() + "] is marked for delete.");
+                    LOGGER.info("..Message with ID [" + sosMimeMessage.getMessageId() + "] is marked for delete.");
                     sosMimeMessage.deleteMessage();
                     bouncedMailStatus = BounceMailStatus.CANCELLED;
                 } else if ("store".equalsIgnoreCase(bouncedMailAction)) {
@@ -310,18 +314,18 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                     if (isRetrySendingAllowed(originalMessage.getMessageId())) {
                         setRetryInterval(getRetryInterval(originalMessage));
                         int currentHeaderValue;
-                        if ((currentHeaderValue = originalMessage.incrementHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER)) == -1) {
+                        if ((currentHeaderValue = originalMessage.incrementHeader(
+                                JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER)) == -1) {
                             currentHeaderValue = 1;
                             originalMessage.setHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER, "1");
-                            getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
+                            LOGGER.debug(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
                         }
-                        getLogger().debug5(
-                                "..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
-                                        + currentHeaderValue + "]");
-                        getLogger().debug5("..query directory [" + bounceDirectory + " ] set.");
+                        LOGGER.debug("..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
+                                + currentHeaderValue + "]");
+                        LOGGER.debug("..query directory [" + bounceDirectory + " ] set.");
                         originalMessage.setQueueDir(bounceDirectory);
                         originalMessage.dumpMessageToFile(true, false);
-                        this.getLogger().debug5("..currently dumped message [" + originalMessage.getDumpedFileName() + "]");
+                        LOGGER.debug("..currently dumped message [" + originalMessage.getDumpedFileName() + "]");
                         if (!orderRetrySend(originalMessage)) {
                             continue;
                         }
@@ -339,7 +343,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     public void updateMailBouncesTable(SOSMimeMessage sosMimeMessage, int bouncedMailStatusCode) throws Exception {
         StringBuilder query = new StringBuilder();
         String bouncedMailStatusText = "";
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         if (bouncedMailStatusCode == BounceMailStatus.REQUESTED) {
             bouncedMailStatusText = "requested";
         } else if (bouncedMailStatusCode == BounceMailStatus.CANCELLED) {
@@ -377,7 +381,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append("',%now,'");
         query.append(this.getJobName());
         query.append("')");
-        this.getLogger().debug5("update MAIL_BOUNCES_TABLE: " + query);
+        LOGGER.debug("update MAIL_BOUNCES_TABLE: " + query);
         this.getConnection().execute(query.toString());
         this.getConnection().commit();
     }
@@ -391,7 +395,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     }
 
     public void setPatternActions() throws Exception {
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         this.patternActions = new HashMap<String, String>();
         this.patternActions.put("0", "drop");
         this.patternActions.put("10", "store");
@@ -400,7 +404,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     }
 
     public int getRetryCounter(String messageId) throws Exception {
-        this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         Map<String, String> result = new HashMap<String, String>();
         StringBuffer query = new StringBuffer();
         query.append("SELECT \"RETRY_COUNT\" FROM ");
@@ -408,11 +412,11 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append(" WHERE \"MESSAGE_ID\" ='");
         query.append(messageId);
         query.append("'");
-        getLogger().debug5("..query[" + query.toString() + "]");
+        LOGGER.debug("..query[" + query.toString() + "]");
         result = getConnection().getSingle(query.toString());
         if (result.get("retry_count") != null && !SOSString.isEmpty(result.get("retry_count"))) {
             try {
-                getLogger().info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count") + "] time(s)");
+                LOGGER.info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count") + "] time(s)");
             } catch (Exception e) {
                 //
             }
@@ -423,7 +427,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
     public void updateTableMails(String messageId) throws Exception {
         StringBuilder query = new StringBuilder();
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         query.append("UPDATE ");
         query.append(this.getTableMails());
         query.append(" SET \"STATUS\"=");
@@ -434,34 +438,34 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append("' WHERE \"MESSAGE_ID\"='");
         query.append(messageId);
         query.append("'");
-        this.getLogger().debug5("update table \"MAILS\": " + query);
+        LOGGER.debug("update table \"MAILS\": " + query);
         this.getConnection().execute(query.toString());
     }
 
     private String getMailId(String messageId) throws Exception {
         StringBuilder query = new StringBuilder();
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         query.append("SELECT \"ID\" FROM ");
         query.append(this.getTableMails());
         query.append(" WHERE \"MESSAGE_ID\"='");
         query.append(messageId);
         query.append("'");
-        this.getLogger().debug5(".. query: " + query);
+        LOGGER.debug(".. query: " + query);
         return this.getConnection().getSingleValue(query.toString());
     }
 
     public boolean isRetrySendingAllowed(String messageId) throws Exception {
         int retryCounter = -1;
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         retryCounter = this.getRetryCounter(messageId);
         if (retryCounter <= 0 && !SOSString.isEmpty(this.getXSOSMailDeliveryCounterHeader())) {
             retryCounter = Integer.parseInt(this.getXSOSMailDeliveryCounterHeader());
         }
-        getLogger().debug3(".. current retry counter [" + retryCounter + "]");
+        LOGGER.debug(".. current retry counter [" + retryCounter + "]");
         if (retryCounter > 0) {
             for (Map<String, String> patternEntry : this.mailBouncePatternTableList) {
-                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").equals(patternId)
-                        && patternEntry.get("max_retries") != null) {
+                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").equals(patternId) && patternEntry.get(
+                        "max_retries") != null) {
                     return Integer.parseInt(patternEntry.get("max_retries").toString()) > retryCounter;
                 }
             }
@@ -472,7 +476,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     public int getRetryInterval(SOSMimeMessage sosMimeMessage) throws Exception {
         StringBuilder query = new StringBuilder();
         String retryItervalString = null;
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         int atIndex = sosMimeMessage.getFromAddress().indexOf('@');
         String domain = sosMimeMessage.getFromAddress().substring(atIndex + 1, sosMimeMessage.getFromAddress().length());
         retryInterval = -1;
@@ -481,7 +485,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append(" WHERE \"DOMAIN\"='");
         query.append(domain);
         query.append("'");
-        this.getLogger().debug5("..query [" + query + "]");
+        LOGGER.debug("..query [" + query + "]");
         retryItervalString = getConnection().getSingleValue(query.toString());
         if (!SOSString.isEmpty(retryItervalString)) {
             retryInterval = Integer.parseInt(retryItervalString);
@@ -492,13 +496,13 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             query.append(this.getTableMailBouncePatternRetries());
             query.append(" WHERE \"PATTERN_ID\"=");
             query.append(patternId);
-            this.getLogger().debug5("..query [" + query + "]");
+            LOGGER.debug("..query [" + query + "]");
             retryItervalString = getConnection().getSingleValue(query.toString());
             if (!SOSString.isEmpty(retryItervalString)) {
                 retryInterval = Integer.parseInt(retryItervalString);
             }
         }
-        this.getLogger().debug5("..current retry interval [" + retryInterval + "]");
+        LOGGER.debug("..current retry interval [" + retryInterval + "]");
         return retryInterval;
     }
 
@@ -531,7 +535,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     }
 
     public boolean orderRetrySend(SOSMimeMessage sosMimeMessage) throws Exception {
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         Variable_set orderData = spooler.create_variable_set();
         orderData.set_var("file", new File(sosMimeMessage.getDumpedFileName()).getName());
         if (!SOSString.isEmpty(getMailId())) {
@@ -541,12 +545,12 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         order.set_title(this.getJobTitle() + "." + jobChainName);
         order.set_payload(orderData);
         if (!spooler.job_chain_exists(jobChainName)) {
-            getLogger().warn("could not find job chain: " + jobChainName);
+            LOGGER.warn("could not find job chain: " + jobChainName);
             return false;
         }
         spooler.job_chain(jobChainName).add_or_replace_order(order);
         spooler_task.job().set_delay_order_after_setback(1, this.getRetryInterval());
-        getLogger().debug3(".. order " + order.title() + " added.");
+        LOGGER.debug(".. order " + order.title() + " added.");
         return true;
     }
 
@@ -558,24 +562,24 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         this.jobChainName = jobChainName;
     }
 
-//    private void createJobChain() throws Exception {
-//        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-//        if (spooler.job_chain_exists(jobChainName)) {
-//            return;
-//        }
-//        Job_chain jobChain = spooler.create_job_chain();
-//        getLogger().debug5(".. job chain [" + jobChainName + "] created.");
-//        jobChain.set_name(this.getJobName() + "." + jobChainName);
-//        jobChain.add_job(jobChainName, "0", "100", "1100");
-//        getLogger().debug3(".. job [" + jobChainName + "] added.");
-//        jobChain.add_end_state("100");
-//        jobChain.add_end_state("1100");
-//        spooler.add_job_chain(jobChain);
-//        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-//    }
+    // private void createJobChain() throws Exception {
+    // LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
+    // if (spooler.job_chain_exists(jobChainName)) {
+    // return;
+    // }
+    // Job_chain jobChain = spooler.create_job_chain();
+    // LOGGER.debug(".. job chain [" + jobChainName + "] created.");
+    // jobChain.set_name(this.getJobName() + "." + jobChainName);
+    // jobChain.add_job(jobChainName, "0", "100", "1100");
+    // LOGGER.debug(".. job [" + jobChainName + "] added.");
+    // jobChain.add_end_state("100");
+    // jobChain.add_end_state("1100");
+    // spooler.add_job_chain(jobChain);
+    // LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
+    // }
 
     public void forwardMessage(MimeMessage message, Session session) throws Exception {
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+        LOGGER.debug("Calling " + SOSClassUtil.getMethodName());
         String[] toArray = {};
         String[] ccArray = {};
         String[] bccArray = {};
@@ -586,20 +590,20 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                     throw new Exception("[mail_to] missing!!");
                 }
                 toArray = patternEntry.get("mail_to").trim().split("[;,]");
-                this.getLogger().debug6("..mail to  [" + patternEntry.get("mail_to") + "]");
+                LOGGER.trace("..mail to  [" + patternEntry.get("mail_to") + "]");
                 if (patternEntry.get("mail_cc") != null) {
                     ccArray = patternEntry.get("mail_cc").trim().split("[;,]");
-                    this.getLogger().debug6("..mail cc [" + patternEntry.get("mail_cc") + "]");
+                    LOGGER.trace("..mail cc [" + patternEntry.get("mail_cc") + "]");
                 }
                 if (patternEntry.get("mail_bcc") != null) {
                     ccArray = patternEntry.get("mail_bcc").trim().split("[;,]");
-                    this.getLogger().debug6("..mail bcc [" + patternEntry.get("mail_bcc") + "]");
+                    LOGGER.trace("..mail bcc [" + patternEntry.get("mail_bcc") + "]");
                 }
                 if (patternEntry.get("reply_to") == null) {
                     throw new Exception("[reply_to] missing!!");
                 }
                 mailFrom = patternEntry.get("reply_to");
-                this.getLogger().debug6("..reply_to [" + patternEntry.get("reply_to") + "]");
+                LOGGER.trace("..reply_to [" + patternEntry.get("reply_to") + "]");
                 break;
             }
         }

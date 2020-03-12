@@ -8,7 +8,6 @@ import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
 import sos.util.SOSArguments;
-import sos.util.SOSLogger;
 
 /** @author andreas pueschel
  * @deprecated use sos.scheduler.managed.configuration.ConfigurationJob */
@@ -160,10 +159,6 @@ public class ProcessJob extends Job_impl {
     }
 
     public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings) throws Exception {
-        return getSchedulerConnection(schedulerSettings, null);
-    }
-
-    public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings, final SOSLogger log) throws Exception {
         String dbProperty = schedulerSettings.getSection("spooler").getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
         dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
         if (dbProperty.endsWith("-password=")) {

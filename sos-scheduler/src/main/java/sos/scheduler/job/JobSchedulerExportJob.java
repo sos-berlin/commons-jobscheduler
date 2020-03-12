@@ -11,7 +11,6 @@ import sos.marshalling.SOSExport;
 import sos.spooler.Variable_set;
 import sos.util.SOSClassUtil;
 import sos.util.SOSDate;
-import sos.util.SOSStandardLogger;
 import sos.util.SOSString;
 
 /** @author mueruevet oeksuez */
@@ -196,7 +195,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
         org.w3c.dom.Element queries = null;
         SOSExport export = null;
         try {
-            export = new SOSExport(sosConnection, filename, "EXPORT", new SOSStandardLogger(spooler_log.level()));
+            export = new SOSExport(sosConnection, filename, "EXPORT");
             queries = getQueryElement(queryfile, jobChain);
             if (queries != null) {
                 exportQueryRecursiv(queries, export, -1, operation);

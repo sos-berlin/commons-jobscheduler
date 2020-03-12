@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -13,6 +12,8 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -21,13 +22,12 @@ import org.w3c.dom.NodeList;
 import sos.net.SOSMail;
 import sos.spooler.Monitor_impl;
 import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
 import sos.xml.SOSXMLXPath;
 
 /** @author andreas pueschel */
 public class ProcessBaseMonitor extends Monitor_impl {
 
-    private SOSSchedulerLogger sosLogger = null;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessBaseMonitor.class);
     private Document configuration = null;
     private StringBuilder configurationBuilder = null;
     private String configurationPath = "";
@@ -36,61 +36,59 @@ public class ProcessBaseMonitor extends Monitor_impl {
     private TreeMap envvars = null;
 
     public void initConfiguration() throws Exception {
+        Variable_set orderParams = null;
         if (spooler_job.order_queue() != null) {
-            if (spooler_task.order().params().value("configuration_path") != null
-                    && !spooler_task.order().params().value("configuration_path").isEmpty()) {
-                this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
+            orderParams = spooler_task.order().params();
+            if (orderParams.value("configuration_path") != null && !orderParams.value("configuration_path").isEmpty()) {
+                setConfigurationPath(orderParams.value("configuration_path"));
             }
-            if (spooler_task.order().params().value("configuration_file") != null
-                    && !spooler_task.order().params().value("configuration_file").isEmpty()) {
-                this.setConfigurationFilename(spooler_task.order().params().value("configuration_file"));
+            if (orderParams.value("configuration_file") != null && !orderParams.value("configuration_file").isEmpty()) {
+                setConfigurationFilename(orderParams.value("configuration_file"));
             }
+
+            initConfiguration(getConfigurationPath(), getConfigurationFilename(), orderParams);
         }
-        this.initConfiguration(this.getConfigurationPath(), this.getConfigurationFilename());
     }
 
-    public void initConfiguration(String configurationPath, String configurationFilename) throws Exception {
-        if (spooler_job.order_queue() != null && spooler_task.order().params().value("configuration_path") != null
-                && !spooler_task.order().params().value("configuration_path").isEmpty()) {
-            this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
+    private void initConfiguration(String configurationPath, String configurationFilename, Variable_set orderParams) throws Exception {
+        if (orderParams.value("configuration_path") != null && !orderParams.value("configuration_path").isEmpty()) {
+            setConfigurationPath(orderParams.value("configuration_path"));
         }
         if (configurationFilename.startsWith(".") || configurationFilename.startsWith("/") || configurationFilename.startsWith("\\")
                 || configurationFilename.indexOf(":") > -1 || configurationPath == null || configurationPath.isEmpty()) {
-            this.initConfiguration(configurationFilename);
+            initConfiguration(configurationFilename, orderParams);
         } else {
-            this.initConfiguration(configurationPath + ((!configurationPath.endsWith("/") && !configurationPath.endsWith("\\")) ? "/" : "")
-                    + configurationFilename);
+            initConfiguration(configurationPath + ((!configurationPath.endsWith("/") && !configurationPath.endsWith("\\")) ? "/" : "")
+                    + configurationFilename, orderParams);
         }
     }
 
-    public void initConfiguration(String configurationFilename) throws Exception {
+    private void initConfiguration(String configurationFilename, Variable_set orderParams) throws Exception {
         FileInputStream fis = null;
         try {
-            if (spooler_task.job().order_queue() != null) {
-                if (configurationFilename == null || configurationFilename.isEmpty()) {
-                    throw new Exception("no configuration filename was specified");
-                }
-                File configurationFile = new File(configurationFilename);
-                if (!configurationFile.exists()) {
-                    throw new Exception("configuration file not found: " + configurationFile.getCanonicalPath());
-                } else if (!configurationFile.canRead()) {
-                    throw new Exception("configuration file is not accessible: " + configurationFile.getCanonicalPath());
-                }
-                fis = new FileInputStream(configurationFile);
-                BufferedInputStream in = new BufferedInputStream(fis);
-                byte inBuffer[] = new byte[1024];
-                int inBytesRead;
-                this.configurationBuilder = new StringBuilder();
-                while ((inBytesRead = in.read(inBuffer)) != -1) {
-                    this.configurationBuilder.append(new String(inBuffer, 0, inBytesRead));
-                }
-                spooler_task.order().set_xml_payload(this.configurationBuilder.toString());
-                spooler_task.order().params().set_var("scheduler_order_configuration_loaded", "true");
-                spooler_task.order().params().set_var("configuration_file", configurationFilename);
+            if (configurationFilename == null || configurationFilename.isEmpty()) {
+                throw new Exception("no configuration filename was specified");
             }
+            File configurationFile = new File(configurationFilename);
+            if (!configurationFile.exists()) {
+                throw new Exception("configuration file not found: " + configurationFile.getCanonicalPath());
+            } else if (!configurationFile.canRead()) {
+                throw new Exception("configuration file is not accessible: " + configurationFile.getCanonicalPath());
+            }
+            fis = new FileInputStream(configurationFile);
+            BufferedInputStream in = new BufferedInputStream(fis);
+            byte inBuffer[] = new byte[1024];
+            int inBytesRead;
+            this.configurationBuilder = new StringBuilder();
+            while ((inBytesRead = in.read(inBuffer)) != -1) {
+                this.configurationBuilder.append(new String(inBuffer, 0, inBytesRead));
+            }
+            spooler_task.order().set_xml_payload(this.configurationBuilder.toString());
+            orderParams.set_var("scheduler_order_configuration_loaded", "true");
+            orderParams.set_var("configuration_file", configurationFilename);
         } catch (Exception e) {
-            this.getLogger().warn("error occurred initializing configuration: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            LOGGER.warn("error occurred initializing configuration: " + e.toString(),e);
+            throw e;
         } finally {
             try {
                 if (fis != null) {
@@ -109,10 +107,9 @@ public class ProcessBaseMonitor extends Monitor_impl {
         try {
             this.orderParameterKeys = new Vector();
             if (spooler_task.job().order_queue() != null) {
-                if (spooler_task.order().xml_payload() == null || spooler_task.order().xml_payload().isEmpty()
-                        || spooler_task.order().params() == null
-                        || spooler_task.order().params().value("scheduler_order_configuration_loaded") == null
-                        || spooler_task.order().params().value("scheduler_order_configuration_loaded").isEmpty()) {
+                if (spooler_task.order().xml_payload() == null || spooler_task.order().xml_payload().isEmpty() || spooler_task.order()
+                        .params() == null || spooler_task.order().params().value("scheduler_order_configuration_loaded") == null || spooler_task
+                                .order().params().value("scheduler_order_configuration_loaded").isEmpty()) {
                     this.initConfiguration();
                 }
                 if (spooler_task.order().xml_payload() == null) {
@@ -135,17 +132,17 @@ public class ProcessBaseMonitor extends Monitor_impl {
                 if (nodeSettings != null) {
                     nodeMapSettings = nodeSettings.getAttributes();
                     if (nodeMapSettings != null && nodeMapSettings.getNamedItem("value") != null) {
-                        this.getLogger().debug1("Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue());
-                        this.getLogger().setLogLevel(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
+                        LOGGER.debug("Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue());
+                        //this.getLogger().setLogLevel(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
                     }
                 }
                 this.setEnvVars();
                 nodeQuery = "//job_chain[@name='" + spooler_task.order().job_chain().name() + "']/order";
-                this.getLogger().debug9("monitor: lookup order for job chain: " + nodeQuery + "/params/param");
+                LOGGER.trace("monitor: lookup order for job chain: " + nodeQuery + "/params/param");
                 nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 if (nodeList == null || nodeList.getLength() == 0) {
                     nodeQuery = "//application[@name='" + spooler_task.order().job_chain().name() + "']/order";
-                    this.getLogger().debug9("monitor: lookup order for application: " + nodeQuery + "/params/param");
+                    LOGGER.trace("monitor: lookup order for application: " + nodeQuery + "/params/param");
                     nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 }
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -169,21 +166,19 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                     }
                                 }
                             }
-                            this.getLogger().debug1(".. monitor: global configuration parameter [" + nodeName + "]: " + nodeValue);
+                            LOGGER.debug(".. monitor: global configuration parameter [" + nodeName + "]: " + nodeValue);
                             spooler_task.order().params().set_var(nodeName, nodeValue);
                         }
                     }
                 }
-                nodeQuery =
-                        "//job_chain[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='" + spooler_task.order().state()
-                                + "']";
-                this.getLogger().debug9("monitor: lookup order node query for job chain: " + nodeQuery + "/params/param");
+                nodeQuery = "//job_chain[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='" + spooler_task.order()
+                        .state() + "']";
+                LOGGER.trace("monitor: lookup order node query for job chain: " + nodeQuery + "/params/param");
                 nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 if (nodeList == null || nodeList.getLength() == 0) {
-                    nodeQuery =
-                            "//application[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='"
-                                    + spooler_task.order().state() + "']";
-                    this.getLogger().debug9("monitor: lookup order node query for application: " + nodeQuery + "/params/param");
+                    nodeQuery = "//application[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='" + spooler_task.order()
+                            .state() + "']";
+                    LOGGER.trace("monitor: lookup order node query for application: " + nodeQuery + "/params/param");
                     nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 }
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -192,11 +187,10 @@ public class ProcessBaseMonitor extends Monitor_impl {
                         NamedNodeMap nodeMap = node.getAttributes();
                         if (nodeMap != null && nodeMap.getNamedItem("name") != null) {
                             if (nodeMap.getNamedItem("value") != null) {
-                                this.getLogger().debug1(
-                                        ".. monitor: configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
-                                                + nodeMap.getNamedItem("value").getNodeValue());
-                                spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(),
-                                        nodeMap.getNamedItem("value").getNodeValue());
+                                LOGGER.debug(".. monitor: configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
+                                        + nodeMap.getNamedItem("value").getNodeValue());
+                                spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value")
+                                        .getNodeValue());
                                 this.orderParameterKeys.add(nodeMap.getNamedItem("name").getNodeValue());
                             } else {
                                 NodeList children = node.getChildNodes();
@@ -209,8 +203,8 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                         nodeValue += item.getNodeValue();
                                     }
                                 }
-                                this.getLogger().debug1(
-                                        ".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: " + nodeValue);
+                                LOGGER.debug(".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
+                                        + nodeValue);
                                 spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeValue);
                             }
                         }
@@ -225,22 +219,18 @@ public class ProcessBaseMonitor extends Monitor_impl {
                         String parameterValue = spooler_task.order().params().value(parameterNames[i]);
                         int trials = 0;
                         while (parameterValue.indexOf("${") != -1 && trials <= 1) {
-                            this.getLogger().debug1("substitution trials: " + trials + " --> " + parameterValue);
+                            LOGGER.debug("substitution trials: " + trials + " --> " + parameterValue);
                             for (int j = 0; j < parameterNames.length; j++) {
-                                this.getLogger().debug9(
-                                        "parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${" + parameterNames[j] + "}"));
-                                if (!parameterNames[i].equals(parameterNames[j])
-                                        && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
-                                                + parameterNames[j] + "}") != -1)) {
+                                LOGGER.trace("parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${"
+                                        + parameterNames[j] + "}"));
+                                if (!parameterNames[i].equals(parameterNames[j]) && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1
+                                        || parameterValue.indexOf("${basename:" + parameterNames[j] + "}") != -1)) {
                                     if (parameterValue.indexOf("${basename:") != -1) {
-                                        parameterValue =
-                                                myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(
-                                                        spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]",
-                                                        "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(
+                                                spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     } else {
-                                        parameterValue =
-                                                myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}",
-                                                        spooler_task.order().params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", spooler_task.order()
+                                                .params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
                                     }
                                     parameterFound = true;
                                     trials = 0;
@@ -254,24 +244,22 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                 Object envName = envIterator.next();
                                 Object envValue = this.envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName.toString() + "}") != -1) {
-                                    parameterValue =
-                                            myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", envValue.toString().replaceAll(
-                                                    "[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", envValue.toString()
+                                            .replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue =
-                                            myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}",
-                                                    new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue
+                                            .toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 }
                             }
                         }
                         if (parameterFound) {
-                            this.getLogger().debug3("parameter substitution [" + parameterNames[i] + "]: " + parameterValue);
+                            LOGGER.debug("parameter substitution [" + parameterNames[i] + "]: " + parameterValue);
                             spooler_task.order().params().set_var(parameterNames[i], parameterValue);
                         }
                         if (envFound) {
-                            this.getLogger().debug3("environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
+                            LOGGER.debug("environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
                             spooler_task.order().params().set_var(parameterNames[i], parameterValue);
                         }
                     }
@@ -279,8 +267,8 @@ public class ProcessBaseMonitor extends Monitor_impl {
             }
             return this.getConfiguration();
         } catch (Exception e) {
-            this.getLogger().warn("Monitor: error occurred preparing configuration: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            LOGGER.warn("Monitor: error occurred preparing configuration: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -325,24 +313,15 @@ public class ProcessBaseMonitor extends Monitor_impl {
             }
             sosMail.setSubject(subject);
             sosMail.setBody(body);
-            this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
+            LOGGER.info("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
-                this.getLogger().warn(
-                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
-                                + "]:" + sosMail.getLastError());
+                LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail
+                        .getQueueDir() + "]:" + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {
             throw new Exception("error occurred in monitor sending mai: " + e.getMessage());
         }
-    }
-
-    public SOSSchedulerLogger getLogger() {
-        return sosLogger;
-    }
-
-    public void setLogger(SOSSchedulerLogger sosLogger) {
-        this.sosLogger = sosLogger;
     }
 
     public Document getConfiguration() {
@@ -377,44 +356,19 @@ public class ProcessBaseMonitor extends Monitor_impl {
             win = true;
         }
         Variable_set env = spooler_task.create_subprocess().env();
-        this.getLogger().debug9("environment variable names: " + env.names());
+        LOGGER.trace("environment variable names: " + env.names());
         StringTokenizer t = new StringTokenizer(env.names(), ";");
         while (t.hasMoreTokens()) {
             String envname = t.nextToken();
             if (envname != null) {
                 String envvalue = env.value(envname);
                 if (win) {
-                    this.getLogger().debug9("set environment variable: " + envname.toUpperCase() + "=" + envvalue);
+                    LOGGER.trace("set environment variable: " + envname.toUpperCase() + "=" + envvalue);
                     this.envvars.put(envname.toUpperCase(), envvalue);
                 } else {
-                    this.getLogger().debug9("set environment variable: " + envname + "=" + envvalue);
+                    LOGGER.trace("set environment variable: " + envname + "=" + envvalue);
                     this.envvars.put(envname, envvalue);
                 }
-            }
-        }
-    }
-
-    private int logLevel2Int(String l) {
-        HashMap levels = new HashMap();
-        if (l == null) {
-            return this.getLogger().getLogLevel();
-        } else {
-            levels.put("info", "10");
-            levels.put("warn", "11");
-            levels.put("error", "12");
-            levels.put("debug1", "1");
-            levels.put("debug2", "2");
-            levels.put("debug3", "3");
-            levels.put("debug4", "4");
-            levels.put("debug5", "5");
-            levels.put("debug6", "6");
-            levels.put("debug7", "7");
-            levels.put("debug8", "8");
-            levels.put("debug9", "9");
-            if (levels.get(l) != null) {
-                return Integer.parseInt(levels.get(l).toString());
-            } else {
-                return this.getLogger().getLogLevel();
             }
         }
     }

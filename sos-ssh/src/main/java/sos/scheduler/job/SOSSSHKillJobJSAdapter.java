@@ -27,24 +27,20 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
 
     @Override
     public boolean spooler_process() throws Exception {
-        boolean successfull = true;
         try {
             super.spooler_process();
-            successfull = doProcessing();
+            doProcessing();
+
+            return getSpoolerProcess().getSuccess();
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
-        }
-        if (successfull) {
-            return signalSuccess();
-        } else {
-            return signalFailure();
         }
     }
 
     private boolean doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getJobOrOrderParameters());
+        allParams.putAll(getJobOrOrderParameters(getSpoolerProcess().getOrder()));
         boolean taskIsActive = true;
         boolean timeoutAfterKillIsSet = false;
         if (allParams.get(PARAM_SSH_JOB_TASK_ID) != null && !allParams.get(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
@@ -57,13 +53,12 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         }
         LOGGER.info("Task is still active: " + taskIsActive);
 
-        String currentNodeName = getCurrentNodeName(false);
+        String currentNodeName = getCurrentNodeName(getSpoolerProcess().getOrder(), false);
         SOSSSHCheckRemotePidJob job = executeCheckPids(currentNodeName);
         if (job.getPids() != null) {
             LOGGER.trace(job.getPids());
-            Order order = spooler_task.order();
-            if (order != null) {
-                Variable_set orderParams = order.params();
+            if (getSpoolerProcess().getOrder() != null) {
+                Variable_set orderParams = getSpoolerProcess().getOrder().params();
                 if (orderParams != null) {
                     orderParams.set_var(PARAM_PIDS_TO_KILL, job.getPids());
                 }
