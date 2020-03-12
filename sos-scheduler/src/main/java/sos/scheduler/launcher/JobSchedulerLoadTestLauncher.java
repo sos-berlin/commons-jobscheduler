@@ -8,7 +8,6 @@ import org.w3c.dom.Node;
 
 import sos.scheduler.command.SOSSchedulerCommand;
 import sos.util.SOSClassUtil;
-import sos.util.SOSLogger;
 import sos.util.SOSString;
 import sos.xml.SOSXMLXPath;
 
