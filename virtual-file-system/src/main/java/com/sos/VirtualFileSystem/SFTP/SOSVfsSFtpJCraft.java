@@ -1296,6 +1296,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     channel.disconnect();
                 } catch (Throwable ex) {
+                    if (isDebugEnabled) {
+                        LOGGER.debug(String.format("[executeResultCommand][disconnect]%s", ex.toString()), ex);
+                    }
                 }
             }
 

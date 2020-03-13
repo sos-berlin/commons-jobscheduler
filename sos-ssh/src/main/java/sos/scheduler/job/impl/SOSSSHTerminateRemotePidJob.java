@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 
 public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
@@ -31,7 +32,7 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
     public void execute() throws Exception {
         List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder();
         try {
-            connect();
+            connect(TransferTypes.ssh);
             getTerminateCommandFromJobParameters();
             LOGGER.debug("try to kill remote PIDs");
             for (Integer pid : pidsToKillFromOrder) {

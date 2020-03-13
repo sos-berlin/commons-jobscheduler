@@ -11,7 +11,6 @@ import sos.net.ssh.SOSSSHJobOptions;
 import sos.scheduler.job.impl.SOSSSHCheckRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHKillRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHTerminateRemotePidJob;
-import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
 public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
@@ -28,9 +27,11 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
     public boolean spooler_process() throws Exception {
         try {
             super.spooler_process();
-            doProcessing();
-
-            return getSpoolerProcess().getSuccess();
+            if (doProcessing()) {
+                return getSpoolerProcess().getSuccess();
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);

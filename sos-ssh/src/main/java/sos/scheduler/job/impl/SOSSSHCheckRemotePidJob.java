@@ -6,7 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
 
 public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
@@ -24,7 +26,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
         List<Integer> paramPids = getParamPids();
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
-            connect();
+            connect(TransferTypes.ssh);
             setActiveProcessesCommand();
 
             for (Integer pid : paramPids) {
@@ -43,27 +45,16 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
                     LOGGER.debug("PID " + pid + " is not running anymore");
                 }
             }
-            if (!pidsStillRunning.isEmpty()) {
-                LOGGER.debug("Overriding param " + PARAM_PIDS_TO_KILL);
-
-                StringBuilder sb = new StringBuilder();
-                boolean first = true;
-                for (Integer pid : pidsStillRunning) {
-                    if (first) {
-                        sb.append(pid.toString());
-                        first = false;
-                    } else {
-                        sb.append(",").append(pid.toString());
-                    }
-                }
-                LOGGER.debug("still running PIDs to kill: " + sb.toString());
-                pids = sb.toString();
-            } else {
+            if (pidsStillRunning.isEmpty()) {
                 pids = null;
+                LOGGER.debug("no still running PIDs found");
+            } else {
+                pids = Joiner.on(",").join(pidsStillRunning);
+                LOGGER.debug("all still running PIDs to kill: " + pids);
             }
         } catch (JobSchedulerException ex) {
             if (pidsStillRunning.isEmpty()) {
-                LOGGER.debug("Overriding PARAM_PIDS_TO_KILL with empty String");
+                LOGGER.debug("Overriding " + PARAM_PIDS_TO_KILL + " param with empty String");
                 objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
             }
         } catch (Exception e) {
