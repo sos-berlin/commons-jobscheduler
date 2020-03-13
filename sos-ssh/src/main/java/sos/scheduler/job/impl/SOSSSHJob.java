@@ -547,13 +547,13 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
 
         try {
-            connect();
             deleteTempFiles();
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("[postCommandRead]%s", postCommandRead));
             }
 
+            connect();
             SOSCommandResult result = handler.executeResultCommand(postCommandRead);
 
             if (result.getExitCode() == 0) {
