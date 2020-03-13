@@ -330,9 +330,13 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     public void connect() {
+        connect(null);
+    }
+
+    public void connect(TransferTypes type) {
         try {
             if (handlerOptions == null) {
-                setHandlerOptions(objOptions);
+                setHandlerOptions(objOptions, type);
                 handlerOptions.checkMandatory();
             } else {
                 if (handler.isConnected()) {
@@ -502,6 +506,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public void deleteTempFiles() {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
+            connect();
             for (String file : tempFilesToDelete) {
                 LOGGER.debug("[deleteTempFiles]" + file);
 
@@ -588,7 +593,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    private void setHandlerOptions(SOSSSHJobOptions jobOptions) {
+    private void setHandlerOptions(SOSSSHJobOptions jobOptions, TransferTypes protocol) {
         handlerOptions = new SOSConnection2OptionsAlternate();
         handlerOptions.strictHostKeyChecking.value(jobOptions.strictHostKeyChecking.value());
         handlerOptions.host.setValue(jobOptions.getHost().getValue());
@@ -620,11 +625,15 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             mapBackOptionsFromCS(handlerOptions);
         }
 
-        if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || (objOptions.commandScriptFile
-                .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty())) {
-            handlerOptions.protocol.setValue(TransferTypes.sftp.name());
+        if (protocol == null) {
+            if ((objOptions.commandScript.getValue() != null && !objOptions.commandScript.getValue().isEmpty()) || (objOptions.commandScriptFile
+                    .getValue() != null && !objOptions.commandScriptFile.getValue().isEmpty())) {
+                handlerOptions.protocol.setValue(TransferTypes.sftp);
+            } else {
+                handlerOptions.protocol.setValue(TransferTypes.ssh);
+            }
         } else {
-            handlerOptions.protocol.setValue(TransferTypes.ssh.name());
+            handlerOptions.protocol.setValue(protocol);
         }
     }
 

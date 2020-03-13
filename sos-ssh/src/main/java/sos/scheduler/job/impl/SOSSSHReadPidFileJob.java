@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 
 public class SOSSSHReadPidFileJob extends SOSSSHJob {
 
@@ -27,7 +28,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
     @Override
     public void execute() throws Exception {
         try {
-            connect();
+            connect(TransferTypes.ssh);
 
             try {
                 String cmd = String.format(objOptions.getPostCommandRead().getValue(), pidFileName);
@@ -77,7 +78,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJob {
                 }
             }
 
-            connect();
             deleteTempFiles();
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
