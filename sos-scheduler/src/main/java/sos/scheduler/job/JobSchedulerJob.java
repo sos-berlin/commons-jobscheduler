@@ -16,6 +16,7 @@ import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
+import sos.spooler.Job;
 import sos.spooler.Job_impl;
 import sos.spooler.Spooler;
 import sos.spooler.Task;
@@ -41,6 +42,7 @@ public class JobSchedulerJob extends Job_impl {
     private SOSSettings jobSettings = null;
     private Properties jobProperties = null;
     private String application = new String("");
+    private String taskJobName = null;
     private String jobName = null;
     private String jobFolder = null;
     private String jobTitle = null;
@@ -213,6 +215,16 @@ public class JobSchedulerJob extends Job_impl {
 
     protected String getApplication() {
         return application;
+    }
+
+    public String getTaskJobName() {
+        if (taskJobName == null && spooler_task != null) {
+            Job job = spooler_task.job();
+            if (job != null) {
+                taskJobName = job.name();
+            }
+        }
+        return taskJobName;
     }
 
     public static SOSSettings getSchedulerSettings(final String factoryIni) throws Exception {
