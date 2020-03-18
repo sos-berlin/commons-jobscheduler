@@ -5,6 +5,7 @@ import sos.spooler.Order;
 public class SpoolerProcess {
 
     private Order order = null;
+    private String currentOrderState = null;
     private boolean success = false;
 
     public SpoolerProcess(Order o) {
@@ -18,5 +19,13 @@ public class SpoolerProcess {
 
     public boolean getSuccess() {
         return success;
+    }
+
+    public void setCurrentOrderState(String val) {
+        currentOrderState = val;
+    }
+
+    public String getCurrentOrderState() {
+        return currentOrderState;
     }
 }

@@ -1,22 +1,19 @@
 package com.sos.JSHelper.Basics;
 
-/** @author KB */
 public interface JSJobUtilities {
 
-    public String replaceSchedulerVars(final String pstrString2Modify);
+    public String replaceSchedulerVars(final String string2Modify);
 
-    public void setJSParam(final String pstrKey, final String pstrValue);
+    public void setJSParam(final String key, final String value);
 
-    public void setJSParam(final String pstrKey, final StringBuffer pstrValue);
+    public void setJSParam(final String key, final StringBuffer value);
 
-    public String getCurrentNodeName();
+    public void setJSJobUtilites(JSJobUtilities val);
 
-    public void setJSJobUtilites(JSJobUtilities pobjJSJobUtilities);
+    public void setStateText(final String val);
 
-    public void setStateText(final String pstrStateText);
+    public void setCC(final int val);
 
-    public void setCC(final int pintCC);
-
-    public void setNextNodeState(final String pstrNodeName);
+    public void setNextNodeState(final String val);
 
 }

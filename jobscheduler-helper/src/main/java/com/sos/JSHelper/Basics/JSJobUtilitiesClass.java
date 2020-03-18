@@ -71,11 +71,6 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
     }
 
     @Override
-    public String getCurrentNodeName() {
-        return null;
-    }
-
-    @Override
     public void setStateText(final String pstrStateText) {
         //
     }

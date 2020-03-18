@@ -1,7 +1,6 @@
 package sos.scheduler.job;
 
 import static com.sos.scheduler.messages.JSMessages.JSJ_D_0070;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
@@ -20,8 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.DefaultConfiguration;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
@@ -60,14 +57,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     public JobSchedulerJobAdapter() {
         messages = new Messages(MESSAGES_BUNDLE_NAME, Locale.getDefault());
-        if (LogManager.getRootLogger() == null) {
-            Configurator.initialize(new DefaultConfiguration());
-        }
     }
 
     @Override
     public boolean spooler_init() {
-        messages = new Messages(MESSAGES_BUNDLE_NAME, Locale.getDefault());
+        setLogger();
         return super.spooler_init();
     }
 
@@ -75,7 +69,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public boolean spooler_process() throws Exception {
         try {
             super.spooler_process();
-            initializeLog4jAppenderClass();
             LOGGER.info(VersionInfo.VERSION_STRING);
 
             spoolerProcess = new SpoolerProcess(spooler_task.order());
@@ -85,7 +78,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
-    protected void initializeLog4jAppenderClass() {
+    private void setLogger() {
         if (!loggerConfigured) {
             LOG_D_0020.toLog();
 
@@ -138,7 +131,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     }
                 }
             }
-            schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
+            schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters, getTaskJobName(), getCurrentNodeName(false));
             parameterSubstitutor = null;
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(e.toString()), e);
@@ -165,10 +158,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
-    private String getParameterName(String parameterName) {
-        String currentNodeName = getCurrentNodeName(false);
-        String currentJob = spooler_task.job().name();// TODO
-
+    private String getParameterName(String currentJob, String currentNodeName, String parameterName) {
         String pattern1 = "^" + currentNodeName + "/(.*)";
         String pattern2 = "^job::" + currentJob + "/(.*)";
         String pattern3 = "^job::" + currentJob + "\\." + currentNodeName + "/(.*)";
@@ -179,14 +169,14 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return newParameter;
     }
 
-    private HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> params) {
+    private HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> params, String currentJob, String currentNodeName) {
 
         HashMap<String, String> result = new HashMap<String, String>();
         result.putAll(params);
         Set<Map.Entry<String, String>> set = params.entrySet();
         for (Map.Entry<String, String> entry : set) {
             String key = entry.getKey();
-            String name = getParameterName(key);
+            String name = getParameterName(currentJob, currentNodeName, key);
             if (!key.equals(name)) {
                 String val = entry.getValue();
                 result.put(name, val);
@@ -314,15 +304,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         //
     }
 
-    @Override
-    @Deprecated
-    public String getCurrentNodeName() {
-        return getCurrentNodeName(true);
-    }
-
-    @Deprecated
-    public String getCurrentNodeName(boolean verbose) {
-        return getCurrentNodeName(spooler_task.order(), verbose);
+    private String getCurrentNodeName(boolean verbose) {
+        return getCurrentNodeName(getSpoolerProcess() != null ? getSpoolerProcess().getOrder() : spooler_task.order(), verbose);
     }
 
     public String getCurrentNodeName(Order order, boolean verbose) {
@@ -331,13 +314,19 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
         if (spooler_task != null) {
             if (order != null) {
-                name = order.state();
+                if (getSpoolerProcess() != null) {
+                    if (getSpoolerProcess().getCurrentOrderState() == null) {
+                        getSpoolerProcess().setCurrentOrderState(order.state());
+                    }
+                    name = getSpoolerProcess().getCurrentOrderState();
+                } else {
+                    name = order.state();
+                }
                 if (verbose) {
                     JSJ_I_0020.toLog(method, name);
                 }
             } else {
-                Job job = spooler_task.job(); // TODO
-                name = job.name();
+                name = getTaskJobName();
                 if (verbose) {
                     JSJ_I_0010.toLog(method, name);
                 }
@@ -357,9 +346,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     @Override
-    @Deprecated
     public void setNextNodeState(final String state) {
-        Order order = spooler_task.order();
+        Order order = spoolerProcess == null ? spooler_task.order() : spoolerProcess.getOrder();
         if (order != null) {
             order.set_state(state);
         }
@@ -376,29 +364,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public boolean signalSuccess(Order order) {
         if (order != null) {
             return true;
-        }
-        return false;
-    }
-
-    @Deprecated
-    public boolean signalFailure() {
-        String msg = JSJ_E_0009.get(getJobName());
-        Order order = spooler_task.order();
-        if (order != null) {
-            if (!isSetBackActive(order)) {
-                LOGGER.error(msg);
-            }
-            return false;
-        }
-        return false;
-    }
-
-    @SuppressWarnings("deprecation")
-    private boolean isSetBackActive(Order order) {
-        if (order != null) {
-            if (order.setback_count() > 0 && order.setback_count() >= spooler_task.job().setback_max()) {
-                return true;
-            }
         }
         return false;
     }
@@ -454,27 +419,27 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public boolean spooler_task_before() throws Exception {
-        initializeLog4jAppenderClass();
+        setLogger();
         getSchedulerParameterAsProperties();
         return true;
     }
 
     @Override
     public void spooler_task_after() throws Exception {
-        initializeLog4jAppenderClass();
+        setLogger();
         getSchedulerParameterAsProperties();
     }
 
     @Override
     public boolean spooler_process_before() throws Exception {
-        initializeLog4jAppenderClass();
+        setLogger();
         getSchedulerParameterAsProperties();
         return true;
     }
 
     @Override
     public boolean spooler_process_after(final boolean result) throws Exception {
-        initializeLog4jAppenderClass();
+        setLogger();
         getSchedulerParameterAsProperties();
         return result;
     }
