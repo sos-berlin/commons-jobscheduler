@@ -40,7 +40,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
         try {
             super.spooler_process();
             doProcessing();
-            return getSpoolerProcess().getSuccess();
+            return getSpoolerProcess().isOrderJob();
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
