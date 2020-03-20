@@ -1,5 +1,7 @@
 package sos.scheduler.job;
 
+import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,8 +9,11 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -27,7 +32,7 @@ import sos.util.SOSString;
 /** @author Andreas Liebert */
 public class JobSchedulerJob extends Job_impl {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJob.class);
+    private static Logger LOGGER = LogManager.getLogger(JobSchedulerJob.class);
 
     public static final String HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER = "hibernate.cfg.xml";
     public static final String HIBERNATE_DEFAULT_FILE_NAME_REPORTING = "reporting.hibernate.cfg.xml";
@@ -47,14 +52,13 @@ public class JobSchedulerJob extends Job_impl {
     private String jobFolder = null;
     private String jobTitle = null;
     private int jobId = 0;
+    private Integer schedulerLogLevel = null;
+    private boolean loggerConfigured = false;
 
     @Override
     public boolean spooler_init() {
         try {
-            boolean rc = super.spooler_init();
-            if (!rc) {
-                return false;
-            }
+            setLogger();
             if (spooler_task != null) {
                 setJobId(spooler_task.id());
             }
@@ -91,6 +95,33 @@ public class JobSchedulerJob extends Job_impl {
             spooler_log.info("Job " + getJobName() + " terminated.");
         } catch (Exception e) {
             // no error processing at job level
+        }
+    }
+
+    public void setLogger() {
+        if (!loggerConfigured) {
+            LOG_D_0020.toLog();
+
+            LOGGER = LogManager.getRootLogger();
+            LoggerContext logContext = (LoggerContext) LogManager.getContext(false);
+            Configuration configuration = logContext.getConfiguration();
+
+            if (schedulerLogLevel == null) {
+                schedulerLogLevel = spooler_log.level();
+            }
+            if (schedulerLogLevel > 1) {
+                configuration.getRootLogger().setLevel(Level.ERROR);
+            } else if (schedulerLogLevel == 1) {
+                configuration.getRootLogger().setLevel(Level.WARN);
+            } else if (schedulerLogLevel == 0) {
+                configuration.getRootLogger().setLevel(Level.INFO);
+            } else if (schedulerLogLevel == -9) {
+                configuration.getRootLogger().setLevel(Level.TRACE);
+            } else if (schedulerLogLevel < 0) {
+                configuration.getRootLogger().setLevel(Level.DEBUG);
+            }
+            loggerConfigured = true;
+            logContext.updateLoggers();
         }
     }
 

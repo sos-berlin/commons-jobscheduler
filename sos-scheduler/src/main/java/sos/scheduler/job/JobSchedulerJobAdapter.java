@@ -5,7 +5,6 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
-import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -14,11 +13,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
@@ -39,7 +35,7 @@ import sos.util.ParameterSubstitutor;
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IMonitor_impl, IJobSchedulerEventHandler {
 
-    private static Logger LOGGER = LogManager.getLogger(JobSchedulerJobAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJobAdapter.class);
     protected final String EMPTY_STRING = "";
 
     private static final String MESSAGES_BUNDLE_NAME = "com_sos_scheduler_messages";
@@ -52,23 +48,14 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private HashMap<String, String> globalSchedulerParams = null;
     private HashMap<String, String> schedulerParameters = new HashMap<String, String>();
     private ParameterSubstitutor parameterSubstitutor;
-    private Integer schedulerLogLevel = null;
-    private boolean loggerConfigured = false;
 
     public JobSchedulerJobAdapter() {
         messages = new Messages(MESSAGES_BUNDLE_NAME, Locale.getDefault());
     }
 
     @Override
-    public boolean spooler_init() {
-        setLogger();
-        return super.spooler_init();
-    }
-
-    @Override
     public boolean spooler_process() throws Exception {
         try {
-            super.spooler_process();
             LOGGER.info(VersionInfo.VERSION_STRING);
 
             if (spoolerProcess == null) {
@@ -77,33 +64,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             return spoolerProcess.getSuccess();
         } catch (Throwable e) {
             return false;
-        }
-    }
-
-    private void setLogger() {
-        if (!loggerConfigured) {
-            LOG_D_0020.toLog();
-
-            LOGGER = LogManager.getRootLogger();
-            LoggerContext logContext = (LoggerContext) LogManager.getContext(false);
-            Configuration configuration = logContext.getConfiguration();
-
-            if (schedulerLogLevel == null) {
-                schedulerLogLevel = spooler_log.level();
-            }
-            if (schedulerLogLevel > 1) {
-                configuration.getRootLogger().setLevel(Level.ERROR);
-            } else if (schedulerLogLevel == 1) {
-                configuration.getRootLogger().setLevel(Level.WARN);
-            } else if (schedulerLogLevel == 0) {
-                configuration.getRootLogger().setLevel(Level.INFO);
-            } else if (schedulerLogLevel == -9) {
-                configuration.getRootLogger().setLevel(Level.TRACE);
-            } else if (schedulerLogLevel < 0) {
-                configuration.getRootLogger().setLevel(Level.DEBUG);
-            }
-            loggerConfigured = true;
-            logContext.updateLoggers();
         }
     }
 
