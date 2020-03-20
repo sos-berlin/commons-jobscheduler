@@ -92,7 +92,7 @@ public class JobSchedulerJob extends Job_impl {
                 spooler_log.warn("spooler_exit(): disconnect failed: " + e.toString());
                 LOGGER.warn(e.toString(), e);
             }
-            spooler_log.info("Job " + getJobName() + " terminated.");
+            LOGGER.info("Job " + getJobName() + " terminated.");
         } catch (Exception e) {
             // no error processing at job level
         }
