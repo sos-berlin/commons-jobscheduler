@@ -6,7 +6,7 @@ public interface JSJobUtilities {
 
     public void setJSParam(final String key, final String value);
 
-    public void setJSParam(final String key, final StringBuffer value);
+    public void setJSParam(final String key, final StringBuilder value);
 
     public void setJSJobUtilites(JSJobUtilities val);
 

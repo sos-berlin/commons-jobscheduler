@@ -71,7 +71,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             super.spooler_process();
             LOGGER.info(VersionInfo.VERSION_STRING);
 
-            spoolerProcess = new SpoolerProcess(spooler_task.order());
+            if (spoolerProcess == null) {
+                spoolerProcess = new SpoolerProcess(spooler_task.order());
+            }
             return spoolerProcess.getSuccess();
         } catch (Throwable e) {
             return false;
@@ -226,7 +228,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             taskParams.set_var(name, value);
         }
 
-        Order order = spooler_task.order();
+        Order order = spoolerProcess == null ? spooler_task.order() : spoolerProcess.getOrder();
         if (order != null) {
             Variable_set orderParams = order.params();
             if (orderParams != null) {
@@ -240,7 +242,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     @Deprecated
-    public void setJSParam(final String name, final StringBuffer value) {
+    public void setJSParam(final String name, final StringBuilder value) {
         setJSParam(name, value.toString());
     }
 
@@ -410,27 +412,24 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public boolean spooler_task_before() throws Exception {
         setLogger();
-        getSchedulerParameterAsProperties(spooler_task.order());
         return true;
     }
 
     @Override
     public void spooler_task_after() throws Exception {
         setLogger();
-        getSchedulerParameterAsProperties(spooler_task.order());
     }
 
     @Override
     public boolean spooler_process_before() throws Exception {
         setLogger();
-        getSchedulerParameterAsProperties(spooler_task.order());
+        spoolerProcess = new SpoolerProcess(spooler_task.order());
         return true;
     }
 
     @Override
     public boolean spooler_process_after(final boolean result) throws Exception {
         setLogger();
-        getSchedulerParameterAsProperties(spooler_task.order());
         return result;
     }
 
@@ -441,7 +440,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             if (stateText.length() > MAX_LENGTH_OF_STATUSTEXT) {
                 stateText = stateText.substring(0, MAX_LENGTH_OF_STATUSTEXT - 3) + "...";
             }
-            Order order = spooler_task.order();
+            Order order = spoolerProcess == null ? spooler_task.order() : spoolerProcess.getOrder();
             if (order != null) {
                 try {
                     order.set_state_text(stateText);
