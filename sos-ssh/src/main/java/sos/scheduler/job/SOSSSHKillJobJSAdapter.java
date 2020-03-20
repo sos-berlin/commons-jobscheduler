@@ -28,7 +28,7 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
         try {
             super.spooler_process();
             if (doProcessing()) {
-                return getSpoolerProcess().getSuccess();
+                return getSpoolerProcess().isOrderJob();
             } else {
                 return false;
             }

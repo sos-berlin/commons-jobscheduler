@@ -1,24 +1,26 @@
 package sos.scheduler.misc;
 
+import sos.spooler.Job;
 import sos.spooler.Order;
+import sos.spooler.Task;
 
 public class SpoolerProcess {
 
     private Order order = null;
     private String currentOrderState = null;
-    private boolean success = false;
+    private boolean isOrderJob = false;
 
-    public SpoolerProcess(Order o) {
-        order = o;
-        success = order == null ? false : true;
+    public SpoolerProcess(Task task, Job job) {
+        order = task.order();
+        isOrderJob = job.order_queue() == null ? false : true;
     }
 
     public Order getOrder() {
         return order;
     }
 
-    public boolean getSuccess() {
-        return success;
+    public boolean isOrderJob() {
+        return isOrderJob;
     }
 
     public void setCurrentOrderState(String val) {
