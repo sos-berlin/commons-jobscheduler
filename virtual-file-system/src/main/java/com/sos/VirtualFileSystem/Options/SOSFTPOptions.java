@@ -27,8 +27,8 @@ import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassPath;
 
-import sos.configuration.SOSConfiguration;
 import sos.net.mail.options.SOSSmtpMailOptions;
+import sos.settings.SOSProfileSettings;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
@@ -567,22 +567,21 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         settings.checkMandatory();
         profile.checkMandatory();
         HashMap<String, String> map = new HashMap<String, String>();
-        SOSConfiguration conf = null;
         Properties properties = new Properties();
         try {
-            LOGGER.debug(String.format("readSettingsFile: settings=%s", settings.getValue()));
+            LOGGER.debug(String.format("readSettingsFile: settings=%s, profile=%s", settings.getValue(), profile.getValue()));
             getEnvVars();
-            conf = new SOSConfiguration(settings.getValue(), profile.getValue());
-            Properties profileProps = conf.getParameterAsProperties();
+
+            SOSProfileSettings conf = new SOSProfileSettings(settings.getValue());
+            Properties profileProps = conf.getSection(profile.getValue());
             if (profileProps.isEmpty()) {
                 String sf = originalSettingsFile == null ? settings.getValue() : originalSettingsFile;
                 throw new JobSchedulerException(String.format("[%s]not found profile=%s", sf, profile.getValue()));
             }
-            conf = new SOSConfiguration(settings.getValue(), "globals");
-            Properties globalsProps = conf.getParameterAsProperties();
-            globalsProps = resolveIncludes(globalsProps);
+            Properties globalsProps = conf.getSection("globals");
+            globalsProps = resolveIncludes(conf, globalsProps);
             properties.putAll(globalsProps);
-            profileProps = resolveIncludes(profileProps);
+            profileProps = resolveIncludes(conf, profileProps);
             properties.putAll(profileProps);
             // Additional Variables
             properties.put("uuid", UUID.randomUUID().toString());
@@ -645,22 +644,21 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             super.setAllOptions(map);
             setChildClasses(map);
         } catch (JobSchedulerException e) {
-            LOGGER.error("ReadSettingsFile(): " + e.getMessage());
+            LOGGER.error("ReadSettingsFile(): " + e.toString(), e);
             throw e;
         } catch (Exception e) {
-            LOGGER.error("ReadSettingsFile(): " + e.getMessage());
+            LOGGER.error("ReadSettingsFile(): " + e.toString(), e);
             throw new JobSchedulerException(e);
         }
         return map;
     }
 
-    private Properties resolveIncludes(Properties props) throws Exception {
-        return resolveIncludes(props, "");
+    private Properties resolveIncludes(SOSProfileSettings conf, Properties props) throws Exception {
+        return resolveIncludes(conf, props, "");
     }
 
-    private Properties resolveIncludes(Properties props, String prefix) throws Exception {
+    private Properties resolveIncludes(SOSProfileSettings conf, Properties props, String prefix) throws Exception {
         Properties allIncludedProps = new Properties();
-        SOSConfiguration conf = null;
         if (prefix == null) {
             prefix = "";
         }
@@ -676,13 +674,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                 }
                 for (String include : includes) {
                     include = include.trim();
-                    conf = new SOSConfiguration(settings.getValue(), include);
-                    Properties includedProps = conf.getParameterAsProperties(includePrefix);
+                    Properties includedProps = conf.getSection(include, true, includePrefix);
                     if (includedProps.isEmpty()) {
-                        String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(include, settings.getValue());
-                        throw new JobSchedulerException(strM);
+                        throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0000.params(include, settings.getValue()));
                     }
-                    includedProps = resolveIncludes(includedProps, includePrefix);
+                    includedProps = resolveIncludes(conf, includedProps, includePrefix);
                     allIncludedProps.putAll(includedProps);
                 }
             }
