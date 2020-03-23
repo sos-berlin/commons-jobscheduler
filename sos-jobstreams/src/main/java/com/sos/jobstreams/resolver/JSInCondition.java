@@ -17,13 +17,13 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
-import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.JobStreamCalendar;
+import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
@@ -35,7 +35,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
-    private boolean consumed;
+    private Set<Long> consumedForContext;
     private boolean jobIsRunning;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
@@ -45,7 +45,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         super();
         haveCalendars = false;
         jobIsRunning = false;
-
+        this.consumedForContext = new HashSet<Long>();
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -102,12 +102,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return listOfInConditionCommands;
     }
 
-    protected void markAsConsumed(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        this.consumed = true;
+    protected void markAsConsumed(SOSHibernateSession sosHibernateSession, Long contextId) throws SOSHibernateException {
+        setConsumed(contextId);
         DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
         dbItemConsumedInCondition.setCreated(new Date());
         dbItemConsumedInCondition.setInConditionId(this.getId());
-        dbItemConsumedInCondition.setSession(Constants.getSession());
+        dbItemConsumedInCondition.setSession(String.valueOf(contextId));
         try {
             DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
             sosHibernateSession.beginTransaction();
@@ -130,7 +130,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 next = d;
             }
         }
-        
+
         this.itemInCondition.setNextPeriod(null);
         if (next != null && next.isAfter(today)) {// Empty if today.
             this.itemInCondition.setNextPeriod(Date.from(last.atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -145,12 +145,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public boolean isConsumed() {
-        return consumed;
+    public boolean isConsumed(Long contextId) {
+        return consumedForContext.contains(contextId);
     }
 
-    public void setConsumed(boolean consumed) {
-        this.consumed = consumed;
+    public void setConsumed(Long contextId) {
+        consumedForContext.add(contextId);
     }
 
     public void setListOfDates(SOSHibernateSession sosHibernateSession, String schedulerId) {
@@ -182,22 +182,20 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public String executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
-            throws SOSHibernateException, JocException, JAXBException {
+    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, Long contextId,
+            SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
         LOGGER.trace("execute commands ------>");
-        String startedJob = "";
+        StartJobReturn startJobReturn = new StartJobReturn();
+        startJobReturn.setStartedJob("");
         if (this.isMarkExpression()) {
             LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
-            this.markAsConsumed(sosHibernateSession);
+            this.markAsConsumed(sosHibernateSession, contextId);
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            String s = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
-            if (!s.isEmpty()) {
-                startedJob = s;
-            }
+            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
         }
-        return startedJob;
+        return startJobReturn;
     }
 
     public boolean isStartToday() {
@@ -227,6 +225,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public Date getNextPeriod() {
         return this.itemInCondition.getNextPeriod();
+    }
+
+    public void removeConsumed(Long contextId) {
+        consumedForContext.remove(contextId);
     }
 
 }

@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
-import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
+
 public class JSJobInConditions {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobInConditions.class);
 
     Map<JSJobConditionKey, JSInConditions> listOfJobInConditions;
@@ -53,11 +53,11 @@ public class JSJobInConditions {
             }
             JSInConditionCommand inConditionCommand = new JSInConditionCommand();
             inConditionCommand.setItemInConditionCommand(itemInConditionWithCommand.getDbItemInConditionCommand());
-            jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
+           // TODO: jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
             jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
-          
+
             addInCondition(jsInCondition);
         }
     }
@@ -66,7 +66,6 @@ public class JSJobInConditions {
         return listOfJobInConditions;
     }
 
-    
     public Boolean getHaveGlobalConditions() {
         return haveGlobalConditions;
     }

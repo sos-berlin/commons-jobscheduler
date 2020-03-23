@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
+import com.sos.jobstreams.resolver.JSJobStreamStarter;
+import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -46,7 +49,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private QueuedEvents addQueuedEvents;
     private QueuedEvents delQueuedEvents;
     private Timer globalEventsPollTimer;
-
+    private Timer nextJobStartTimer;
+    private JSJobStreamStarter nextStarter;
     private int waitInterval = 2;
     private String session;
     JSConditionResolver conditionResolver;
@@ -61,8 +65,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             globalEventsPollTimer = null;
         }
     }
-
-    public void resetTimer() {
+ 
+    public void resetGlobalEventsPollTimer() {
         if (globalEventsPollTimer != null) {
             globalEventsPollTimer.cancel();
             globalEventsPollTimer.purge();
@@ -72,6 +76,26 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         if (isDebugEnabled) {
             LOGGER.debug("60s Polling for is activated");
         }
+    }
+    
+    public void resetNextJobStartTimer() {
+        if (nextJobStartTimer != null) {
+            nextJobStartTimer.cancel();
+            nextJobStartTimer.purge();
+        }
+        nextJobStartTimer = new Timer();
+        nextStarter = this.conditionResolver.getNextStarttime();
+        Long next = nextStarter.getNextStartFromList().getTime();
+        Long now = new Date().getTime();
+        Long delay = next - now;
+        
+        if (delay > 0) {
+         //   LOGGER.debug("Next start:" + nextStarter.getItemJobStreamStarter().getJob() + " at " + nextStarter.getNextStart());
+            nextJobStartTimer.schedule(new JobStartTask(), delay);
+        }else {
+            LOGGER.info("negative delay");
+        }
+        
     }
 
     public class InputTask extends TimerTask {
@@ -89,9 +113,31 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         }
     }
+    
+    public class JobStartTask extends TimerTask {
+
+        public void run() {
+            try {
+             //   LOGGER.debug(nextStarter.getItemJobStreamStarter().getJob() + " at " + nextStarter.getNextStartFromList());
+                startJob();
+                resetNextJobStartTimer();
+                
+             } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.error("Timer Task Error", e);
+                resetNextJobStartTimer();
+            }
+        }
+    }
+
+    private void startJob() throws Exception {
+        Long taskId = nextStarter.startJob(getXmlCommandExecutor());
+        conditionResolver.getJobStreamContexts().addTaskToContext(taskId, taskId);
+       // LOGGER.debug(nextStarter.getItemJobStreamStarter().getJob() + " started");
+    }
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated, EventRemoved
+        InconditionValidated, EventCreated, EventRemoved,JobStreamRemoved
     }
 
     public static enum CustomEventTypeValue {
@@ -131,8 +177,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
             conditionResolver.init();
-            this.resetTimer();
-
+            this.resetGlobalEventsPollTimer();
+            this.resetNextJobStartTimer();
+ 
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -179,7 +226,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent.getReturnCode(), getSettings().getSchedulerId(), taskEndEvent
+        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
                 .getJobPath());
         
         conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
@@ -271,7 +318,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
                 try {
                     conditionResolver.init();
-                    this.resetTimer();
+                    this.resetGlobalEventsPollTimer();
+                    this.resetNextJobStartTimer();
 
                 } catch (Exception e) {
                     conditionResolver = null;
@@ -330,7 +378,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "InitConditionResolver":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reInit();
-                            this.resetTimer();
+                            this.resetGlobalEventsPollTimer();
 
                             resolveInConditions = true;
                             break;
@@ -339,7 +387,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reinitCalendarUsage();
-                            this.resetTimer();
+                            this.resetGlobalEventsPollTimer();
 
                             resolveInConditions = true;
                             break;
@@ -348,6 +396,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             conditionResolver.reInitEvents(reportingFactory);
                             resolveInConditions = true;
                             break;
+                            
+                        
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 

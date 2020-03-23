@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobchainnodeparameter.JobchainNodeConfiguration;
 import com.sos.jitl.jobstreams.Constants;
-import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.exceptions.JocException;
@@ -117,7 +116,7 @@ public class JobStarter {
         return parameters;
     }
 
-    private List<NameValuePair> getDefaultEnvVars(JSInCondition inCondition) {
+    private List<NameValuePair> getDefaultEnvVars(JobStarterOptions inCondition) {
 
         EnvVarCreator envVarCreator = new EnvVarCreator();
 
@@ -144,10 +143,10 @@ public class JobStarter {
         return getMapOfAttributes(commandParam);
     }
 
-    public String buildJobStartXml(JSInCondition inCondition, String commandParam) throws JocException, JAXBException {
-        JobV jobV = this.getJob(inCondition.getNormalizedJob());
+    public String buildJobStartXml(JobStarterOptions jobStartOptions, String commandParam) throws JocException, JAXBException {
+        JobV jobV = this.getJob(jobStartOptions.getNormalizedJob());
         XMLBuilder xml = new XMLBuilder("start_job");
-        xml.addAttribute("job", inCondition.getNormalizedJob());
+        xml.addAttribute("job", jobStartOptions.getNormalizedJob());
 
         Map<String, String> listOfAttributes = getMapOfAttributes(commandParam);
         if (listOfAttributes.get("force") == null) {
@@ -155,7 +154,7 @@ public class JobStarter {
         }
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
 
-        List<NameValuePair> envVars = getDefaultEnvVars(inCondition);
+        List<NameValuePair> envVars = getDefaultEnvVars(jobStartOptions);
         List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
@@ -182,5 +181,6 @@ public class JobStarter {
         }
         return paramsElem;
     }
+
 
 }

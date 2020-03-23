@@ -6,13 +6,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.joc.Globals;
 import com.sos.joc.model.common.NameValuePair;
 
 class EnvVarCreator {
 
-    public NameValuePair getEnvVar(JSInCondition inCondition, String envVarName) {
+    public NameValuePair getEnvVar(JobStarterOptions inCondition, String envVarName) {
         String functionName = envVarName.toUpperCase();
         SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 

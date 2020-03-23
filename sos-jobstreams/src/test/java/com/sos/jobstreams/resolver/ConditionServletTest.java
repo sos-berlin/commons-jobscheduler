@@ -19,6 +19,7 @@ public class ConditionServletTest {
     public static void main(String[] args) throws Exception {
 
         final String METHOD = "init";
+
         LOGGER.info(METHOD);
         String host = "localhost";
         String port = "40444";

@@ -1,5 +1,6 @@
 package com.sos.jobstreams.resolver;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -12,6 +13,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -53,7 +57,7 @@ public class TestInConditionResolver {
     
     @Test
     @Ignore
-    public void testInit() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException, JocException, JAXBException     {
+    public void testInit() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception     {
         EventHandlerSettings settings = new EventHandlerSettings();
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
         settings.setSchedulerId("scheduler_joc_cockpit");

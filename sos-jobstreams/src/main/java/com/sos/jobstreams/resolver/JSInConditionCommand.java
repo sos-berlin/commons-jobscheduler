@@ -1,14 +1,15 @@
 package com.sos.jobstreams.resolver;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.jobstreams.classes.JobStarter;
-import com.sos.joc.exceptions.JocException;
+import com.sos.jobstreams.classes.JobStarterOptions;
+import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
+
+import sos.xml.SOSXMLXPath;
 
 public class JSInConditionCommand {
 
@@ -44,34 +45,43 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private String startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
+    private StartJobReturn startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws NumberFormatException, Exception  {
 
+        StartJobReturn startJobReturn = new StartJobReturn();
         JobStarter jobStarter = new JobStarter();
-        String jobXml = jobStarter.buildJobStartXml(inCondition, getCommandParam());
+        JobStarterOptions jobStartOptions = new JobStarterOptions();
+        jobStartOptions.setJob(inCondition.getNormalizedJob());
+        jobStartOptions.setJobStream(inCondition.getJobStream());
+        jobStartOptions.setNormalizedJob(inCondition.getNormalizedJob());
+        String jobXml = jobStarter.buildJobStartXml(jobStartOptions, getCommandParam());
         String answer = "";
-        String job = inCondition.getNormalizedJob();
-        String startedJob = "";
+        startJobReturn.setStartedJob("");
         if (inCondition.isStartToday()) {
             LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
             if (schedulerXmlCommandExecutor != null) {
                 answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+
+                SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(answer);
+                Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
+                startJobReturn.setTaskId(taskId);
                 LOGGER.trace(answer);
-                startedJob = job;
+                startJobReturn.setStartedJob(jobStartOptions.getJob());
             } else {
-                LOGGER.debug("Start job will be ignored as running in debug  mode.: " + job);
+                LOGGER.debug("Start job will be ignored as running in debug  mode.: " + jobStartOptions.getJob());
             }
             executed = true;
         } else {
-            LOGGER.debug("Job " + job + " will not be started today");
+            LOGGER.debug("Job " + jobStartOptions.getJob() + " will not be started today");
             executed = false;
         }
         LOGGER.trace(answer);
-        return startedJob;
+        return startJobReturn;
     }
 
-    public String executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
+    public StartJobReturn executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws NumberFormatException, Exception  {
 
-        String startedJob = "";
+        StartJobReturn startJobReturn = new StartJobReturn();
+        startJobReturn.setStartedJob("");
         String command = getCommand();
         String commandParam = getCommandParam();
         LOGGER.debug("execution command: " + command + " " + commandParam);
@@ -82,9 +92,9 @@ public class JSInConditionCommand {
         }
         if ("startjob".equalsIgnoreCase(command)) {
             LOGGER.debug("....starting job:" + inCondition.getJob());
-            startedJob = startJob(schedulerXmlCommandExecutor, inCondition);
+            startJobReturn = startJob(schedulerXmlCommandExecutor, inCondition);
         }
-        return startedJob;
+        return startJobReturn;
     }
 
     public void setCommand(String command) {

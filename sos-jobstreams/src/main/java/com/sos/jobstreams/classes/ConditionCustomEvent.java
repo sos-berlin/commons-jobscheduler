@@ -15,6 +15,7 @@ public class ConditionCustomEvent {
     private String job;
     private String key;
     private Integer eventId;
+    private String state;
 
     public ConditionCustomEvent(JsonObject entry) {
         super();
@@ -27,6 +28,7 @@ public class ConditionCustomEvent {
             this.session = variables.getString("session", "");
             this.source = variables.getString("source", "");
             this.jobStream = variables.getString("jobStream", "");
+            this.state = variables.getString("state", "");
             this.job = variables.getString("job", "");
             this.globalEvent = "true".equals(variables.getString("globalEvent","false"));
             this.outConditionId = variables.getString("outConditionId", "");
@@ -73,6 +75,11 @@ public class ConditionCustomEvent {
     
     public String getOutConditionId() {
         return outConditionId;
+    }
+
+    
+    public String getState() {
+        return state;
     }
 
 }
