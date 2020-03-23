@@ -606,7 +606,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                 if (beatParams != null && beatParams.containsKey(key)) {
                     value = beatParams.get(key);
                 }
-                if (hasVariableToSubstitute(value) == true && gflgSubsituteVariables == true) {
+                if (hasVariableToSubstitute(value) == true) {
 
                     LOGGER.trace("ReadSettingsFile() - key = " + key + ", value = " + value);
                     value = substituteVariables(value, properties);

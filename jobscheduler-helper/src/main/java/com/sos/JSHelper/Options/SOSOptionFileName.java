@@ -44,7 +44,7 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
         strOriginalValue = pstrStringValue;
         String strT = pstrStringValue;
         if (strT.length() > 2 && (strT.startsWith("./") || strT.startsWith(".\\"))) {
-            strT = strT.replaceFirst("\\.", Matcher.quoteReplacement(getUserDir()));
+            strT = strT.replaceFirst("\\.", Matcher.quoteReplacement(System.getProperty("user.dir")));
         }
         super.setValue(strT);
     }

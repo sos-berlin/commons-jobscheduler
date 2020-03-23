@@ -3,12 +3,16 @@ package com.sos.JSHelper.Options;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 
 public class SOSOptionUrl extends SOSOptionString {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionUrl.class);
     private static final long serialVersionUID = 4655546707861016058L;
     private URL objURL = null;
 
@@ -89,7 +93,7 @@ public class SOSOptionUrl extends SOSOptionString {
 
     private void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
         if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
-            logger.trace("setValue = " + pstrValue);
+            LOGGER.trace("setValue = " + pstrValue);
             objOption.setValue(pstrValue);
         }
     }

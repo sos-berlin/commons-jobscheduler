@@ -547,7 +547,6 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public SchedulerSocket getSocket() {
         if (objSchedulerSocket == null) {
             try {
-                LOGGER.debug(objOptions.toXML().toString());
                 objSchedulerSocket = new SchedulerSocket(objOptions);
             } catch (Exception e) {
                 throw new JobSchedulerException(e.getMessage(), e);
