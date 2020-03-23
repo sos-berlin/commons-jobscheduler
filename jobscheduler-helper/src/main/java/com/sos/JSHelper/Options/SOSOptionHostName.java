@@ -108,50 +108,7 @@ public class SOSOptionHostName extends SOSOptionElement {
         return true;
     }
 
-    public String toXML(final String pstrXMLTagName) throws Exception {
-        String strRet = "";
-        String strT = this.getXMLTagName();
-        try {
-            this.xmlTagName(pstrXMLTagName);
-            strRet = toXml();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        } finally {
-            this.xmlTagName(strT);
-        }
-        return strRet;
-    }
-
-    @Override
-    public String toXml() throws Exception {
-        String strT = "";
-        if (gflgCreateShortXML) {
-            strT = super.toXml();
-        } else {
-            strT = "<" + this.getXMLTagName();
-            strT += " mandatory=" + getQuotedValue(boolean2String(this.isMandatory()));
-            if (isNotEmpty(this.getDefaultValue())) {
-                strT += " default=" + getQuotedValue(this.getDefaultValue());
-            }
-            if (isNotEmpty(this.getTitle())) {
-                strT += " title=" + getQuotedValue(this.getTitle());
-            }
-            strT += ">";
-            if (!this.getValue().isEmpty()) {
-                if (isCData) {
-                    strT += "<![CDATA[" + this.getFormattedValue() + "]]>";
-                } else {
-                    strT += this.getValue();
-                }
-            }
-            if (objPortNumber != null) {
-                strT = strT + objPortNumber.toXml();
-            }
-            strT += "</" + this.getXMLTagName() + ">";
-            strT += objH.toXml();
-        }
-        return strT;
-    }
+    
 
     public String getPID() {
         if (strPID == null) {

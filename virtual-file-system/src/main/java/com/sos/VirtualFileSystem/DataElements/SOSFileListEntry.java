@@ -3,6 +3,7 @@ package com.sos.VirtualFileSystem.DataElements;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -750,7 +751,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     @Override
     public String getPid() {
-        return parent.getOptions().getPid();
+        String pid = ManagementFactory.getRuntimeMXBean().getName();
+        String arr[] = pid.split("@");
+        return arr[0];
     }
 
     @Override

@@ -10,6 +10,10 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
 
+    private static final String PREFIX_JUMP = "jump_";
+    private static final String PREFIX_TARGET = "target_";
+    private static final String PREFIX_SOURCE = "source_";
+    
     private static final long serialVersionUID = 6485361196241983182L;
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
     private SOSConnection2OptionsAlternate alternativeOptions = null;
@@ -61,17 +65,17 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
         alternativeOptions.setAllOptions(settings);
         this.addProcessedOptions(alternativeOptions.getProcessedOptions());
 
-        sourceOptions.setAllOptions(settings, conParamNamePrefixSOURCE);
-        sourceOptions.getAlternatives().setChildClasses(settings, conParamNamePrefixSOURCE);
-        sourceOptions.setChildClasses(settings, conParamNamePrefixSOURCE);
+        sourceOptions.setAllOptions(settings, PREFIX_SOURCE);
+        sourceOptions.getAlternatives().setChildClasses(settings, PREFIX_SOURCE);
+        sourceOptions.setChildClasses(settings, PREFIX_SOURCE);
         this.addProcessedOptions(sourceOptions.getProcessedOptions());
 
-        targetOptions.setAllOptions(settings, conParamNamePrefixTARGET);
-        targetOptions.getAlternatives().setChildClasses(settings, conParamNamePrefixTARGET);
-        targetOptions.setChildClasses(settings, conParamNamePrefixTARGET);
+        targetOptions.setAllOptions(settings, PREFIX_TARGET);
+        targetOptions.getAlternatives().setChildClasses(settings, PREFIX_TARGET);
+        targetOptions.setChildClasses(settings, PREFIX_TARGET);
         this.addProcessedOptions(targetOptions.getProcessedOptions());
 
-        jumpOptions.setAllOptions(settings, conParamNamePrefixJUMP);
+        jumpOptions.setAllOptions(settings, PREFIX_JUMP);
         this.addProcessedOptions(jumpOptions.getProcessedOptions());
     }
 
@@ -94,7 +98,7 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
 
     public SOSConnection2OptionsAlternate getSource() {
         if (sourceOptions == null) {
-            sourceOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixSOURCE);
+            sourceOptions = new SOSConnection2OptionsAlternate(PREFIX_SOURCE);
         }
         return sourceOptions;
     }
