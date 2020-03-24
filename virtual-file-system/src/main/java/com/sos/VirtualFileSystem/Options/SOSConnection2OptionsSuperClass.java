@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
@@ -418,21 +417,18 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public SOSConnection2OptionsSuperClass() {
         objParentClass = this.getClass();
     }
-
-    public SOSConnection2OptionsSuperClass(final JSListener listener) {
-        this();
-    }
-
+   
     public SOSConnection2OptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        this.setAllOptions(settings);
+        this.setSettings(settings);
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        objSettings = settings;
-        super.setAllOptions(settings);
-        super.setSettings(objSettings);
+        //objSettings = settings;
+        //super.setAllOptions(settings);
+        //super.setSettings(objSettings);
+        super.setSettings(settings);
     }
 
     @Override

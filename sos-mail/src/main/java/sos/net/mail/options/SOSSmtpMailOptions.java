@@ -53,6 +53,12 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         }
         return objO;
     }
+    
+    public SOSSmtpMailOptions(final HashMap<String, String> settings) throws Exception {
+        super(settings);
+        initChildOptions();
+        setPrefixedValues(settings);
+    }
 
     private void initChildOptions() {
         if (objMailOnError == null) {
@@ -62,16 +68,10 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         }
     }
 
-    public void setPrefixedValues(final HashMap<String, String> JSSettings) throws Exception {
-        objMailOnError.setAllOptions(JSSettings, "MailOnError_");
-        objMailOnSuccess.setAllOptions(JSSettings, "MailOnSuccess_");
-        objMailOnEmptyFiles.setAllOptions(JSSettings, "MailOnEmptyFiles_");
-    }
-
-    public SOSSmtpMailOptions(final HashMap<String, String> JSSettings) throws Exception {
-        super(JSSettings);
-        initChildOptions();
-        setPrefixedValues(JSSettings);
+    public void setPrefixedValues(final HashMap<String, String> settings) throws Exception {
+        objMailOnError.setAllOptions(settings, "MailOnError_");
+        objMailOnSuccess.setAllOptions(settings, "MailOnSuccess_");
+        objMailOnEmptyFiles.setAllOptions(settings, "MailOnEmptyFiles_");
     }
 
     public SOSSmtpMailOptions(final HashMap<String, String> JSSettings, final String pstrPrefix) throws Exception {

@@ -80,6 +80,9 @@ public class SOSHibernateSession implements Serializable {
             closeSession();
         }
         try {
+            if (isTraceEnabled) {
+                LOGGER.trace(String.format("%s start", method));
+            }
             String sessionName = null;
             if (factory == null || factory.getSessionFactory() == null) {
                 throw new SOSHibernateInvalidSessionException("No valid session factory available. Can not open hibernate session.");
@@ -1129,8 +1132,8 @@ public class SOSHibernateSession implements Serializable {
     }
 
     private void closeSession() {
-        if (isDebugEnabled) {
-            LOGGER.debug(String.format("%s", SOSHibernate.getMethodName(logIdentifier, "closeSession")));
+        if (isTraceEnabled) {
+            LOGGER.trace(String.format("%s", SOSHibernate.getMethodName(logIdentifier, "closeSession")));
         }
         try {
             if (currentSession != null) {
@@ -1154,8 +1157,8 @@ public class SOSHibernateSession implements Serializable {
             if (currentSession != null) {
                 Transaction tr = getTransaction();
                 if (tr != null) {
-                    if (isDebugEnabled) {
-                        LOGGER.debug(String.format("%s[rollback]%s", SOSHibernate.getMethodName(logIdentifier, "closeTransaction"), tr.getStatus()));
+                    if (isTraceEnabled) {
+                        LOGGER.trace(String.format("%s[rollback]%s", SOSHibernate.getMethodName(logIdentifier, "closeTransaction"), tr.getStatus()));
                     }
                     tr.rollback();
                 } else {

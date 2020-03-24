@@ -1,8 +1,6 @@
 package com.sos.VirtualFileSystem.Options;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2433,21 +2431,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "This parameter specifies whether zero byte files", "yes", "yes", false);
     public SOSOptionZeroByteTransfer transferZeroByteFiles = (SOSOptionZeroByteTransfer) zeroByteTransfer.setAlias("transfer_zero_byte_files");
 
-    public void setAllOptions(final Properties val) {
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        HashMap<String, String> map = new HashMap<String, String>((Map) val);
-        try {
-            super.setAllOptions(map);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-    }
-
     @Override
-    public void setAllOptions(final HashMap<String, String> val) {
-        objSettings = val;
-        super.setSettings(objSettings);
-        super.setAllOptions(val);
+    public void setAllOptions(final HashMap<String, String> settings) {
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("[setAllOptions]map");
+        }
+        super.setSettings(settings);
     }
 
     @Override
