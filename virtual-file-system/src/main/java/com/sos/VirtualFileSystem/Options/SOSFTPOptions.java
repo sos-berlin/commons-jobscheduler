@@ -183,26 +183,25 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return mailOptions;
     }
 
-    @SuppressWarnings("unchecked")
-    public void setChildClasses(final Properties properties) {
-        @SuppressWarnings("rawtypes")
-        HashMap<String, String> map = new HashMap<String, String>((Map) properties);
-        try {
-            setChildClasses(map);
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
-        }
-    }
-
     private void setChildClasses(final HashMap<String, String> settings) {
         try {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("[setChildClasses]map");
+            }
+
             if (connectionOptions == null) {
+                LOGGER.debug("set connection options");
                 connectionOptions = new SOSConnection2Options(settings);
             } else {
-                connectionOptions.setPrefixedValues(settings);
+                // connectionOptions.setPrefixedValues(settings);
             }
             if (mailOptions == null) {
-                mailOptions = new SOSSmtpMailOptions(settings);
+                LOGGER.debug("set smtpmail options");
+                if (settings.containsKey("mail_smtp")) {
+                    mailOptions = new SOSSmtpMailOptions(settings);
+                } else {
+                    mailOptions = new SOSSmtpMailOptions();
+                }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(e);
@@ -542,21 +541,28 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     public void setAllOptions2(HashMap<String, String> params) {
-        Map<String, String> mapFromIniFile = new HashMap<String, String>();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("settingsFileProcessed=%s, readSettingsFileIsActive=%s", settingsFileProcessed, readSettingsFileIsActive));
+        }
         if (!settingsFileProcessed && !readSettingsFileIsActive && params.containsKey("settings") && params.containsKey("profile")) {
+            Map<String, String> mapFromIniFile = new HashMap<String, String>();
             settings.setValue(params.get("settings"));
             profile.setValue(params.get("profile"));
             readSettingsFileIsActive = true;
             mapFromIniFile = readSettingsFile(params);
             readSettingsFileIsActive = false;
             settingsFileProcessed = true;
+            params.putAll(mapFromIniFile);
         }
-        params.putAll(mapFromIniFile);
         handleFileOrderSource(params);
-        objSettings = params;
+
+        LOGGER.debug("[set options]start");
         super.setSettings(params);
-        super.setAllOptions(params);
+        // super.setAllOptions(params);
+
+        LOGGER.debug("set childs options");
         setChildClasses(params);
+        LOGGER.debug("[set options]end");
     }
 
     public HashMap<String, String> readSettingsFile() {
@@ -566,7 +572,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public HashMap<String, String> readSettingsFile(Map<String, String> beatParams) {
         settings.checkMandatory();
         profile.checkMandatory();
-        HashMap<String, String> map = new HashMap<String, String>();
+
+        HashMap<String, String> result = new HashMap<String, String>();
         Properties properties = new Properties();
         try {
             LOGGER.debug(String.format("readSettingsFile: settings=%s, profile=%s", settings.getValue(), profile.getValue()));
@@ -581,8 +588,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             Properties globalsProps = conf.getSection("globals");
             globalsProps = resolveIncludes(conf, globalsProps);
             properties.putAll(globalsProps);
+
             profileProps = resolveIncludes(conf, profileProps);
             properties.putAll(profileProps);
+
             // Additional Variables
             properties.put("uuid", UUID.randomUUID().toString());
             properties.put("date", SOSOptionTime.getCurrentDateAsString());
@@ -639,10 +648,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                     }
                     value = unescape(value);
                 }
-                map.put(key, value);
+                result.put(key, value);
             }
-            super.setAllOptions(map);
-            setChildClasses(map);
+            // super.setAllOptions(map);
+            // setChildClasses(map);
         } catch (JobSchedulerException e) {
             LOGGER.error("ReadSettingsFile(): " + e.toString(), e);
             throw e;
@@ -650,7 +659,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             LOGGER.error("ReadSettingsFile(): " + e.toString(), e);
             throw new JobSchedulerException(e);
         }
-        return map;
+        return result;
     }
 
     private Properties resolveIncludes(SOSProfileSettings conf, Properties props) throws Exception {
@@ -960,10 +969,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             connectionOptions = new SOSConnection2Options();
         }
         return connectionOptions;
-    }
-
-    public void setConnectionOptions(final SOSConnection2Options val) {
-        connectionOptions = val;
     }
 
     public boolean isReplaceReplacingInEffect() {

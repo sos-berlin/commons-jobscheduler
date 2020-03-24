@@ -18,7 +18,6 @@ import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
@@ -48,23 +47,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     public SOSConnection2OptionsAlternate(final String prefix) {
         strAlternativePrefix = prefix;
-    }
-
-    public SOSConnection2OptionsAlternate(final JSListener listener) {
-        this();
-        this.registerMessageListener(listener);
-    }
-
-    public SOSConnection2OptionsAlternate(final HashMap<String, String> settings) throws Exception {
-        super(settings);
-        getAlternativeOptions().setAllOptions(settings, "alternative_" + strAlternativePrefix);
-        this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
-    }
-
-    public SOSConnection2OptionsAlternate(final HashMap<String, String> settings, final String prefix) throws Exception {
-        strAlternativePrefix = prefix;
-        setAllOptions(settings, strAlternativePrefix);
-        setChildClasses(settings, prefix);
     }
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
@@ -135,82 +117,77 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         alternateOptionsUsed.setValue(val);
         return this;
     }
-   
 
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "alternate_")
-    private SOSConnection2OptionsAlternate objAlternativeOptions = null;
-    @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "proxy_")
-    private SOSConnection2OptionsAlternate objProxyOptions = null;
-    @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "jump_")
-    private SOSConnection2OptionsAlternate objJumpServerOptions = null;
+    private SOSConnection2OptionsAlternate alternativeOptions = null;
+
     @JSOptionClass(description = "", name = "SOSCredentialStoreOptions")
-    private SOSCredentialStoreOptions objCredentialStoreOptions = null;
+    private SOSCredentialStoreOptions credentialStoreOptions = null;
 
     public void setChildClasses(final HashMap<String, String> settings, final String prefix) throws Exception {
         strAlternativePrefix = prefix;
-        getCredentialStore().setAllOptions(settings, strAlternativePrefix);
-        getAlternativeOptions().setAllOptions(settings, "alternative_" + strAlternativePrefix);
-        getAlternativeOptions().setAllOptions(settings, "alternate_" + strAlternativePrefix);
-        getProxyOptions().setAllOptions(settings, "proxy_" + strAlternativePrefix);
-        getJumpServerOptions().setAllOptions(settings, "jump_" + strAlternativePrefix);
-        this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
+
+        if (settings.containsKey(strAlternativePrefix + "use_credential_store")) {
+            getCredentialStore().setAllOptions(settings, strAlternativePrefix);
+        }
+        if (alternateOptionsUsed.value()) {
+            getAlternativeOptions().setAllOptions(settings, "alternative_" + strAlternativePrefix);
+            if (settings.containsKey("alternative_" + strAlternativePrefix + "credentialstore_authenticationmethod")) {
+                getAlternativeOptions().getCredentialStore().setAllOptions(settings, "alternative_" + strAlternativePrefix);
+            }
+        }
+        // getAlternativeOptions().setAllOptions(settings, "alternate_" + strAlternativePrefix);
+        // this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
     }
 
-    public SOSConnection2OptionsAlternate getAlternativeOptions() {
-        if (objAlternativeOptions == null) {
-            objAlternativeOptions = new SOSConnection2OptionsAlternate();
+    private SOSConnection2OptionsAlternate getAlternativeOptions() {
+        if (alternativeOptions == null) {
+            alternativeOptions = new SOSConnection2OptionsAlternate();
         }
-        return objAlternativeOptions;
+        return alternativeOptions;
     }
 
-    public SOSConnection2OptionsAlternate getProxyOptions() {
-        if (objProxyOptions == null) {
-            objProxyOptions = new SOSConnection2OptionsAlternate();
+    public SOSConnection2OptionsAlternate getAlternatives() {
+        if (alternativeOptions == null) {
+            alternativeOptions = new SOSConnection2OptionsAlternate("");
         }
-        return objProxyOptions;
-    }
-
-    public SOSConnection2OptionsAlternate getJumpServerOptions() {
-        if (objJumpServerOptions == null) {
-            objJumpServerOptions = new SOSConnection2OptionsAlternate();
-        }
-        return objJumpServerOptions;
+        return alternativeOptions;
     }
 
     public void setCredentialStore(SOSCredentialStoreOptions opt) {
-        objCredentialStoreOptions = opt;
+        credentialStoreOptions = opt;
     }
 
     public SOSCredentialStoreOptions getCredentialStore() {
-        if (objCredentialStoreOptions == null) {
-            objCredentialStoreOptions = new SOSCredentialStoreOptions();
+        if (credentialStoreOptions == null) {
+            credentialStoreOptions = new SOSCredentialStoreOptions();
         }
-        return objCredentialStoreOptions;
+        return credentialStoreOptions;
     }
 
     public void checkCredentialStoreOptions() {
-        if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
+        if (credentialStoreOptions.useCredentialStore.isTrue()) {
             SOSKeePassDatabase kpd = null;
             if (keepass_database.value() == null) {
-                Path databaseFile = Paths.get(objCredentialStoreOptions.credentialStoreFileName.getValue());
+                Path databaseFile = Paths.get(credentialStoreOptions.credentialStoreFileName.getValue());
 
                 LOGGER.debug(String.format("load KeePass from file %s", SOSKeePassDatabase.getFilePath(databaseFile)));
-                objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
+                credentialStoreOptions.credentialStoreFileName.checkMandatory(true);
 
                 String keePassPassword = null;
                 Path keePassKeyFile = null;
-                if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
-                    keePassPassword = objCredentialStoreOptions.credentialStorePassword.getValue();
+                if (credentialStoreOptions.credentialStorePassword.isDirty()) {
+                    keePassPassword = credentialStoreOptions.credentialStorePassword.getValue();
                 }
 
                 try {
-                    if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
-                        keePassKeyFile = Paths.get(objCredentialStoreOptions.credentialStoreKeyFileName.getValue());
+                    if (credentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
+                        keePassKeyFile = Paths.get(credentialStoreOptions.credentialStoreKeyFileName.getValue());
                         if (Files.notExists(keePassKeyFile)) {
                             throw new Exception(String.format("[%s]key file not found", SOSKeePassDatabase.getFilePath(keePassKeyFile)));
                         }
                     } else {
-                        if ("privatekey".equals(objCredentialStoreOptions.credentialStoreAuthenticationMethod.getValue())) {
+                        if ("privatekey".equals(credentialStoreOptions.credentialStoreAuthenticationMethod.getValue())) {
                             Path defaultKeyFile = SOSKeePassDatabase.getDefaultKeyFile(databaseFile);
                             if (Files.notExists(defaultKeyFile)) {
                                 if (SOSString.isEmpty(keePassPassword)) {
@@ -334,7 +311,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         Entry<?, ?, ?, ?> entry = keePass2OptionsByKeePassSyntax(kpd);
         if (sshAuthFile.isNotEmpty()) {
             String optionName = sshAuthFile.getShortKey();
-            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), objCredentialStoreOptions.credentialStoreKeyPath
+            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), credentialStoreOptions.credentialStoreKeyPath
                     .getValue());
             if (keePassPath.isValid()) {
                 LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
@@ -359,20 +336,20 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     private Entry<?, ?, ?, ?> getKeePassEntry(final SOSKeePassDatabase kpd, final String entryPath) throws Exception {
         Entry<?, ?, ?, ?> entry = kpd.getEntryByPath(entryPath);
         if (entry == null) {
-            throw new Exception(String.format("[%s][%s]entry not found", objCredentialStoreOptions.credentialStoreFileName.getValue(), entryPath));
+            throw new Exception(String.format("[%s][%s]entry not found", credentialStoreOptions.credentialStoreFileName.getValue(), entryPath));
         }
         if (entry.getExpires()) {
-            throw new Exception(String.format("[%s][%s]entry is expired (%s)", objCredentialStoreOptions.credentialStoreFileName.getValue(),
-                    entryPath, entry.getExpiryTime()));
+            throw new Exception(String.format("[%s][%s]entry is expired (%s)", credentialStoreOptions.credentialStoreFileName.getValue(), entryPath,
+                    entry.getExpiryTime()));
         }
         return entry;
     }
 
     private Entry<?, ?, ?, ?> keePass2OptionByKeePassSyntax(final SOSKeePassDatabase kpd, final SOSOptionElement option, Entry<?, ?, ?, ?> lastEntry)
             throws Exception {
-        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), objCredentialStoreOptions.credentialStoreKeyPath.getValue());
+        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), credentialStoreOptions.credentialStoreKeyPath.getValue());
         Entry<?, ?, ?, ?> entry = null;
-        String fileName = objCredentialStoreOptions.credentialStoreFileName.getValue();
+        String fileName = credentialStoreOptions.credentialStoreFileName.getValue();
         String optionName = option.getShortKey();
         if (keePassPath.isValid()) {
             if (lastEntry == null || !keePassPath.getEntryPath().equals(lastEntry.getPath())) {
@@ -434,17 +411,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
-    }
-
-    public SOSConnection2OptionsAlternate getAlternatives() {
-        if (objAlternativeOptions == null) {
-            objAlternativeOptions = new SOSConnection2OptionsAlternate("");
-        }
-        return objAlternativeOptions;
-    }
-
-    public void setAlternativeOptions(final SOSConnection2OptionsAlternate val) {
-        objAlternativeOptions = val;
     }
 
     public boolean optionsHaveMinRequirements() {

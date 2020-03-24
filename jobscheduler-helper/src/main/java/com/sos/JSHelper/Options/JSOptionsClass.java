@@ -10,11 +10,14 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.text.StrTokenizer;
 import org.slf4j.Logger;
@@ -52,20 +55,9 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     private String commandLineArgs[];
     private String currentNodeName = "";
 
-    protected enum IterationTypes {
-        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(
-                12), setPrefix(14), toString(13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(
-                        18), getQuotedCommandLine(19);
+    private enum IterationTypes {
+        setRecord, getRecord, toOut, setDefaultValues, clearAllValues, CheckMandatory, setPrefix, toString, getCommandLine, DirtyToString, getKeyValuePair, LoadValues, StoreValues, getQuotedCommandLine;
 
-        private int intType;
-
-        IterationTypes(final int pintType) {
-            intType = pintType;
-        }
-
-        public int getCode() {
-            return intType;
-        }
     }
 
     public JSOptionsClass() {
@@ -81,87 +73,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         this.setSettings(settings);
     }
 
-    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName baseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory",
-            "A Base Directory for all relative FileNames used by SOSOptionFileName", "env:user.dir", "env:user.dir", false);
-
-    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString dateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting",
-            "yyyy-MM-dd", "yyyy-MM-dd", false);
-
-    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString timeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting",
-            "HH:mm:ss", "HH:mm:ss", false);
-
-    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName schedulerHotFolder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder",
-            "Pathname to the JobScheduler live-folder", "${SCHEDULER_DATA}/config/live", "", true);
-
-    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName schedulerData = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data",
-            "Data Folder of JobScheduler Installation", "env:SCHEDULER_DATA", "env:SCHEDULER_DATA", false);
-
-    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", mandatory = true)
-    public SOSOptionFolderName schedulerHome = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler",
-            "env:SCHEDULER_HOME", "env:SCHEDULER_HOME", false);
-
-    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", type = "SOSOptionUserName", mandatory = true)
-    public SOSOptionUserName userName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user", System.getProperty("user.name"),
-            System.getProperty("user.name"), true);
-
-    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString", mandatory = true)
-    public SOSOptionLocale locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application",
-            "env:SOS_LOCALE", java.util.Locale.getDefault().toString(), true);
-
-    @JSOptionDefinition(name = "CheckNotProcessedOptions", description = "If this Option is set to true, all not processed or recognized options "
-            + "are reported as a warning", key = "CheckNotProcessedOptions", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean checkNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions",
-            "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
-
-    @JSOptionDefinition(name = "XmlId", description = "This ist the ...", key = "XmlId", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString xmlId = new SOSOptionString(this, CLASS_NAME + ".XmlId", "This ist the ...", "root", "root", true);
-
-    @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean testMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
-
-    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
-
-    @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
-    public SOSOptionInteger debugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
-
-    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Einträgen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionLogFileName logFilename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename", "Name der Datei mit den Logging-Einträgen",
-            "stdout", "stdout", false);
-
-    public SOSOptionLogFileName getLogFilename() {
-        return logFilename;
-    }
-
-    public void setLogFilename(final SOSOptionLogFileName pstrValue) {
-        logFilename = pstrValue;
-    }
-
-    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName",
-            "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
-
-    @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString applicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application",
-            "env:SOSApplicationName", "env:SOSApplicationName", false);
-
-    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
-    public SOSOptionUrl applicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl",
-            "The Url of the Documentation of this Application", "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
-
-    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean allowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList",
-            "If true, an empty parameter list leads not into an error", "true", "true", false);
-
-    public String getPrefix() {
-        return alternativePrefix;
-    }
-
     public HashMap<String, String> settings() {
         if (objSettings == null) {
             objSettings = new HashMap<String, String>();
@@ -170,8 +81,83 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     public void setSettings(final HashMap<String, String> settings) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[setSettings][%s]map", getClass().getSimpleName()));
+        }
         objSettings = settings;
         setAllCommonOptions(settings);
+    }
+
+    private void loadProperties(final String fileName) {
+        final String method = CLASS_NAME + "::LoadProperties ";
+        try {
+            final Properties properties = new Properties();
+            properties.load(new FileInputStream(fileName));
+            message(method + ": PropertyFile read. Name '" + fileName + "'.");
+            this.settings();
+            for (Map.Entry<Object, Object> property : properties.entrySet()) {
+                if (property.getValue() != null) {
+                    final String value = property.getValue().toString();
+                    if (value != null && !value.isEmpty() && !".".equalsIgnoreCase(value)) {
+                        objSettings.put(property.getKey().toString(), value);
+                    }
+                }
+            }
+            message(method + ": Property-File loaded");
+            setAllOptions(objSettings);
+            setAllCommonOptions(objSettings);
+        } catch (Exception e) {
+            throw new JobSchedulerException(e);
+        }
+    }
+
+    public void loadProperties(final Properties properties) {
+        this.settings();
+        for (Map.Entry<Object, Object> mapItem : properties.entrySet()) {
+            final String strMapKey = mapItem.getKey().toString();
+            if (mapItem.getValue() != null) {
+                final String strTemp = mapItem.getValue().toString();
+                LOGGER.debug("Property " + strMapKey + " = " + strTemp);
+                if (strTemp != null && !strTemp.isEmpty() && !".".equalsIgnoreCase(strTemp)) {
+                    objSettings.put(strMapKey, strTemp);
+                }
+            }
+        }
+        setAllCommonOptions(objSettings);
+    }
+
+    public void setAllOptions(final HashMap<String, String> settings, final String prefix) throws Exception {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[setAllOptions][%s][%s]map", getClass().getSimpleName(), prefix));
+        }
+        if (alternativePrefix.isEmpty()) {
+            alternativePrefix = prefix;
+            // if (objParentClass != null) {
+            // iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
+            // }
+        }
+        setAllCommonOptions(settings, alternativePrefix);
+    }
+
+    public void setAllOptions(final HashMap<String, String> val) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[setAllOptions][%s]map", getClass().getSimpleName()));
+        }
+        setAllCommonOptions(val);
+    }
+
+    private void setAllCommonOptions(final HashMap<String, String> settings) {
+        setAllCommonOptions(settings, null);
+    }
+
+    private void setAllCommonOptions(final HashMap<String, String> settings, String prefix) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[setAllCommonOptions][%s][%s]map", getClass().getSimpleName(), prefix));
+        }
+        objSettings = settings;
+        if (objParentClass != null) {
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer, prefix);
+        }
     }
 
     public String getItem(final String pstrKey) {
@@ -358,7 +344,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     private String getAllOptionsAsString(final IterationTypes penuIterationType) {
         StringBuilder sb = new StringBuilder();
         if (objParentClass != null) {
-            sb.append(iterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuilder("")));
+            sb.append(iterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuilder(""), null));
         }
         return sb.toString();
     }
@@ -367,17 +353,13 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return getAllOptionsAsString(IterationTypes.toString);
     }
 
-    private void setAllCommonOptions(final HashMap<String, String> JSSettings) {
-        objSettings = JSSettings;
-        if (objParentClass != null) {
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.countSegmentFields, strBuffer);
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer);
-        }
-    }
-
     public void checkMandatory() throws Exception {
         if (objParentClass != null) {
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer);
+            // if (LOGGER.isDebugEnabled()) {
+            // LOGGER.debug(String.format("[checkMandatory]%s", getClass().getSimpleName()));
+            // }
+
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer, null);
         }
     }
 
@@ -493,63 +475,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     public String[] commandLineArgs() {
         return commandLineArgs;
-    }
-
-    private void loadProperties(final String fileName) {
-        final String method = CLASS_NAME + "::LoadProperties ";
-        try {
-            final Properties properties = new Properties();
-            properties.load(new FileInputStream(fileName));
-            message(method + ": PropertyFile read. Name '" + fileName + "'.");
-            this.settings();
-            for (Map.Entry<Object, Object> property : properties.entrySet()) {
-                if (property.getValue() != null) {
-                    final String value = property.getValue().toString();
-                    if (value != null && !value.isEmpty() && !".".equalsIgnoreCase(value)) {
-                        objSettings.put(property.getKey().toString(), value);
-                    }
-                }
-            }
-            message(method + ": Property-File loaded");
-            setAllOptions(objSettings);
-            setAllCommonOptions(objSettings);
-        } catch (Exception e) {
-            throw new JobSchedulerException(e);
-        }
-    }
-
-    public void loadProperties(final Properties properties) {
-        this.settings();
-        for (Map.Entry<Object, Object> mapItem : properties.entrySet()) {
-            final String strMapKey = mapItem.getKey().toString();
-            if (mapItem.getValue() != null) {
-                final String strTemp = mapItem.getValue().toString();
-                LOGGER.debug("Property " + strMapKey + " = " + strTemp);
-                if (strTemp != null && !strTemp.isEmpty() && !".".equalsIgnoreCase(strTemp)) {
-                    objSettings.put(strMapKey, strTemp);
-                }
-            }
-        }
-        try {
-            setAllOptions(objSettings);
-        } catch (Exception e) {
-            throw new JobSchedulerException("setAllOptions returns an error:", e);
-        }
-        setAllCommonOptions(objSettings);
-    }
-
-    public void setAllOptions(final HashMap<String, String> settings, final String prefix) throws Exception {
-        if (alternativePrefix.isEmpty()) {
-            alternativePrefix = prefix;
-            if (objParentClass != null) {
-                iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
-            }
-        }
-        this.setAllOptions(settings);
-    }
-
-    public void setAllOptions(final HashMap<String, String> val) {
-        setAllCommonOptions(val);
     }
 
     public String getCurrentNodeName() {
@@ -727,76 +652,75 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     private StringBuilder iterateAllDataElementsByAnnotation(final Class<?> clazz, final Object element, final IterationTypes enuIterate4What,
-            StringBuilder sb) {
+            StringBuilder sb, String prefix) {
         if (clazz == null) {
             throw new JobSchedulerException(String.format("[%s::IterateAllDataElementsByAnnotation]clazz is null", CLASS_NAME));
         }
 
         SOSOptionElement.gflgProcessHashMap = true;
         try {
-            final Field fields[] = clazz.getFields();
-            final StringBuilder xml = new StringBuilder("");
+
             String clazzName = clazz.getName();
-            if (enuIterate4What.equals(IterationTypes.createXML)) {
-                xml.append("<" + clazzName + " id=" + xmlId.getQuotedValue() + ">");
-            }
+            List<Field> fields = Arrays.stream(clazz.getFields()).filter(f -> f.isAnnotationPresent(JSOptionDefinition.class)).collect(Collectors
+                    .toList());
+
+            // if (LOGGER.isTraceEnabled()) {
+            // LOGGER.trace(String.format("[iterateAllDataElementsByAnnotation][%s]%s annotated fields", clazz.getSimpleName(), fields.size()));
+            // }
+
             for (final Field field : fields) {
-
                 try {
-                    if (field.isAnnotationPresent(JSOptionDefinition.class)) {
-
-                        final SOSOptionElement el = (SOSOptionElement) field.get(element);
-                        if (el != null) {
-                            if (enuIterate4What.equals(IterationTypes.LoadValues)) {
-                                SOSOptionElement.gflgProcessHashMap = true;
-                                el.loadValues();
-                            } else if (enuIterate4What.equals(IterationTypes.StoreValues)) {
-                                el.storeValues();
-                            } else if (enuIterate4What.equals(IterationTypes.setPrefix)) {
-                                el.setPrefix(alternativePrefix);
-                            } else if (enuIterate4What.equals(IterationTypes.setRecord)) {
-                                SOSOptionElement.gflgProcessHashMap = true;
-                                // objDE.gflgProcessHashMap = true;
-                                el.mapValue();
-                            } else if (enuIterate4What.equals(IterationTypes.CheckMandatory)) {
-                                el.checkMandatory();
-                            } else if (enuIterate4What.equals(IterationTypes.toOut)) {
-                                LOGGER.debug(el.toString());
-                            } else if (enuIterate4What.equals(IterationTypes.toString)) {
-                                sb.append(el.toString() + "\n");
-                            } else if (enuIterate4What.equals(IterationTypes.DirtyToString) && el.isDirty()) {
-                                sb.append(el.getDirtyToString() + "\n");
-                            } else if (enuIterate4What.equals(IterationTypes.createXML)) {
-                                //xml.append(el.toXml());
-                            } else if (enuIterate4What.equals(IterationTypes.setDefaultValues)) {
-                                final String strV = el.getValue();
-                                if (strV.isEmpty()) {
-                                    el.setValue(el.getDefaultValue());
-                                }
-                            } else if (enuIterate4What.equals(IterationTypes.clearAllValues)) {
-                                el.setValue("");
-                            } else if (enuIterate4What.equals(IterationTypes.getCommandLine)) {
-                                sb.append(el.toCommandLine());
-                            } else if (enuIterate4What.equals(IterationTypes.getQuotedCommandLine)) {
-                                sb.append(el.toQuotedCommandLine());
-                            } else if (enuIterate4What.equals(IterationTypes.getKeyValuePair)) {
-                                clazzName = el.toKeyValuePair(alternativePrefix);
-                                if (isNotEmpty(clazzName)) {
-                                    sb.append(clazzName + "\n");
-                                }
+                    final SOSOptionElement el = (SOSOptionElement) field.get(element);
+                    if (el != null) {
+                        if (enuIterate4What.equals(IterationTypes.setRecord)) {
+                            if (prefix != null) {
+                                el.setPrefix(prefix);
                             }
-                            iterateAllDataElementsByAnnotation(el.getClass(), el, enuIterate4What, sb);
+                            SOSOptionElement.gflgProcessHashMap = true;
+                            // objDE.gflgProcessHashMap = true;
+                            el.mapValue();
+                        } else if (enuIterate4What.equals(IterationTypes.CheckMandatory)) {
+                            el.checkMandatory();
+                        } else if (enuIterate4What.equals(IterationTypes.setPrefix)) {
+                            el.setPrefix(alternativePrefix);
+                        } else if (enuIterate4What.equals(IterationTypes.setDefaultValues)) {
+                            final String val = el.getValue();
+                            if (val.isEmpty()) {
+                                el.setValue(el.getDefaultValue());
+                            }
+                        } else if (enuIterate4What.equals(IterationTypes.LoadValues)) {
+                            SOSOptionElement.gflgProcessHashMap = true;
+                            el.loadValues();
+                        } else if (enuIterate4What.equals(IterationTypes.StoreValues)) {
+                            el.storeValues();
+                        } else if (enuIterate4What.equals(IterationTypes.toOut)) {
+                            LOGGER.debug(el.toString());
+                        } else if (enuIterate4What.equals(IterationTypes.toString)) {
+                            sb.append(el.toString() + "\n");
+                        } else if (enuIterate4What.equals(IterationTypes.DirtyToString) && el.isDirty()) {
+                            sb.append(el.getDirtyToString() + "\n");
+
+                        } else if (enuIterate4What.equals(IterationTypes.clearAllValues)) {
+                            el.setValue("");
+                        } else if (enuIterate4What.equals(IterationTypes.getCommandLine)) {
+                            sb.append(el.toCommandLine());
+                        } else if (enuIterate4What.equals(IterationTypes.getQuotedCommandLine)) {
+                            sb.append(el.toQuotedCommandLine());
+                        } else if (enuIterate4What.equals(IterationTypes.getKeyValuePair)) {
+                            clazzName = el.toKeyValuePair(alternativePrefix);
+                            if (isNotEmpty(clazzName)) {
+                                sb.append(clazzName + "\n");
+                            }
                         }
+                        // recursion disabled due an option element not have the JSOptionDefinition annotated fields
+                        // iterateAllDataElementsByAnnotation(el.getClass(), el, enuIterate4What, sb, prefix);
                     }
+
                 } catch (final ClassCastException objException) {
                     //
                 } catch (final Exception objE) {
                     throw new RuntimeException(objE);
                 }
-            }
-            if (enuIterate4What.equals(IterationTypes.createXML)) {
-                xml.append("</" + clazzName + ">");
-                sb = xml;
             }
         } catch (final Exception x) {
             throw new RuntimeException(x);
@@ -809,48 +733,35 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     private StringBuilder iterate(final IterationTypes enuIterate4What) {
         StringBuilder sb = new StringBuilder();
         if (objParentClass != null) {
-            sb = iterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, sb);
+            sb = iterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, sb, null);
         }
         return sb;
     }
 
-    public HashMap<String, String> deletePrefix(final HashMap<String, String> phsmParameters, final String pstrPrefix) {
-        String strTemp;
-        HashMap<String, String> hsmNewMap = new HashMap<String, String>();
-        if (phsmParameters != null) {
-            for (Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
-                String strMapKey = mapItem.getKey();
-                if (mapItem.getValue() != null) {
-                    strTemp = mapItem.getValue();
+    public HashMap<String, String> deletePrefix(final HashMap<String, String> params, final String prefix) {
+
+        HashMap<String, String> result = new HashMap<String, String>();
+        if (params != null) {
+            String longPrefix = "/" + prefix;
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                String key = param.getKey();
+                String value = param.getValue();
+                if (key.startsWith(prefix)) {
+                    key = key.replaceAll(prefix, "");
+                    result.put(key, value);
+                    param.setValue("\n");
                 } else {
-                    strTemp = null;
-                }
-                if (!strMapKey.startsWith(pstrPrefix)) {
-                    hsmNewMap.put(strMapKey, strTemp);
-                }
-            }
-            for (Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
-                String strMapKey = mapItem.getKey();
-                if (mapItem.getValue() != null) {
-                    strTemp = mapItem.getValue();
-                } else {
-                    strTemp = null;
-                }
-                if (strMapKey.startsWith(pstrPrefix)) {
-                    strMapKey = strMapKey.replaceAll(pstrPrefix, "");
-                    hsmNewMap.put(strMapKey, strTemp);
-                    mapItem.setValue("\n");
-                } else {
-                    String strP = "/" + pstrPrefix;
-                    if (strMapKey.contains(strP)) {
-                        strMapKey = strMapKey.replace(strP, "/");
-                        hsmNewMap.put(strMapKey, strTemp);
-                        mapItem.setValue("\n");
+                    if (key.contains(longPrefix)) {
+                        key = key.replace(longPrefix, "/");
+                        result.put(key, value);
+                        param.setValue("\n");
+                    } else {
+                        result.put(key, value);
                     }
                 }
             }
         }
-        return hsmNewMap;
+        return result;
     }
 
     public Preferences getPreferenceStore() {
@@ -865,6 +776,87 @@ public class JSOptionsClass extends I18NBase implements Serializable {
             LOGGER.trace("setValue = " + pstrValue);
             objOption.setValue(pstrValue);
         }
+    }
+
+    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName baseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory",
+            "A Base Directory for all relative FileNames used by SOSOptionFileName", "env:user.dir", "env:user.dir", false);
+
+    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString dateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting",
+            "yyyy-MM-dd", "yyyy-MM-dd", false);
+
+    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString timeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting",
+            "HH:mm:ss", "HH:mm:ss", false);
+
+    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", type = "SOSOptionFolderName", mandatory = true)
+    public SOSOptionFolderName schedulerHotFolder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder",
+            "Pathname to the JobScheduler live-folder", "${SCHEDULER_DATA}/config/live", "", true);
+
+    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName schedulerData = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data",
+            "Data Folder of JobScheduler Installation", "env:SCHEDULER_DATA", "env:SCHEDULER_DATA", false);
+
+    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", mandatory = true)
+    public SOSOptionFolderName schedulerHome = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler",
+            "env:SCHEDULER_HOME", "env:SCHEDULER_HOME", false);
+
+    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", type = "SOSOptionUserName", mandatory = true)
+    public SOSOptionUserName userName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user", System.getProperty("user.name"),
+            System.getProperty("user.name"), true);
+
+    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString", mandatory = true)
+    public SOSOptionLocale locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application",
+            "env:SOS_LOCALE", java.util.Locale.getDefault().toString(), true);
+
+    @JSOptionDefinition(name = "CheckNotProcessedOptions", description = "If this Option is set to true, all not processed or recognized options "
+            + "are reported as a warning", key = "CheckNotProcessedOptions", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean checkNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions",
+            "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
+
+    @JSOptionDefinition(name = "XmlId", description = "This ist the ...", key = "XmlId", type = "SOSOptionString", mandatory = true)
+    public SOSOptionString xmlId = new SOSOptionString(this, CLASS_NAME + ".XmlId", "This ist the ...", "root", "root", true);
+
+    @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean testMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
+
+    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
+
+    @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
+    public SOSOptionInteger debugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
+
+    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Einträgen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
+    public SOSOptionLogFileName logFilename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename", "Name der Datei mit den Logging-Einträgen",
+            "stdout", "stdout", false);
+
+    public SOSOptionLogFileName getLogFilename() {
+        return logFilename;
+    }
+
+    public void setLogFilename(final SOSOptionLogFileName pstrValue) {
+        logFilename = pstrValue;
+    }
+
+    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
+    public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName",
+            "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
+
+    @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString applicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application",
+            "env:SOSApplicationName", "env:SOSApplicationName", false);
+
+    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
+    public SOSOptionUrl applicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl",
+            "The Url of the Documentation of this Application", "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
+
+    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean allowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList",
+            "If true, an empty parameter list leads not into an error", "true", "true", false);
+
+    public String getPrefix() {
+        return alternativePrefix;
     }
 
 }

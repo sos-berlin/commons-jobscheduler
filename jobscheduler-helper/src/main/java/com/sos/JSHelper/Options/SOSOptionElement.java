@@ -419,19 +419,19 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     public void mapValue() {
         if (!this.isEmpty(strKey)) {
-            String strV = objParentClass.getItem(strKey, null);
-            if (strV == null) {
-                for (String strAlias : objAliase) {
-                    strV = objParentClass.getItem(strAlias, null);
-                    if (strV != null) {
+            String value = objParentClass.getItem(strKey, null);
+            if (value == null) {
+                for (String alias : objAliase) {
+                    value = objParentClass.getItem(alias, null);
+                    if (value != null) {
                         break;
                     }
                 }
             }
-            if (strV == null) {
-                strV = strDefaultValue;
+            if (value == null) {
+                value = strDefaultValue;
             } else {
-                this.setValue(strV);
+                this.setValue(value);
                 this.setProtected(flgIncludeProcessingInProgress);
             }
             if (intOptionType == isOptionTypeOptions) {
@@ -525,16 +525,16 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         strValue = null;
     }
 
-    public String setPrefix(final String strPrefix) {
-        String strT = strKey;
-        int i = strT.indexOf(".");
+    public String setPrefix(final String prefix) {
+        String key = strKey;
+        int i = key.indexOf(".");
         if (i > 0) {
-            strT = strT.replaceFirst("\\.", "." + strPrefix);
+            key = key.replaceFirst("\\.", "." + prefix);
         } else {
-            strT = strPrefix + strT;
+            key = prefix + key;
         }
-        strKey = strT;
-        return strT;
+        strKey = key;
+        return strKey;
     }
 
     public int getIntSize() {

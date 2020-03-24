@@ -317,16 +317,16 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         this.registerMessageListener(pobjListener);
     }
 
-    public SOSSmtpMailOptionsSuperClass(final HashMap<String, String> JSSettings) throws Exception {
+    public SOSSmtpMailOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        this.setAllOptions(JSSettings);
+        this.setAllOptions(settings);
     }
 
     @Override
-    public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-        objSettings = pobjJSSettings;
+    public void setAllOptions(final HashMap<String, String> settings) {
+        objSettings = settings;
         super.setSettings(objSettings);
-        super.setAllOptions(pobjJSSettings);
+        //super.setAllOptions(settings);
     }
 
     @Override
