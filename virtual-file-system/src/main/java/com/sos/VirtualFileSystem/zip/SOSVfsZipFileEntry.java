@@ -72,7 +72,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     public OutputStream getFileOutputStream() {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(zipEntry.getName(),false,false));
+                setOutputStream(getHandler().getOutputStream(zipEntry.getName(), false, false));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileOutputStream"), e);

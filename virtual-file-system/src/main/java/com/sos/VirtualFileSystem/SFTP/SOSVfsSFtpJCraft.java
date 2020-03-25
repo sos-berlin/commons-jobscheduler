@@ -1044,7 +1044,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
- 
     public StringBuilder getStdErr() {
         return stdErr;
     }
