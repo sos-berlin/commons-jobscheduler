@@ -77,11 +77,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     public OutputStream getFileOutputStream() {
         try {
             if (getOutputStream() == null) {
-                if (isModeAppend()) {
-                    setOutputStream(((SOSVfsFtpBaseClass) getHandler()).getAppendFileStream(fileName));
-                } else {
-                    setOutputStream(getHandler().getOutputStream(fileName));
-                }
+                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
                 if (getOutputStream() == null) {
                     throw new JobSchedulerException(getHandler().getReplyString());
                 }
@@ -251,9 +247,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             InputStream is = this.getFileInputStream();
             if (is != null) {
                 bytes = is.read(buffer);
-            } else {
-                bytes = getHandler().read(buffer);
-            }
+            } 
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
         }
@@ -267,8 +261,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             InputStream is = this.getFileInputStream();
             if (is != null) {
                 bytes = is.read(buffer, offset, length);
-            } else {
-                bytes = getHandler().read(buffer, offset, length);
             }
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);

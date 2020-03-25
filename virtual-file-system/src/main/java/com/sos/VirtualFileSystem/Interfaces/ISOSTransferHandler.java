@@ -40,7 +40,7 @@ public interface ISOSTransferHandler extends ISOSShell {
 
     public SOSFileEntry getFileEntry(String path) throws Exception;
 
-    public OutputStream getOutputStream(String path);
+    public OutputStream getOutputStream(String path, boolean append, boolean resume);
 
     public InputStream getInputStream(String path);
 
@@ -69,18 +69,6 @@ public interface ISOSTransferHandler extends ISOSShell {
     public boolean isDirectory(String path);
 
     public void rename(String path, String newPath);
-
-    public void write(byte[] buffer, int offset, int length);
-
-    public void write(byte[] buffer);
-
-    public int read(byte[] buffer);
-
-    public int read(byte[] buffer, int offset, int length);
-
-    public void close();
-
-    public void flush();
 
     public boolean isSimulateShell();
 

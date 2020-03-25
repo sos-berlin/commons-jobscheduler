@@ -37,7 +37,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSTransferHandler {
     private String strReplyString = "";
     private ZipFile objWorkingDirectory = null;
     public ZipOutputStream objZipOutputStream = null;
-    private String strZipArchiveName = "";
     private String strCurrentEntryName = "";
     private SOSVfsZipFileEntry objCurrentZipFileEntry = null;
     private boolean simulateShell = false;
@@ -53,7 +52,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSTransferHandler {
             if (objWorkingDirectory != null) {
                 objWorkingDirectory.close();
             }
-            strZipArchiveName = pstrPathName;
             JSFile objFile = new JSFile(pstrPathName);
             if (this.isTarget()) {
                 if (objFile.exists()) {
@@ -318,7 +316,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSTransferHandler {
     }
 
     @Override
-    public OutputStream getOutputStream(final String strFileName) {
+    public OutputStream getOutputStream(final String strFileName, boolean append, boolean resume) {
         ZipOutputStream objZOS = null;
         ZipEntry objZE = objWorkingDirectory.getEntry(strFileName);
         if (objZE != null) {
@@ -341,65 +339,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSTransferHandler {
 
     @Override
     public void rename(final String strFileName, final String pstrNewFileName) {
-        //
-    }
-
-    @Override
-    public void close() {
-        if (objWorkingDirectory != null) {
-            String strName = objWorkingDirectory.getName();
-            try {
-                objWorkingDirectory.close();
-                LOGGER.debug(SOSVfs_D_204.params(strName));
-                objWorkingDirectory = null;
-            } catch (IOException e) {
-                throw new JobSchedulerException(SOSVfs_E_205.params(strName));
-            }
-        } else {
-            this.closeOutput();
-        }
-    }
-
-    private void closeOutput() {
-        if (objZipOutputStream != null) {
-            try {
-                objZipOutputStream.flush();
-                objZipOutputStream.close();
-                LOGGER.debug(SOSVfs_D_206.params(strZipArchiveName));
-            } catch (IOException e) {
-                throw new JobSchedulerException(SOSVfs_E_134.params("close()"), e);
-            }
-        }
-    }
-
-    @Override
-    public void flush() {
-        if (objZipOutputStream != null) {
-            try {
-                objZipOutputStream.flush();
-            } catch (IOException e) {
-                throw new JobSchedulerException(SOSVfs_E_134.params("flush()"), e);
-            }
-        }
-    }
-
-    @Override
-    public int read(final byte[] bteBuffer) {
-        return 0;
-    }
-
-    @Override
-    public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        return 0;
-    }
-
-    @Override
-    public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        //
-    }
-
-    @Override
-    public void write(final byte[] bteBuffer) {
         //
     }
 

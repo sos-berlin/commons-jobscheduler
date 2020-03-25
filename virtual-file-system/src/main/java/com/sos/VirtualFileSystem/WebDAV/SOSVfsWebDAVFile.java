@@ -50,7 +50,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName));
+                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
@@ -66,7 +66,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
     public void write(final byte[] bteBuffer) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName));
+                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());

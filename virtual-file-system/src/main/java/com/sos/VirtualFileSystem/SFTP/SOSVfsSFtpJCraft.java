@@ -46,7 +46,6 @@ import com.jcraft.jsch.agentproxy.Connector;
 import com.jcraft.jsch.agentproxy.ConnectorFactory;
 import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
@@ -113,8 +112,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
-        setStrictHostKeyChecking(destinationOptions.strictHostKeyChecking.getValue());
-        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
+        host = destinationOptions.host.getValue();
+        port = destinationOptions.port.value();
+        LOGGER.info(new StringBuilder("[").append(destinationOptions.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(host, port))
+                .toString());
     }
 
     @Override
@@ -132,16 +133,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
-    }
-
-    @Override
-    public void setStrictHostKeyChecking(final String val) {
-        JSch.setConfig("StrictHostKeyChecking", val);
-    }
-
-    @SuppressWarnings("unused")
-    private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
-        return val.value() ? "yes" : "no";
     }
 
     @Override
@@ -617,14 +608,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(final String fileName) {
+    public OutputStream getOutputStream(final String fileName, boolean append, boolean resume) {
         try {
-            boolean modeAppend = false;
-            boolean modeRestart = false;
             int transferMode = ChannelSftp.OVERWRITE;
-            if (modeAppend) {
+            if (append) {
                 transferMode = ChannelSftp.APPEND;
-            } else if (modeRestart) {
+            } else if (resume) {
                 transferMode = ChannelSftp.RESUME;
             }
             return channelSftp.put(fileName, transferMode);
@@ -982,18 +971,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    private void doConnect(final String phost, final int pport) {
-        host = phost;
-        port = pport;
-        LOGGER.info(new StringBuilder("[").append(destinationOptions.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(host, port))
-                .toString());
-        if (!isConnected()) {
-            logReply();
-        } else {
-            LOGGER.warn(SOSVfs_D_0103.params(host, port));
-        }
-    }
-
     private void createSession(final String puser, final String phost, final int pport) throws Exception {
         if (secureChannel == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("secureChannel"));
@@ -1002,6 +979,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.debug(String.format("user=%s, host=%s, port=%s", puser, phost, pport));
         sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
+        // JSch.setConfig("StrictHostKeyChecking", destinationOptions.strictHostKeyChecking.getValue());
         config.put("StrictHostKeyChecking", destinationOptions.strictHostKeyChecking.getValue());
         if (destinationOptions.useZlibCompression.value()) {
             config.put("compression.s2c", "zlib@openssh.com,zlib,none");
@@ -1066,11 +1044,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    @Override
-    public void close() {
-        //
-    }
-
+ 
     public StringBuilder getStdErr() {
         return stdErr;
     }

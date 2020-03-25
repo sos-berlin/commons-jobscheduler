@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.JMS;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
@@ -190,7 +189,6 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         return messageText;
     }
 
- 
     @Override
     public boolean isSimulateShell() {
         return false;
@@ -202,7 +200,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(String fileName) {
+    public OutputStream getOutputStream(String fileName, boolean append, boolean resume) {
         // not implemented, no need
         return null;
     }

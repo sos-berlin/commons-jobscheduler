@@ -560,7 +560,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(final String path) {
+    public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
         SmbFile smbFile = null;
         try {
             smbFile = getSmbFile(normalizePath(path));

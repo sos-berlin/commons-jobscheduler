@@ -448,7 +448,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(final String path) {
+    public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
         String uri = normalizeHttpPath(path);
         try {
             PutMethod m = new PutMethod(uri);

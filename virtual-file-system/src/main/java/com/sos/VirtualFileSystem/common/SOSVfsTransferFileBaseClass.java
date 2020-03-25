@@ -67,7 +67,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             if (getOutputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                setOutputStream( getHandler().getOutputStream(fileName));
+                setOutputStream( getHandler().getOutputStream(fileName,false,false));
                 
             }
         } catch (Exception e) {
