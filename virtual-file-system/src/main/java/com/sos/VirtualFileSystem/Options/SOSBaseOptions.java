@@ -48,7 +48,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String OPERATION_RECEIVE = "receive";
     private static final String OPERATION_SEND = "send";
-    private SOSDestinationMainOptions connectionOptions;
+    private SOSTransferOptions transferOptions;
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private Properties allEnvVars = null;
@@ -193,11 +193,9 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         try {
             LOGGER.trace("[setChildClasses]map");
 
-            if (connectionOptions == null) {
-                LOGGER.trace("[destination options]main");
-                connectionOptions = new SOSDestinationMainOptions(settings);
-            } else {
-                // connectionOptions.setPrefixedValues(settings);
+            if (transferOptions == null) {
+                LOGGER.trace("[transfer options]main");
+                transferOptions = new SOSTransferOptions(settings);
             }
             if (mailOptions == null) {
                 if (settings.containsKey(SETTINGS_KEY_MAIL_SMTP)) {
@@ -260,8 +258,8 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         if (operation.getValue().equalsIgnoreCase(enuJadeOperations.getlist.getText())) {
             removeFiles.setFalse();
         }
-        checkURLParameter(getConnectionOptions().getSource());
-        checkURLParameter(getConnectionOptions().getTarget());
+        checkURLParameter(getTransferOptions().getSource());
+        checkURLParameter(getTransferOptions().getTarget());
         String localDir = this.localDir.getValue();
         if (isEmpty(localDir)) {
             this.localDir.setValue(sourceDir.getValue());
@@ -474,7 +472,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     @Override
     public void commandLineArgs(final String[] args) {
         super.commandLineArgs(args);
-        this.setAllOptions(super.objSettings);
+        this.setAllOptions(super.getSettings());
         boolean found = false;
         for (int i = 0; i < args.length; i++) {
             String strParam = args[i];
@@ -491,7 +489,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     @Override
     public void commandLineArgs(final String args) {
         try {
-            this.commandLineArgs(args.split(" "));
+            commandLineArgs(args.split(" "));
         } catch (Exception e) {
             LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_153.params("command lines args"), e);
@@ -500,9 +498,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        objSettings = settings;
-        super.setSettings(objSettings);
-        super.setAllOptions(settings);
         HashMap<String, String> map = settings;
         if (!settingsFileProcessed && !readSettingsFileIsActive && configurationFile.isNotEmpty()) {
             readSettingsFileIsActive = true;
@@ -510,7 +505,30 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             readSettingsFileIsActive = false;
             settingsFileProcessed = true;
         }
+        super.setAllOptions(map);
         setChildClasses(map);
+    }
+
+    public void setAllOptionsOnJob(HashMap<String, String> params) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("settingsFileProcessed=%s, readSettingsFileIsActive=%s", settingsFileProcessed, readSettingsFileIsActive));
+        }
+        if (!settingsFileProcessed && !readSettingsFileIsActive && params.containsKey("settings") && params.containsKey("profile")) {
+            Map<String, String> mapFromIniFile = new HashMap<String, String>();
+            settings.setValue(params.get("settings"));
+            profile.setValue(params.get("profile"));
+            readSettingsFileIsActive = true;
+            mapFromIniFile = readSettingsFile(params);
+            readSettingsFileIsActive = false;
+            settingsFileProcessed = true;
+            params.putAll(mapFromIniFile);
+        }
+        handleFileOrderSource(params);
+
+        LOGGER.trace("[set options]start");
+        super.setAllOptions(params);
+        setChildClasses(params);
+        LOGGER.trace("[set options]end");
     }
 
     private boolean isEmpty(HashMap<String, String> params, String key) {
@@ -542,28 +560,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
                             + "and no file_spec has been specified", basename, params.get("scheduler_file_path"), path));
             params.put("file_path", basename);
         }
-    }
-
-    public void setAllOptions2(HashMap<String, String> params) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("settingsFileProcessed=%s, readSettingsFileIsActive=%s", settingsFileProcessed, readSettingsFileIsActive));
-        }
-        if (!settingsFileProcessed && !readSettingsFileIsActive && params.containsKey("settings") && params.containsKey("profile")) {
-            Map<String, String> mapFromIniFile = new HashMap<String, String>();
-            settings.setValue(params.get("settings"));
-            profile.setValue(params.get("profile"));
-            readSettingsFileIsActive = true;
-            mapFromIniFile = readSettingsFile(params);
-            readSettingsFileIsActive = false;
-            settingsFileProcessed = true;
-            params.putAll(mapFromIniFile);
-        }
-        handleFileOrderSource(params);
-
-        LOGGER.trace("[set options]start");
-        super.setSettings(params);
-        setChildClasses(params);
-        LOGGER.trace("[set options]end");
     }
 
     public HashMap<String, String> readSettingsFile() {
@@ -810,16 +806,16 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             copyValue(targetDir, remoteDir);
             copyValue(getSource().directory, localDir);
             copyValue(getTarget().directory, remoteDir);
-            changeOptions(getConnectionOptions().getTarget());
+            changeOptions(getTransferOptions().getTarget());
         } else if (OPERATION_RECEIVE.equalsIgnoreCase(operation.getValue())) {
             targetType = TransferTypes.local.name();
             copyValue(sourceDir, remoteDir);
             copyValue(targetDir, localDir);
             copyValue(getSource().directory, remoteDir);
             copyValue(getTarget().directory, localDir);
-            changeOptions2Local(getConnectionOptions().getTarget());
+            changeOptions2Local(getTransferOptions().getTarget());
         } else {
-            targetType = getConnectionOptions().getTarget().protocol.getValue();
+            targetType = getTransferOptions().getTarget().protocol.getValue();
             if (targetType.isEmpty()) {
                 targetType = TransferTypes.local.name();
             }
@@ -879,11 +875,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
             sourceType = TransferTypes.local.name();
             changeDirValues();
-            SOSDestinationOptions options = getConnectionOptions().getSource();
+            SOSDestinationOptions options = getTransferOptions().getSource();
             options.host.setValue(SOSOptionHostName.getLocalHost());
             options.port.value(0);
             options.protocol.setValue(sourceType);
-            options = getConnectionOptions().getTarget();
+            options = getTransferOptions().getTarget();
             options.host = host;
             options.port = port;
             options.protocol = protocol;
@@ -904,7 +900,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
                 sourceType = TransferTypes.local.name();
             }
             changeDirValues4Receive();
-            SOSDestinationOptions options = getConnectionOptions().getSource();
+            SOSDestinationOptions options = getTransferOptions().getSource();
             options.host.setValue(host.getValue());
             options.port.value(port.value());
             options.protocol.setValue(protocol.getValue());
@@ -913,7 +909,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             options.password = password;
             options.sshAuthFile = sshAuthFile;
             options.sshAuthMethod = sshAuthMethod;
-            options = getConnectionOptions().getTarget();
+            options = getTransferOptions().getTarget();
             options.host.setValue(SOSOptionHostName.getLocalHost());
             options.port.value(0);
             options.protocol.setValue(TransferTypes.local.name());
@@ -924,7 +920,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             alternate.protocol.setValue(protocol.getValue());
             alternate.passiveMode.setValue(alternativePassiveMode.getValue());
         } else {
-            sourceType = this.getConnectionOptions().getSource().protocol.getValue();
+            sourceType = getTransferOptions().getSource().protocol.getValue();
             if (sourceType.isEmpty()) {
                 sourceType = TransferTypes.local.name();
             }
@@ -965,11 +961,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return !overwriteFiles.value() && !appendFiles.value();
     }
 
-    public SOSDestinationMainOptions getConnectionOptions() {
-        if (connectionOptions == null) {
-            connectionOptions = new SOSDestinationMainOptions();
+    public SOSTransferOptions getTransferOptions() {
+        if (transferOptions == null) {
+            transferOptions = new SOSTransferOptions();
         }
-        return connectionOptions;
+        return transferOptions;
     }
 
     public boolean isReplaceReplacingInEffect() {
@@ -977,11 +973,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public SOSDestinationOptions getSource() {
-        return getConnectionOptions().getSource();
+        return getTransferOptions().getSource();
     }
 
     public SOSDestinationOptions getTarget() {
-        return getConnectionOptions().getTarget();
+        return getTransferOptions().getTarget();
     }
 
     public boolean isNeedTargetClient() {
@@ -1057,12 +1053,12 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return dmzOptions;
     }
 
-    public void setDmzOption(String dmzOptionKey, String dmzOptionValue) {
-        dmzOptions.put(dmzOptionKey, dmzOptionValue);
+    public void setDmzOption(String key, String value) {
+        dmzOptions.put(key, value);
     }
 
-    public String getDmzOption(String dmzOptionKey) {
-        return dmzOptions.getOrDefault(dmzOptionKey, "");
+    public String getDmzOption(String key) {
+        return dmzOptions.getOrDefault(key, "");
     }
 
     public void setOriginalSettingsFile(String val) {

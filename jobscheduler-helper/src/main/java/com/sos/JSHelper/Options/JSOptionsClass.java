@@ -41,10 +41,10 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClass.class);
 
     public Class<?> objParentClass = this.getClass();
-    public HashMap<String, String> objSettings = null;
 
     private static Properties properties = new Properties();
-    private final StringBuilder strBuffer = new StringBuilder("");
+    private HashMap<String, String> settings = null;
+    private final StringBuilder buffer = new StringBuilder("");
     private final String optionNamePrefix = "-";
     private final String filePathSeparator = File.separator;
 
@@ -70,22 +70,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     public JSOptionsClass(final HashMap<String, String> settings) {
         this();
-        this.setSettings(settings);
-    }
-
-    public HashMap<String, String> settings() {
-        if (objSettings == null) {
-            objSettings = new HashMap<String, String>();
-        }
-        return objSettings;
-    }
-
-    public void setSettings(final HashMap<String, String> settings) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[setSettings][%s]map", getClass().getSimpleName()));
-        }
-        objSettings = settings;
-        setAllCommonOptions(settings);
+        this.setAllOptions(settings);
     }
 
     private void loadProperties(final String fileName) {
@@ -94,69 +79,74 @@ public class JSOptionsClass extends I18NBase implements Serializable {
             final Properties properties = new Properties();
             properties.load(new FileInputStream(fileName));
             message(method + ": PropertyFile read. Name '" + fileName + "'.");
-            this.settings();
+            getSettings();
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
                 if (property.getValue() != null) {
                     final String value = property.getValue().toString();
                     if (value != null && !value.isEmpty() && !".".equalsIgnoreCase(value)) {
-                        objSettings.put(property.getKey().toString(), value);
+                        settings.put(property.getKey().toString(), value);
                     }
                 }
             }
             message(method + ": Property-File loaded");
-            setAllOptions(objSettings);
-            setAllCommonOptions(objSettings);
+            setAllCommonOptions(settings);
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         }
     }
 
     public void loadProperties(final Properties properties) {
-        this.settings();
-        for (Map.Entry<Object, Object> mapItem : properties.entrySet()) {
-            final String strMapKey = mapItem.getKey().toString();
-            if (mapItem.getValue() != null) {
-                final String strTemp = mapItem.getValue().toString();
-                LOGGER.debug("Property " + strMapKey + " = " + strTemp);
-                if (strTemp != null && !strTemp.isEmpty() && !".".equalsIgnoreCase(strTemp)) {
-                    objSettings.put(strMapKey, strTemp);
+        getSettings();
+        for (Map.Entry<Object, Object> property : properties.entrySet()) {
+            final String key = property.getKey().toString();
+            if (property.getValue() != null) {
+                final String value = property.getValue().toString();
+                LOGGER.debug("Property " + key + " = " + value);
+                if (value != null && !value.isEmpty() && !".".equalsIgnoreCase(value)) {
+                    settings.put(key, value);
                 }
             }
         }
-        setAllCommonOptions(objSettings);
+        setAllCommonOptions(settings);
     }
 
-    public void setAllOptions(final HashMap<String, String> settings, final String prefix) throws Exception {
+    public HashMap<String, String> getSettings() {
+        if (settings == null) {
+            settings = new HashMap<String, String>();
+        }
+        return settings;
+    }
+
+    public void setAllOptions(final HashMap<String, String> params, final String prefix) throws Exception {
+        settings = params;
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[setAllOptions][%s][%s]map", getClass().getSimpleName(), prefix));
         }
         if (alternativePrefix.isEmpty()) {
             alternativePrefix = prefix;
-            // if (objParentClass != null) {
-            // iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
-            // }
         }
         setAllCommonOptions(settings, alternativePrefix);
     }
 
-    public void setAllOptions(final HashMap<String, String> val) {
+    public void setAllOptions(final HashMap<String, String> params) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[setAllOptions][%s]map", getClass().getSimpleName()));
         }
-        setAllCommonOptions(val);
+        settings = params;
+        setAllCommonOptions(settings);
     }
 
-    private void setAllCommonOptions(final HashMap<String, String> settings) {
-        setAllCommonOptions(settings, null);
+    private void setAllCommonOptions(final HashMap<String, String> params) {
+        setAllCommonOptions(params, null);
     }
 
-    private void setAllCommonOptions(final HashMap<String, String> settings, String prefix) {
+    private void setAllCommonOptions(final HashMap<String, String> params, String prefix) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[setAllCommonOptions][%s][%s]map", getClass().getSimpleName(), prefix));
         }
-        objSettings = settings;
+        settings = params;
         if (objParentClass != null) {
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer, prefix);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, buffer, prefix);
         }
     }
 
@@ -173,7 +163,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         String strLSKey = "";
         if (!currentNodeName.isEmpty()) {
             strLSKey = currentNodeName + "/" + pstrKey.replaceAll("_", "");
-            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+            for (Map.Entry<String, String> mapItem : settings.entrySet()) {
                 String strMapKey = mapItem.getKey();
                 strMapKey = strMapKey.replaceAll("_", "");
                 if (strLSKey.equalsIgnoreCase(strMapKey)) {
@@ -187,7 +177,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
                 }
             }
         }
-        for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+        for (Map.Entry<String, String> mapItem : settings.entrySet()) {
             String strMapKey = mapItem.getKey();
             String lstrMapKey = strMapKey.replaceAll("_", "");
             if (strKey.equalsIgnoreCase(lstrMapKey)) {
@@ -206,7 +196,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
             strKey = strKey.substring(++i);
             if (!currentNodeName.isEmpty()) {
                 strLSKey = currentNodeName + "/" + strKey;
-                for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+                for (Map.Entry<String, String> mapItem : settings.entrySet()) {
                     String strMapKey = mapItem.getKey();
                     String lstrMapKey = strMapKey.replaceAll("_", "");
                     if (strLSKey.equalsIgnoreCase(lstrMapKey)) {
@@ -220,7 +210,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
                     }
                 }
             }
-            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
+            for (Map.Entry<String, String> mapItem : settings.entrySet()) {
                 String strMapKey = mapItem.getKey();
                 String lstrMapKey = strMapKey.replaceAll("_", "");
                 if (!strLSKey.isEmpty() && strLSKey.equalsIgnoreCase(lstrMapKey)) {
@@ -250,26 +240,20 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     public boolean checkNotProcessedOptions() {
-        boolean flgIsOK = true;
+        boolean result = true;
         // int intNumberOfNotProcessedOptions = 0;
-        if (objSettings != null) {
-            for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
-                String strMapKey = mapItem.getKey();
-                String strT = processedOptions.get(strMapKey);
-                if (strT == null) {
-                    String strValue = null;
-                    if (mapItem.getValue() != null) {
-                        strValue = mapItem.getValue();
-                    } else {
-                        strValue = null;
-                    }
-                    LOGGER.warn(String.format("SOSOPT-W-001: Option '%1$s' with value '%2$s' is unknown and not processed", strMapKey, strValue));
-                    flgIsOK = false;
+        if (settings != null) {
+            for (Map.Entry<String, String> entry : settings.entrySet()) {
+                String key = entry.getKey();
+                if (processedOptions.get(key) == null) {
+                    String value = entry.getValue();
+                    LOGGER.warn(String.format("SOSOPT-W-001: Option '%1$s' with value '%2$s' is unknown and not processed", key, value));
+                    result = false;
                     // intNumberOfNotProcessedOptions++;
                 }
             }
         }
-        return flgIsOK;
+        return result;
     }
 
     public HashMap<String, String> getProcessedOptions() {
@@ -293,22 +277,21 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     @Override
-    public boolean string2Bool(final String pstrVal) {
-        boolean flgT = false;
-        if (isNotEmpty(pstrVal) && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(
-                pstrVal) || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
-            flgT = true;
+    public boolean string2Bool(final String val) {
+        if (isNotEmpty(val) && ("1".equals(val) || "y".equalsIgnoreCase(val) || "yes".equalsIgnoreCase(val) || "j".equalsIgnoreCase(val) || "on"
+                .equalsIgnoreCase(val) || "true".equalsIgnoreCase(val) || "wahr".equalsIgnoreCase(val))) {
+            return true;
         }
-        return flgT;
+        return false;
     }
 
     private void toOut(final String msg) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            String strT = msg;
-            if (!strT.contains(CLASS_NAME)) {
-                strT += getAllOptionsAsString();
+            if (msg.contains(CLASS_NAME)) {
+                LOGGER.debug(msg);
+            } else {
+                LOGGER.debug(msg + getAllOptionsAsString());
             }
-            LOGGER.debug(strT);
         }
     }
 
@@ -341,10 +324,10 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return strT;
     }
 
-    private String getAllOptionsAsString(final IterationTypes penuIterationType) {
+    private String getAllOptionsAsString(final IterationTypes type) {
         StringBuilder sb = new StringBuilder();
         if (objParentClass != null) {
-            sb.append(iterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuilder(""), null));
+            sb.append(iterateAllDataElementsByAnnotation(objParentClass, this, type, new StringBuilder(""), null));
         }
         return sb.toString();
     }
@@ -359,118 +342,111 @@ public class JSOptionsClass extends I18NBase implements Serializable {
             // LOGGER.debug(String.format("[checkMandatory]%s", getClass().getSimpleName()));
             // }
 
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer, null);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, buffer, null);
         }
     }
 
-    public String substituteVariables(final String pstrValue) {
-        String strT = pstrValue;
-        if (strT == null) {
+    public String substituteVariables(final String value) {
+        if (value == null) {
             return null;
         }
-
-        strT = strT.replace("//", "/");
-        return strT;
+        return value.replace("//", "/");
     }
 
-    protected String[] splitString(final String pstrStr) {
-        if (pstrStr == null) {
+    protected String[] splitString(final String value) {
+        if (value == null) {
             return null;
         }
-        return pstrStr.trim().split("[;|,]");
+        return value.trim().split("[;|,]");
     }
 
-    protected void checkNull(final String pstrMethodName, final String pstrTitel, final String pstrOptionName, final String pstrOptionValue)
-            throws Exception {
-        if (isEmpty(pstrOptionValue)) {
-            this.signalError(pstrOptionName + " is mandatory, must be not null");
+    protected void checkNull(final String method, final String titel, final String name, final String value) throws Exception {
+        if (isEmpty(value)) {
+            signalError(name + " is mandatory, must be not null");
         }
     }
 
-    public void commandLineArgs(final String pstrArgs) {
-        StrTokenizer objT = new StrTokenizer(pstrArgs);
-        String[] strA = objT.getTokenArray();
-        commandLineArgs(strA);
+    public void commandLineArgs(final String args) {
+        commandLineArgs(new StrTokenizer(args).getTokenArray());
     }
 
     public void commandLineArgs(final String[] args) {
-        final String conMethodName = CLASS_NAME + "::CommandLineArgs ";
+        final String method = CLASS_NAME + "::CommandLineArgs ";
         if (allowEmptyParameterList.isFalse() && args.length <= 0) {
             throw new ParametersMissingButRequiredException(applicationName.getValue(), applicationDocuUrl.getValue());
         }
         commandLineArgs = args;
-        boolean flgOption = true;
-        String strOptionName = null;
-        String strOptionValue = null;
-        this.settings();
+        boolean isOption = true;
+        String name = null;
+        String value = null;
+        getSettings();
         final int l = optionNamePrefix.length();
-        for (final String strCommandLineArg : commandLineArgs) {
-            if (flgOption) {
-                if (strCommandLineArg.length() < l) {
+        for (final String arg : commandLineArgs) {
+            if (isOption) {
+                if (arg.length() < l) {
                     continue;
                 }
-                if (strCommandLineArg.substring(0, l).equalsIgnoreCase(optionNamePrefix)) {
-                    strOptionName = strCommandLineArg.substring(l);
-                    flgOption = false;
+                if (arg.substring(0, l).equalsIgnoreCase(optionNamePrefix)) {
+                    name = arg.substring(l);
+                    isOption = false;
                     // name and value separated by an equalsign?
-                    int intESPos = strOptionName.indexOf("=");
-                    if (intESPos > 0) {
-                        strOptionValue = strOptionName.substring(intESPos + 1);
-                        strOptionValue = stripQuotes(strOptionValue);
-                        strOptionName = strOptionName.substring(0, intESPos);
-                        objSettings.put(strOptionName, strOptionValue);
-                        if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                            this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
+                    int pos = name.indexOf("=");
+                    if (pos > 0) {
+                        value = name.substring(pos + 1);
+                        value = stripQuotes(value);
+                        name = name.substring(0, pos);
+                        settings.put(name, value);
+                        if ("password".equalsIgnoreCase(name) || "proxy_password".equalsIgnoreCase(name)) {
+                            signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", method, name, "*****"));
                         } else {
-                            this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+                            signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", method, name, value));
                         }
-                        flgOption = true;
+                        isOption = true;
                     }
                 }
             } else {
-                if (strOptionName != null) {
-                    strOptionValue = strCommandLineArg;
-                    flgOption = true;
-                    objSettings.put(strOptionName, strOptionValue);
-                    if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                        this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
+                if (name != null) {
+                    value = arg;
+                    isOption = true;
+                    settings.put(name, value);
+                    if ("password".equalsIgnoreCase(name) || "proxy_password".equalsIgnoreCase(name)) {
+                        signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", method, name, "*****"));
                     } else {
-                        this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+                        signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", method, name, value));
                     }
-                    strOptionName = null;
+                    name = null;
                 }
             }
         }
-        final String strPropertyFileName = this.getItem("PropertyFileName", "");
-        if (!strPropertyFileName.isEmpty()) {
-            loadProperties(strPropertyFileName);
-            strOptionName = null;
-            flgOption = true;
-            for (final String strCommandLineArg : commandLineArgs) {
-                if (flgOption) {
-                    if (strCommandLineArg.substring(0, l).equalsIgnoreCase(optionNamePrefix)) {
-                        strOptionName = strCommandLineArg.substring(l);
-                        flgOption = false;
+        final String propertyFileName = this.getItem("PropertyFileName", "");
+        if (!propertyFileName.isEmpty()) {
+            loadProperties(propertyFileName);
+            name = null;
+            isOption = true;
+            for (final String arg : commandLineArgs) {
+                if (isOption) {
+                    if (arg.substring(0, l).equalsIgnoreCase(optionNamePrefix)) {
+                        name = arg.substring(l);
+                        isOption = false;
                     }
                 } else {
-                    if (strOptionName != null) {
-                        strOptionValue = strCommandLineArg;
-                        flgOption = true;
-                        objSettings.put(strOptionName, strOptionValue);
-                        if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                            this.signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
+                    if (name != null) {
+                        value = arg;
+                        isOption = true;
+                        settings.put(name, value);
+                        if ("password".equalsIgnoreCase(name) || "proxy_password".equalsIgnoreCase(name)) {
+                            signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", method, name, "*****"));
                         } else {
-                            this.signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName,
-                                    strOptionValue));
+                            signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", method, name, value));
                         }
-                        strOptionName = null;
+                        name = null;
                     }
                 }
             }
-            message(conMethodName + ": Property-File loaded. " + strPropertyFileName);
+            message(method + ": Property-File loaded. " + propertyFileName);
         }
         dumpSettings();
-        setAllOptions(objSettings);
+        setAllOptions(settings);
     }
 
     public String[] commandLineArgs() {
@@ -486,22 +462,22 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return this;
     }
 
-    private String getOptionByName(final String optionName) {
+    private String getOptionByName(final String name) {
         String value = null;
         Class<?> clazz = this.getClass();
-        value = getOptionValue(clazz, optionName);
+        value = getOptionValue(clazz, name);
         if (value == null) {
             clazz = objParentClass.getClass();
-            value = getOptionValue(clazz, optionName);
+            value = getOptionValue(clazz, name);
         }
         return value;
     }
 
-    private String getOptionValue(final Class<?> clazz, final String optionName) {
+    private String getOptionValue(final Class<?> clazz, final String name) {
         String value = null;
         Field field = null;
         try {
-            field = clazz.getField(optionName);
+            field = clazz.getField(name);
             Object obj = field.get(this);
             if (obj instanceof String) {
                 value = (String) field.get(this);
@@ -514,7 +490,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         } catch (final NoSuchFieldException objException) {
             Method method;
             try {
-                method = clazz.getMethod(optionName);
+                method = clazz.getMethod(name);
+                method.setAccessible(true);
                 value = (String) method.invoke(this);
             } catch (final SecurityException exception) {
                 LOGGER.error(exception.getMessage(), exception);
@@ -540,15 +517,15 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return properties;
     }
 
-    public String replaceVars(final String pstrReplaceIn) {
+    public String replaceVars(final String value) {
         getTextProperties();
         try {
             properties.put("date", SOSOptionTime.getCurrentDateAsString(dateFormatMask.getValue()));
             properties.put("time", SOSOptionTime.getCurrentTimeAsString(timeFormatMask.getValue()));
             properties.put("local_user", System.getProperty("user.name"));
-            java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
-            properties.put("localhost", localMachine.getHostName());
-            properties.put("local_host_ip", localMachine.getHostAddress());
+            java.net.InetAddress localHost = java.net.InetAddress.getLocalHost();
+            properties.put("localhost", localHost.getHostName());
+            properties.put("local_host_ip", localHost.getHostAddress());
             properties.put("tempdir", System.getProperty("java.io.tmpdir") + filePathSeparator);
             properties.put("temp", System.getProperty("java.io.tmpdir") + filePathSeparator);
             properties.put("uuid", SOSOptionRegExp.getUUID());
@@ -559,84 +536,81 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         } catch (Exception uhe) {
             //
         }
-        String strVal = "";
-        String strKey = "";
-        String strParamNameEnclosedInPercentSigns = "^.*(\\$|%)\\{([^%\\}]+)\\}.*$";
-        String strNewString = "";
-        if (isNotNull(pstrReplaceIn)) {
+        String paramNameEnclosedInPercentSigns = "^.*(\\$|%)\\{([^%\\}]+)\\}.*$";
+
+        String key = "";
+        String val = "";
+        StringBuilder result = new StringBuilder();
+        if (isNotNull(value)) {
             try {
-                String[] strA = pstrReplaceIn.split("\\n");
-                for (String string : strA) {
-                    while (string.matches(strParamNameEnclosedInPercentSigns)) {
-                        strKey = string.replaceFirst(strParamNameEnclosedInPercentSigns, "$2");
-                        if ("uuid".equalsIgnoreCase(strKey)) {
+                String[] arr = value.split("\\n");
+                for (String string : arr) {
+                    while (string.matches(paramNameEnclosedInPercentSigns)) {
+                        key = string.replaceFirst(paramNameEnclosedInPercentSigns, "$2");
+                        if ("uuid".equalsIgnoreCase(key)) {
                             continue;
                         }
-                        String strPP = "(\\$|%)\\{" + Matcher.quoteReplacement(strKey) + "\\}";
-                        strVal = this.getOptionByName(strKey);
-                        if (isNotNull(strVal)) {
-                            strVal = strVal.replace('\\', '/');
-                            string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
+                        String var = "(\\$|%)\\{" + Matcher.quoteReplacement(key) + "\\}";
+                        val = this.getOptionByName(key);
+                        if (isNotNull(val)) {
+                            val = val.replace('\\', '/');
+                            string = string.replaceAll(var, Matcher.quoteReplacement(val));
                         } else {
-                            strVal = (String) properties.get(strKey);
-                            if (strVal != null) {
-                                string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
+                            val = (String) properties.get(key);
+                            if (val != null) {
+                                string = string.replaceAll(var, Matcher.quoteReplacement(val));
                             } else {
-                                strVal = settings().get(strKey);
-                                if (strVal != null) {
-                                    string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
+                                val = getSettings().get(key);
+                                if (val != null) {
+                                    string = string.replaceAll(var, Matcher.quoteReplacement(val));
                                 } else {
-                                    string = string.replaceAll(strPP, "?" + Matcher.quoteReplacement(strKey) + "?");
+                                    string = string.replaceAll(var, "?" + Matcher.quoteReplacement(key) + "?");
                                 }
                             }
                         }
                     }
-                    strNewString += string + "\n";
+                    result.append(string).append("\n");
                 }
             } catch (Exception e) {
                 // intentionally no error, wrong regexp ?
             }
         }
-        strNewString = strNewString.replaceFirst("\n$", "");
-        return strNewString;
+        return result.toString().replaceFirst("\n$", "");
     }
 
     private void dumpSettings() {
-        final String conMethodName = CLASS_NAME + "::DumpSettings";
-        for (Map.Entry<String, String> mapItem : objSettings.entrySet()) {
-            final String strMapKey = mapItem.getKey();
-            if (mapItem.getValue() != null) {
-                String strTemp = mapItem.getValue();
-                if ("ftp_password".equals(strMapKey)) {
-                    strTemp = "***";
-                }
-                if ("password".equalsIgnoreCase(strMapKey)) {
-                    this.signalDebug(conMethodName + ": Key = " + strMapKey + " --> " + "*****");
+        final String method = CLASS_NAME + "::DumpSettings";
+        for (Map.Entry<String, String> entry : settings.entrySet()) {
+            final String key = entry.getKey();
+            if (entry.getValue() != null) {
+                String value = entry.getValue();
+                if ("ftp_password".equals(key)) {
+                    value = "***";
+                } else if ("password".equalsIgnoreCase(key)) {
+                    signalDebug(method + ": Key = " + key + " --> " + "*****");
                 } else {
-                    this.signalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
+                    signalDebug(method + ": Key = " + key + " --> " + value);
                 }
             }
         }
     }
 
-    public String getIndexedItem(final String pstrIndexedKey, final String pstrDescription, final String pstrDelimiter) {
-        String strT = "";
-        final JSOptionValueList optionValueList = new JSOptionValueList(this, pstrIndexedKey, pstrDescription, "", true);
-        strT = optionValueList.concatenatedValue(pstrDelimiter);
-        return strT;
+    public String getIndexedItem(final String key, final String description, final String delimiter) {
+        final JSOptionValueList list = new JSOptionValueList(this, key, description, "", true);
+        return list.concatenatedValue(delimiter);
     }
 
     @SuppressWarnings("unused")
-    private Object deepCopy(final Object pobj2Copy) throws Exception {
-        ByteArrayOutputStream bufOutStream = new ByteArrayOutputStream();
-        ObjectOutputStream outStream = new ObjectOutputStream(bufOutStream);
-        outStream.writeObject(pobj2Copy);
-        outStream.close();
-        byte[] buffer = bufOutStream.toByteArray();
-        ByteArrayInputStream bufInStream = new ByteArrayInputStream(buffer);
-        ObjectInputStream inStream = new ObjectInputStream(bufInStream);
-        Object objDeepCopy = inStream.readObject();
-        return objDeepCopy;
+    private Object deepCopy(final Object obj) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        oos.close();
+
+        byte[] buffer = baos.toByteArray();
+        ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        return ois.readObject();
     }
 
     public String getOptionsAsCommandLine() {
@@ -771,10 +745,10 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return preferenceStore;
     }
 
-    protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
-        if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
-            LOGGER.trace("setValue = " + pstrValue);
-            objOption.setValue(pstrValue);
+    protected void setIfNotDirty(final SOSOptionElement el, final String value) {
+        if (el.isNotDirty() && isNotEmpty(value)) {
+            LOGGER.trace("setValue = " + value);
+            el.setValue(value);
         }
     }
 
@@ -835,8 +809,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         return logFilename;
     }
 
-    public void setLogFilename(final SOSOptionLogFileName pstrValue) {
-        logFilename = pstrValue;
+    public void setLogFilename(final SOSOptionLogFileName val) {
+        logFilename = val;
     }
 
     @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
