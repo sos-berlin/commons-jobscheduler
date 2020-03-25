@@ -7,14 +7,14 @@ import java.io.OutputStream;
 import java.util.zip.ZipOutputStream;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISOSVirtualFile {
 
-    private ISOSVfsFileTransfer handler = null;
+    private ISOSTransferHandler handler = null;
     private InputStream inputStream = null;
     private OutputStream outputStream = null;
     private ZipOutputStream entryOutputStream = null;
@@ -31,7 +31,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer val) {
+    public void setHandler(final ISOSTransferHandler val) {
         handler = val;
     }
 
@@ -60,7 +60,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public ISOSVfsFileTransfer getHandler() {
+    public ISOSTransferHandler getHandler() {
         return handler;
     }
 
@@ -165,12 +165,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
 
     @Override
     public OutputStream getFileOutputStream() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public OutputStream getFileAppendStream() {
         // TODO Auto-generated method stub
         return null;
     }

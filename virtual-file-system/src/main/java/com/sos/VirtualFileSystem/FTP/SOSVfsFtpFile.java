@@ -60,26 +60,10 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public OutputStream getFileAppendStream() {
-        OutputStream os = null;
-        try {
-            os = getHandler().getAppendFileStream(fileName);
-        } catch (JobSchedulerException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileAppendStream"), e);
-        }
-        return os;
-    }
-
-    @Override
     public InputStream getFileInputStream() {
         try {
             if (getInputStream() == null) {
                 setInputStream(getHandler().getInputStream(fileName));
-                if (getInputStream() == null) {
-                    getHandler().openInputFile(fileName);
-                }
             }
         } catch (JobSchedulerException e) {
             throw e;
@@ -94,7 +78,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         try {
             if (getOutputStream() == null) {
                 if (isModeAppend()) {
-                    setOutputStream(getHandler().getAppendFileStream(fileName));
+                    setOutputStream(((SOSVfsFtpBaseClass) getHandler()).getAppendFileStream(fileName));
                 } else {
                     setOutputStream(getHandler().getOutputStream(fileName));
                 }
@@ -214,7 +198,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
                 try {
                     getInputStream().close();
                     setInputStream(null);
-                    getHandler().completePendingCommand();
+                    ((SOSVfsFtpBaseClass) getHandler()).completePendingCommand();
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                     throw new JobSchedulerException(e);
@@ -235,7 +219,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             if (getOutputStream() != null) {
                 getOutputStream().flush();
                 getOutputStream().close();
-                getHandler().completePendingCommand();
+                ((SOSVfsFtpBaseClass) getHandler()).completePendingCommand();
                 if (getHandler().isNegativeCommandCompletion()) {
                     throw new JobSchedulerException(SOSVfs_E_175.params(fileName, getHandler().getReplyString()));
                 }

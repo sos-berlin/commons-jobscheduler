@@ -5,15 +5,12 @@ import org.apache.commons.net.ftp.FTPHTTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSConnection {
+public class SOSVfsFtp extends SOSVfsFtpBaseClass {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtp.class);
 

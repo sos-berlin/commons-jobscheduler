@@ -23,7 +23,7 @@ import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.interfaces.ISOSTransferOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.Options.SOSTransferOptions;
@@ -351,7 +351,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private ISOSVirtualFile tryReconnect(String range, ISOSVfsFileTransfer transfer, SOSDestinationOptions opt, ISOSVirtualFile file,
+    private ISOSVirtualFile tryReconnect(String range, ISOSTransferHandler transfer, SOSDestinationOptions opt, ISOSVirtualFile file,
             int retryCount) {
         if (transfer.isConnected()) {
             return null;
@@ -466,7 +466,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
     }
 
-    private void setEntryErrorMessage(ISOSVfsFileTransfer sourceTransfer, ISOSVfsFileTransfer targetTransfer, JobSchedulerException ex) {
+    private void setEntryErrorMessage(ISOSTransferHandler sourceTransfer, ISOSTransferHandler targetTransfer, JobSchedulerException ex) {
         StringBuilder msg = new StringBuilder();
         if (sourceTransfer != null && !sourceTransfer.isConnected()) {
             msg.append("[source not connected]");
@@ -485,16 +485,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         parent.setLastErrorMessage(msg.toString());
     }
 
-    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands) {
+    private void executeCommands(final String commandOptionName, final ISOSTransferHandler fileTransfer, final SOSOptionString optionCommands) {
         executeCommands(commandOptionName, fileTransfer, optionCommands, null, null);
     }
 
-    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
+    private void executeCommands(final String commandOptionName, final ISOSTransferHandler fileTransfer, final SOSOptionString optionCommands,
             final SOSOptionString optionCommandDelimiter) {
         executeCommands(commandOptionName, fileTransfer, optionCommands, optionCommandDelimiter, null);
     }
 
-    private void executeCommands(final String commandOptionName, final ISOSVfsFileTransfer fileTransfer, final SOSOptionString optionCommands,
+    private void executeCommands(final String commandOptionName, final ISOSTransferHandler fileTransfer, final SOSOptionString optionCommands,
             final SOSOptionString optionCommandDelimiter, SOSVfsEnv env) {
         String commands = optionCommands.getValue().trim();
         String fileName = "";
@@ -519,7 +519,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (delimiter.isEmpty()) {
                 try {
                     LOGGER.info(String.format("[%s][%s][%s]%s", transferNumber, commandOptionName, fileName, commands));
-                    fileTransfer.getHandler().executeCommand(commands, env);
+                    fileTransfer.executeCommand(commands, env);
                 } catch (JobSchedulerException e) {
                     throw new JobSchedulerException(String.format("[%s][%s][%s][%s]", transferNumber, commandOptionName, fileName, commands), e);
                 } catch (Exception e) {
@@ -535,7 +535,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     if (command.length() > 0) {
                         try {
                             LOGGER.info(String.format("[%s][%s][%s]%s", transferNumber, commandOptionName, fileName, command));
-                            fileTransfer.getHandler().executeCommand(command, env);
+                            fileTransfer.executeCommand(command, env);
                         } catch (JobSchedulerException e) {
                             throw new JobSchedulerException(String.format("[%s][%s][%s][%s]", transferNumber, commandOptionName, fileName, command),
                                     e);
@@ -1243,18 +1243,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             String msg = SOSVfs_E_229.params(e);
             LOGGER.error(msg);
             throw new JobSchedulerException(msg, e);
-        } finally {
-            try {
-                if (parent.getSourceClient() != null) {
-                    parent.getSourceClient().getHandler().release();
-                }
-                if (parent.getTargetClient() != null) {
-                    parent.getTargetClient().getHandler().release();
-                }
-
-            } catch (Exception e) {
-                //
-            }
         }
     }
 

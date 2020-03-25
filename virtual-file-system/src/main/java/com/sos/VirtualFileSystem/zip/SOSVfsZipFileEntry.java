@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDateTime;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSVfsCommonFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -43,12 +43,6 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     @Override
     public void deleteFile() {
         this.delete(false);
-    }
-
-    @Override
-    public OutputStream getFileAppendStream() {
-        notImplemented();
-        return null;
     }
 
     @Override
@@ -159,7 +153,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer val) {
+    public void setHandler(final ISOSTransferHandler val) {
         super.setHandler(val);
     }
 

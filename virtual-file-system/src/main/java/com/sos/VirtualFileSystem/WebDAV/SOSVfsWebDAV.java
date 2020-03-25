@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -54,59 +53,27 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection connect() throws Exception {
-        this.connect(this.destinationOptions);
-        return this;
-
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSDestinationOptions options) throws Exception {
         destinationOptions = options;
         if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        this.doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
-        return this;
+        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
     }
 
     @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
+    public void login(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
             proxyHost = destinationOptions.proxyHost.getValue();
             proxyPort = destinationOptions.proxyPort.value();
             proxyUser = destinationOptions.proxyUser.getValue();
             proxyPassword = destinationOptions.proxyPassword.getValue();
-            this.doAuthenticate(authenticationOptions);
+            doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
-        }
-        return this;
-    }
-
-    @Override
-    public void login(final String pUserName, final String pPassword) {
-        String method = "login";
-        try {
-            userName = pUserName;
-            password = pPassword;
-            LOGGER.debug(SOSVfs_D_132.params(userName));
-            HttpURL httpUrl = this.setRootHttpURL(userName, pPassword, host, port);
-            davClient = getWebdavResource(httpUrl);
-            if (!davClient.exists() && SOSString.isEmpty(davClient.getStatusMessage())) {
-                davClient.setProperties(0);
-            }
-            if (!davClient.exists()) {
-                throw new Exception(String.format("%s: HTTP-DAV isn't enabled %s ", method, getStatusMessage(davClient)));
-            }
-            reply = "OK";
-            LOGGER.info(SOSVfs_D_133.params(userName));
-            this.logReply();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
         }
     }
 
@@ -650,7 +617,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         return url;
     }
 
-    private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
+    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         userName = authenticationOptions.getUser().getValue();
         password = authenticationOptions.getPassword().getValue();
@@ -676,7 +643,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
         this.logReply();
-        return this;
     }
 
     private String getStatusMessage(WebdavResource client) {
@@ -713,16 +679,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } else {
             LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return null;
     }
 
     @Override

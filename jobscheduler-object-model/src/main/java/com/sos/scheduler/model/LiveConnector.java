@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.tools.PathResolver;
 
@@ -19,7 +18,7 @@ public class LiveConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LiveConnector.class);
     private final String liveFolder;
-    private final ISOSVfsFileTransfer fileSystemHandler;
+    private final ISOSTransferHandler fileSystemHandler;
     private final ISOSVirtualFile hotFolderHandle;
     private String workingDirectory;
 
@@ -64,14 +63,14 @@ public class LiveConnector {
         return result;
     }
 
-    private static ISOSVfsFileTransfer connect(String folder) {
-        ISOSVfsFileTransfer result = null;
+    private static ISOSTransferHandler connect(String folder) {
+        ISOSTransferHandler result = null;
         try {
-            ISOSVFSHandler vfs = VFSFactory.getHandler(folder);
+            ISOSTransferHandler vfs = VFSFactory.getHandler(folder);
             if (vfs == null) {
                 throw new JobSchedulerException();
             }
-            result = (ISOSVfsFileTransfer) vfs;
+            result = vfs;
         } catch (Exception e) {
             throw new JobSchedulerException("error to connect folder " + folder, e);
         }
@@ -100,9 +99,8 @@ public class LiveConnector {
         this.workingDirectory = path;
     }
 
-    /** Gets the base folder for an order. An order like /folder/orderId bases on
-     * the root directory (e.g. the live folder). Orders with a relative name
-     * such as ../folder/orderId based on the working directory.
+    /** Gets the base folder for an order. An order like /folder/orderId bases on the root directory (e.g. the live folder). Orders with a relative name such as
+     * ../folder/orderId based on the working directory.
      * 
      * @param baseName
      * @return */
@@ -110,7 +108,7 @@ public class LiveConnector {
         return (baseName.startsWith("/")) ? getLiveFolder() : getCurrentFolder();
     }
 
-    public ISOSVfsFileTransfer getFileSystemHandler() {
+    public ISOSTransferHandler getFileSystemHandler() {
         return fileSystemHandler;
     }
 

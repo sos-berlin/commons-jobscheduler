@@ -49,9 +49,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
                 SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
                 setInputStream(handler.getChannelSftp().get(fileName, mode));
-                if (getInputStream() == null) {
-                    getHandler().openInputFile(fileName);
-                }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
@@ -107,9 +104,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
                 SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
                 setOutputStream(handler.getChannelSftp().put(fileName, transferMode));
-                if (getOutputStream() == null) {
-                    getHandler().openOutputFile(fileName);
-                }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);

@@ -4,22 +4,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Vector;
 
-import com.sos.JSHelper.Options.SOSOptionTransferMode;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 
-public interface ISOSVfsFileTransfer {
+public interface ISOSTransferHandler extends ISOSShell {
 
-    public boolean isConnected();
+    public void connect(SOSDestinationOptions options) throws Exception;
+
+    public void login(ISOSAuthenticationOptions options) throws Exception;
 
     public void reconnect(SOSDestinationOptions options);
 
     public void logout() throws IOException;
 
     public void disconnect() throws IOException;
+
+    public boolean isConnected();
 
     public boolean changeWorkingDirectory(String path) throws IOException;
 
@@ -29,8 +30,6 @@ public interface ISOSVfsFileTransfer {
 
     public void rmdir(String path) throws IOException;
 
-    public boolean rmdir(SOSFolderName path) throws IOException;
-
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException;
 
     public List<SOSFileEntry> nList(String path, boolean recursive, boolean checkIfExists);
@@ -38,20 +37,12 @@ public interface ISOSVfsFileTransfer {
     public List<SOSFileEntry> getFilelist(String path, String regexp, int flag, boolean recursive, boolean checkIfExists, String integrityHashType);
 
     public List<SOSFileEntry> getFolderlist(String path, String regexp, int flag, boolean recursive);
-    
-    public SOSFileEntry getFileEntry(String path) throws Exception;
 
-    public OutputStream getAppendFileStream(String path);
+    public SOSFileEntry getFileEntry(String path) throws Exception;
 
     public OutputStream getOutputStream(String path);
 
-    public OutputStream getOutputStream();
-
-    public OutputStream getFileOutputStream();
-
     public InputStream getInputStream(String path);
-
-    public InputStream getInputStream();
 
     public void put(String sourcePath, String targetPath);
 
@@ -65,20 +56,6 @@ public interface ISOSVfsFileTransfer {
 
     public long getFile(String sourcePath, String targetPath) throws Exception;
 
-    public ISOSVirtualFile transferMode(SOSOptionTransferMode mode);
-
-    public int passive();
-
-    public void login(String user, String password);
-
-    public void ascii();
-
-    public void binary();
-
-    public ISOSVFSHandler getHandler();
-
-    public long appendFile(String sourcePath, String targetPath);
-
     public ISOSVirtualFile getFileHandle(final String path);
 
     public boolean isNegativeCommandCompletion();
@@ -86,8 +63,6 @@ public interface ISOSVfsFileTransfer {
     public long getFileSize(String path);
 
     public String getModificationTime(String path);
-
-    public void completePendingCommand();
 
     public String doPWD();
 
@@ -107,17 +82,8 @@ public interface ISOSVfsFileTransfer {
 
     public void flush();
 
-    public void closeInput();
+    public boolean isSimulateShell();
 
-    public void closeOutput();
+    public void setSimulateShell(boolean simulateShell);
 
-    public void openInputFile(final String path);
-
-    public void openOutputFile(final String path);
-
-    public Vector<ISOSVirtualFile> getFiles(String path);
-
-    public Vector<ISOSVirtualFile> getFiles();
-
-    public void putFile(ISOSVirtualFile file);
 }

@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -59,22 +58,15 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection connect() {
-        connect(destinationOptions);
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions options) {
+    public void connect(final SOSDestinationOptions options) {
         destinationOptions = options;
         if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
-        return this;
     }
 
     @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
+    public void login(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
             domain = destinationOptions.domain.getValue();
@@ -91,19 +83,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             LOGGER.info(logPrefix);
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
-        }
-        return this;
-    }
-
-    @Override
-    public void login(String user, final String password) {
-        try {
-            userName = user;
-            createContext(domain, host, port, userName, password);
-            reply = "OK";
-            logReply();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
         }
     }
 
@@ -713,16 +692,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         }
         sb.append("[").append(userName).append("@").append(host).append(":").append(port).append("]");
         logPrefix = sb.toString();
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return null;
     }
 
     @Override

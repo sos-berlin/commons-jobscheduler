@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
@@ -32,19 +31,12 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     private Session session = null;
 
     @Override
-    public ISOSConnection connect() {
-        this.connect(destinationOptions);
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions pConnection2OptionsAlternate) {
-        destinationOptions = pConnection2OptionsAlternate;
+    public void connect(final SOSDestinationOptions options) {
+        destinationOptions = options;
         if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
-        this.doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
-        return this;
+        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
     }
 
     private void doConnect(final String host, final int port) {
@@ -198,18 +190,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         return messageText;
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        // not implemented, no need
-        return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        // not implemented, no need
-        return null;
-    }
-   
+ 
     @Override
     public boolean isSimulateShell() {
         return false;
@@ -225,7 +206,6 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         // not implemented, no need
         return null;
     }
-    
 
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {

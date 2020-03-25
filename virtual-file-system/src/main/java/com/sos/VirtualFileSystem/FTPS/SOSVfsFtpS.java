@@ -67,14 +67,11 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     }
 
     @Override
-    public void doConnect(final String host, final int port) {
+    public void doConnect() {
         try {
             if (!isConnected()) {
-                super.doConnect(host, port);
-                if (getConnectionOption() != null) {
-                    getConnectionOption().getHost().setValue(host);
-                    getConnectionOption().getPort().value(port);
-                }
+                super.doConnect();
+
                 FTPSClient client = (FTPSClient) super.getClient();
                 client.execPBSZ(0);
                 logReply();

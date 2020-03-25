@@ -13,12 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
-import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
-import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
-import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -34,31 +30,13 @@ import sos.util.SOSFile;
 public class SOSVfsLocal extends SOSVfsTransferBaseClass {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
-    private final InputStream inputStream = null;
-    private final OutputStream outputStream = null;
     private SOSDestinationOptions destinationOptions = null;
     private CmdShell cmdShell = null;
     private boolean simulateShell = false;
 
-    //
     @Override
-    public long appendFile(final String sourceFileName, final String targetFileName) {
-        JSFile targetFile = new JSFile(targetFileName);
-        long size = 0;
-        try {
-            size = targetFile.appendFile(sourceFileName);
-        } catch (Exception e) {
-            String msg = SOSVfs_E_134.params("appendFile()");
-            LOGGER.error(msg, e);
-            throw new JobSchedulerException(msg, e);
-        }
-        return size;
-    }
-
-    @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) throws Exception {
+    public void login(final ISOSAuthenticationOptions options) throws Exception {
         reply = "Login successful";
-        return this;
     }
 
     @Override
@@ -74,36 +52,8 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void closeConnection() throws Exception {
-        reply = "ok";
-    }
-
-    @Override
-    public void closeSession() throws Exception {
-        reply = "Goodbye";
-    }
-
-    @Override
-    public ISOSConnection connect() throws Exception {
-        reply = "ok";
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final ISOSConnectionOptions options) throws Exception {
-        connect();
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSDestinationOptions options) throws Exception {
         destinationOptions = options;
-        return null;
-    }
-
-    @Override
-    public ISOSConnection connect(final String host, final int port) throws Exception {
-        return null;
     }
 
     @Override
@@ -153,11 +103,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection getConnection() {
-        return null;
-    }
-
-    @Override
     public Integer getExitCode() {
         return 0;
     }
@@ -171,6 +116,19 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
             file.copy(targetFileName);
         } else {
             size = appendFile(sourceFileName, targetFileName);
+        }
+        return size;
+    }
+
+    private long appendFile(final String sourceFileName, final String targetFileName) {
+        JSFile targetFile = new JSFile(targetFileName);
+        long size = 0;
+        try {
+            size = targetFile.appendFile(sourceFileName);
+        } catch (Exception e) {
+            String msg = SOSVfs_E_134.params("appendFile()");
+            LOGGER.error(msg, e);
+            throw new JobSchedulerException(msg, e);
         }
         return size;
     }
@@ -264,16 +222,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getFileOutputStream() {
-        return outputStream;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return inputStream;
-    }
-
-    @Override
     public OutputStream getOutputStream(final String fileName) {
         return null;
     }
@@ -306,62 +254,8 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSSession openSession(final ISOSShellOptions options) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void putFile(final ISOSVirtualFile file) {
-        String name = file.getName();
-        name = new File(name).getAbsolutePath();
-        if (name.startsWith("c:")) {
-            name = name.substring(3);
-        }
-        OutputStream os = null;
-        InputStream is = null;
-        try {
-            os = getFileHandle(name).getFileOutputStream();
-            is = file.getFileInputStream();
-            byte[] buffer = new byte[1024];
-            int bytes;
-            synchronized (this) {
-                while ((bytes = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, bytes);
-                }
-                is.close();
-                os.flush();
-                os.close();
-
-                is = null;
-                os = null;
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("putFile()"), e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
-            }
-            if (os != null) {
-                try {
-                    os.flush();
-                    os.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    @Override
     public void rmdir(final String folderName) throws IOException {
         new File(folderName).delete();
-    }
-
-    @Override
-    public ISOSVirtualFile transferMode(final SOSOptionTransferMode mode) {
-        return null;
     }
 
     @Override
@@ -379,8 +273,4 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
         simulateShell = val;
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        return outputStream;
-    }
 }

@@ -15,7 +15,7 @@ import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.TransferStatus;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -33,8 +33,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileList.class);
     private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(VFSFactory.getLoggerName());
 
-    private ISOSVfsFileTransfer sourceClient = null;
-    private ISOSVfsFileTransfer targetClient = null;
+    private ISOSTransferHandler sourceClient = null;
+    private ISOSTransferHandler targetClient = null;
     private SOSBaseOptions options = null;
     private IJobSchedulerEventHandler eventHandler = null;
     private List<SOSFileListEntry> fileListEntries = new ArrayList<>();
@@ -542,19 +542,19 @@ public class SOSFileList extends SOSVfsMessageCodes {
         return counterBytesTransferred;
     }
 
-    public ISOSVfsFileTransfer getTargetClient() {
+    public ISOSTransferHandler getTargetClient() {
         return targetClient;
     }
 
-    public void setTargetClient(ISOSVfsFileTransfer val) {
+    public void setTargetClient(ISOSTransferHandler val) {
         targetClient = val;
     }
 
-    public ISOSVfsFileTransfer getSourceClient() {
+    public ISOSTransferHandler getSourceClient() {
         return sourceClient;
     }
 
-    public void setSourceClient(ISOSVfsFileTransfer val) {
+    public void setSourceClient(ISOSTransferHandler val) {
         sourceClient = val;
     }
 

@@ -1,11 +1,9 @@
 package com.sos.scheduler.model.objects;
 
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-
 
 import java.io.File;
 import java.math.BigInteger;
@@ -20,7 +18,6 @@ public class JSObjJobChain extends JobChain {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSObjJobChain.class);
     public final static String fileNameExtension = ".job_chain.xml";
     public static final String conFileNameExtension4NodeParameterFile = ".config.xml";
-
 
     public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
         super();
@@ -51,8 +48,7 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(jobChain);
         if (super.objVirtualFile == null) {
             try {
-                ISOSVFSHandler sosVFSHandler = VFSFactory.getHandler("local");
-                ISOSVfsFileTransfer sosVFSFileTransfer = (ISOSVfsFileTransfer) sosVFSHandler;
+                ISOSTransferHandler sosVFSFileTransfer = VFSFactory.getHandler("local");
                 ISOSVirtualFile virtualFile = sosVFSFileTransfer.getFileHandle(file.getAbsolutePath());
                 super.objVirtualFile = virtualFile;
             } catch (Exception e) {
@@ -249,8 +245,6 @@ public class JSObjJobChain extends JobChain {
         }
         return strM;
     }
-
-  
 
     @Override
     public BigInteger getmaxOrders() {

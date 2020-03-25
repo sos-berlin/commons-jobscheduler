@@ -3,8 +3,7 @@ package com.sos.graphviz.jobchain.datasource.jobscheduler;
 import java.io.File;
 import java.util.ArrayList;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.graphviz.jobchain.interfaces.IDataSourceOrders;
 import com.sos.scheduler.model.SchedulerHotFolder;
@@ -43,10 +42,8 @@ public class DataSourceOrders implements IDataSourceOrders {
     public void getList() {
         reset();
         String liveFolderName = liveFolder.getAbsolutePath();
-        ISOSVFSHandler objVFS;
         try {
-            objVFS = VFSFactory.getHandler("local");
-            ISOSVfsFileTransfer objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
+            ISOSTransferHandler objFileSystemHandler = VFSFactory.getHandler("local");
             ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(liveFolderName);
             SchedulerHotFolder objSchedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(objHotFolder);
             SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.loadOrderObjects();

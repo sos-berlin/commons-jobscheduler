@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -19,22 +18,11 @@ import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionTransferMode;
-import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
-import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
-import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
-import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
@@ -43,11 +31,9 @@ import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
+public class SOSVfsZip extends SOSVfsBaseClass implements ISOSTransferHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsZip.class);
-    private final InputStream objInputStream = null;
-    private final OutputStream objOutputStream = null;
     private String strReplyString = "";
     private ZipFile objWorkingDirectory = null;
     public ZipOutputStream objZipOutputStream = null;
@@ -57,29 +43,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     private boolean simulateShell = false;
 
     public SOSVfsZip() {
-        //
-    }
-
-    @Override
-    public long appendFile(final String strSourceFileName, final String strTargetFileName) {
-        JSFile objTargetFile = new JSFile(strTargetFileName);
-        long lngFileSize = 0;
-        try {
-            lngFileSize = objTargetFile.appendFile(strSourceFileName);
-        } catch (Exception e) {
-            String strM = SOSVfs_E_134.params("appendFile()");
-            throw new JobSchedulerException(strM, e);
-        }
-        return lngFileSize;
-    }
-
-    @Override
-    public void ascii() {
-        //
-    }
-
-    @Override
-    public void binary() {
         //
     }
 
@@ -134,39 +97,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
         return 0;
     }
 
-    public ISOSVirtualFolder getFolder() {
-        return null;
-    }
-
-    public ISOSVirtualFolder getFolder(final String pstrFolderName) {
-        return null;
-    }
-
-    @Override
-    public Vector<ISOSVirtualFile> getFiles() {
-        Vector<ISOSVirtualFile> vecFiles = new Vector<ISOSVirtualFile>();
-        for (Enumeration<? extends ZipEntry> e = objWorkingDirectory.entries(); e.hasMoreElements();) {
-            ZipEntry entry = e.nextElement();
-            String strZipEntryName = entry.getName();
-            SOSVfsZipFileEntry objEntry = new SOSVfsZipFileEntry(strZipEntryName);
-            objEntry.setZipEntry(entry);
-            LOGGER.debug(SOSVfs_D_201.params(strZipEntryName));
-            vecFiles.add(objEntry);
-        }
-        return vecFiles;
-    }
-
-    @Override
-    public Vector<ISOSVirtualFile> getFiles(final String pstrFolderName) {
-        changeWorkingDirectory(pstrFolderName);
-        return getFiles();
-    }
-
-    @Override
-    public ISOSVFSHandler getHandler() {
-        return this;
-    }
-
     @Override
     public String getReplyString() {
         return strReplyString;
@@ -180,11 +110,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     @Override
     public List<SOSFileEntry> listNames(final String pathname, boolean checkIfExists, boolean checkIfIsDirector) throws IOException {
         return nList(pathname, false, checkIfExists);
-    }
-
-    @Override
-    public void login(final String strUserName, final String strPassword) {
-        //
     }
 
     @Override
@@ -216,11 +141,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public int passive() {
-        return 0;
-    }
-
-    @Override
     public void put(final String localFile, final String remoteFile) {
         //
     }
@@ -231,78 +151,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void putFile(final ISOSVirtualFile objVirtualFile) {
-        if (objZipOutputStream == null) {
-            throw new JobSchedulerException(SOSVfs_E_202.get());
-        }
-        String strName = objVirtualFile.getName();
-        strName = new File(strName).getAbsolutePath();
-        if (strName.startsWith("c:")) {
-            strName = strName.substring(3);
-        }
-        InputStream objFI = objVirtualFile.getFileInputStream();
-        int lngBufferSize = 1024;
-        byte[] buffer = new byte[lngBufferSize];
-        int intBytesTransferred;
-        long totalBytes = 0;
-        try {
-            synchronized (this) {
-                while ((intBytesTransferred = objFI.read(buffer)) != -1) {
-                    objZipOutputStream.write(buffer, 0, intBytesTransferred);
-                    totalBytes += intBytesTransferred;
-                }
-                objFI.close();
-                objZipOutputStream.closeEntry();
-                LOGGER.debug(SOSVfs_D_203.params(objVirtualFile.getName(), strZipArchiveName, totalBytes));
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_130.params("putFile()"), e);
-        }
-    }
-
-    @Override
     public long putFile(final String localFile, final String remoteFile) throws Exception {
         return 0;
-    }
-
-    @Override
-    public ISOSConnection getConnection() {
-        return null;
-    }
-
-    @Override
-    public ISOSSession getSession() {
-        return null;
-    }
-
-    @Override
-    public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
-        notImplemented();
-        new File(pobjFolderName.getValue()).mkdir();
-        return null;
-    }
-
-    @Override
-    public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
-        notImplemented();
-        new File(pobjFolderName.getValue()).delete();
-        return true;
-    }
-
-    @Override
-    public List<SOSFileEntry> dir(final SOSFolderName pobjFolderName) {
-        return getFilelist("", ".*", 1, true, true, null);
-    }
-
-    @Override
-    public List<SOSFileEntry> dir(final String pathname, final int flag) {
-        notImplemented();
-        return null;
-    }
-
-    @Override
-    public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        //
     }
 
     @Override
@@ -331,41 +181,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+    public void login(final ISOSAuthenticationOptions pobjAO) throws Exception {
         strReplyString = "230 Login successful.";
-        return this;
-    }
-
-    @Override
-    public void closeConnection() throws Exception {
-        strReplyString = "ok";
-    }
-
-    @Override
-    public ISOSConnection connect() throws Exception {
-        strReplyString = "ok";
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
-        this.connect();
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void closeSession() throws Exception {
-        strReplyString = "221 Goodbye.";
-    }
-
-    @Override
-    public ISOSSession openSession(final ISOSShellOptions pobjShellOptions) throws Exception {
-        return null;
     }
 
     @Override
@@ -467,22 +284,11 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void completePendingCommand() {
-        // nothing to do
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions pobjConnectionOptions) throws Exception {
-        return null;
+    public void connect(final SOSDestinationOptions pobjConnectionOptions) throws Exception {
     }
 
     @Override
     public String doPWD() {
-        return null;
-    }
-
-    @Override
-    public OutputStream getAppendFileStream(final String strFileName) {
         return null;
     }
 
@@ -554,13 +360,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
         }
     }
 
-    @Override
-    public void closeInput() {
-        //
-    }
-
-    @Override
-    public void closeOutput() {
+    private void closeOutput() {
         if (objZipOutputStream != null) {
             try {
                 objZipOutputStream.flush();
@@ -604,48 +404,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void openInputFile(final String pstrFileName) {
-        //
-    }
-
-    @Override
-    public void openOutputFile(final String pstrFileName) {
-        //
-    }
-
-    @Override
-    public ISOSVirtualFile transferMode(final SOSOptionTransferMode pobjFileTransferMode) {
-        return null;
-    }
-
-    @Override
     public void rmdir(final String pstrFolderName) throws IOException {
         notImplemented();
-    }
-
-    @Override
-    public void doPostLoginOperations() {
-        //
-    }
-
-    @Override
-    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
-        return null;
-    }
-
-    @Override
-    public OutputStream getFileOutputStream() {
-        return objOutputStream;
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return objOutputStream;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return objInputStream;
     }
 
     @Override

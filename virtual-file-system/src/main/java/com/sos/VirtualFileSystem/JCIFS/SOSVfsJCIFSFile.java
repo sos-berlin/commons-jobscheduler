@@ -75,9 +75,6 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
                 fileName = super.adjustRelativePathName(fileName);
                 SOSVfsJCIFS handler = (SOSVfsJCIFS) getHandler();
                 setOutputStream(handler.getOutputStream(fileName));
-                if (getOutputStream() == null) {
-                    getHandler().openOutputFile(fileName);
-                }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
