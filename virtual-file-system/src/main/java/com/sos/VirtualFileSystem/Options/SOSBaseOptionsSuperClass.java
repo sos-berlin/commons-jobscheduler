@@ -42,13 +42,13 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.Options.SOSOptionZeroByteTransfer;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
-import com.sos.JSHelper.interfaces.ISOSFtpOptions;
+import com.sos.JSHelper.interfaces.ISOSTransferOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSFtpOptions {
+public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSTransferOptions {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptionsSuperClass.class);
     private static final long serialVersionUID = -4445655877481869778L;
@@ -68,7 +68,7 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("[setAllOptions]map");
         }
-        super.setSettings(settings);
+        super.setAllOptions(settings);
     }
 
     @Override
@@ -2266,16 +2266,6 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements
 
     public SOSOptionIniFileName sosIniFileName = (SOSOptionIniFileName) settings.setAlias(CLASS_NAME + ".SOSIniFileName");
 
-    @Override
-    public SOSOptionIniFileName getSettings() {
-        return settings;
-    }
-
-    @Override
-    public void setSettings(final SOSOptionIniFileName val) {
-        settings = val;
-    }
-
     @JSOptionDefinition(name = "skip_transfer", description = "If this Parameter is set to true then", key = "skip_transfer", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean skipTransfer = new SOSOptionBoolean(this, CLASS_NAME + ".skip_transfer", "If this Parameter is set to true then", "false",
             "false", false);
@@ -2445,7 +2435,7 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements
     @Override
     public void commandLineArgs(final String[] args) {
         super.commandLineArgs(args);
-        setAllOptions(super.objSettings);
+        setAllOptions(super.getSettings());
     }
 
     @Override

@@ -54,10 +54,9 @@ public class JSCsvFileOptions extends JSOptionsClass {
     }
 
     @Override
-    public void setAllOptions(final HashMap<String, String> JSSettings) {
+    public void setAllOptions(final HashMap<String, String> settings) {
         try {
-            objSettings = JSSettings;
-            super.setSettings(objSettings);
+            super.setAllOptions(settings);
             final String strT = super.getItem(DELIMITER_SETTINGS_KEY);
             if (isNotEmpty(strT)) {
                 this.setDelimiter(strT);

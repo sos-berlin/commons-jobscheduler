@@ -10,9 +10,9 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@JSOptionClass(name = "SOSDestinationMainOptions", description = "Options for a connection to an uri (server, site, e.g.)")
+@JSOptionClass(name = "SOSTransferOptions", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSDestinationMainOptions extends SOSDestinationOptionsSuperClass {
+public class SOSTransferOptions extends SOSDestinationOptionsSuperClass {
 
     private static final long serialVersionUID = 6485361196241983182L;
 
@@ -27,30 +27,28 @@ public class SOSDestinationMainOptions extends SOSDestinationOptionsSuperClass {
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
     private SOSDestinationOptions targetOptions = null;
 
-    public SOSDestinationMainOptions() {
+    public SOSTransferOptions() {
         super();
         initChildOptions();
     }
 
-    public SOSDestinationMainOptions(final HashMap<String, String> settings) throws Exception {
+    public SOSTransferOptions(final HashMap<String, String> settings) throws Exception {
         super(settings);
-        initChildOptions();
-        setPrefixedValues(settings);
+        initChildOptions(settings);
     }
 
     private void initChildOptions() {
         if (sourceOptions == null) {
-            sourceOptions = new SOSDestinationOptions("");
+            sourceOptions = new SOSDestinationOptions(true);
         }
-        sourceOptions.isSource = true;
-
         if (targetOptions == null) {
-            targetOptions = new SOSDestinationOptions("");
-            targetOptions.isSource = false;
+            targetOptions = new SOSDestinationOptions(false);
         }
     }
 
-    private void setPrefixedValues(final HashMap<String, String> settings) throws Exception {
+    private void initChildOptions(final HashMap<String, String> settings) throws Exception {
+        initChildOptions();
+
         LOGGER.trace("[destination options]source");
         sourceOptions.setAllOptions(settings, PREFIX_SOURCE);
         if (settings.containsKey(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE)) {
@@ -81,24 +79,30 @@ public class SOSDestinationMainOptions extends SOSDestinationOptionsSuperClass {
 
     public SOSDestinationOptions getSource() {
         if (sourceOptions == null) {
-            sourceOptions = new SOSDestinationOptions(PREFIX_SOURCE);
+            sourceOptions = new SOSDestinationOptions(true);
         }
         return sourceOptions;
     }
 
     public void setSource(final SOSDestinationOptions val) {
         sourceOptions = val;
+        if (sourceOptions != null) {
+            sourceOptions.setIsSource(true);
+        }
     }
 
     public SOSDestinationOptions getTarget() {
         if (targetOptions == null) {
-            targetOptions = new SOSDestinationOptions("");
+            targetOptions = new SOSDestinationOptions(false);
         }
         return targetOptions;
     }
 
     public void setTarget(final SOSDestinationOptions val) {
         targetOptions = val;
+        if (targetOptions != null) {
+            targetOptions.setIsSource(false);
+        }
     }
 
 }

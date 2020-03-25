@@ -11,7 +11,6 @@ import com.sos.JSHelper.Options.SOSOptionFileName;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
-import com.sos.JSHelper.Options.SOSOptionIniFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation;
 import com.sos.JSHelper.Options.SOSOptionLogFileName;
@@ -26,8 +25,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 
-/** @author KB */
-public interface ISOSFtpOptions {
+public interface ISOSTransferOptions {
 
     public abstract SOSOptionString getAccount();
 
@@ -325,10 +323,6 @@ public interface ISOSFtpOptions {
 
     public abstract void setSchedulerPort(SOSOptionPortNumber pSchedulerPort);
 
-    public abstract SOSOptionIniFileName getSettings();
-
-    public abstract void setSettings(SOSOptionIniFileName pSettings);
-
     public abstract SOSOptionBoolean getSkipTransfer();
 
     public abstract void setSkipTransfer(SOSOptionBoolean pSkipTransfer);
@@ -404,5 +398,5 @@ public interface ISOSFtpOptions {
     public abstract void setAuthMethod(SOSOptionAuthenticationMethod authMethod);
 
     public abstract boolean isAtomicTransfer();
-    
+
 }

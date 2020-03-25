@@ -7,9 +7,8 @@ public class JSMailOptions extends JSOptionsClass {
     private static final long serialVersionUID = 7303809164979485903L;
 
     @Override
-    public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-        objSettings = pobjJSSettings;
-        super.setSettings(objSettings);
+    public void setAllOptions(HashMap<String, String> settings) {
+        super.setAllOptions(settings);
     }
 
 }

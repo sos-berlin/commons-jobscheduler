@@ -20,13 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.interfaces.ISOSFtpOptions;
+import com.sos.JSHelper.interfaces.ISOSTransferOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSDestinationMainOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
+import com.sos.VirtualFileSystem.Options.SOSTransferOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -550,7 +550,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void executeTFNPostCommnands() {
-        SOSDestinationOptions target = parent.getOptions().getConnectionOptions().getTarget();
+        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_target_tfn_post_command", parent.getTargetClient(), target.getAlternatives().tfnPostCommand, target
                     .getAlternatives().commandDelimiter);
@@ -558,7 +558,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             executeCommands("tfn_post_command", parent.getTargetClient(), parent.getOptions().tfnPostCommand);
             executeCommands("target_tfn_post_command", parent.getTargetClient(), target.tfnPostCommand, target.commandDelimiter);
         }
-        SOSDestinationOptions source = parent.getOptions().getConnectionOptions().getSource();
+        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_source_tfn_post_command", parent.getSourceClient(), source.getAlternatives().tfnPostCommand, source
                     .getAlternatives().commandDelimiter);
@@ -576,7 +576,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         SOSVfsEnv envs = new SOSVfsEnv();
         envs.setLocalEnvs(env);
 
-        SOSDestinationOptions target = parent.getOptions().getConnectionOptions().getTarget();
+        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && target.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[%s][alternative_target_post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber,
@@ -597,7 +597,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 executeCommands("target_post_command", parent.getTargetClient(), target.postCommand, target.commandDelimiter, envs);
             }
         }
-        SOSDestinationOptions source = parent.getOptions().getConnectionOptions().getSource();
+        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && source.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[%s][alternative_source_post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber,
@@ -616,7 +616,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void executePreCommands(boolean isSkipped) {
-        SOSDestinationOptions target = parent.getOptions().getConnectionOptions().getTarget();
+        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (target.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
@@ -641,7 +641,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 executeCommands("target_pre_command", parent.getTargetClient(), target.preCommand, target.commandDelimiter);
             }
         }
-        SOSDestinationOptions source = parent.getOptions().getConnectionOptions().getSource();
+        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (source.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
@@ -970,9 +970,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return sourceFileSteady;
     }
 
-    public String getTargetAtomicFileName(final ISOSFtpOptions ftpOptions) {
-        targetTransferFileName = targetTransferFileName + ftpOptions.getAtomicSuffix().getValue().trim();
-        targetTransferFileName = ftpOptions.getAtomicPrefix().getValue() + targetTransferFileName;
+    public String getTargetAtomicFileName(final ISOSTransferOptions options) {
+        targetTransferFileName = targetTransferFileName + options.getAtomicSuffix().getValue().trim();
+        targetTransferFileName = options.getAtomicPrefix().getValue() + targetTransferFileName;
         targetAtomicFileName = targetTransferFileName.trim();
         return targetAtomicFileName;
     }
@@ -1260,7 +1260,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void setNoOfBytesTransferred(final long bytes, long fileSize) {
         bytesTransferred = bytes;
-        SOSDestinationMainOptions connectionOptions = parent.getOptions().getConnectionOptions();
+        SOSTransferOptions connectionOptions = parent.getOptions().getTransferOptions();
         if (!(parent.getOptions().checkSize.isFalse() || parent.getOptions().compressFiles.isTrue() || parent.getOptions().transferMode.isAscii()
                 || connectionOptions.getSource().transferMode.isAscii() || connectionOptions.getTarget().transferMode.isAscii())) {
             if (sourceFileSize <= 0) {

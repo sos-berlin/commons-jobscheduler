@@ -420,15 +420,12 @@ public class SOSDestinationOptionsSuperClass extends JSOptionsClass implements I
 
     public SOSDestinationOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        this.setSettings(settings);
+        this.setAllOptions(settings);
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        // objSettings = settings;
-        // super.setAllOptions(settings);
-        // super.setSettings(objSettings);
-        super.setSettings(settings);
+        super.setAllOptions(settings);
     }
 
     @Override
@@ -443,7 +440,7 @@ public class SOSDestinationOptionsSuperClass extends JSOptionsClass implements I
     @Override
     public void commandLineArgs(final String[] args) {
         super.commandLineArgs(args);
-        this.setAllOptions(super.objSettings);
+        this.setAllOptions(super.getSettings());
     }
 
     @JSOptionDefinition(name = "ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "ssh_auth_file", type = "SOSOptionInFileName", mandatory = false)

@@ -344,10 +344,8 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
-    public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-        objSettings = pobjJSSettings;
-        super.setSettings(objSettings);
-        super.setAllOptions(pobjJSSettings);
+    public void setAllOptions(HashMap<String, String> settings) {
+        super.setAllOptions(settings);
     }
 
     @Override
@@ -362,13 +360,13 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     @Override
     public void commandLineArgs(final String[] pstrArgs) {
         super.commandLineArgs(pstrArgs);
-        setAllOptions(super.objSettings);
+        setAllOptions(super.getSettings());
     }
 
     @Override
     public void commandLineArgs(final String val) {
         super.commandLineArgs(val);
-        setAllOptions(super.objSettings);
+        setAllOptions(super.getSettings());
     }
 
     @Override

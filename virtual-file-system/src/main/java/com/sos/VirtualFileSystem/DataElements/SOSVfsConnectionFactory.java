@@ -58,24 +58,24 @@ public class SOSVfsConnectionFactory {
     private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
         ISOSVFSHandler handler = null;
         try {
-            SOSDestinationOptions optionsAlternate;
+            SOSDestinationOptions destinationOptions;
             String dataType;
             if (isSource) {
-                optionsAlternate = options.getConnectionOptions().getSource();
+                destinationOptions = options.getTransferOptions().getSource();
                 dataType = options.getDataSourceType();
             } else {
-                optionsAlternate = options.getConnectionOptions().getTarget();
+                destinationOptions = options.getTransferOptions().getTarget();
                 dataType = options.getDataTargetType();
             }
-            optionsAlternate.loadClassName.setIfNotDirty(options.getConnectionOptions().loadClassName);
+            destinationOptions.loadClassName.setIfNotDirty(options.getTransferOptions().loadClassName);
             handler = prepareVFSHandler(handler, dataType, isSource);
             ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
             try {
-                handler.connect(optionsAlternate);
-                handler.authenticate(optionsAlternate);
-                handleClient(client, optionsAlternate, isSource);
+                handler.connect(destinationOptions);
+                handler.authenticate(destinationOptions);
+                handleClient(client, destinationOptions, isSource);
             } catch (Exception e) {
-                SOSDestinationOptions alternatives = optionsAlternate.getAlternatives();
+                SOSDestinationOptions alternatives = destinationOptions.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
@@ -90,7 +90,7 @@ public class SOSVfsConnectionFactory {
                     client = (ISOSVfsFileTransfer) handler;
                     handler.connect(alternatives);
                     handler.authenticate(alternatives);
-                    optionsAlternate.alternateOptionsUsed.value(true);
+                    destinationOptions.alternateOptionsUsed.value(true);
                     handleClient(client, alternatives, isSource);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
@@ -125,21 +125,21 @@ public class SOSVfsConnectionFactory {
         return handler;
     }
 
-    private void handleClient(ISOSVfsFileTransfer client, SOSDestinationOptions optionsAlternate, boolean isSource) throws Exception {
-        if (optionsAlternate.directory.isDirty()) {
+    private void handleClient(ISOSVfsFileTransfer client, SOSDestinationOptions destinationOptions, boolean isSource) throws Exception {
+        if (destinationOptions.directory.isDirty()) {
             if (isSource) {
-                options.sourceDir = optionsAlternate.directory;
-                options.localDir = optionsAlternate.directory;
+                options.sourceDir = destinationOptions.directory;
+                options.localDir = destinationOptions.directory;
             } else {
-                options.targetDir = optionsAlternate.directory;
-                options.remoteDir = optionsAlternate.directory;
+                options.targetDir = destinationOptions.directory;
+                options.remoteDir = destinationOptions.directory;
             }
         }
-        if (options.passiveMode.value() || optionsAlternate.passiveMode.isTrue()) {
+        if (options.passiveMode.value() || destinationOptions.passiveMode.isTrue()) {
             client.passive();
         }
-        if (optionsAlternate.transferMode.isDirty() && optionsAlternate.transferMode.isNotEmpty()) {
-            client.transferMode(optionsAlternate.transferMode);
+        if (destinationOptions.transferMode.isDirty() && destinationOptions.transferMode.isNotEmpty()) {
+            client.transferMode(destinationOptions.transferMode);
         } else {
             client.transferMode(options.transferMode);
         }

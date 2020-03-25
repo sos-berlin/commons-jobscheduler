@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
-import com.sos.JSHelper.interfaces.ISOSFtpOptions;
+import com.sos.JSHelper.interfaces.ISOSTransferOptions;
 
 public class SOSOptionUrl extends SOSOptionString {
 
@@ -74,7 +74,7 @@ public class SOSOptionUrl extends SOSOptionString {
         }
     }
 
-    public void getJadeOptions(final ISOSFtpOptions pobjO) {
+    public void getJadeOptions(final ISOSTransferOptions pobjO) {
         if (objURL == null) {
             throw new JobSchedulerException("no URL speficied");
         }
