@@ -370,7 +370,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(final String path) {
+    public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
         WebdavResource res = null;
         try {
             res = this.getResource(path, false);

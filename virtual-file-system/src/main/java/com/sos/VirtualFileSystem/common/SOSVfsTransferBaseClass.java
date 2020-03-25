@@ -298,10 +298,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     public void disconnect() {
     }
 
-    public void setStrictHostKeyChecking(final String val) {
-
-    }
-
     protected boolean fileExists(final String filename) {
         return false;
     }
@@ -317,35 +313,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public int read(final byte[] buffer) {
-        return 0;
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        return 0;
-    }
-
-    @Override
-    public void write(final byte[] buffer) {
-
-    }
-
-    @Override
-    public void flush() {
-    }
-
-    @Override
-    public void close() {
-    }
-
-    @Override
     public InputStream getInputStream(final String fileName) {
         return null;
     }
 
     @Override
-    public abstract OutputStream getOutputStream(final String fileName);
+    public abstract OutputStream getOutputStream(final String fileName, boolean append, boolean resume);
 
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
@@ -419,11 +392,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     public long putFile(final String localFile, final String remoteFile) {
         LOGGER.info("not implemented yet");
         return 0;
-    }
-
-    @Override
-    public void write(final byte[] buffer, final int offset, final int length) {
-        LOGGER.info("not implemented yet");
     }
 
     @Override

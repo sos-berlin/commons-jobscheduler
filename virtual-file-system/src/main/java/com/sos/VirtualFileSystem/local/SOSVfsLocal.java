@@ -2,7 +2,6 @@ package com.sos.VirtualFileSystem.local;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -222,7 +220,7 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public OutputStream getOutputStream(final String fileName) {
+    public OutputStream getOutputStream(final String fileName, boolean append, boolean resume) {
         return null;
     }
 

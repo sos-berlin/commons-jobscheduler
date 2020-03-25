@@ -671,7 +671,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     }
 
     @Override
-    public OutputStream getOutputStream(final String fileName) {
+    public OutputStream getOutputStream(final String fileName, boolean append, boolean resume) {
         OutputStream os = null;
         try {
             os = getClient().storeFileStream(fileName);
@@ -1102,26 +1102,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     }
 
     @Override
-    public void flush() {
-        //
-    }
-
-    @Override
-    public void close() {
-        //
-    }
-
-    @Override
-    public void write(final byte[] buffer) {
-        //
-    }
-
-    @Override
-    public void write(final byte[] buffer, final int offset, final int length) {
-        //
-    }
-
-    @Override
     public StringBuilder getStdErr() {
         return new StringBuilder();
     }
@@ -1129,16 +1109,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     @Override
     public StringBuilder getStdOut() {
         return new StringBuilder();
-    }
-
-    @Override
-    public int read(final byte[] buffer) {
-        return 0;
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        return 0;
     }
 
     @Override

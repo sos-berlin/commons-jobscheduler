@@ -96,14 +96,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         try {
             if (getOutputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                int transferMode = ChannelSftp.OVERWRITE;
-                if (isModeAppend()) {
-                    transferMode = ChannelSftp.APPEND;
-                } else if (isModeRestart()) {
-                    transferMode = ChannelSftp.RESUME;
-                }
-                SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) getHandler();
-                setOutputStream(handler.getChannelSftp().put(fileName, transferMode));
+                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
