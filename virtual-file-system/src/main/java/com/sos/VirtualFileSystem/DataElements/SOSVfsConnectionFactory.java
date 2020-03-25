@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.exception.SOSYadeSourceConnectionException;
@@ -55,8 +54,8 @@ public class SOSVfsConnectionFactory {
         }
     }
 
-    private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
-        ISOSVFSHandler handler = null;
+    private ISOSTransferHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
+        ISOSTransferHandler client = null;
         try {
             SOSDestinationOptions destinationOptions;
             String dataType;
@@ -68,12 +67,11 @@ public class SOSVfsConnectionFactory {
                 dataType = options.getDataTargetType();
             }
             destinationOptions.loadClassName.setIfNotDirty(options.getTransferOptions().loadClassName);
-            handler = prepareVFSHandler(handler, dataType, isSource);
-            ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
+            client = VFSFactory.getHandler(dataType);
             try {
-                handler.connect(destinationOptions);
-                handler.authenticate(destinationOptions);
-                handleClient(client, destinationOptions, isSource);
+                handleOptions(destinationOptions, isSource);
+                client.connect(destinationOptions);
+                client.login(destinationOptions);
             } catch (Exception e) {
                 SOSDestinationOptions alternatives = destinationOptions.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
@@ -86,12 +84,11 @@ public class SOSVfsConnectionFactory {
                     } catch (Exception ce) {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
-                    handler = prepareVFSHandler(handler, alternatives.protocol.getValue(), isSource);
-                    client = (ISOSVfsFileTransfer) handler;
-                    handler.connect(alternatives);
-                    handler.authenticate(alternatives);
+                    client = VFSFactory.getHandler(alternatives.protocol.getValue());
+                    handleOptions(alternatives, isSource);
+                    client.connect(alternatives);
+                    client.login(alternatives);
                     destinationOptions.alternateOptionsUsed.value(true);
-                    handleClient(client, alternatives, isSource);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
                     LOGGER.debug(String.format("alternate options are not defined"));
@@ -111,21 +108,10 @@ public class SOSVfsConnectionFactory {
                 throw new SOSYadeTargetConnectionException(ex);
             }
         }
-        return handler;
+        return client;
     }
 
-    private ISOSVFSHandler prepareVFSHandler(ISOSVFSHandler handler, final String dataType, final boolean isSource) throws Exception {
-        handler = VFSFactory.getHandler(dataType);
-        handler.getOptions(options);
-        if (isSource) {
-            handler.setSource();
-        } else {
-            handler.setTarget();
-        }
-        return handler;
-    }
-
-    private void handleClient(ISOSVfsFileTransfer client, SOSDestinationOptions destinationOptions, boolean isSource) throws Exception {
+    private void handleOptions(SOSDestinationOptions destinationOptions, boolean isSource) throws Exception {
         if (destinationOptions.directory.isDirty()) {
             if (isSource) {
                 options.sourceDir = destinationOptions.directory;
@@ -135,19 +121,11 @@ public class SOSVfsConnectionFactory {
                 options.remoteDir = destinationOptions.directory;
             }
         }
-        if (options.passiveMode.value() || destinationOptions.passiveMode.isTrue()) {
-            client.passive();
-        }
         if (destinationOptions.transferMode.isDirty() && destinationOptions.transferMode.isNotEmpty()) {
-            client.transferMode(destinationOptions.transferMode);
+            // client.transferMode(destinationOptions.transferMode);
         } else {
-            client.transferMode(options.transferMode);
+            // client.transferMode(options.transferMode);
+            destinationOptions.transferMode = options.transferMode;
         }
     }
-
-    public void clear() {
-        source.clear();
-        target.clear();
-    }
-
 }

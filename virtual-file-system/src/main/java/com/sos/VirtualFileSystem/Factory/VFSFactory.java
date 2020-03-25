@@ -8,7 +8,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.FTP.SOSVfsFtp;
 import com.sos.VirtualFileSystem.FTPS.SOSVfsFtpS;
 import com.sos.VirtualFileSystem.HTTP.SOSVfsHTTP;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.JCIFS.SOSVfsJCIFS;
 import com.sos.VirtualFileSystem.JMS.SOSVfsJms;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
@@ -38,12 +38,12 @@ public class VFSFactory extends SOSVfsMessageCodes {
         super(SOSVfsConstants.BUNDLE_NAME);
     }
 
-    public static ISOSVFSHandler getHandler(final SOSOptionTransferType.TransferTypes type) throws Exception {
+    public static ISOSTransferHandler getHandler(final SOSOptionTransferType.TransferTypes type) throws Exception {
         return getHandler(type.name());
     }
 
-    public static ISOSVFSHandler getHandler(String protocol) throws Exception {
-        ISOSVFSHandler handler = null;
+    public static ISOSTransferHandler getHandler(String protocol) throws Exception {
+        ISOSTransferHandler handler = null;
 
         protocol = protocol.toLowerCase();
 

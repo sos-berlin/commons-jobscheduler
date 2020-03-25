@@ -18,7 +18,7 @@ import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDateTime;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -30,7 +30,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocalFile.class);
 
     private static final String CLASS_NAME = SOSVfsLocalFile.class.getSimpleName();
-    private ISOSVfsFileTransfer handler = null;
+    private ISOSTransferHandler handler = null;
     private InputStream is = null;
     private OutputStream os = null;
     private boolean append = false;
@@ -58,18 +58,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public ISOSVirtualFile getFile() throws Exception {
         return this;
-    }
-
-    @Override
-    public OutputStream getFileAppendStream() {
-        final String method = CLASS_NAME + "::getFileAppendStream";
-        OutputStream aos = null;
-        try {
-            aos = new FileOutputStream(new File(strFileName), true);
-        } catch (FileNotFoundException e) {
-            throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
-        }
-        return aos;
     }
 
     @Override
@@ -111,7 +99,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public ISOSVfsFileTransfer getHandler() {
+    public ISOSTransferHandler getHandler() {
         return handler;
     }
 
@@ -174,7 +162,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer val) {
+    public void setHandler(final ISOSTransferHandler val) {
         handler = val;
     }
 

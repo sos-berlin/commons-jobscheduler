@@ -52,7 +52,6 @@ import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
@@ -109,34 +108,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void setStrictHostKeyChecking(final String val) {
-        JSch.setConfig("StrictHostKeyChecking", val);
-    }
-
-    @SuppressWarnings("unused")
-    private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
-        return val.value() ? "yes" : "no";
-    }
-
-    @Override
-    public ISOSConnection connect() {
-        connect(destinationOptions);
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions options) {
+    public void connect(final SOSDestinationOptions options) {
         destinationOptions = options;
         if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
         setStrictHostKeyChecking(destinationOptions.strictHostKeyChecking.getValue());
         doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
-        return this;
     }
 
     @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
+    public void login(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
             proxyProtocol = destinationOptions.proxyProtocol;
@@ -150,30 +132,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
-        return this;
     }
 
     @Override
-    public void login(final String user, final String password) {
-        try {
-            userName = user;
-            if (isDebugEnabled) {
-                LOGGER.debug(SOSVfs_D_132.params(userName));
-            }
-            createSession(userName, host, port);
+    public void setStrictHostKeyChecking(final String val) {
+        JSch.setConfig("StrictHostKeyChecking", val);
+    }
 
-            sshSession.setPassword(password);
-
-            setConfigFromFiles();
-            sshSession.connect();
-            createSftpClient();
-
-            reply = "OK";
-            LOGGER.info(SOSVfs_D_133.params(userName));
-            logReply();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
-        }
+    @SuppressWarnings("unused")
+    private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
+        return val.value() ? "yes" : "no";
     }
 
     @Override
@@ -859,7 +827,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return preferredAuthentications;
     }
 
-    private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
+    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         userName = authenticationOptions.getUser().getValue();
         setKnownHostsFile();
@@ -904,7 +872,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
         this.logReply();
-        return this;
     }
 
     private void printConnectionInfos() {
@@ -1102,16 +1069,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public void close() {
         //
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-        return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return null;
     }
 
     public StringBuilder getStdErr() {

@@ -1,28 +1,33 @@
 package com.sos.graphviz.main;
 
+import static com.sos.scheduler.model.messages.JSMessages.JOM_F_107;
+import static com.sos.scheduler.model.messages.JSMessages.JOM_I_110;
+import static com.sos.scheduler.model.messages.JSMessages.JOM_I_111;
+
+import java.io.File;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.graphviz.enums.FileType;
 import com.sos.graphviz.jobchain.diagram.JobChainDiagramCreator;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.objects.*;
-import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import static com.sos.scheduler.model.messages.JSMessages.*;
+import com.sos.scheduler.model.objects.JSObjBase;
+import com.sos.scheduler.model.objects.JSObjJobChain;
+import com.sos.scheduler.model.objects.Spooler;
 
 public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOptions> {
 
     private static final String CLASSNAME = "JSObjects2Graphviz";
     private static final Logger LOGGER = LoggerFactory.getLogger(JSObjects2Graphviz.class);
-    private ISOSVFSHandler vfs = null;
-    private ISOSVfsFileTransfer fileSystemHandler = null;
+    private ISOSTransferHandler fileSystemHandler = null;
     private SchedulerObjectFactory schedulerObjectFactory = null;
     private SchedulerHotFolderFileList schedulerHotFolderFileList = null;
     private String outputFolderName = "";
@@ -35,8 +40,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
-        vfs = VFSFactory.getHandler("local");
-        fileSystemHandler = (ISOSVfsFileTransfer) vfs;
+        fileSystemHandler = VFSFactory.getHandler("local");
         schedulerObjectFactory = new SchedulerObjectFactory();
         schedulerObjectFactory.initMarshaller(Spooler.class);
         ISOSVirtualFile hotFolder = fileSystemHandler.getFileHandle(liveFolderName);

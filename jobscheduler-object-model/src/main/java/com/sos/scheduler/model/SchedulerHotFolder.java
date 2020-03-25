@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.scheduler.model.objects.JSObjBase;
@@ -106,7 +106,7 @@ public class SchedulerHotFolder extends JSObjBase {
             LOGGER.error(objJSException.getMessage(), objJSException);
             throw objJSException;
         }
-        ISOSVfsFileTransfer objVFSHandler = pobjVirtualDir.getHandler();
+        ISOSTransferHandler objVFSHandler = pobjVirtualDir.getHandler();
         List<SOSFileEntry> entries = objVFSHandler.getFolderlist(pobjVirtualDir.getName(), ".*", 0, false);
         result.setHotFolderSrc(pobjVirtualDir);
         for (SOSFileEntry entry : entries) {

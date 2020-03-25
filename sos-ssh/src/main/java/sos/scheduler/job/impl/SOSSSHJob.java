@@ -92,8 +92,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void execute() throws Exception {
         resetOutput();
 
-        handler.setJSJobUtilites(objJSJobUtilities);
-
         try {
             connect();
 
@@ -347,7 +345,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
             handler.connect(handlerOptions);
-            handler.authenticate(handlerOptions);
+            handler.login(handlerOptions);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("handler connection established");
             }

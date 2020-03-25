@@ -34,8 +34,6 @@ public interface ISOSVirtualFile {
 
     public OutputStream getFileOutputStream();
 
-    public OutputStream getFileAppendStream();
-
     public void setModeAppend(final boolean mode);
 
     public void setModeRestart(final boolean mode);
@@ -52,9 +50,9 @@ public interface ISOSVirtualFile {
 
     public ISOSVirtualFile getParentVfsFile();
 
-    public ISOSVfsFileTransfer getHandler();
+    public ISOSTransferHandler getHandler();
 
-    public void setHandler(final ISOSVfsFileTransfer handler);
+    public void setHandler(final ISOSTransferHandler handler);
 
     public String getName();
 

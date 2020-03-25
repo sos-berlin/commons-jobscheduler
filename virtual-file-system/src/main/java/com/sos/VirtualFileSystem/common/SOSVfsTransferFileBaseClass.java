@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -50,26 +50,11 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     }
 
     @Override
-    public OutputStream getFileAppendStream() {
-        OutputStream objO = null;
-        try {
-            fileName = adjustRelativePathName(fileName);
-            objO = getHandler().getAppendFileStream(fileName);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_158.params("getFileAppendStream()", fileName), e);
-        }
-        return objO;
-    }
-
-    @Override
     public InputStream getFileInputStream() {
         try {
             if (getInputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
                 setInputStream(getHandler().getInputStream(fileName));
-                if (getInputStream() == null) {
-                    getHandler().openInputFile(fileName);
-                }
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
@@ -82,9 +67,8 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
         try {
             if (getOutputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                if (getOutputStream() == null) {
-                    getHandler().openOutputFile(fileName);
-                }
+                setOutputStream( getHandler().getOutputStream(fileName));
+                
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
@@ -169,7 +153,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     }
 
     @Override
-    public void setHandler(final ISOSVfsFileTransfer handler) {
+    public void setHandler(final ISOSTransferHandler handler) {
         super.setHandler(handler);
     }
 

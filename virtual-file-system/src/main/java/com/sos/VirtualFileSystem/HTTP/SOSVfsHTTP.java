@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -70,27 +69,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection connect() throws Exception {
-        connect(destinationOptions);
-        return this;
-    }
-
-    @Override
-    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSDestinationOptions options) throws Exception {
         destinationOptions = options;
         if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
         proxyHost = destinationOptions.proxyHost.getValue();
         proxyPort = destinationOptions.proxyPort.value();
         proxyUser = destinationOptions.proxyUser.getValue();
         proxyPassword = destinationOptions.proxyPassword.getValue();
         doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
-        return this;
     }
 
     @Override
-    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
+    public void login(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
             doAuthenticate(authenticationOptions);
@@ -99,21 +91,8 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
-        return this;
     }
-
-    @Override
-    public void login(final String user, final String password) {
-        try {
-            doLogin(user, password);
-            reply = "OK";
-            LOGGER.info(SOSVfs_D_133.params(userName));
-            logReply();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("authentication"), e);
-        }
-    }
-
+    
     @Override
     public void disconnect() {
         reply = "disconnect OK";
@@ -238,10 +217,9 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         }
     }
 
-    private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
+    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
-        return this;
     }
 
     private void doConnect(final String phost, final int pport) {
@@ -424,12 +402,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         }
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     private ByteArrayOutputStream getOutputStream4Append(String path) throws Exception {
         // @TODO original Name
         path = path.replace(getOptions().atomicPrefix.getValue(), "");
@@ -608,11 +580,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                 throw new RuntimeException(ex);
             }
         }
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return null;
     }
 
     private String getHttpMethodExceptionText(HttpMethod method, String uri) throws Exception {
