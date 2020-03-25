@@ -31,10 +31,16 @@ import sos.net.mail.options.SOSSmtpMailOptions;
 import sos.settings.SOSProfileSettings;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
+public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptions.class);
     private static final long serialVersionUID = -8219289268940238015L;
+
+    public static final String SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE = "alternative_source_include";
+    public static final String SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE = "alternative_target_include";
+    public static final String SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD = "alternative_%scredentialstore_authenticationmethod";
+    public static final String SETTINGS_KEY_USE_CREDENTIAL_STORE = "%suse_credential_store";
+    public static final String SETTINGS_KEY_MAIL_SMTP = "mail_smtp";
 
     private static final String PREFIX_FILE_URI = "file://";
     private static final String PREFIX_SCHEDULER_ENV_VAR = "scheduler_param_";
@@ -42,7 +48,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String OPERATION_RECEIVE = "receive";
     private static final String OPERATION_SEND = "send";
-    private SOSConnection2Options connectionOptions;
+    private SOSDestinationMainOptions connectionOptions;
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private Properties allEnvVars = null;
@@ -85,7 +91,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
     };
 
-    public SOSFTPOptions(final TransferTypes type) {
+    public SOSBaseOptions(final TransferTypes type) {
         super();
         switch (type) {
         case webdav:
@@ -116,7 +122,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
     }
 
-    public SOSFTPOptions(final TransferTypes source, final TransferTypes target) {
+    public SOSBaseOptions(final TransferTypes source, final TransferTypes target) {
         super();
         switch (source) {
         case webdav:
@@ -131,15 +137,15 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         changeDefaults(target, getTarget());
     }
 
-    public SOSFTPOptions() {
+    public SOSBaseOptions() {
         super();
     }
 
-    public SOSFTPOptions(final HashMap<String, String> settings) throws Exception {
+    public SOSBaseOptions(final HashMap<String, String> settings) throws Exception {
         super(settings);
     }
 
-    private void changeDefaults(final TransferTypes type, final SOSConnection2OptionsAlternate options) {
+    private void changeDefaults(final TransferTypes type, final SOSDestinationOptions options) {
         switch (type) {
         case sftp:
             options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
@@ -185,19 +191,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private void setChildClasses(final HashMap<String, String> settings) {
         try {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("[setChildClasses]map");
-            }
+            LOGGER.trace("[setChildClasses]map");
 
             if (connectionOptions == null) {
-                LOGGER.debug("set connection options");
-                connectionOptions = new SOSConnection2Options(settings);
+                LOGGER.trace("[destination options]main");
+                connectionOptions = new SOSDestinationMainOptions(settings);
             } else {
                 // connectionOptions.setPrefixedValues(settings);
             }
             if (mailOptions == null) {
-                LOGGER.debug("set smtpmail options");
-                if (settings.containsKey("mail_smtp")) {
+                if (settings.containsKey(SETTINGS_KEY_MAIL_SMTP)) {
+                    LOGGER.trace("[smtpmail options]");
                     mailOptions = new SOSSmtpMailOptions(settings);
                 } else {
                     mailOptions = new SOSSmtpMailOptions();
@@ -344,7 +348,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         checkMandatoryDone = true;
     }
 
-    private void checkReplaceAndReplacing(final SOSConnection2OptionsSuperClass options) {
+    private void checkReplaceAndReplacing(final SOSDestinationOptionsSuperClass options) {
         if (options.replacing.isNotEmpty() && options.replacement.isNull()) {
             options.replacement.setValue("");
         }
@@ -353,19 +357,19 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
     }
 
-    private void checkCredentialStore(final SOSConnection2OptionsAlternate options) {
+    private void checkCredentialStore(final SOSDestinationOptions options) {
         if (options.getCredentialStore() != null) {
             options.checkCredentialStoreOptions();
         }
     }
 
-    private void checkURLParameter(final SOSConnection2OptionsAlternate options) {
+    private void checkURLParameter(final SOSDestinationOptions options) {
         if (options.url.isDirty()) {
             options.url.getOptions(options);
         }
     }
 
-    private void setDefaultAuth(final SOSOptionTransferType type, final SOSConnection2OptionsAlternate options) {
+    private void setDefaultAuth(final SOSOptionTransferType type, final SOSDestinationOptions options) {
         TransferTypes transferType = type.getEnum();
         if ((type.isHTTP() || transferType.equals(TransferTypes.webdav)) && !options.authMethod.isDirty() && !options.sshAuthMethod.isDirty()) {
             options.authMethod.setValue(enuAuthenticationMethods.url);
@@ -556,13 +560,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
         handleFileOrderSource(params);
 
-        LOGGER.debug("[set options]start");
+        LOGGER.trace("[set options]start");
         super.setSettings(params);
-        // super.setAllOptions(params);
-
-        LOGGER.debug("set childs options");
         setChildClasses(params);
-        LOGGER.debug("[set options]end");
+        LOGGER.trace("[set options]end");
     }
 
     public HashMap<String, String> readSettingsFile() {
@@ -830,7 +831,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return targetType;
     }
 
-    private void changeOptions(final SOSConnection2OptionsAlternate options) {
+    private void changeOptions(final SOSDestinationOptions options) {
         options.host.set(host);
         LOGGER.debug("prefix_host = " + options.host.getValue());
         options.user.setValue(user.getValue());
@@ -842,7 +843,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         options.sshAuthFile.setIfNotDirty(sshAuthFile);
         options.sshAuthMethod.setIfNotDirty(sshAuthMethod);
 
-        SOSConnection2OptionsSuperClass alternate = options.getAlternatives();
+        SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
         alternate.host.setValue(alternativeHost.getValue());
         alternate.port.value(alternativePort.value());
         alternate.protocol.setValue(protocol.getValue());
@@ -850,7 +851,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         alternate.transferMode.setValue(alternativeTransferMode.getValue());
     }
 
-    private void changeOptions2Local(final SOSConnection2OptionsAlternate options) {
+    private void changeOptions2Local(final SOSDestinationOptions options) {
         options.host.setValue(SOSOptionHostName.getLocalHost());
         options.user.setValue("");
         options.password.setValue("");
@@ -859,7 +860,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         options.passiveMode.setValue("");
         options.transferMode.setValue("");
 
-        SOSConnection2OptionsSuperClass alternate = options.getAlternatives();
+        SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
         alternate.host.setValue(options.host.getValue());
         alternate.port.value(0);
         alternate.protocol.setValue("local");
@@ -878,7 +879,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
             sourceType = TransferTypes.local.name();
             changeDirValues();
-            SOSConnection2OptionsAlternate options = getConnectionOptions().getSource();
+            SOSDestinationOptions options = getConnectionOptions().getSource();
             options.host.setValue(SOSOptionHostName.getLocalHost());
             options.port.value(0);
             options.protocol.setValue(sourceType);
@@ -892,7 +893,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             options.sshAuthMethod = sshAuthMethod;
             options.passiveMode = passiveMode;
 
-            SOSConnection2OptionsSuperClass alternate = options.getAlternatives();
+            SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
             alternate.host.setValue(alternativeHost.getValue());
             alternate.port.value(alternativePort.value());
             alternate.protocol.setValue(protocol.getValue());
@@ -903,7 +904,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                 sourceType = TransferTypes.local.name();
             }
             changeDirValues4Receive();
-            SOSConnection2OptionsAlternate options = getConnectionOptions().getSource();
+            SOSDestinationOptions options = getConnectionOptions().getSource();
             options.host.setValue(host.getValue());
             options.port.value(port.value());
             options.protocol.setValue(protocol.getValue());
@@ -917,7 +918,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             options.port.value(0);
             options.protocol.setValue(TransferTypes.local.name());
 
-            SOSConnection2OptionsSuperClass alternate = options.getAlternatives();
+            SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
             alternate.host.setValue(alternativeHost.getValue());
             alternate.port.value(alternativePort.value());
             alternate.protocol.setValue(protocol.getValue());
@@ -964,9 +965,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return !overwriteFiles.value() && !appendFiles.value();
     }
 
-    public SOSConnection2Options getConnectionOptions() {
+    public SOSDestinationMainOptions getConnectionOptions() {
         if (connectionOptions == null) {
-            connectionOptions = new SOSConnection2Options();
+            connectionOptions = new SOSDestinationMainOptions();
         }
         return connectionOptions;
     }
@@ -975,11 +976,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return this.getReplacing().isNotEmpty();
     }
 
-    public SOSConnection2OptionsAlternate getSource() {
+    public SOSDestinationOptions getSource() {
         return getConnectionOptions().getSource();
     }
 
-    public SOSConnection2OptionsAlternate getTarget() {
+    public SOSDestinationOptions getTarget() {
         return getConnectionOptions().getTarget();
     }
 
@@ -997,8 +998,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return result;
     }
 
-    public SOSFTPOptions getClone() {
-        SOSFTPOptions options = new SOSFTPOptions();
+    public SOSBaseOptions getClone() {
+        SOSBaseOptions options = new SOSBaseOptions();
         options.commandLineArgs(getOptionsAsCommandLine());
         return options;
     }

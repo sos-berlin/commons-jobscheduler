@@ -27,7 +27,7 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
@@ -55,18 +55,18 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
     @Override
     public ISOSConnection connect() throws Exception {
-        this.connect(this.connection2OptionsAlternate);
+        this.connect(this.destinationOptions);
         return this;
 
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
-        connection2OptionsAlternate = options;
-        if (connection2OptionsAlternate == null) {
+    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+        destinationOptions = options;
+        if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
+        this.doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
         return this;
     }
 
@@ -74,10 +74,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            proxyHost = connection2OptionsAlternate.proxyHost.getValue();
-            proxyPort = connection2OptionsAlternate.proxyPort.value();
-            proxyUser = connection2OptionsAlternate.proxyUser.getValue();
-            proxyPassword = connection2OptionsAlternate.proxyPassword.getValue();
+            proxyHost = destinationOptions.proxyHost.getValue();
+            proxyPort = destinationOptions.proxyPort.value();
+            proxyUser = destinationOptions.proxyUser.getValue();
+            proxyPassword = destinationOptions.proxyPassword.getValue();
             this.doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
@@ -576,7 +576,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         rootUrl = null;
         HttpURL httpUrl = null;
         String path = "/";
-        if (connection2OptionsAlternate.authMethod.isURL()) {
+        if (destinationOptions.authMethod.isURL()) {
             URL url = new URL(phost);
             String phostRootUrl = url.getProtocol() + "://" + url.getAuthority();
             if (url.getPort() == -1) {
@@ -595,7 +595,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             if ("https".equalsIgnoreCase(httpUrl.getScheme())) {
                 rootUrl = new HttpsURL(phostRootUrl);
                 StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
+                psf.setCheckHostname(destinationOptions.verifyCertificateHostname.value());
                 if (!psf.getCheckHostname()) {
                     LOGGER.info("*********************** Security warning *********************************************************************");
                     LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
@@ -603,7 +603,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
                     LOGGER.info("**************************************************************************************************************");
                 }
-                if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
+                if (destinationOptions.acceptUntrustedCertificate.value()) {
                     psf.useDefaultJavaCiphers();
                     psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                 }
@@ -689,8 +689,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
         if (SOSString.isEmpty(msg)) {
             msg = "no details provided.";
-            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0 && !connection2OptionsAlternate.acceptUntrustedCertificate
-                    .value()) {
+            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0 && !destinationOptions.acceptUntrustedCertificate.value()) {
                 msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
             }
         }
@@ -704,7 +703,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     private void doConnect(final String phost, final int pport) throws Exception {
         host = phost;
         port = pport;
-        if (connection2OptionsAlternate.authMethod.isURL()) {
+        if (destinationOptions.authMethod.isURL()) {
             URL url = new URL(phost);
             port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
         }

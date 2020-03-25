@@ -1,12 +1,12 @@
 package com.sos.VirtualFileSystem.common;
 
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 
-    private SOSFTPOptions options = null;
+    private SOSBaseOptions options = null;
     private enuSourceOrTarget sourceOrTarget = enuSourceOrTarget.isUndefined;
     private boolean isLocked = false;
     private boolean loggedIn = false;
@@ -50,11 +50,11 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
         isLocked = true;
     }
 
-    final public SOSFTPOptions getOptions() {
+    final public SOSBaseOptions getOptions() {
         return options;
     }
 
-    public void getOptions(final SOSFTPOptions opt) {
+    public void getOptions(final SOSBaseOptions opt) {
         options = opt;
     }
 

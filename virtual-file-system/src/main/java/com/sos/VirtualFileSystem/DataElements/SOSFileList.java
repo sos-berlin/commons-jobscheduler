@@ -17,7 +17,7 @@ import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.TransferStatus;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
@@ -35,7 +35,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 
     private ISOSVfsFileTransfer sourceClient = null;
     private ISOSVfsFileTransfer targetClient = null;
-    private SOSFTPOptions options = null;
+    private SOSBaseOptions options = null;
     private IJobSchedulerEventHandler eventHandler = null;
     private List<SOSFileListEntry> fileListEntries = new ArrayList<>();
     private final HashMap<String, String> subFolders = new HashMap<>();
@@ -54,7 +54,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private int retryCountMax = 0;
     private int retryInterval = 0;// in seconds
 
-    public SOSFileList(SOSFTPOptions opt, IJobSchedulerEventHandler handler) {
+    public SOSFileList(SOSBaseOptions opt, IJobSchedulerEventHandler handler) {
         super(SOSVfsConstants.BUNDLE_NAME);
         options = opt;
         eventHandler = handler;
@@ -533,7 +533,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
         return subFolders;
     }
 
-    public SOSFTPOptions getOptions() {
+    public SOSBaseOptions getOptions() {
         return options;
     }
 

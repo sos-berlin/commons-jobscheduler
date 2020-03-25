@@ -37,7 +37,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
@@ -71,21 +71,21 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public ISOSConnection connect() throws Exception {
-        connect(connection2OptionsAlternate);
+        connect(destinationOptions);
         return this;
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
-        connection2OptionsAlternate = options;
-        if (connection2OptionsAlternate == null) {
+    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+        destinationOptions = options;
+        if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        proxyHost = connection2OptionsAlternate.proxyHost.getValue();
-        proxyPort = connection2OptionsAlternate.proxyPort.value();
-        proxyUser = connection2OptionsAlternate.proxyUser.getValue();
-        proxyPassword = connection2OptionsAlternate.proxyPassword.getValue();
-        doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
+        proxyHost = destinationOptions.proxyHost.getValue();
+        proxyPort = destinationOptions.proxyPort.value();
+        proxyUser = destinationOptions.proxyUser.getValue();
+        proxyPassword = destinationOptions.proxyPassword.getValue();
+        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
         return this;
     }
 
@@ -261,7 +261,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
                         rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
+                        psf.setCheckHostname(destinationOptions.verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
                             LOGGER.info(
                                     "*********************** Security warning *********************************************************************");
@@ -272,7 +272,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                             LOGGER.info(
                                     "**************************************************************************************************************");
                         }
-                        if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
+                        if (destinationOptions.acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }

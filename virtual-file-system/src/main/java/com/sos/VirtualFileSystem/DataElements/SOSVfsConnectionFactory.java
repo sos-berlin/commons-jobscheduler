@@ -7,8 +7,8 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.exception.SOSYadeSourceConnectionException;
 import com.sos.exception.SOSYadeTargetConnectionException;
 
@@ -17,9 +17,9 @@ public class SOSVfsConnectionFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsConnectionFactory.class);
     private SOSVfsConnectionPool source = null;
     private SOSVfsConnectionPool target = null;
-    private SOSFTPOptions options = null;
+    private SOSBaseOptions options = null;
 
-    public SOSVfsConnectionFactory(final SOSFTPOptions opt) {
+    public SOSVfsConnectionFactory(final SOSBaseOptions opt) {
         options = opt;
     }
 
@@ -58,7 +58,7 @@ public class SOSVfsConnectionFactory {
     private ISOSVFSHandler getVfsHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
         ISOSVFSHandler handler = null;
         try {
-            SOSConnection2OptionsAlternate optionsAlternate;
+            SOSDestinationOptions optionsAlternate;
             String dataType;
             if (isSource) {
                 optionsAlternate = options.getConnectionOptions().getSource();
@@ -75,7 +75,7 @@ public class SOSVfsConnectionFactory {
                 handler.authenticate(optionsAlternate);
                 handleClient(client, optionsAlternate, isSource);
             } catch (Exception e) {
-                SOSConnection2OptionsAlternate alternatives = optionsAlternate.getAlternatives();
+                SOSDestinationOptions alternatives = optionsAlternate.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
@@ -125,7 +125,7 @@ public class SOSVfsConnectionFactory {
         return handler;
     }
 
-    private void handleClient(ISOSVfsFileTransfer client, SOSConnection2OptionsAlternate optionsAlternate, boolean isSource) throws Exception {
+    private void handleClient(ISOSVfsFileTransfer client, SOSDestinationOptions optionsAlternate, boolean isSource) throws Exception {
         if (optionsAlternate.directory.isDirty()) {
             if (isSource) {
                 options.sourceDir = optionsAlternate.directory;

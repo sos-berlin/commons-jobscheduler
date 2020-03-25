@@ -1,10 +1,10 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 
 public interface ISOSTransferHistory {
 
-    public void setData(SOSFTPOptions options);
+    public void setData(SOSBaseOptions options);
 
     public void doTransferDetail();
 

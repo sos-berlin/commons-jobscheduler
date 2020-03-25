@@ -10,9 +10,9 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@JSOptionClass(name = "SOSConnection2Options", description = "Options for a connection to an uri (server, site, e.g.)")
+@JSOptionClass(name = "SOSDestinationMainOptions", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
+public class SOSDestinationMainOptions extends SOSDestinationOptionsSuperClass {
 
     private static final long serialVersionUID = 6485361196241983182L;
 
@@ -22,17 +22,17 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
     private static final String PREFIX_SOURCE = "source_";
 
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
-    private SOSConnection2OptionsAlternate sourceOptions = null;
+    private SOSDestinationOptions sourceOptions = null;
 
     @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate")
-    private SOSConnection2OptionsAlternate targetOptions = null;
+    private SOSDestinationOptions targetOptions = null;
 
-    public SOSConnection2Options() {
+    public SOSDestinationMainOptions() {
         super();
         initChildOptions();
     }
 
-    public SOSConnection2Options(final HashMap<String, String> settings) throws Exception {
+    public SOSDestinationMainOptions(final HashMap<String, String> settings) throws Exception {
         super(settings);
         initChildOptions();
         setPrefixedValues(settings);
@@ -40,30 +40,29 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
 
     private void initChildOptions() {
         if (sourceOptions == null) {
-            sourceOptions = new SOSConnection2OptionsAlternate("");
+            sourceOptions = new SOSDestinationOptions("");
         }
         sourceOptions.isSource = true;
 
         if (targetOptions == null) {
-            targetOptions = new SOSConnection2OptionsAlternate("");
+            targetOptions = new SOSDestinationOptions("");
             targetOptions.isSource = false;
         }
     }
 
     private void setPrefixedValues(final HashMap<String, String> settings) throws Exception {
-        LOGGER.debug("setSource options");
+        LOGGER.trace("[destination options]source");
         sourceOptions.setAllOptions(settings, PREFIX_SOURCE);
-        if (settings.containsKey("alternative_source_include")) {
+        if (settings.containsKey(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE)) {
             sourceOptions.alternateOptionsUsed.value(true);
         }
         // sourceOptions.getAlternatives().setChildClasses(settings, PREFIX_SOURCE);
         sourceOptions.setChildClasses(settings, PREFIX_SOURCE);
         // this.addProcessedOptions(sourceOptions.getProcessedOptions());
 
-        
-        LOGGER.debug("setTarget options");
+        LOGGER.trace("[destination options]target");
         targetOptions.setAllOptions(settings, PREFIX_TARGET);
-        if (settings.containsKey("alternative_target_include")) {
+        if (settings.containsKey(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE)) {
             targetOptions.alternateOptionsUsed.value(true);
         }
         // targetOptions.getAlternatives().setChildClasses(settings, PREFIX_TARGET);
@@ -80,25 +79,25 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
         }
     }
 
-    public SOSConnection2OptionsAlternate getSource() {
+    public SOSDestinationOptions getSource() {
         if (sourceOptions == null) {
-            sourceOptions = new SOSConnection2OptionsAlternate(PREFIX_SOURCE);
+            sourceOptions = new SOSDestinationOptions(PREFIX_SOURCE);
         }
         return sourceOptions;
     }
 
-    public void setSource(final SOSConnection2OptionsAlternate val) {
+    public void setSource(final SOSDestinationOptions val) {
         sourceOptions = val;
     }
 
-    public SOSConnection2OptionsAlternate getTarget() {
+    public SOSDestinationOptions getTarget() {
         if (targetOptions == null) {
-            targetOptions = new SOSConnection2OptionsAlternate("");
+            targetOptions = new SOSDestinationOptions("");
         }
         return targetOptions;
     }
 
-    public void setTarget(final SOSConnection2OptionsAlternate val) {
+    public void setTarget(final SOSDestinationOptions val) {
         targetOptions = val;
     }
 

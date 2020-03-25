@@ -31,21 +31,21 @@ import com.sos.keepass.SOSKeePassPath;
 import sos.util.ParameterSubstitutor;
 import sos.util.SOSString;
 
-@JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
+@JSOptionClass(name = "SOSDestinationOptions", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
+public class SOSDestinationOptions extends SOSDestinationOptionsSuperClass {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSConnection2OptionsAlternate.class);
-    private static final String CLASSNAME = SOSConnection2OptionsAlternate.class.getSimpleName();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSDestinationOptions.class);
+    private static final String CLASSNAME = SOSDestinationOptions.class.getSimpleName();
     private String strAlternativePrefix = "";
     public boolean isSource = false;
 
-    public SOSConnection2OptionsAlternate() {
+    public SOSDestinationOptions() {
         //
     }
 
-    public SOSConnection2OptionsAlternate(final String prefix) {
+    public SOSDestinationOptions(final String prefix) {
         strAlternativePrefix = prefix;
     }
 
@@ -59,7 +59,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return preTransferCommands.getValue();
     }
 
-    public SOSConnection2OptionsAlternate setPreTransferCommands(final String val) {
+    public SOSDestinationOptions setPreTransferCommands(final String val) {
         preTransferCommands.setValue(val);
         return this;
     }
@@ -74,7 +74,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return postTransferCommands.getValue();
     }
 
-    public SOSConnection2OptionsAlternate setPostTransferCommands(final String val) {
+    public SOSDestinationOptions setPostTransferCommands(final String val) {
         postTransferCommands.setValue(val);
         return this;
     }
@@ -96,7 +96,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return ignoreCertificateError.value();
     }
 
-    public SOSConnection2OptionsAlternate setIgnoreCertificateError(final boolean val) {
+    public SOSDestinationOptions setIgnoreCertificateError(final boolean val) {
         ignoreCertificateError.value(val);
         return this;
     }
@@ -113,13 +113,13 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         return alternateOptionsUsed.getValue();
     }
 
-    public SOSConnection2OptionsAlternate setAlternateOptionsUsed(final String val) {
+    public SOSDestinationOptions setAlternateOptionsUsed(final String val) {
         alternateOptionsUsed.setValue(val);
         return this;
     }
 
-    @JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "alternate_")
-    private SOSConnection2OptionsAlternate alternativeOptions = null;
+    @JSOptionClass(description = "", name = "SOSDestinationOptions", prefix = "alternate_")
+    private SOSDestinationOptions alternativeOptions = null;
 
     @JSOptionClass(description = "", name = "SOSCredentialStoreOptions")
     private SOSCredentialStoreOptions credentialStoreOptions = null;
@@ -127,12 +127,21 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     public void setChildClasses(final HashMap<String, String> settings, final String prefix) throws Exception {
         strAlternativePrefix = prefix;
 
-        if (settings.containsKey(strAlternativePrefix + "use_credential_store")) {
+        if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_USE_CREDENTIAL_STORE, strAlternativePrefix))) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[destination options]credential store %s", strAlternativePrefix));
+            }
             getCredentialStore().setAllOptions(settings, strAlternativePrefix);
         }
         if (alternateOptionsUsed.value()) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[destination options]alternative_%s", strAlternativePrefix));
+            }
             getAlternativeOptions().setAllOptions(settings, "alternative_" + strAlternativePrefix);
-            if (settings.containsKey("alternative_" + strAlternativePrefix + "credentialstore_authenticationmethod")) {
+            if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, strAlternativePrefix))) {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace(String.format("[destination options]alternative_%s credential store", strAlternativePrefix));
+                }
                 getAlternativeOptions().getCredentialStore().setAllOptions(settings, "alternative_" + strAlternativePrefix);
             }
         }
@@ -140,16 +149,16 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         // this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
     }
 
-    private SOSConnection2OptionsAlternate getAlternativeOptions() {
+    private SOSDestinationOptions getAlternativeOptions() {
         if (alternativeOptions == null) {
-            alternativeOptions = new SOSConnection2OptionsAlternate();
+            alternativeOptions = new SOSDestinationOptions();
         }
         return alternativeOptions;
     }
 
-    public SOSConnection2OptionsAlternate getAlternatives() {
+    public SOSDestinationOptions getAlternatives() {
         if (alternativeOptions == null) {
-            alternativeOptions = new SOSConnection2OptionsAlternate("");
+            alternativeOptions = new SOSDestinationOptions("");
         }
         return alternativeOptions;
     }

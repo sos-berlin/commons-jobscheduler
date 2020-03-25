@@ -48,7 +48,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
@@ -65,7 +65,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     private static final String CLASS_NAME = SOSVfsFtpBaseClass.class.getSimpleName();
 
     private ISOSConnectionOptions connectionOptions = null;
-    private SOSConnection2OptionsAlternate connectionOptionsAlternate = null;
+    private SOSDestinationOptions destinationOptions= null;
     private SOSFtpServerReply ftpReply = null;
     private SOSOptionTransferMode transferMode = null;
     private SOSFtpClientLogger commandListener = null;
@@ -130,12 +130,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             LOGGER.debug(SOSVfs_D_0101.params(host, port));
         }
         try {
-            if (connectionOptionsAlternate != null) {
-                proxyProtocol = connectionOptionsAlternate.proxyProtocol;
-                proxyHost = connectionOptionsAlternate.proxyHost.getValue();
-                proxyPort = connectionOptionsAlternate.proxyPort.value();
-                proxyUser = connectionOptionsAlternate.proxyUser.getValue();
-                proxyPassword = connectionOptionsAlternate.proxyPassword.getValue();
+            if (destinationOptions != null) {
+                proxyProtocol = destinationOptions.proxyProtocol;
+                proxyHost = destinationOptions.proxyHost.getValue();
+                proxyPort = destinationOptions.proxyPort.value();
+                proxyUser = destinationOptions.proxyUser.getValue();
+                proxyPassword = destinationOptions.proxyPassword.getValue();
             }
             doConnect(host, port);
             LOGGER.info(SOSVfs_D_0102.params(host, port));
@@ -177,17 +177,17 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) {
+    public ISOSConnection connect(final SOSDestinationOptions options) {
         final String method = CLASS_NAME + "::Connect";
-        connectionOptionsAlternate = options;
+        destinationOptions = options;
         try {
-            host = connectionOptionsAlternate.host.getValue();
-            port = connectionOptionsAlternate.port.value();
-            proxyProtocol = connectionOptionsAlternate.proxyProtocol;
-            proxyHost = connectionOptionsAlternate.proxyHost.getValue();
-            proxyPort = connectionOptionsAlternate.proxyPort.value();
-            proxyUser = connectionOptionsAlternate.proxyUser.getValue();
-            proxyPassword = connectionOptionsAlternate.proxyPassword.getValue();
+            host = destinationOptions.host.getValue();
+            port = destinationOptions.port.value();
+            proxyProtocol = destinationOptions.proxyProtocol;
+            proxyHost = destinationOptions.proxyHost.getValue();
+            proxyPort = destinationOptions.proxyPort.value();
+            proxyUser = destinationOptions.proxyUser.getValue();
+            proxyPassword = destinationOptions.proxyPassword.getValue();
             connect(host, port);
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
@@ -272,7 +272,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public void reconnect(SOSConnection2OptionsAlternate options) {
+    public void reconnect(SOSDestinationOptions options) {
         if (!isConnected()) {
             try {
                 connect(options);
@@ -642,12 +642,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             }
             LOGGER.info(SOSVfs_D_151.params(command, replyString));
         } catch (JobSchedulerException ex) {
-            if (getConnectionOptionsAlternate().raiseExceptionOnError.value()) {
+            if (destinationOptions.raiseExceptionOnError.value()) {
                 throw ex;
             }
             LOGGER.info(SOSVfs_D_151.params(command, ex.toString()), ex);
         } catch (Exception ex) {
-            if (getConnectionOptionsAlternate().raiseExceptionOnError.value()) {
+            if (destinationOptions.raiseExceptionOnError.value()) {
                 throw new JobSchedulerException(SOSVfs_E_134.params("ExecuteCommand"), ex);
             }
             LOGGER.info(SOSVfs_D_151.params(command, ex.toString()), ex);
@@ -1230,7 +1230,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     protected boolean logReply() {
         reply = getReplyString();
         if (LOGGER.isTraceEnabled()) {
-            if (connectionOptionsAlternate.protocolCommandListener.isFalse()) {
+            if (destinationOptions.protocolCommandListener.isFalse()) {
                 LOGGER.trace(reply);
             }
         }
@@ -1332,8 +1332,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return connectionOptions;
     }
 
-    public SOSConnection2OptionsAlternate getConnectionOptionsAlternate() {
-        return connectionOptionsAlternate;
+    public SOSDestinationOptions getDestinationOptions() {
+        return destinationOptions;
     }
 
     public SOSFtpServerReply getFtpReply() {

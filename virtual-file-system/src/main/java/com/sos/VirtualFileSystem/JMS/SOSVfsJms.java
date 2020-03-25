@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 
@@ -33,17 +33,17 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
 
     @Override
     public ISOSConnection connect() {
-        this.connect(connection2OptionsAlternate);
+        this.connect(destinationOptions);
         return this;
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
-        connection2OptionsAlternate = pConnection2OptionsAlternate;
-        if (connection2OptionsAlternate == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+    public ISOSConnection connect(final SOSDestinationOptions pConnection2OptionsAlternate) {
+        destinationOptions = pConnection2OptionsAlternate;
+        if (destinationOptions == null) {
+            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
-        this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
+        this.doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
         return this;
     }
 

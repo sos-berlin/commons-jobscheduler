@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSJobChain;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionArrayList;
@@ -47,26 +46,38 @@ import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@JSOptionClass(name = "SOSFtpOptionsSuperClass", description = "SOSFtpOptionsSuperClass")
+@JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSFtpOptions {
+public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSFtpOptions {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFtpOptionsSuperClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptionsSuperClass.class);
     private static final long serialVersionUID = -4445655877481869778L;
-    private static final String CLASS_NAME = SOSFtpOptionsSuperClass.class.getSimpleName();
+    private static final String CLASS_NAME = SOSBaseOptionsSuperClass.class.getSimpleName();
 
-    public SOSFtpOptionsSuperClass() {
+    public SOSBaseOptionsSuperClass() {
         objParentClass = getClass();
     }
 
-    public SOSFtpOptionsSuperClass(final JSListener listener) {
-        this();
-        registerMessageListener(listener);
-    }
-
-    public SOSFtpOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
+    public SOSBaseOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
         setAllOptions(settings);
+    }
+
+    @Override
+    public void setAllOptions(final HashMap<String, String> settings) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("[setAllOptions]map");
+        }
+        super.setSettings(settings);
+    }
+
+    @Override
+    public void checkMandatory() throws com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing {
+        try {
+            super.checkMandatory();
+        } catch (Exception e) {
+            throw new JSExceptionMandatoryOptionMissing(e.toString());
+        }
     }
 
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
@@ -77,7 +88,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return tfnPostCommand;
     }
 
-    public SOSFtpOptionsSuperClass setTfnPostCommand(final SOSOptionString val) {
+    public SOSBaseOptionsSuperClass setTfnPostCommand(final SOSOptionString val) {
         tfnPostCommand = val;
         return this;
     }
@@ -90,7 +101,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingWait4SourceFolder.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingWait4SourceFolder(final String val) {
+    public SOSBaseOptionsSuperClass setPollingWait4SourceFolder(final String val) {
         pollingWait4SourceFolder.setValue(val);
         return this;
     }
@@ -102,7 +113,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return include.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setinclude(final String val) {
+    public SOSBaseOptionsSuperClass setinclude(final String val) {
         include.setValue(val);
         return this;
     }
@@ -115,7 +126,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return useFilters;
     }
 
-    public SOSFtpOptionsSuperClass setUseFilters(final SOSOptionBoolean val) {
+    public SOSBaseOptionsSuperClass setUseFilters(final SOSOptionBoolean val) {
         useFilters = val;
         return this;
     }
@@ -128,7 +139,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return isFragment.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setIsFragment(final String val) {
+    public SOSBaseOptionsSuperClass setIsFragment(final String val) {
         isFragment.setValue(val);
         return this;
     }
@@ -141,7 +152,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return reuseConnection.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setReuseConnection(final String val) {
+    public SOSBaseOptionsSuperClass setReuseConnection(final String val) {
         reuseConnection.setValue(val);
         return this;
     }
@@ -154,7 +165,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingServer.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingServer(final String val) {
+    public SOSBaseOptionsSuperClass setPollingServer(final String val) {
         pollingServer.setValue(val);
         return this;
     }
@@ -167,7 +178,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingEndAt.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingEndAt(final String val) {
+    public SOSBaseOptionsSuperClass setPollingEndAt(final String val) {
         pollingEndAt.setValue(val);
         return this;
     }
@@ -180,7 +191,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingServerPollForever.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingServerPollForever(final String val) {
+    public SOSBaseOptionsSuperClass setPollingServerPollForever(final String val) {
         pollingServerPollForever.setValue(val);
         return this;
     }
@@ -193,7 +204,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingServerDuration.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingServerDuration(final String val) {
+    public SOSBaseOptionsSuperClass setPollingServerDuration(final String val) {
         pollingServerDuration.setValue(val);
         return this;
     }
@@ -206,7 +217,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return lazyConnectionMode.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setLazyConnectionMode(final String val) {
+    public SOSBaseOptionsSuperClass setLazyConnectionMode(final String val) {
         lazyConnectionMode.setValue(val);
         return this;
     }
@@ -218,7 +229,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return platform.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPlatform(final String val) {
+    public SOSBaseOptionsSuperClass setPlatform(final String val) {
         platform.setValue(val);
         return this;
     }
@@ -231,7 +242,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return mailOnSuccess.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMailOnSuccess(final String val) {
+    public SOSBaseOptionsSuperClass setMailOnSuccess(final String val) {
         mailOnSuccess.setValue(val);
         return this;
     }
@@ -244,7 +255,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return mailOnError.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMailOnError(final String val) {
+    public SOSBaseOptionsSuperClass setMailOnError(final String val) {
         mailOnError.setValue(val);
         return this;
     }
@@ -257,7 +268,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return mailOnEmptyFiles.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMailOnEmptyFiles(final String val) {
+    public SOSBaseOptionsSuperClass setMailOnEmptyFiles(final String val) {
         mailOnEmptyFiles.setValue(val);
         return this;
     }
@@ -269,7 +280,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return title.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setTitle(final String val) {
+    public SOSBaseOptionsSuperClass setTitle(final String val) {
         title.setValue(val);
         return this;
     }
@@ -282,7 +293,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return keepModificationDate.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setKeepModificationDate(final String val) {
+    public SOSBaseOptionsSuperClass setKeepModificationDate(final String val) {
         keepModificationDate.setValue(val);
         return this;
     }
@@ -295,7 +306,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return cumulateFiles.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCumulateFiles(final String val) {
+    public SOSBaseOptionsSuperClass setCumulateFiles(final String val) {
         cumulateFiles.setValue(val);
         return this;
     }
@@ -308,7 +319,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return cumulativeFileName.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCumulativeFilename(final String val) {
+    public SOSBaseOptionsSuperClass setCumulativeFilename(final String val) {
         cumulativeFileName.setValue(val);
         return this;
     }
@@ -321,7 +332,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return cumulativeFileSeparator.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCumulativeFileSeparator(final String val) {
+    public SOSBaseOptionsSuperClass setCumulativeFileSeparator(final String val) {
         cumulativeFileSeparator.setValue(val);
         return this;
     }
@@ -334,7 +345,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return cumulativeFileDelete.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCumulativeFileDelete(final String val) {
+    public SOSBaseOptionsSuperClass setCumulativeFileDelete(final String val) {
         cumulativeFileDelete.setValue(val);
         return this;
     }
@@ -347,7 +358,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return postCommand.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPostCommand(final String val) {
+    public SOSBaseOptionsSuperClass setPostCommand(final String val) {
         postCommand.setValue(val);
         return this;
     }
@@ -363,7 +374,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return preCommand.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPreCommand(final String val) {
+    public SOSBaseOptionsSuperClass setPreCommand(final String val) {
         preCommand.setValue(val);
         return this;
     }
@@ -380,7 +391,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollKeepConnection.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollKeepConnection(final String val) {
+    public SOSBaseOptionsSuperClass setPollKeepConnection(final String val) {
         pollKeepConnection.setValue(val);
         return this;
     }
@@ -393,7 +404,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return fileNameEncoding.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setFileNameEncoding(final String val) {
+    public SOSBaseOptionsSuperClass setFileNameEncoding(final String val) {
         fileNameEncoding.setValue(val);
         return this;
     }
@@ -406,7 +417,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return historyFileAppendMode;
     }
 
-    public SOSFtpOptionsSuperClass setHistoryFileAppendMode(final SOSOptionBoolean val) {
+    public SOSBaseOptionsSuperClass setHistoryFileAppendMode(final SOSOptionBoolean val) {
         historyFileAppendMode = val;
         return this;
     }
@@ -419,7 +430,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return historyEntries.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setHistoryEntries(final String val) {
+    public SOSBaseOptionsSuperClass setHistoryEntries(final String val) {
         historyEntries.setValue(val);
         return this;
     }
@@ -432,7 +443,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return sendTransferHistory.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setSendTransferHistory(final String val) {
+    public SOSBaseOptionsSuperClass setSendTransferHistory(final String val) {
         sendTransferHistory.setValue(val);
         return this;
     }
@@ -445,7 +456,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return writeTransferHistory.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setWriteTransferHistory(final String val) {
+    public SOSBaseOptionsSuperClass setWriteTransferHistory(final String val) {
         writeTransferHistory.setValue(val);
         return this;
     }
@@ -459,7 +470,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return schedulerTransferMethod.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setSchedulerTransferMethod(final String val) {
+    public SOSBaseOptionsSuperClass setSchedulerTransferMethod(final String val) {
         schedulerTransferMethod.setValue(val);
         return this;
     }
@@ -473,7 +484,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return preFtpCommands.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPreFtpCommands(final String val) {
+    public SOSBaseOptionsSuperClass setPreFtpCommands(final String val) {
         preFtpCommands.setValue(val);
         return this;
     }
@@ -487,7 +498,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return postTransferCommands.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPostTransferCommands(final String val) {
+    public SOSBaseOptionsSuperClass setPostTransferCommands(final String val) {
         postTransferCommands.setValue(val);
         return this;
     }
@@ -660,7 +671,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return mergeOrderParameter.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMergeOrderParameter(final String val) {
+    public SOSBaseOptionsSuperClass setMergeOrderParameter(final String val) {
         mergeOrderParameter.setValue(val);
         return this;
     }
@@ -831,7 +842,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return maxFiles.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMaxFiles(final String val) {
+    public SOSBaseOptionsSuperClass setMaxFiles(final String val) {
         maxFiles.setValue(val);
         return this;
     }
@@ -844,7 +855,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return checkSteadyCount.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCheckSteadyCount(final String val) {
+    public SOSBaseOptionsSuperClass setCheckSteadyCount(final String val) {
         checkSteadyCount.setValue(val);
         return this;
     }
@@ -857,7 +868,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return checkSteadyStateInterval.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCheckSteadyStateInterval(final String val) {
+    public SOSBaseOptionsSuperClass setCheckSteadyStateInterval(final String val) {
         checkSteadyStateInterval.setValue(val);
         return this;
     }
@@ -870,7 +881,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return checkSteadyStateOfFiles.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCheckSteadyStateOfFiles(final String val) {
+    public SOSBaseOptionsSuperClass setCheckSteadyStateOfFiles(final String val) {
         checkSteadyStateOfFiles.setValue(val);
         return this;
     }
@@ -884,7 +895,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollErrorState.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollErrorState(final String val) {
+    public SOSBaseOptionsSuperClass setPollErrorState(final String val) {
         pollErrorState.setValue(val);
         return this;
     }
@@ -897,7 +908,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return steadyStateErrorState.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setSteadyStateErrorState(final String val) {
+    public SOSBaseOptionsSuperClass setSteadyStateErrorState(final String val) {
         steadyStateErrorState.setValue(val);
         return this;
     }
@@ -911,7 +922,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return makeDirs.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setMakeDirs(final String val) {
+    public SOSBaseOptionsSuperClass setMakeDirs(final String val) {
         makeDirs.setValue(val);
         return this;
     }
@@ -924,7 +935,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return fileListName.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setFileListName(final String val) {
+    public SOSBaseOptionsSuperClass setFileListName(final String val) {
         fileListName.setValue(val);
         return this;
     }
@@ -938,7 +949,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return createResultSet.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setCreateResultSet(final String val) {
+    public SOSBaseOptionsSuperClass setCreateResultSet(final String val) {
         createResultSet.setValue(val);
         return this;
     }
@@ -951,7 +962,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return resultSetFileName.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setResultSetFileName(final String val) {
+    public SOSBaseOptionsSuperClass setResultSetFileName(final String val) {
         resultSetFileName.setValue(val);
         return this;
     }
@@ -1976,7 +1987,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return waitingForLateComers.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setWaitingForLateComers(final String val) {
+    public SOSBaseOptionsSuperClass setWaitingForLateComers(final String val) {
         waitingForLateComers.setValue(val);
         return this;
     }
@@ -2003,7 +2014,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return pollingDuration.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setPollingDuration(final String val) {
+    public SOSBaseOptionsSuperClass setPollingDuration(final String val) {
         pollingDuration.setValue(val);
         return this;
     }
@@ -2241,7 +2252,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return restart.getValue();
     }
 
-    public SOSFtpOptionsSuperClass setRestart(final String val) {
+    public SOSBaseOptionsSuperClass setRestart(final String val) {
         restart.setValue(val);
         return this;
     }
@@ -2430,23 +2441,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionZeroByteTransfer zeroByteTransfer = new SOSOptionZeroByteTransfer(this, CLASS_NAME + ".zero_byte_transfer",
             "This parameter specifies whether zero byte files", "yes", "yes", false);
     public SOSOptionZeroByteTransfer transferZeroByteFiles = (SOSOptionZeroByteTransfer) zeroByteTransfer.setAlias("transfer_zero_byte_files");
-
-    @Override
-    public void setAllOptions(final HashMap<String, String> settings) {
-        if(LOGGER.isTraceEnabled()) {
-            LOGGER.trace("[setAllOptions]map");
-        }
-        super.setSettings(settings);
-    }
-
-    @Override
-    public void checkMandatory() throws com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing {
-        try {
-            super.checkMandatory();
-        } catch (Exception e) {
-            throw new JSExceptionMandatoryOptionMissing(e.toString());
-        }
-    }
 
     @Override
     public void commandLineArgs(final String[] args) {
