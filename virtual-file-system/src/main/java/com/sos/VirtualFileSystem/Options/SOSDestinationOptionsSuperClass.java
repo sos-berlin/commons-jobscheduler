@@ -29,12 +29,12 @@ import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@JSOptionClass(name = "SOSConnection2OptionsSuperClass", description = "SOSConnection2OptionsSuperClass")
+@JSOptionClass(name = "SOSDestinationOptionsSuperClass", description = "SOSDestinationOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements ISOSAuthenticationOptions, ISOSDataProviderOptions {
+public class SOSDestinationOptionsSuperClass extends JSOptionsClass implements ISOSAuthenticationOptions, ISOSDataProviderOptions {
 
     private static final long serialVersionUID = 1997338600688654140L;
-    private static final String CLASSNAME = "SOSConnection2OptionsSuperClass";
+    private static final String CLASSNAME = SOSDestinationOptionsSuperClass.class.getSimpleName();
 
     @JSOptionDefinition(name = "url", description = "the url for the connection", key = "url", type = "SOSOptionURL", mandatory = false)
     public SOSOptionUrl url = new SOSOptionUrl(this, CLASSNAME + ".url", "the url for the connection", "", "", false);
@@ -414,20 +414,20 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         passphrase = val;
     }
 
-    public SOSConnection2OptionsSuperClass() {
+    public SOSDestinationOptionsSuperClass() {
         objParentClass = this.getClass();
     }
-   
-    public SOSConnection2OptionsSuperClass(final HashMap<String, String> settings) throws Exception {
+
+    public SOSDestinationOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
         this.setSettings(settings);
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        //objSettings = settings;
-        //super.setAllOptions(settings);
-        //super.setSettings(objSettings);
+        // objSettings = settings;
+        // super.setAllOptions(settings);
+        // super.setSettings(objSettings);
         super.setSettings(settings);
     }
 

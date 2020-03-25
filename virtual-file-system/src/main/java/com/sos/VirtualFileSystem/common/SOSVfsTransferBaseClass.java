@@ -30,7 +30,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -40,7 +40,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
     private List<SOSFileEntry> directoryListing = null;
 
-    protected SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
+    protected SOSDestinationOptions destinationOptions = null;
     protected ISOSAuthenticationOptions authenticationOptions = null;
 
     protected String authenticationFilename = "";
@@ -71,7 +71,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public void reconnect(SOSConnection2OptionsAlternate options) {
+    public void reconnect(SOSDestinationOptions options) {
         if (!isConnected()) {
             try {
                 connect(options);
@@ -399,7 +399,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
+    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
         return this;
     }
 

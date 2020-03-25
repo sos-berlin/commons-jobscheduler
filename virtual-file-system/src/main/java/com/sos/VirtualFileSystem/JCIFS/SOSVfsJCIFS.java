@@ -21,7 +21,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -60,14 +60,14 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     @Override
     public ISOSConnection connect() {
-        connect(connection2OptionsAlternate);
+        connect(destinationOptions);
         return this;
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) {
-        connection2OptionsAlternate = options;
-        if (connection2OptionsAlternate == null) {
+    public ISOSConnection connect(final SOSDestinationOptions options) {
+        destinationOptions = options;
+        if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         return this;
@@ -77,9 +77,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            domain = connection2OptionsAlternate.domain.getValue();
-            host = connection2OptionsAlternate.host.getValue();
-            port = connection2OptionsAlternate.port.isDirty() ? connection2OptionsAlternate.port.value() : DEFAULT_PORT;
+            domain = destinationOptions.domain.getValue();
+            host = destinationOptions.host.getValue();
+            port = destinationOptions.port.isDirty() ? destinationOptions.port.value() : DEFAULT_PORT;
             userName = authenticationOptions.getUser().getValue();
             setLogPrefix();
             try {
@@ -120,8 +120,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     private Properties setConfigFromFiles(Properties properties) {
-        if (!SOSString.isEmpty(connection2OptionsAlternate.configuration_files.getValue())) {
-            String[] files = connection2OptionsAlternate.configuration_files.getValue().split(";");
+        if (!SOSString.isEmpty(destinationOptions.configuration_files.getValue())) {
+            String[] files = destinationOptions.configuration_files.getValue().split(";");
             for (int i = 0; i < files.length; i++) {
                 String file = files[i].trim();
                 LOGGER.info(String.format("%s[setConfigFromFiles][%s]", logPrefix, file));
@@ -554,8 +554,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         int exitCode = cmdShell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
-            if (connection2OptionsAlternate != null) {
-                raiseException = connection2OptionsAlternate.raiseExceptionOnError.value();
+            if (destinationOptions != null) {
+                raiseException = destinationOptions.raiseExceptionOnError.value();
             }
             if (raiseException) {
                 throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));

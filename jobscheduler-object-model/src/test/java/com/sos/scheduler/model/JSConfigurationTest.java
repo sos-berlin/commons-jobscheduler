@@ -10,7 +10,7 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.scheduler.model.objects.Spooler;
 
 /** @author oh */
@@ -20,7 +20,7 @@ public class JSConfigurationTest {
     private static SchedulerObjectFactory objFactory = null;
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
-    private SOSFTPOptions objOptions = null;
+    private SOSBaseOptions objOptions = null;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -39,7 +39,7 @@ public class JSConfigurationTest {
     }
 
     private final void prepareFtpVfs() {
-        objOptions = new SOSFTPOptions();
+        objOptions = new SOSBaseOptions();
         objOptions.host.setValue("galadriel.sos");
         objOptions.user.setValue("sos");
         objOptions.password.setValue("sos");

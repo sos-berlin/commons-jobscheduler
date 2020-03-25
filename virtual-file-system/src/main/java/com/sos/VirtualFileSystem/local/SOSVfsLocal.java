@@ -20,7 +20,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
@@ -36,7 +36,7 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
     private final InputStream inputStream = null;
     private final OutputStream outputStream = null;
-    private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
+    private SOSDestinationOptions destinationOptions = null;
     private CmdShell cmdShell = null;
     private boolean simulateShell = false;
 
@@ -96,8 +96,8 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
-        connection2OptionsAlternate = options;
+    public ISOSConnection connect(final SOSDestinationOptions options) throws Exception {
+        destinationOptions = options;
         return null;
     }
 
@@ -134,8 +134,8 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
         int exitCode = cmdShell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
-            if (connection2OptionsAlternate != null) {
-                raiseException = connection2OptionsAlternate.raiseExceptionOnError.value();
+            if (destinationOptions != null) {
+                raiseException = destinationOptions.raiseExceptionOnError.value();
             }
             if (raiseException) {
                 throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
@@ -365,7 +365,7 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void reconnect(SOSConnection2OptionsAlternate options) {
+    public void reconnect(SOSDestinationOptions options) {
         //
     }
 

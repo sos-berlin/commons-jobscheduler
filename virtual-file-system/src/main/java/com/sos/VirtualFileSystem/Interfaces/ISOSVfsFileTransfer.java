@@ -8,14 +8,14 @@ import java.util.Vector;
 
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 
 public interface ISOSVfsFileTransfer {
 
     public boolean isConnected();
 
-    public void reconnect(SOSConnection2OptionsAlternate options);
+    public void reconnect(SOSDestinationOptions options);
 
     public void logout() throws IOException;
 

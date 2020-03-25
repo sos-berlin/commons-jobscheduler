@@ -38,7 +38,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
                 client = new FTPClient();
             }
             setCommandListener(new SOSFtpClientLogger(getHostID("")));
-            if (getConnectionOptionsAlternate() != null && getConnectionOptionsAlternate().protocolCommandListener.isTrue()) {
+            if (getDestinationOptions() != null && getDestinationOptions().protocolCommandListener.isTrue()) {
                 client.addProtocolCommandListener(getCommandListener());
                 LOGGER.debug("ProtocolcommandListener added and activated");
             }

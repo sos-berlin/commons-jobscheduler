@@ -1,7 +1,7 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass.enuSourceOrTarget;
 
 public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
@@ -24,9 +24,9 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
 
     public void lock();
 
-    public SOSFTPOptions getOptions();
+    public SOSBaseOptions getOptions();
 
-    public void getOptions(final SOSFTPOptions options);
+    public void getOptions(final SOSBaseOptions options);
 
     public void release();
 

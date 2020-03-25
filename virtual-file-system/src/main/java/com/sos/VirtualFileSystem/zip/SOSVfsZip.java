@@ -35,7 +35,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
@@ -472,7 +472,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSDestinationOptions pobjConnectionOptions) throws Exception {
         return null;
     }
 
@@ -649,7 +649,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     }
 
     @Override
-    public void reconnect(SOSConnection2OptionsAlternate options) {
+    public void reconnect(SOSDestinationOptions options) {
         //
     }
 
