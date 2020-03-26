@@ -34,19 +34,6 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
     }
 
     @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        try {
-            InputStream is = this.getFileInputStream();
-            if (is == null) {
-                throw new Exception(SOSVfs_E_177.get());
-            }
-            return is.read(buffer, offset, length);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
-        }
-    }
-
-    @Override
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             if (getOutputStream() == null) {

@@ -37,22 +37,24 @@ import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSFileEntry.EntryType;
-import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.VirtualFileSystem.common.SOSVfsEnv;
+import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferHandler {
+public class SOSVfsFtpBaseClass extends SOSVfsMessageCodes implements ISOSTransferHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpBaseClass.class);
     private static final String CLASS_NAME = SOSVfsFtpBaseClass.class.getSimpleName();
 
+    private SOSBaseOptions baseOptions = null;
     private SOSDestinationOptions destinationOptions = null;
     private SOSFtpServerReply ftpReply = null;
     private SOSOptionTransferMode transferMode = null;
@@ -70,10 +72,23 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
-    private boolean simulateShell = false;
 
     public SOSVfsFtpBaseClass() {
-        super();
+        super("SOSVirtualFileSystem");
+    }
+
+    @Override
+    public boolean isConnected() {
+        boolean isConnected = false;
+        if (getClient().isConnected()) {
+            try {
+                getClient().sendCommand("NOOP");
+                isConnected = true;
+            } catch (IOException e) {
+                //
+            }
+        }
+        return isConnected;
     }
 
     @Override
@@ -127,25 +142,20 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         }
-
     }
 
-    protected void doConnect() {
-        try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(SOSVfs_D_0101.params(host, port));
-            }
+    @Override
+    public void reconnect(SOSDestinationOptions options) {
+        if (!isConnected()) {
+            try {
+                connect(options);
+                login(options);
 
-            if (!isConnected()) {
-                getClient().connect(host, port);
-                LOGGER.info(SOSVfs_D_0102.params(host, port));
-                logReply();
-                getClient().setControlKeepAliveTimeout(180);
-            } else {
-                LOGGER.warn(SOSVfs_D_0103.params(host, port));
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new JobSchedulerException(e);
             }
-        } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
     }
 
@@ -174,18 +184,22 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         }
     }
 
-    @Override
-    public void reconnect(SOSDestinationOptions options) {
-        if (!isConnected()) {
-            try {
-                connect(options);
-                login(options);
-
-            } catch (JobSchedulerException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new JobSchedulerException(e);
+    protected void doConnect() {
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(SOSVfs_D_0101.params(host, port));
             }
+
+            if (!isConnected()) {
+                getClient().connect(host, port);
+                LOGGER.info(SOSVfs_D_0102.params(host, port));
+                logReply();
+                getClient().setControlKeepAliveTimeout(180);
+            } else {
+                LOGGER.warn(SOSVfs_D_0103.params(host, port));
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
     }
 
@@ -353,26 +367,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         return getClient().cwd(directory);
     }
 
-    @Override
-    public boolean changeWorkingDirectory(final String pathname) {
-        final String method = CLASS_NAME + "::changeWorkingDirectory";
-        boolean result = true;
-        try {
-            String path = SOSVfsTransferBaseClass.normalizePath(pathname);
-            getClient().cwd(path);
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(SOSVfs_D_135.params(path, getReplyString(), "[directory exists]"));
-            }
-            result = getFtpReply().isSuccessCode();
-            if (result) {
-                setCurrentPath(path);
-            }
-        } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
-        }
-        return result;
-    }
-
     private int doCD(final String folderName) {
         int x = 0;
         try {
@@ -449,8 +443,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         sendCommand("NOOP");
     }
 
-    @Override
-    public final String doPWD() {
+    private final String doPWD() {
         final String method = CLASS_NAME + "::doPWD";
         try {
             if (LOGGER.isTraceEnabled()) {
@@ -536,53 +529,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     }
 
     @Override
-    public long getFile(final String remoteFile, final String localFile) {
-        return getFile(remoteFile, localFile, false);
-    }
-
-    @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) {
-        final String method = CLASS_NAME + "::getFile";
-        InputStream in = null;
-        OutputStream out = null;
-        long totalBytes = 0;
-        try {
-            in = getClient().retrieveFileStream(remoteFile);
-            if (in == null) {
-                throw new JobSchedulerException(SOSVfs_E_143.params(getReplyString()));
-            }
-            if (!isPositiveCommandCompletion()) {
-                throw new JobSchedulerException(SOSVfs_E_144.params("getFile()", remoteFile, getReplyString()));
-            }
-            byte[] buffer = new byte[4096];
-            out = new FileOutputStream(new File(localFile), append);
-            int bytes_read = 0;
-            synchronized (this) {
-                while ((bytes_read = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytes_read);
-                    out.flush();
-                    totalBytes += bytes_read;
-                }
-            }
-            closeInput(in);
-            closeObject(out);
-            completePendingCommand();
-            if (totalBytes > 0) {
-                return totalBytes;
-            } else {
-                return -1L;
-            }
-        } catch (JobSchedulerException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
-        } finally {
-            closeInput(in);
-            closeObject(out);
-        }
-    }
-
-    @Override
     public final boolean isDirectory(final String path) {
         boolean result = false;
         if (isNotHiddenFile(path)) {
@@ -637,7 +583,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     }
 
     @Override
-    public String getModificationTime(final String strFileName) {
+    public String getModificationDateTime(final String strFileName) {
         final String method = CLASS_NAME + "::getModificationTime";
         try {
             return getClient().getModificationTime(strFileName);
@@ -745,65 +691,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         } catch (IOException e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
         }
-    }
-
-    @Override
-    public void put(final String localFile, final String remoteFile) {
-        final String method = CLASS_NAME + "::put";
-        FileInputStream in = null;
-        boolean rc = false;
-        try {
-            in = new FileInputStream(localFile);
-            rc = getClient().storeFile(remoteFile, in);
-            if (!rc) {
-                throw new JobSchedulerException(SOSVfs_E_154.params("put"));
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
-        } finally {
-            closeInput(in);
-        }
-    }
-
-    @Override
-    public long putFile(final String localFile, final OutputStream out) {
-        final String method = CLASS_NAME + "::putFile";
-        if (out == null) {
-            throw new JobSchedulerException("OutputStream null value.");
-        }
-        FileInputStream in = null;
-        long totalBytes = 0;
-        try {
-            byte[] buffer = new byte[4096];
-            in = new FileInputStream(new File(localFile));
-            int bytes;
-            synchronized (this) {
-                while ((bytes = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytes);
-                    totalBytes += bytes;
-                }
-            }
-            closeInput(in);
-            closeObject(out);
-            completePendingCommand();
-            return totalBytes;
-        } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
-        } finally {
-            closeInput(in);
-            closeObject(out);
-        }
-    }
-
-    @Override
-    public long putFile(final String localFile, final String remoteFile) throws Exception {
-        OutputStream os = getClient().storeFileStream(remoteFile);
-        if (isNegativeCommandCompletion()) {
-            throw new JobSchedulerException(SOSVfs_E_144.params("storeFileStream()", remoteFile, getReplyString()));
-        }
-        long i = putFile(localFile, os);
-        LOGGER.debug(SOSVfs_D_146.params(localFile, remoteFile));
-        return i;
     }
 
     @Override
@@ -956,20 +843,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
     }
 
     @Override
-    public boolean isConnected() {
-        boolean isConnected = false;
-        if (getClient().isConnected()) {
-            try {
-                getClient().sendCommand("NOOP");
-                isConnected = true;
-            } catch (IOException e) {
-                //
-            }
-        }
-        return isConnected;
-    }
-
-    @Override
     public boolean isNegativeCommandCompletion() {
         int x = getClient().getReplyCode();
         return x > 300;
@@ -997,11 +870,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         return true;
     }
 
-    @Override
-    public boolean isLoggedin() {
-        return super.isLoggedin();
-    }
-
     public String getResponse() {
         return this.getReplyString();
     }
@@ -1025,16 +893,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
         return response.substring(4).trim();
     }
 
-    @Override
-    public void setConnected(final boolean val) {
-        super.setConnected(val);
-    }
-
-    @Override
-    public void setLogin(final boolean val) {
-        super.setLogin(val);
-    }
-
     public SOSOptionProxyProtocol getProxyProtocol() {
         return proxyProtocol;
     }
@@ -1053,16 +911,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
 
     public String getProxyPassword() {
         return proxyPassword;
-    }
-
-    @Override
-    public boolean isSimulateShell() {
-        return simulateShell;
-    }
-
-    @Override
-    public void setSimulateShell(boolean val) {
-        simulateShell = val;
     }
 
     public String getHost() {
@@ -1099,6 +947,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSTransferH
 
     public void setClient(FTPClient val) {
         ftpClient = val;
+    }
+
+    public SOSBaseOptions getBaseOptions() {
+        return baseOptions;
+    }
+
+    public void setBaseOptions(SOSBaseOptions val) {
+        baseOptions = val;
     }
 
     @Override

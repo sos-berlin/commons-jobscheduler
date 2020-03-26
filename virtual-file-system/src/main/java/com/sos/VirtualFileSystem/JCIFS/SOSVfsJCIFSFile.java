@@ -34,19 +34,6 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     }
 
     @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        try {
-            InputStream is = getFileInputStream();
-            if (is == null) {
-                throw new Exception(SOSVfs_E_177.get());
-            }
-            return is.read(buffer, offset, length);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_173.params("read", fileName), e);
-        }
-    }
-
-    @Override
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             OutputStream os = getFileOutputStream();
@@ -68,8 +55,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    @Override
-    public OutputStream getFileOutputStream() {
+    private OutputStream getFileOutputStream() {
         try {
             if (getOutputStream() == null) {
                 fileName = super.adjustRelativePathName(fileName);

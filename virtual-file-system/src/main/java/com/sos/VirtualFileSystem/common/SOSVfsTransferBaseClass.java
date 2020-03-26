@@ -1,7 +1,5 @@
 package com.sos.VirtualFileSystem.common;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,27 +16,55 @@ import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements ISOSTransferHandler {
+public abstract class SOSVfsTransferBaseClass extends SOSVfsMessageCodes implements ISOSTransferHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
-    private List<SOSFileEntry> directoryListing = null;
 
     protected SOSDestinationOptions destinationOptions = null;
     protected ISOSAuthenticationOptions authenticationOptions = null;
 
-    protected String authenticationFilename = "";
+    private List<SOSFileEntry> directoryListing = null;
+    private SOSBaseOptions baseOptions = null;
+
     protected String host = EMPTY_STRING;
     protected int port = 0;
     protected String userName = EMPTY_STRING;
     protected String reply = "OK";
-    protected String currentDirectory = "";
 
     public SOSVfsTransferBaseClass() {
-        super();
+        super("SOSVirtualFileSystem");
+    }
+
+    @Override
+    public boolean isConnected() {
+        return false;
+    }
+
+    @Override
+    public void connect(final SOSDestinationOptions options) throws Exception {
+    }
+
+    @Override
+    public void login(final ISOSAuthenticationOptions options) throws Exception {
+    }
+
+    @Override
+    public void reconnect(SOSDestinationOptions options) {
+        if (!isConnected()) {
+            try {
+                connect(options);
+                login(options);
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new JobSchedulerException(e);
+            }
+        }
     }
 
     @Override
@@ -58,17 +84,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public void reconnect(SOSDestinationOptions options) {
-        if (!isConnected()) {
-            try {
-                connect(options);
-                login(options);
-            } catch (JobSchedulerException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new JobSchedulerException(e);
-            }
-        }
+    public void disconnect() {
     }
 
     @Override
@@ -151,53 +167,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return list;
     }
 
-    @Override
-    public long getFile(final String remoteFile, final String localFile) {
-        try {
-            return getFile(remoteFile, localFile, false);
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
-        }
-        return 0;
-    }
-
-    @Override
-    public void put(final String localFile, final String remoteFile) {
-        putFile(localFile, remoteFile);
-    }
-
-    public long putFile(final String localFile, final OutputStream out) {
-        if (out == null) {
-            throw new JobSchedulerException(SOSVfs_E_147.get());
-        }
-        FileInputStream in = null;
-        long bytesWrittenTotal = 0;
-        try {
-            byte[] buffer = new byte[4096];
-            in = new FileInputStream(new File(localFile));
-            int bytesWritten;
-            synchronized (this) {
-                while ((bytesWritten = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesWritten);
-                    bytesWrittenTotal += bytesWritten;
-                }
-            }
-            closeInput(in);
-            closeObject(out);
-            return bytesWrittenTotal;
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_130.params("putFile()"), e);
-        } finally {
-            closeInput(in);
-            closeObject(out);
-        }
-    }
-
-    public int cd(final String directory) throws Exception {
-        changeWorkingDirectory(directory);
-        return 1;
-    }
-
     public static String normalizePath(String path) {
         return path.replaceAll("\\\\", "/");
     }
@@ -220,8 +189,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return "(" + userName + "@" + host + ":" + port + ") " + msg;
     }
 
-    @Override
-    public String doPWD() {
+    private String doPWD() {
         try {
             LOGGER.debug(SOSVfs_D_141.params("doPWD"));
             return this.getCurrentPath();
@@ -281,23 +249,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return reply;
     }
 
-    @Override
-    public void login(final ISOSAuthenticationOptions options) throws Exception {
-    }
-
-    @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
-    }
-
-    @Override
-    public boolean isConnected() {
-        return false;
-    }
-
-    @Override
-    public void disconnect() {
-    }
-
     protected boolean fileExists(final String filename) {
         return false;
     }
@@ -319,11 +270,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public abstract OutputStream getOutputStream(final String fileName, boolean append, boolean resume);
-
-    @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
-        return 0;
-    }
 
     protected String getCurrentPath() {
         return null;
@@ -350,12 +296,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public boolean changeWorkingDirectory(final String pathname) throws IOException {
-        LOGGER.info("not implemented yet");
-        return true;
-    }
-
-    @Override
     public void executeCommand(final String cmd) throws Exception {
         LOGGER.info("not implemented yet");
     }
@@ -377,7 +317,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     @Override
-    public String getModificationTime(final String fileName) {
+    public String getModificationDateTime(final String fileName) {
         LOGGER.info("not implemented yet");
         return null;
     }
@@ -388,10 +328,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return null;
     }
 
-    @Override
-    public long putFile(final String localFile, final String remoteFile) {
-        LOGGER.info("not implemented yet");
-        return 0;
+    public SOSBaseOptions getBaseOptions() {
+        return baseOptions;
+    }
+
+    public void setBaseOptions(SOSBaseOptions val) {
+        baseOptions = val;
     }
 
     @Override

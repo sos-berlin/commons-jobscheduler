@@ -1,8 +1,6 @@
 package com.sos.VirtualFileSystem.JCIFS;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,12 +47,16 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     private boolean isConnected = false;
     private String domain = null;
     private String currentDirectory = "";
-    private boolean simulateShell = false;
     private CmdShell cmdShell = null;
     private String logPrefix = null;
 
     public SOSVfsJCIFS() {
         super();
+    }
+
+    @Override
+    public boolean isConnected() {
+        return isConnected;
     }
 
     @Override
@@ -84,6 +86,28 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
+    }
+
+    @Override
+    public void logout() {
+        // do nothing
+    }
+
+    @Override
+    public void disconnect() {
+        reply = "OK";
+        if (context != null) {
+            try {
+                context.close();
+            } catch (CIFSException e) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("%s[disconnect]%s", logPrefix, e.toString()), e);
+                }
+            }
+            context = null;
+        }
+        isConnected = false;
+        LOGGER.info(String.format("%s[disconnect]%s", logPrefix, getReplyString()));
     }
 
     private void createContext(String domain, String host, int port, String user, String password) throws Exception {
@@ -137,33 +161,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             }
         }
         return properties;
-    }
-
-    @Override
-    public void logout() {
-        // do nothing
-    }
-
-    @Override
-    public void disconnect() {
-        reply = "OK";
-        if (context != null) {
-            try {
-                context.close();
-            } catch (CIFSException e) {
-                if (isDebugEnabled) {
-                    LOGGER.debug(String.format("%s[disconnect]%s", logPrefix, e.toString()), e);
-                }
-            }
-            context = null;
-        }
-        isConnected = false;
-        LOGGER.info(String.format("%s[disconnect]%s", logPrefix, getReplyString()));
-    }
-
-    @Override
-    public boolean isConnected() {
-        return isConnected;
     }
 
     @Override
@@ -366,107 +363,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) {
-        long fileSize = -1;
-
-        SmbFile smbFile = null;
-        SmbFileInputStream in = null;
-        FileOutputStream fos = null;
-        String remoteFilePath = normalizePath(remoteFile);
-        try {
-            fileSize = size(remoteFilePath);
-            smbFile = getSmbFile(remoteFilePath);
-
-            in = new SmbFileInputStream(smbFile);
-            fos = new FileOutputStream(localFile, append);
-            byte[] b = new byte[8192];
-            int n = 0;
-            while ((n = in.read(b)) > 0) {
-                fos.write(b, 0, n);
-            }
-            in.close();
-            in = null;
-            fos.flush();
-            fos.close();
-            fos = null;
-
-            File transferFile = new File(localFile);
-            if (!append && fileSize > 0 && fileSize != transferFile.length()) {
-                throw new JobSchedulerException(SOSVfs_E_162.params(fileSize, transferFile.length()));
-            }
-            fileSize = transferFile.length();
-            reply = "OK";
-            LOGGER.info(String.format("%s[getFile][%s][%s]%s", logPrefix, remoteFilePath, localFile, getReplyString()));
-
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(String.format("%s[getFile][%s][%s][failed]%s", logPrefix, remoteFilePath, localFile, ex.toString()), ex);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception ex) {
-                    //
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (Exception ex) {
-                    //
-                }
-            }
-            if (smbFile != null) {
-                smbFile.close();
-            }
-        }
-        return fileSize;
-    }
-
-    @Override
-    public long putFile(final String localFile, final String remoteFile) {
-        long size = 0;
-        SmbFile smbFile = null;
-        SmbFileOutputStream out = null;
-        FileInputStream in = null;
-        try {
-            smbFile = getSmbFile(normalizePath(remoteFile));
-            in = new FileInputStream(localFile);
-            out = new SmbFileOutputStream(smbFile);
-            byte[] b = new byte[8192];
-            int n = 0;
-            while ((n = in.read(b)) > 0) {
-                out.write(b, 0, n);
-            }
-            reply = "put OK";
-            LOGGER.info(String.format("%s[putFile][%s][%s]%s", logPrefix, localFile, smbFile.getPath(), getReplyString()));
-            size = size(normalizePath(remoteFile));
-        } catch (Exception e) {
-            reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[putFile][%s][%s][failed]%s", logPrefix, localFile, remoteFile, e.toString()), e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (smbFile != null) {
-                smbFile.close();
-            }
-        }
-        return size;
-    }
-
-    @Override
     public void delete(final String path, boolean checkIsDirectory) {
         SmbFile smbFile = null;
         try {
@@ -575,37 +471,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public boolean changeWorkingDirectory(final String path) {
-        SmbFile smbFile = null;
-        try {
-            if (isDebugEnabled) {
-                LOGGER.debug(String.format("%s[cwd]%s", logPrefix, path));
-            }
-            smbFile = getSmbFile(normalizePath(path));
-            if (!smbFile.exists()) {
-                reply = String.format("%s[cwd][%s]filepath does not exist", logPrefix, smbFile.getPath());
-                return false;
-            }
-            if (!smbFile.isDirectory()) {
-                reply = String.format("%s[cwd][%s]filepath is not a directory", logPrefix, smbFile.getPath());
-                return false;
-            }
-            currentDirectory = smbFile.getPath();
-            reply = "OK";
-        } catch (Exception ex) {
-            throw new JobSchedulerException(String.format("%s[cwd][%s][failed]%s", logPrefix, path, ex.toString()), ex);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
-            if (isDebugEnabled) {
-                LOGGER.debug(getReplyString());
-            }
-        }
-        return true;
-    }
-
-    @Override
     public ISOSVirtualFile getFileHandle(String fileName) {
         fileName = adjustFileSeparator(fileName);
         ISOSVirtualFile file = new SOSVfsJCIFSFile(fileName);
@@ -614,7 +479,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String getModificationTime(final String path) {
+    public String getModificationDateTime(final String path) {
         String dateTime = null;
         SmbFile smbFile = null;
         try {
@@ -694,13 +559,4 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         logPrefix = sb.toString();
     }
 
-    @Override
-    public boolean isSimulateShell() {
-        return simulateShell;
-    }
-
-    @Override
-    public void setSimulateShell(boolean val) {
-        simulateShell = val;
-    }
 }

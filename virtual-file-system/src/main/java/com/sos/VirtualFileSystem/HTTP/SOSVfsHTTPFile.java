@@ -34,19 +34,6 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
     }
 
     @Override
-    public int read(byte[] buffer, int offset, int len) {
-        try {
-            InputStream is = getFileInputStream();
-            if (is == null) {
-                throw new Exception(SOSVfs_E_177.get());
-            }
-            return is.read(buffer, offset, len);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_173.params("read", this.fileName), e);
-        }
-    }
-
-    @Override
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             if (getOutputStream() == null) {

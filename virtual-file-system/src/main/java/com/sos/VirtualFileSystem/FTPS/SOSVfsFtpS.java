@@ -25,6 +25,28 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpS.class);
 
     @Override
+    public void doConnect() {
+        try {
+            if (!isConnected()) {
+                super.doConnect();
+
+                FTPSClient client = (FTPSClient) super.getClient();
+                client.execPBSZ(0);
+                logReply();
+                client.execPROT("P");
+                logReply();
+                getClient().enterLocalPassiveMode();
+                logReply();
+            } else {
+                LOGGER.warn(SOSVfs_D_0102.params(getHost(), getPort()));
+            }
+        } catch (Exception e) {
+            String msg = getHostID("connect returns an exception");
+            LOGGER.error(msg, e);
+        }
+    }
+
+    @Override
     public FTPClient getClient() {
         if (super.getClient() == null) {
             FTPSClient client = null;
@@ -64,28 +86,6 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 
         }
         return super.getClient();
-    }
-
-    @Override
-    public void doConnect() {
-        try {
-            if (!isConnected()) {
-                super.doConnect();
-
-                FTPSClient client = (FTPSClient) super.getClient();
-                client.execPBSZ(0);
-                logReply();
-                client.execPROT("P");
-                logReply();
-                getClient().enterLocalPassiveMode();
-                logReply();
-            } else {
-                LOGGER.warn(SOSVfs_D_0102.params(getHost(), getPort()));
-            }
-        } catch (Exception e) {
-            String msg = getHostID("connect returns an exception");
-            LOGGER.error(msg, e);
-        }
     }
 
     private void setTrustManager(FTPSClient client) throws Exception {

@@ -1,8 +1,6 @@
 package com.sos.VirtualFileSystem.HTTP;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,7 +55,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
-    private boolean simulateShell = false;
     private int lastStatusCode = -1;
     private boolean raiseJobSchedulerException = true;
     private GetMethod lastInputStreamGetMethod = null;
@@ -66,6 +63,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         super();
         fileSizes = new HashMap<String, Long>();
         putMethods = new HashMap<String, PutMethod>();
+    }
+
+    @Override
+    public boolean isConnected() {
+        return httpClient != null && connectionManager != null;
     }
 
     @Override
@@ -85,14 +87,14 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     public void login(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            doAuthenticate(authenticationOptions);
+            doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
     }
-    
+
     @Override
     public void disconnect() {
         reply = "disconnect OK";
@@ -111,11 +113,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         LOGGER.info(reply);
     }
 
-    @Override
-    public boolean isConnected() {
-        return httpClient != null && connectionManager != null;
-    }
-
     private String normalizeHttpPath(String path) {
         if (!path.toLowerCase().startsWith("http://") && !path.toLowerCase().startsWith("https://")) {
             if (path.startsWith("http:/")) {
@@ -129,39 +126,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             path = httpClient.getHostConfiguration().getHostURL() + path;
         }
         return path;
-    }
-
-    @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) {
-        long fileSize = -1;
-        FileOutputStream outputStream = null;
-        try {
-            InputStream responseStream = getInputStream(remoteFile);
-            File local = new File(localFile);
-            outputStream = new FileOutputStream(local, append);
-            byte buffer[] = new byte[1000];
-            int numOfBytes = 0;
-            while ((numOfBytes = responseStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, numOfBytes);
-            }
-            fileSize = local.length();
-            reply = "get OK";
-            LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", remoteFile, localFile, getReplyString())));
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(SOSVfs_E_184.params("getFile", remoteFile, localFile), ex);
-        } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.flush();
-                    outputStream.close();
-                }
-            } catch (Exception e) {
-                //
-            }
-            resetLastInputStreamGetMethod();
-        }
-        return fileSize;
     }
 
     @Override
@@ -215,11 +179,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                 //
             }
         }
-    }
-
-    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
-        authenticationOptions = options;
-        doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
     }
 
     private void doConnect(final String phost, final int pport) {
@@ -404,8 +363,8 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     private ByteArrayOutputStream getOutputStream4Append(String path) throws Exception {
         // @TODO original Name
-        path = path.replace(getOptions().atomicPrefix.getValue(), "");
-        path = path.replace(getOptions().atomicSuffix.getValue(), "");
+        path = path.replace(getBaseOptions().atomicPrefix.getValue(), "");
+        path = path.replace(getBaseOptions().atomicSuffix.getValue(), "");
 
         InputStream source = null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -425,7 +384,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
         try {
             if (source != null) {
-                byte[] buffer = new byte[getOptions().bufferSize.value()];
+                byte[] buffer = new byte[getBaseOptions().bufferSize.value()];
                 int bytesTransferred;
                 while ((bytesTransferred = source.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesTransferred);
@@ -453,7 +412,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         try {
             PutMethod m = new PutMethod(uri);
             SOSVfsHTTPRequestEntity re = null;
-            if (getOptions().appendFiles.value()) {
+            if (append) {
                 re = new SOSVfsHTTPRequestEntity(getOutputStream4Append(path));
             } else {
                 re = new SOSVfsHTTPRequestEntity();
@@ -544,11 +503,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public boolean changeWorkingDirectory(String path) {
-        return true;
-    }
-
-    @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
         reply = "get OK";
         return new SOSFileEntry(EntryType.HTTP);// TODO
@@ -626,13 +580,4 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         }
     }
 
-    @Override
-    public boolean isSimulateShell() {
-        return simulateShell;
-    }
-
-    @Override
-    public void setSimulateShell(boolean val) {
-        simulateShell = val;
-    }
 }

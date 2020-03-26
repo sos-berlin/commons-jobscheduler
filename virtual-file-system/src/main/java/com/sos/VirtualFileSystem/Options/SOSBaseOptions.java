@@ -91,37 +91,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     };
 
-    public SOSBaseOptions(final TransferTypes type) {
-        super();
-        switch (type) {
-        case webdav:
-            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            getSource().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            getTarget().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            getSource().protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            getTarget().protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            getSource().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            getTarget().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            break;
-        case http:
-        case https:
-            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            getSource().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            getTarget().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
-            getSource().protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
-            getTarget().protocol.changeDefaults(TransferTypes.http.name(), TransferTypes.http.name());
-            port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            getSource().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            getTarget().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            break;
-        default:
-            break;
-        }
-    }
-
     public SOSBaseOptions(final TransferTypes source, final TransferTypes target) {
         super();
         switch (source) {
@@ -210,44 +179,12 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     }
 
-    public void adjustDefaults() {
-        if (operation.getValue().equalsIgnoreCase(enuJadeOperations.move.getText())) {
-            removeFiles.value(true);
-            removeFiles.setProtected(operation.isProtected());
-        }
-        if (transactionMode.isTrue() && !isAtomicTransfer()) {
-            atomicSuffix.setValue("~");
-        }
-        if (operation.getValue().equalsIgnoreCase(enuJadeOperations.getlist.getText())) {
-            removeFiles.value(false);
-        }
-        String localDir = this.localDir.getValue();
-        if (isEmpty(localDir)) {
-            this.localDir.set(sourceDir);
-            localDir = this.localDir.getValue();
-        }
-        checkReplaceAndReplacing(getTarget());
-        checkReplaceAndReplacing(getSource());
-        if (replacing.isNotEmpty() && replacement.isNull()) {
-            replacement.setValue("");
-        }
-        if (this.getTarget().protocol.isDirty() && !protocol.isDirty()) {
-            protocol.set(getTarget().protocol);
-        }
-        setDefaultHostPort(protocol, port, host);
-        setDefaultHostPort(getSource().protocol, getSource().port, getSource().host);
-        setDefaultHostPort(getTarget().protocol, getTarget().port, getTarget().host);
-        setDefaultHostPort(getSource().getAlternatives().protocol, getSource().getAlternatives().port, getSource().getAlternatives().host);
-        setDefaultHostPort(getTarget().getAlternatives().protocol, getTarget().getAlternatives().port, getTarget().getAlternatives().host);
-        getDataSourceType();
-        getDataTargetType();
-    }
-
     @Override
     public void checkMandatory() {
         if (checkMandatoryDone) {
             return;
         }
+        LOGGER.info("AAAAAAA");
         operation.checkMandatory();
         if (operation.getValue().equalsIgnoreCase(enuJadeOperations.move.getText())) {
             removeFiles.value(true);
@@ -510,18 +447,16 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public void setAllOptionsOnJob(HashMap<String, String> params) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("settingsFileProcessed=%s, readSettingsFileIsActive=%s", settingsFileProcessed, readSettingsFileIsActive));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("settingsFileProcessed=%s, readSettingsFileIsActive=%s", settingsFileProcessed, readSettingsFileIsActive));
         }
         if (!settingsFileProcessed && !readSettingsFileIsActive && params.containsKey("settings") && params.containsKey("profile")) {
-            Map<String, String> mapFromIniFile = new HashMap<String, String>();
             settings.setValue(params.get("settings"));
             profile.setValue(params.get("profile"));
             readSettingsFileIsActive = true;
-            mapFromIniFile = readSettingsFile(params);
+            params.putAll(readSettingsFile(params));
             readSettingsFileIsActive = false;
             settingsFileProcessed = true;
-            params.putAll(mapFromIniFile);
         }
         handleFileOrderSource(params);
 
@@ -647,8 +582,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
                 }
                 result.put(key, value);
             }
-            // super.setAllOptions(map);
-            // setChildClasses(map);
         } catch (JobSchedulerException e) {
             LOGGER.error("ReadSettingsFile(): " + e.toString(), e);
             throw e;
@@ -711,15 +644,15 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return value.replaceAll("\\\\((?:\\$|%)\\{[^/\\}\\\\]+\\})", "$1").replaceAll("\\\\(%[^/%\\\\]+%)", "$1");
     }
 
-    public boolean isIncludeDirective(final String includeDirective) {
+    private boolean isIncludeDirective(final String includeDirective) {
         return includeDirectives.containsKey(includeDirective);
     }
 
-    public String getIncludePrefix(final String includeDirective) {
+    private String getIncludePrefix(final String includeDirective) {
         return includeDirectives.get(includeDirective);
     }
 
-    public String substituteVariables(String txt, final Properties prop) {
+    private String substituteVariables(String txt, final Properties prop) {
         Map<String, String> startEndCharsForSubstitute = new HashMap<String, String>();
         startEndCharsForSubstitute.put("${", "}");
         startEndCharsForSubstitute.put("%{", "}");
@@ -730,7 +663,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return txt;
     }
 
-    public String substituteVariables(String txt, final Properties prop, final String startPrefix, final String endPrefix) {
+    private String substituteVariables(String txt, final Properties prop, final String startPrefix, final String endPrefix) {
         try {
             for (Object k : prop.keySet()) {
                 String key = (String) k;
@@ -759,7 +692,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     }
 
-    protected URI createURI(final String fileName) {
+    private URI createURI(final String fileName) {
         URI uri = null;
         try {
             uri = new URI(fileName);
@@ -994,36 +927,12 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return result;
     }
 
-    public SOSBaseOptions getClone() {
-        SOSBaseOptions options = new SOSBaseOptions();
-        options.commandLineArgs(getOptionsAsCommandLine());
-        return options;
-    }
-
-    public void clearJumpParameter() {
-        String nullString = null;
-        jumpUser.setValue(nullString);
-        jumpPassword.setValue(nullString);
-        jumpProtocol.setValue(nullString);
-        jumpHost.setValue(nullString);
-        jumpSshAuthMethod.setValue(nullString);
-        jumpCommand.setValue(nullString);
-        host.setValue(nullString);
-    }
-
     public boolean isFilePollingEnabled() {
         boolean result = false;
         if ((pollTimeout.isDirty() || pollingDuration.isDirty()) && skipTransfer.isFalse()) {
             result = true;
         }
         return result;
-    }
-
-    public String dirtyString() {
-        StringBuilder sb = new StringBuilder("\n").append(super.dirtyString());
-        sb.append("\n").append(getSource().dirtyString());
-        sb.append("\n").append(getTarget().dirtyString());
-        return sb.toString();
     }
 
     @Override
@@ -1062,19 +971,19 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public void setOriginalSettingsFile(String val) {
-        this.originalSettingsFile = val;
+        originalSettingsFile = val;
     }
 
     public String getOriginalSettingsFile() {
-        return this.originalSettingsFile;
+        return originalSettingsFile;
     }
 
     public void setDeleteSettingsFileOnExit(boolean val) {
-        this.deleteSettingsFileOnExit = val;
+        deleteSettingsFileOnExit = val;
     }
 
     public boolean getDeleteSettingsFileOnExit() {
-        return this.deleteSettingsFileOnExit;
+        return deleteSettingsFileOnExit;
     }
 
     public String getJobSchedulerId() {

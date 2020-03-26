@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -87,56 +86,17 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
         }
         return sb.toString();
     }
-
+    
     @Override
-    public void string2File(final String content) {
-        OutputStream os = null;
-        try {
-            os = this.getFileOutputStream();
-            os.write(content.getBytes());
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_130.get("String2File"), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    @Override
-    public void putFile(final File file) throws Exception {
+    public InputStream getFileInputStream() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void putFile(final String path) throws Exception {
-        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
     public long getFileSize() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public Integer getFilePermissions() throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getModificationTime() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setFilePermissions(final Integer val) throws Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -152,30 +112,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public boolean notExists() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isEmptyFile() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public OutputStream getFileOutputStream() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public InputStream getFileInputStream() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean delete(boolean checkIsDirectory) {
         // TODO Auto-generated method stub
         return false;
@@ -184,18 +120,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     @Override
     public void rename(final String newPath) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getParentVfs() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ISOSVirtualFile getParentVfsFile() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -221,22 +145,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void close() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void flush() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void closeInput() {
         // TODO Auto-generated method stub
     }
@@ -244,16 +152,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     @Override
     public void closeOutput() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void deleteFile() {
-        this.delete(true);
-    }
-
-    @Override
-    public ISOSVirtualFile getFile() {
-        return this;
     }
 
     @Override
@@ -272,11 +170,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
 
     public boolean isModeRestart() {
         return modeRestart;
-    }
-
-    @Override
-    public void setModeOverwrite(final boolean val) {
-
     }
 
 }
