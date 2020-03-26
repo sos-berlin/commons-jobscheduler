@@ -38,7 +38,7 @@ public class SOSVfsConnectionFactory {
             if (options.concurrentTransfer.isTrue()) {
                 intMaxParallelTransfers = options.maxConcurrentTransfers.value() + 1;
             }
-            if (source == null || options.reuseConnection.isFalse()) {
+            if (source == null) {
                 LOGGER.debug("create connection pool");
                 source = new SOSVfsConnectionPool();
                 target = new SOSVfsConnectionPool();
@@ -72,7 +72,7 @@ public class SOSVfsConnectionFactory {
                 handleOptions(destinationOptions, isSource);
                 client.setBaseOptions(options);
                 client.connect(destinationOptions);
-                client.login(destinationOptions);
+                client.login();
             } catch (Exception e) {
                 SOSDestinationOptions alternatives = destinationOptions.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
@@ -88,7 +88,7 @@ public class SOSVfsConnectionFactory {
                     client = VFSFactory.getHandler(alternatives.protocol.getValue());
                     handleOptions(alternatives, isSource);
                     client.connect(alternatives);
-                    client.login(alternatives);
+                    client.login();
                     destinationOptions.alternateOptionsUsed.value(true);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);

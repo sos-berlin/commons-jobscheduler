@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
@@ -26,14 +25,13 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsMessageCodes impleme
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTransferBaseClass.class);
 
     protected SOSDestinationOptions destinationOptions = null;
-    protected ISOSAuthenticationOptions authenticationOptions = null;
 
     private List<SOSFileEntry> directoryListing = null;
     private SOSBaseOptions baseOptions = null;
 
+    protected String user = EMPTY_STRING;
     protected String host = EMPTY_STRING;
     protected int port = 0;
-    protected String userName = EMPTY_STRING;
     protected String reply = "OK";
 
     public SOSVfsTransferBaseClass() {
@@ -47,10 +45,21 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsMessageCodes impleme
 
     @Override
     public void connect(final SOSDestinationOptions options) throws Exception {
+        if (options == null) {
+            throw new Exception("destinationOptions is null");
+        }
+        destinationOptions = options;
+
+        user = destinationOptions.user.getValue();
+        host = destinationOptions.host.getValue();
+        port = destinationOptions.port.value();
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) throws Exception {
+    public void login() throws Exception {
+        if (destinationOptions == null) {
+            throw new Exception("destinationOptions is null");
+        }
     }
 
     @Override
@@ -58,7 +67,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsMessageCodes impleme
         if (!isConnected()) {
             try {
                 connect(options);
-                login(options);
+                login();
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
@@ -186,7 +195,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsMessageCodes impleme
     }
 
     protected String getHostID(final String msg) {
-        return "(" + userName + "@" + host + ":" + port + ") " + msg;
+        return "(" + user + "@" + host + ":" + port + ") " + msg;
     }
 
     private String doPWD() {

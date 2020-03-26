@@ -345,7 +345,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
             handler.connect(handlerOptions);
-            handler.login(handlerOptions);
+            handler.login();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("handler connection established");
             }

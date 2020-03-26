@@ -13,7 +13,7 @@ public interface ISOSTransferHandler extends ISOSShell {
 
     public void connect(SOSDestinationOptions options) throws Exception;
 
-    public void login(ISOSAuthenticationOptions options) throws Exception;
+    public void login() throws Exception;
 
     public void reconnect(SOSDestinationOptions options);
 

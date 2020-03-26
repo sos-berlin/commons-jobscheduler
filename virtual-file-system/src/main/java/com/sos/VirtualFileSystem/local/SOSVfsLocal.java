@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -41,7 +40,7 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) throws Exception {
+    public void login() throws Exception {
         reply = "Login successful";
     }
 

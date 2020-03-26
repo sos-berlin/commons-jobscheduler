@@ -34,7 +34,6 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
@@ -110,13 +109,16 @@ public class SOSVfsFtpBaseClass extends SOSVfsMessageCodes implements ISOSTransf
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) throws Exception {
-        user = options.getUser().getValue();
+    public void login() throws Exception {
+        if (destinationOptions == null) {
+            throw new Exception("destinationOptions is null");
+        }
+        user = destinationOptions.user.getValue();
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(SOSVfs_D_132.params(user));
             }
-            getClient().login(user, options.getPassword().getValue());
+            getClient().login(user, destinationOptions.password.getValue());
             logReply();
             if (ftpReply.isSuccessCode()) {
                 commandListener.setClientId(getHostID(""));
@@ -149,7 +151,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsMessageCodes implements ISOSTransf
         if (!isConnected()) {
             try {
                 connect(options);
-                login(options);
+                login();
 
             } catch (JobSchedulerException e) {
                 throw e;

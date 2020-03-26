@@ -35,12 +35,9 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) {
-        destinationOptions = options;
-        if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
-        }
-        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
+    public void connect(final SOSDestinationOptions options) throws Exception {
+        super.connect(options);
+        doConnect();
     }
 
     @Override
@@ -54,23 +51,17 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         }
     }
 
-    private void doConnect(final String host, final int port) {
-        if (!this.isConnected()) {
-            try {
-                this.port = port;
-                this.host = host;
-                if (host.toLowerCase().startsWith("tcp://")) {
-                    URL url = new URL(host);
-                    this.port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
-                    this.host = url.getHost();
-                }
-                LOGGER.info(SOSVfs_D_0101.params(host, port));
-                this.logReply();
-            } catch (Exception ex) {
-                throw new JobSchedulerException(ex);
+    private void doConnect() {
+        try {
+            if (host.toLowerCase().startsWith("tcp://")) {
+                URL url = new URL(host);
+                port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
+                host = url.getHost();
             }
-        } else {
-            LOGGER.warn(SOSVfs_D_0103.params(host, port));
+            LOGGER.info(SOSVfs_D_0101.params(host, port));
+            this.logReply();
+        } catch (Exception ex) {
+            throw new JobSchedulerException(ex);
         }
     }
 

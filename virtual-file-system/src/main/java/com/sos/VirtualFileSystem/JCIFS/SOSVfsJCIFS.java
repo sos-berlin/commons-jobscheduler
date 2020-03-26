@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -45,7 +44,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     private static final int DEFAULT_PORT = 445;
     private CIFSContext context = null;
     private boolean isConnected = false;
+
     private String domain = null;
+
     private String currentDirectory = "";
     private CmdShell cmdShell = null;
     private String logPrefix = null;
@@ -60,24 +61,19 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) {
-        destinationOptions = options;
-        if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
-        }
+    public void connect(final SOSDestinationOptions options) throws Exception {
+        super.connect(options);
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) {
-        authenticationOptions = options;
+    public void login() throws Exception {
+        super.login();
         try {
             domain = destinationOptions.domain.getValue();
-            host = destinationOptions.host.getValue();
-            port = destinationOptions.port.isDirty() ? destinationOptions.port.value() : DEFAULT_PORT;
-            userName = authenticationOptions.getUser().getValue();
+            port = destinationOptions.port.isDirty() ? port : DEFAULT_PORT;
             setLogPrefix();
             try {
-                createContext(domain, host, port, userName, authenticationOptions.getPassword().getValue());
+                createContext(domain, host, port, user, destinationOptions.password.getValue());
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
@@ -555,7 +551,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         if (!SOSString.isEmpty(domain)) {
             sb.append("[").append(domain).append("]");
         }
-        sb.append("[").append(userName).append("@").append(host).append(":").append(port).append("]");
+        sb.append("[").append(user).append("@").append(host).append(":").append(port).append("]");
         logPrefix = sb.toString();
     }
 
