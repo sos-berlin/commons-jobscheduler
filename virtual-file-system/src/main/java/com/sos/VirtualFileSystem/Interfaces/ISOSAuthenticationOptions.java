@@ -1,7 +1,6 @@
 package com.sos.VirtualFileSystem.Interfaces;
 
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionUserName;
@@ -11,10 +10,6 @@ public interface ISOSAuthenticationOptions {
     public abstract SOSOptionInFileName getAuthFile();
 
     public abstract void setAuthFile(SOSOptionInFileName authFile);
-
-    public abstract void setUseKeyAgent(SOSOptionBoolean keyAgent);
-
-    public abstract SOSOptionBoolean isUseKeyAgent();
 
     public abstract SOSOptionAuthenticationMethod getAuthMethod();
 

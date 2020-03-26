@@ -12,14 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod.enuAuthenticationMethods;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
-import com.sos.JSHelper.Options.SOSOptionRegExp;
-import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
@@ -46,8 +43,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private static final String PREFIX_SCHEDULER_ENV_VAR = "scheduler_param_";
     private static final String PREFIX_SOSFTP_ENV_VAR = "sosftp_";
     private static final String FILE_SEPARATOR = "file.separator";
-    private static final String OPERATION_RECEIVE = "receive";
-    private static final String OPERATION_SEND = "send";
     private SOSTransferOptions transferOptions;
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
@@ -95,9 +90,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         super();
         switch (source) {
         case webdav:
-            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         default:
             break;
@@ -195,8 +188,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         if (operation.getValue().equalsIgnoreCase(enuJadeOperations.getlist.getText())) {
             removeFiles.setFalse();
         }
-        checkURLParameter(getTransferOptions().getSource());
-        checkURLParameter(getTransferOptions().getTarget());
         String localDir = this.localDir.getValue();
         if (isEmpty(localDir)) {
             this.localDir.setValue(sourceDir.getValue());
@@ -249,7 +240,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         if (this.getTarget().protocol.isDirty() && !protocol.isDirty()) {
             protocol.setValue(getTarget().protocol.getValue());
         }
-        setDefaultHostPort(protocol, port, host);
         setDefaultHostPort(getSource().protocol, getSource().port, getSource().host);
         setDefaultHostPort(getTarget().protocol, getTarget().port, getTarget().host);
         setDefaultHostPort(getSource().getAlternatives().protocol, getSource().getAlternatives().port, getSource().getAlternatives().host);
@@ -298,12 +288,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     }
 
-    private void checkURLParameter(final SOSDestinationOptions options) {
-        if (options.url.isDirty()) {
-            options.url.getOptions(options);
-        }
-    }
-
     private void setDefaultAuth(final SOSOptionTransferType type, final SOSDestinationOptions options) {
         TransferTypes transferType = type.getEnum();
         if ((type.isHTTP() || transferType.equals(TransferTypes.webdav)) && !options.authMethod.isDirty() && !options.sshAuthMethod.isDirty()) {
@@ -313,8 +297,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         if (transferType.equals(TransferTypes.local)) {
             options.user.setValue(System.getProperty("user.name"));
             options.user.setNotDirty();
-            user.setValue(System.getProperty("user.name"));
-            user.setNotDirty();
         }
     }
 
@@ -368,7 +350,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return sb.toString();
     }
 
-    @Override
     public boolean isAtomicTransfer() {
         return atomicPrefix.isNotEmpty() || atomicSuffix.isNotEmpty();
     }
@@ -729,136 +710,25 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public String getDataTargetType() {
-        String targetType = "";
-        if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
-            targetType = protocol.getValue();
-            if (targetType.isEmpty()) {
-                targetType = TransferTypes.local.name();
-            }
-            copyValue(sourceDir, localDir);
-            copyValue(targetDir, remoteDir);
-            copyValue(getSource().directory, localDir);
-            copyValue(getTarget().directory, remoteDir);
-            changeOptions(getTransferOptions().getTarget());
-        } else if (OPERATION_RECEIVE.equalsIgnoreCase(operation.getValue())) {
+        String targetType = getTransferOptions().getTarget().protocol.getValue();
+        if (targetType.isEmpty()) {
             targetType = TransferTypes.local.name();
-            copyValue(sourceDir, remoteDir);
-            copyValue(targetDir, localDir);
-            copyValue(getSource().directory, remoteDir);
-            copyValue(getTarget().directory, localDir);
-            changeOptions2Local(getTransferOptions().getTarget());
-        } else {
-            targetType = getTransferOptions().getTarget().protocol.getValue();
-            if (targetType.isEmpty()) {
-                targetType = TransferTypes.local.name();
-            }
-            changeDirValues();
         }
+        changeDirValues();
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[target]%s", targetType));
         }
         return targetType;
     }
 
-    private void changeOptions(final SOSDestinationOptions options) {
-        options.host.set(host);
-        LOGGER.debug("prefix_host = " + options.host.getValue());
-        options.user.setValue(user.getValue());
-        options.password.set(password);
-        options.port.set(port);
-        options.protocol.set(protocol);
-        options.passiveMode.set(passiveMode);
-        options.transferMode.set(transferMode);
-        options.sshAuthFile.setIfNotDirty(sshAuthFile);
-        options.sshAuthMethod.setIfNotDirty(sshAuthMethod);
-
-        SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
-        alternate.host.setValue(alternativeHost.getValue());
-        alternate.port.value(alternativePort.value());
-        alternate.protocol.setValue(protocol.getValue());
-        alternate.passiveMode.setValue(alternativePassiveMode.getValue());
-        alternate.transferMode.setValue(alternativeTransferMode.getValue());
-    }
-
-    private void changeOptions2Local(final SOSDestinationOptions options) {
-        options.host.setValue(SOSOptionHostName.getLocalHost());
-        options.user.setValue("");
-        options.password.setValue("");
-        options.port.value(0);
-        options.protocol.setValue("local");
-        options.passiveMode.setValue("");
-        options.transferMode.setValue("");
-
-        SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
-        alternate.host.setValue(options.host.getValue());
-        alternate.port.value(0);
-        alternate.protocol.setValue("local");
-        alternate.passiveMode.setValue("");
-        alternate.transferMode.setValue("");
-    }
-
-    private void copyValue(final SOSOptionElement to, final SOSOptionElement from) {
-        if (to.isNotDirty()) {
-            to.setValue(from.getValue());
-        }
-    }
-
     public String getDataSourceType() {
-        String sourceType = "";
-        if (OPERATION_SEND.equalsIgnoreCase(operation.getValue())) {
+        String sourceType = getTransferOptions().getSource().protocol.getValue();
+        if (sourceType.isEmpty()) {
             sourceType = TransferTypes.local.name();
-            changeDirValues();
-            SOSDestinationOptions options = getTransferOptions().getSource();
-            options.host.setValue(SOSOptionHostName.getLocalHost());
-            options.port.value(0);
-            options.protocol.setValue(sourceType);
-            options = getTransferOptions().getTarget();
-            options.host = host;
-            options.port = port;
-            options.protocol = protocol;
-            options.user = user;
-            options.password = password;
-            options.sshAuthFile = sshAuthFile;
-            options.sshAuthMethod = sshAuthMethod;
-            options.passiveMode = passiveMode;
-
-            SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
-            alternate.host.setValue(alternativeHost.getValue());
-            alternate.port.value(alternativePort.value());
-            alternate.protocol.setValue(protocol.getValue());
-            alternate.passiveMode.setValue(alternativePassiveMode.getValue());
-        } else if (OPERATION_RECEIVE.equalsIgnoreCase(operation.getValue())) {
-            sourceType = protocol.getValue();
-            if (sourceType.isEmpty()) {
-                sourceType = TransferTypes.local.name();
-            }
-            changeDirValues4Receive();
-            SOSDestinationOptions options = getTransferOptions().getSource();
-            options.host.setValue(host.getValue());
-            options.port.value(port.value());
-            options.protocol.setValue(protocol.getValue());
-            options.passiveMode.setValue(passiveMode.getValue());
-            options.user = user;
-            options.password = password;
-            options.sshAuthFile = sshAuthFile;
-            options.sshAuthMethod = sshAuthMethod;
-            options = getTransferOptions().getTarget();
-            options.host.setValue(SOSOptionHostName.getLocalHost());
-            options.port.value(0);
-            options.protocol.setValue(TransferTypes.local.name());
-
-            SOSDestinationOptionsSuperClass alternate = options.getAlternatives();
-            alternate.host.setValue(alternativeHost.getValue());
-            alternate.port.value(alternativePort.value());
-            alternate.protocol.setValue(protocol.getValue());
-            alternate.passiveMode.setValue(alternativePassiveMode.getValue());
-        } else {
-            sourceType = getTransferOptions().getSource().protocol.getValue();
-            if (sourceType.isEmpty()) {
-                sourceType = TransferTypes.local.name();
-            }
-            changeDirValues();
         }
+        changeDirValues();
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[source]%s", sourceType));
         }
@@ -872,11 +742,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         changeValue(remoteDir, targetDir);
         changeValue(getSource().folderName, sourceDir);
         changeValue(getTarget().folderName, targetDir);
-    }
-
-    private void changeDirValues4Receive() {
-        changeValue(sourceDir, remoteDir);
-        changeValue(targetDir, localDir);
     }
 
     private void changeValue(final SOSOptionElement target, final SOSOptionElement source) {
@@ -902,7 +767,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public boolean isReplaceReplacingInEffect() {
-        return this.getReplacing().isNotEmpty();
+        return this.replacing.isNotEmpty();
     }
 
     public SOSDestinationOptions getSource() {
@@ -933,29 +798,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             result = true;
         }
         return result;
-    }
-
-    @Override
-    public SOSOptionRegExp getReplacing() {
-        SOSOptionRegExp val = super.getReplacing();
-        if (getTarget().getReplacing().isDirty()) {
-            val = getTarget().getReplacing();
-        }
-        return val;
-    }
-
-    @Override
-    public SOSOptionString getReplacement() {
-        SOSOptionString val = super.getReplacement();
-        if (getTarget().getReplacement().isDirty()) {
-            val = getTarget().getReplacement();
-        }
-        return val;
-    }
-
-    @Override
-    public SOSOptionBoolean getRaiseExceptionOnError() {
-        return super.getRaiseExceptionOnError();
     }
 
     public Map<String, String> getDmzOptions() {
@@ -1040,16 +882,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
     public void setParentTransferId(Long val) {
         parentTransferId = val;
-    }
-
-    @Override
-    public void setUseKeyAgent(SOSOptionBoolean val) {
-
-    }
-
-    @Override
-    public SOSOptionBoolean isUseKeyAgent() {
-        return null;
     }
 
     public boolean getCumulativeTargetDeleted() {

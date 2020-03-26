@@ -20,11 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.interfaces.ISOSTransferOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.Options.SOSTransferOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -485,10 +485,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         parent.setLastErrorMessage(msg.toString());
     }
 
-    private void executeCommands(final String commandOptionName, final ISOSTransferHandler fileTransfer, final SOSOptionString optionCommands) {
-        executeCommands(commandOptionName, fileTransfer, optionCommands, null, null);
-    }
-
     private void executeCommands(final String commandOptionName, final ISOSTransferHandler fileTransfer, final SOSOptionString optionCommands,
             final SOSOptionString optionCommandDelimiter) {
         executeCommands(commandOptionName, fileTransfer, optionCommands, optionCommandDelimiter, null);
@@ -555,7 +551,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             executeCommands("alternative_target_tfn_post_command", parent.getTargetClient(), target.getAlternatives().tfnPostCommand, target
                     .getAlternatives().commandDelimiter);
         } else {
-            executeCommands("tfn_post_command", parent.getTargetClient(), parent.getOptions().tfnPostCommand);
             executeCommands("target_tfn_post_command", parent.getTargetClient(), target.tfnPostCommand, target.commandDelimiter);
         }
         SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
@@ -586,12 +581,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         .getAlternatives().commandDelimiter, envs);
             }
         } else {
-            if (!isTransferred && parent.getOptions().post_command_disable_for_skipped_transfer.value()) {
-                LOGGER.info(String.format("[%s][post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber, status));
-            } else {
-                executeCommands("post_command", parent.getTargetClient(), parent.getOptions().postCommand, target.commandDelimiter, envs);
-            }
-            if (!isTransferred && target.post_command_disable_for_skipped_transfer.value()) {
+            if (!isTransferred && (parent.getOptions().post_command_disable_for_skipped_transfer.value()
+                    || target.post_command_disable_for_skipped_transfer.value())) {
                 LOGGER.info(String.format("[%s][target_post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber, status));
             } else {
                 executeCommands("target_post_command", parent.getTargetClient(), target.postCommand, target.commandDelimiter, envs);
@@ -629,15 +620,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             }
         } else {
             if (isSkipped) {
-                if (parent.getOptions().pre_command_enable_for_skipped_transfer.value()) {
-                    executeCommands("pre_command enable_for_skipped_transfer=true", parent.getTargetClient(), parent.getOptions().preCommand);
-                }
-                if (target.pre_command_enable_for_skipped_transfer.value()) {
+                if (parent.getOptions().pre_command_enable_for_skipped_transfer.value() || target.pre_command_enable_for_skipped_transfer.value()) {
                     executeCommands("target_pre_command enable_for_skipped_transfer=true", parent.getTargetClient(), target.preCommand,
                             target.commandDelimiter);
                 }
             } else {
-                executeCommands("pre_command", parent.getTargetClient(), parent.getOptions().preCommand);
                 executeCommands("target_pre_command", parent.getTargetClient(), target.preCommand, target.commandDelimiter);
             }
         }
@@ -794,9 +781,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         } else {
             targetFileName = getFileNameWithoutPath(targetFileName);
             targetTransferFileName = targetFileName;
-            if (parent.getOptions().getReplacing().isNotEmpty()) {
+            if (parent.getOptions().replacing.isNotEmpty()) {
                 try {
-                    targetFileName = parent.getOptions().getReplacing().doReplace(targetFileName, parent.getOptions().getReplacement().getValue());
+                    targetFileName = parent.getOptions().replacing.doReplace(targetFileName, parent.getOptions().replacement.getValue());
                 } catch (Exception e) {
                     throw new JobSchedulerException(SOSVfs_E_0150.get() + " " + e.toString(), e);
                 }
@@ -807,7 +794,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         }
         if (recursive) {
             String sourceDir = getPathWithoutFileName(sourceFile.getName());
-            String sourceDirOrig = parent.getOptions().sourceDir().getValue();
+            String sourceDirOrig = parent.getOptions().sourceDir.getValue();
 
             if (!fileNamesAreEqual(sourceDir, sourceDirOrig, true) && sourceDir.length() > sourceDirOrig.length()) {
                 String subFolder = sourceDir.substring(sourceDirOrig.length());
@@ -824,7 +811,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     setTargetAtomicFileName(targetTransferFileName);
                 }
                 try {
-                    String dir = addFileSeparator(parent.getOptions().targetDir().getValue()) + subFolder;
+                    String dir = addFileSeparator(parent.getOptions().targetDir.getValue()) + subFolder;
                     if (parent.add2SubFolders(subFolder)) {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug(String.format("[%s][target][%s][%s]check mkdir", transferNumber, targetFileName, dir));
@@ -970,9 +957,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         return sourceFileSteady;
     }
 
-    public String getTargetAtomicFileName(final ISOSTransferOptions options) {
-        targetTransferFileName = targetTransferFileName + options.getAtomicSuffix().getValue().trim();
-        targetTransferFileName = options.getAtomicPrefix().getValue() + targetTransferFileName;
+    public String getTargetAtomicFileName(final SOSBaseOptions options) {
+        targetTransferFileName = targetTransferFileName + options.atomicSuffix.getValue().trim();
+        targetTransferFileName = options.atomicPrefix.getValue() + targetTransferFileName;
         targetAtomicFileName = targetTransferFileName.trim();
         return targetAtomicFileName;
     }
@@ -983,9 +970,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     private String makeFileNameReplacing(final String fileName) {
         String name = adjustFileSeparator(fileName);
-        String replacement = parent.getOptions().getReplacement().getValue();
+        String replacement = parent.getOptions().replacement.getValue();
         try {
-            name = parent.getOptions().getReplacing().doReplace(name, replacement);
+            name = parent.getOptions().replacing.doReplace(name, replacement);
         } catch (Exception e) {
             LOGGER.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
             throw new JobSchedulerException(SOSVfs_E_0150.get(), e);

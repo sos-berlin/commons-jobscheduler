@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -51,11 +50,13 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     private HttpURL rootUrl = null;
     private HashMap<String, Long> fileSizes = null;
     private HashMap<String, PutMethod> putMethods = null;
+
     private String proxyHost = null;
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
     private int lastStatusCode = -1;
+
     private boolean raiseJobSchedulerException = true;
     private GetMethod lastInputStreamGetMethod = null;
 
@@ -72,22 +73,19 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public void connect(final SOSDestinationOptions options) throws Exception {
-        destinationOptions = options;
-        if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
-        }
+        super.connect(options);
         proxyHost = destinationOptions.proxyHost.getValue();
         proxyPort = destinationOptions.proxyPort.value();
         proxyUser = destinationOptions.proxyUser.getValue();
         proxyPassword = destinationOptions.proxyPassword.getValue();
-        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
+        doConnect();
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) {
-        authenticationOptions = options;
+    public void login() throws Exception {
+        super.login();
         try {
-            doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
+            doLogin(destinationOptions.user.getValue(), destinationOptions.password.getValue());
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -154,10 +152,9 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     private void doLogin(final String user, final String password) throws Exception {
-        this.userName = user;
-        LOGGER.debug(SOSVfs_D_132.params(userName));
-        if (!SOSString.isEmpty(userName)) {
-            Credentials credentials = new UsernamePasswordCredentials(userName, password);
+        LOGGER.debug(SOSVfs_D_132.params(user));
+        if (!SOSString.isEmpty(user)) {
+            Credentials credentials = new UsernamePasswordCredentials(user, password);
             httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         }
         checkConnection();
@@ -181,14 +178,12 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         }
     }
 
-    private void doConnect(final String phost, final int pport) {
+    private void doConnect() {
         if (!this.isConnected()) {
             try {
-                port = pport;
-                host = phost;
                 HostConfiguration hc = new HostConfiguration();
-                if (phost.toLowerCase().startsWith("https://") || phost.toLowerCase().startsWith("http://")) {
-                    URL url = new URL(phost);
+                if (host.toLowerCase().startsWith("https://") || host.toLowerCase().startsWith("http://")) {
+                    URL url = new URL(host);
                     port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
                     host = url.getHost();
                     String _rootUrl = url.getProtocol() + "://" + host + ":" + port + url.getPath();
@@ -221,7 +216,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                         hc.setHost(new HttpHost(host, port));
                     }
                 } else {
-                    rootUrl = new HttpURL(phost, pport, "/");
+                    rootUrl = new HttpURL(host, port, "/");
                     hc.setHost(new HttpHost(host, port));
                 }
                 LOGGER.info(SOSVfs_D_0101.params(host, port));

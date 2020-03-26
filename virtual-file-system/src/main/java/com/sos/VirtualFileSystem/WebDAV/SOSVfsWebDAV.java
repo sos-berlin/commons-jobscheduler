@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
@@ -39,8 +38,13 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAV.class);
     private HttpURL rootUrl = null;
     private WebdavResource davClient = null;
-    private String currentDirectory = "";
+    // private String currentDirectory = "";
+
+    private String host = null;
+    private int port = 0;
+    private String userName = null;
     private String password = null;
+
     private String proxyHost = null;
     private int proxyPort = 0;
     private String proxyUser = null;
@@ -52,22 +56,23 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
     @Override
     public void connect(final SOSDestinationOptions options) throws Exception {
-        destinationOptions = options;
-        if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+        super.connect(options);
+
+        host = destinationOptions.host.getValue();
+        port = destinationOptions.port.value();
+        if (destinationOptions.authMethod.isURL()) {
+            URL url = new URL(host);
+            port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
         }
-        doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
+        LOGGER.info(SOSVfs_D_0101.params(host, port));
+        this.logReply();
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) {
-        authenticationOptions = options;
+    public void login() throws Exception {
+        super.login();
         try {
-            proxyHost = destinationOptions.proxyHost.getValue();
-            proxyPort = destinationOptions.proxyPort.value();
-            proxyUser = destinationOptions.proxyUser.getValue();
-            proxyPassword = destinationOptions.proxyPassword.getValue();
-            doAuthenticate(authenticationOptions);
+            doLogin();
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -397,22 +402,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
     }
 
-    @Override
-    protected String getCurrentPath() {
-        try {
-            if (currentDirectory == null || currentDirectory.isEmpty()) {
-                currentDirectory = "/" + davClient.getPath() + "/";
-                currentDirectory = normalizePath(currentDirectory);
-                LOGGER.debug(getHostID(SOSVfs_D_195.params(currentDirectory)));
-                logReply();
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("getCurrentPath"), e);
-        }
-
-        return currentDirectory;
-    }
-
     private WebdavResource getResource(final String path) throws Exception {
         return getResource(path, true);
     }
@@ -534,10 +523,15 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         return url;
     }
 
-    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
-        authenticationOptions = options;
-        userName = authenticationOptions.getUser().getValue();
-        password = authenticationOptions.getPassword().getValue();
+    private void doLogin() throws Exception {
+        userName = destinationOptions.user.getValue();
+        password = destinationOptions.password.getValue();
+
+        proxyHost = destinationOptions.proxyHost.getValue();
+        proxyPort = destinationOptions.proxyPort.value();
+        proxyUser = destinationOptions.proxyUser.getValue();
+        proxyPassword = destinationOptions.proxyPassword.getValue();
+
         LOGGER.debug(SOSVfs_D_132.params(userName));
         HttpURL httpUrl = this.setRootHttpURL(userName, password, host, port);
         try {
@@ -554,8 +548,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().getValue(), authenticationOptions.getAuthFile()
-                    .getValue()), ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(destinationOptions.authMethod.getValue(), destinationOptions.authFile.getValue()),
+                    ex);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -581,21 +575,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             proxy = String.format("[proxy %s:%s, proxy user = %s]", proxyHost, proxyPort, proxyUser);
         }
         return String.format("[%s]%s %s", uri, proxy, msg);
-    }
-
-    private void doConnect(final String phost, final int pport) throws Exception {
-        host = phost;
-        port = pport;
-        if (destinationOptions.authMethod.isURL()) {
-            URL url = new URL(phost);
-            port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
-        }
-        LOGGER.info(SOSVfs_D_0101.params(host, port));
-        if (!this.isConnected()) {
-            this.logReply();
-        } else {
-            LOGGER.warn(SOSVfs_D_0103.params(host, port));
-        }
     }
 
 }

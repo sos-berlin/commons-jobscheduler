@@ -49,7 +49,6 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSCommandResult;
@@ -79,8 +78,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private Session sshSession = null;
     private ChannelSftp channelSftp = null;
     private ChannelExec channelExec = null;
-    // proxy
-    private SOSOptionProxyProtocol proxyProtocol = null;
 
     private Integer exitCode;
     private String exitSignal;
@@ -93,9 +90,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private int proxyPort = 0;
     private int sessionConnectTimeout = 0;
     private int channelConnectTimeout = 0; // default 20sek
-    private String proxyHost = null;
-    private String proxyUser = null;
-    private String proxyPassword = null;
     private final String lineSeparator = System.getProperty("line.separator");
 
     public SOSVfsSFtpJCraft() {
@@ -114,27 +108,19 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) {
-        destinationOptions = options;
-        if (destinationOptions == null) {
-            throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
-        }
-        host = destinationOptions.host.getValue();
-        port = destinationOptions.port.value();
-        LOGGER.info(new StringBuilder("[").append(destinationOptions.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(host, port))
-                .toString());
+    public void connect(final SOSDestinationOptions options) throws Exception {
+        super.connect(options);
+
+        LOGGER.info(new StringBuilder("[").append(destinationOptions.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(
+                destinationOptions.host.getValue(), destinationOptions.port.value())).toString());
     }
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) {
-        authenticationOptions = options;
+    public void login() throws Exception {
+        super.login();
+
         try {
-            proxyProtocol = destinationOptions.proxyProtocol;
-            proxyHost = destinationOptions.proxyHost.getValue();
-            proxyPort = destinationOptions.proxyPort.value();
-            proxyUser = destinationOptions.proxyUser.getValue();
-            proxyPassword = destinationOptions.proxyPassword.getValue();
-            doConnect(authenticationOptions);
+            doConnect();
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -650,23 +636,23 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } else {
 
             if (kd == null || ke == null) {
-                SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
+                SOSOptionInFileName authenticationFile = destinationOptions.authFile;
                 authenticationFile.checkMandatory(true);
                 if (authenticationFile.isNotEmpty()) {
                     try {
-                        if (authenticationOptions.getPassphrase().isNotEmpty()) {
+                        if (destinationOptions.passphrase.isNotEmpty()) {
                             if (isDebugEnabled) {
-                                LOGGER.debug(String.format("[%s]file=%s, passphrase=?", method, authenticationOptions.getAuthFile().getValue()));
+                                LOGGER.debug(String.format("[%s]file=%s, passphrase=?", method, destinationOptions.authFile.getValue()));
                             }
-                            secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), authenticationOptions.getPassphrase().getValue());
+                            secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), destinationOptions.passphrase.getValue());
                         } else {
                             if (isDebugEnabled) {
-                                LOGGER.debug(String.format("[%s]file=%s", method, authenticationOptions.getAuthFile().getValue()));
+                                LOGGER.debug(String.format("[%s]file=%s", method, destinationOptions.authFile.getValue()));
                             }
                             secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
                         }
                     } catch (JSchException e) {
-                        throw new Exception(String.format("[%s][%s]%s", method, authenticationOptions.getAuthFile().getValue(), e.toString()), e);
+                        throw new Exception(String.format("[%s][%s]%s", method, destinationOptions.authFile.getValue(), e.toString()), e);
                     }
                 } else {
                     if (isDebugEnabled) {
@@ -680,12 +666,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     byte[] pr = kpd.getAttachment(entry, destinationOptions.keepass_attachment_property_name.getValue());
                     String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + destinationOptions.keepass_attachment_property_name
                             .getValue();
-                    if (authenticationOptions.getPassphrase().isNotEmpty()) {
+                    if (destinationOptions.passphrase.isNotEmpty()) {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", method, keePassPath));
                         }
-                        secureChannel.addIdentity(SOSVfsSFtpJCraft.class.getSimpleName(), pr, (byte[]) null, authenticationOptions.getPassphrase()
-                                .getValue().getBytes());
+                        secureChannel.addIdentity(SOSVfsSFtpJCraft.class.getSimpleName(), pr, (byte[]) null, destinationOptions.passphrase.getValue()
+                                .getBytes());
                     } else {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s", method, keePassPath));
@@ -701,7 +687,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private void usePasswordMethod() throws Exception {
         LOGGER.debug("[password]");
-        sshSession.setPassword(authenticationOptions.getPassword().getValue());
+        sshSession.setPassword(destinationOptions.password.getValue());
     }
 
     private void useKeyboardInteractive() throws Exception {
@@ -727,7 +713,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception e) {
             LOGGER.warn(e.toString());
         }
-        if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+        if (destinationOptions.authMethod.isKeyboardInteractive()) {
             useKeyboardInteractive();
         } else {
             usePasswordMethod();
@@ -745,7 +731,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
 
         usePublicKeyMethod();
-        if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+        if (destinationOptions.authMethod.isKeyboardInteractive()) {
             sshSession.setConfig("userauth.keyboard-interactive", SOSRequiredAuthKeyboardInteractive.class.getName());
             useKeyboardInteractive();
         } else {
@@ -756,11 +742,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return preferredAuthentications;
     }
 
-    private void doConnect(final ISOSAuthenticationOptions options) throws Exception {
-        authenticationOptions = options;
-        userName = authenticationOptions.getUser().getValue();
+    private void doConnect() throws Exception {
         setKnownHostsFile();
-        createSession(userName, host, port);
+        createSession();
 
         String preferredAuthentications = null;
         if (destinationOptions.preferred_authentications.isNotEmpty()) {
@@ -769,15 +753,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         } else if (destinationOptions.required_authentications.isNotEmpty()) {
             preferredAuthentications = useRequiredAuthentications(destinationOptions.required_authentications.getValue());
         } else {
-            if (authenticationOptions.getPassword().isNotEmpty() && authenticationOptions.getAuthFile().isNotEmpty()) {
+            if (destinationOptions.password.isNotEmpty() && destinationOptions.authFile.isNotEmpty()) {
                 preferredAuthentications = usePreferredAuthentications("password,publickey", "password,publickey");
             } else {
-                preferredAuthentications = authenticationOptions.getAuthMethod().getValue();
-                if (authenticationOptions.getAuthMethod().isPublicKey()) {
+                preferredAuthentications = destinationOptions.authMethod.getValue();
+                if (destinationOptions.authMethod.isPublicKey()) {
                     usePublicKeyMethod();
-                } else if (authenticationOptions.getAuthMethod().isPassword()) {
+                } else if (destinationOptions.authMethod.isPassword()) {
                     usePasswordMethod();
-                } else if (authenticationOptions.getAuthMethod().isKeyboardInteractive()) {
+                } else if (destinationOptions.authMethod.isKeyboardInteractive()) {
                     useKeyboardInteractive();
                 }
             }
@@ -799,7 +783,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
         reply = "OK";
-        LOGGER.info(SOSVfs_D_133.params(userName));
+        LOGGER.info(SOSVfs_D_133.params(destinationOptions.user.getValue()));
         this.logReply();
     }
 
@@ -911,13 +895,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    private void createSession(final String puser, final String phost, final int pport) throws Exception {
+    private void createSession() throws Exception {
         if (secureChannel == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("secureChannel"));
         }
+        LOGGER.debug(String.format("user=%s, host=%s, port=%s", user, host, port));
+        sshSession = secureChannel.getSession(user, host, port);
 
-        LOGGER.debug(String.format("user=%s, host=%s, port=%s", puser, phost, pport));
-        sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
         // JSch.setConfig("StrictHostKeyChecking", destinationOptions.strictHostKeyChecking.getValue());
         config.put("StrictHostKeyChecking", destinationOptions.strictHostKeyChecking.getValue());
@@ -938,7 +922,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     private void setProxy() throws Exception {
-        if (!SOSString.isEmpty(this.proxyHost)) {
+        SOSOptionProxyProtocol proxyProtocol = destinationOptions.proxyProtocol;
+        String proxyHost = destinationOptions.proxyHost.getValue();
+        String proxyUser = destinationOptions.proxyUser.getValue();
+        String proxyPassword = destinationOptions.proxyPassword.getValue();
+
+        if (!SOSString.isEmpty(proxyHost)) {
             LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%s, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
                     proxyUser));
             if (proxyProtocol.isHttp()) {
