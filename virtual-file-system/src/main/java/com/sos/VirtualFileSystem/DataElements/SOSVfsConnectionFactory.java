@@ -70,6 +70,7 @@ public class SOSVfsConnectionFactory {
             client = VFSFactory.getHandler(dataType);
             try {
                 handleOptions(destinationOptions, isSource);
+                client.setBaseOptions(options);
                 client.connect(destinationOptions);
                 client.login(destinationOptions);
             } catch (Exception e) {

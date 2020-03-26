@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
@@ -30,22 +29,9 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
     private SOSDestinationOptions destinationOptions = null;
     private CmdShell cmdShell = null;
-    private boolean simulateShell = false;
 
     @Override
-    public void login(final ISOSAuthenticationOptions options) throws Exception {
-        reply = "Login successful";
-    }
-
-    @Override
-    public boolean changeWorkingDirectory(final String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            return false;
-        }
-        if (!file.isDirectory()) {
-            return false;
-        }
+    public boolean isConnected() {
         return true;
     }
 
@@ -55,14 +41,19 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
-        File file = new File(pathname);
-        file.delete();
+    public void login(final ISOSAuthenticationOptions options) throws Exception {
+        reply = "Login successful";
     }
 
     @Override
-    public String doPWD() {
-        return null;
+    public void logout() {
+        //
+    }
+
+    @Override
+    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
+        File file = new File(pathname);
+        file.delete();
     }
 
     @Override
@@ -103,32 +94,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     @Override
     public Integer getExitCode() {
         return 0;
-    }
-
-    @Override
-    public long getFile(final String sourceFileName, final String targetFileName, final boolean append) throws Exception {
-        long size = 0;
-        if (!append) {
-            JSFile file = new JSFile(sourceFileName);
-            size = file.length();
-            file.copy(targetFileName);
-        } else {
-            size = appendFile(sourceFileName, targetFileName);
-        }
-        return size;
-    }
-
-    private long appendFile(final String sourceFileName, final String targetFileName) {
-        JSFile targetFile = new JSFile(targetFileName);
-        long size = 0;
-        try {
-            size = targetFile.appendFile(sourceFileName);
-        } catch (Exception e) {
-            String msg = SOSVfs_E_134.params("appendFile()");
-            LOGGER.error(msg, e);
-            throw new JobSchedulerException(msg, e);
-        }
-        return size;
     }
 
     @Override
@@ -225,18 +190,8 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public boolean isConnected() {
-        return true;
-    }
-
-    @Override
     public boolean isDirectory(final String fileName) {
         return new File(fileName).isDirectory();
-    }
-
-    @Override
-    public void logout() {
-        //
     }
 
     @Override
@@ -259,16 +214,6 @@ public class SOSVfsLocal extends SOSVfsTransferBaseClass {
     @Override
     public void reconnect(SOSDestinationOptions options) {
         //
-    }
-
-    @Override
-    public boolean isSimulateShell() {
-        return this.simulateShell;
-    }
-
-    @Override
-    public void setSimulateShell(boolean val) {
-        simulateShell = val;
     }
 
 }

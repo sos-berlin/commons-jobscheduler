@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.FTP;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.common.SOSVfsCommonFile;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -73,8 +71,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         return getInputStream();
     }
 
-    @Override
-    public OutputStream getFileOutputStream() {
+    private OutputStream getFileOutputStream() {
         try {
             if (getOutputStream() == null) {
                 setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
@@ -88,11 +85,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileOutputStream"), e);
         }
         return getOutputStream();
-    }
-
-    @Override
-    public Integer getFilePermissions() throws Exception {
-        return 0;
     }
 
     @Override
@@ -115,76 +107,13 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public String getParentVfs() {
-        return null;
-    }
-
-    @Override
-    public ISOSVirtualFile getParentVfsFile() {
-        return null;
-    }
-
-    @Override
     public boolean isDirectory() {
         return getHandler().isDirectory(fileName);
     }
 
     @Override
-    public boolean isEmptyFile() {
-        return this.getFileSize() <= 0;
-    }
-
-    @Override
-    public boolean notExists() {
-        boolean result = false;
-        try {
-            result = !fileExists();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::notExists"), e);
-        }
-        return result;
-    }
-
-    @Override
-    public void putFile(final File path) {
-        notImplemented();
-    }
-
-    @Override
-    public void putFile(final String path) {
-        notImplemented();
-    }
-
-    @Override
     public void rename(final String newPath) {
         getHandler().rename(fileName, newPath);
-    }
-
-    @Override
-    public void setFilePermissions(final Integer val) {
-        notImplemented();
-    }
-
-    @Override
-    public String getModificationTime() {
-        try {
-            return getHandler().getModificationTime(fileName);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getModificationTime"), e);
-        }
-    }
-
-    @Override
-    public void close() {
-        if (getOutputStream() != null) {
-            this.closeOutput();
-            setOutputStream(null);
-        } else {
-            if (getInputStream() != null) {
-                this.closeInput();
-                setInputStream(null);
-            }
-        }
     }
 
     @Override
@@ -230,37 +159,12 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public void flush() {
-        try {
-            if (getOutputStream() != null) {
-                getOutputStream().flush();
-            }
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::flush"), e);
-        }
-    }
-
-    @Override
     public int read(final byte[] buffer) {
         int bytes = 0;
         try {
             InputStream is = this.getFileInputStream();
             if (is != null) {
                 bytes = is.read(buffer);
-            } 
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
-        }
-        return bytes;
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        int bytes = 0;
-        try {
-            InputStream is = this.getFileInputStream();
-            if (is != null) {
-                bytes = is.read(buffer, offset, length);
             }
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
@@ -290,13 +194,8 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public void putFile(final ISOSVirtualFile file) throws Exception {
-        notImplemented();
-    }
-
-    @Override
     public long getModificationDateTime() {
-        String dateTime = getHandler().getModificationTime(fileName);
+        String dateTime = getHandler().getModificationDateTime(fileName);
         long result = -1;
         if (dateTime != null) {
             if (dateTime.startsWith("213 ")) {

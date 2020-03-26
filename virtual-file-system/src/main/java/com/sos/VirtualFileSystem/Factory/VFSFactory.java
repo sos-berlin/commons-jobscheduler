@@ -16,7 +16,6 @@ import com.sos.VirtualFileSystem.WebDAV.SOSVfsWebDAV;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.VirtualFileSystem.local.SOSVfsLocal;
-import com.sos.VirtualFileSystem.zip.SOSVfsZip;
 import com.sos.i18n.annotation.I18NMessage;
 import com.sos.i18n.annotation.I18NMessages;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -61,8 +60,6 @@ public class VFSFactory extends SOSVfsMessageCodes {
             handler = new SOSVfsHTTP();
         } else if (protocol.equals(TransferTypes.smb.name())) {
             handler = new SOSVfsJCIFS();
-        } else if (protocol.equals(TransferTypes.zip.name())) {
-            handler = new SOSVfsZip();
         } else if (protocol.equals(TransferTypes.mq.name())) {
             handler = new SOSVfsJms();
         }

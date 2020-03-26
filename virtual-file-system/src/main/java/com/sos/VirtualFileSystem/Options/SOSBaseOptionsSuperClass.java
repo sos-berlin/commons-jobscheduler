@@ -48,7 +48,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 
 @JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSTransferOptions {
+public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions,
+        ISOSTransferOptions {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptionsSuperClass.class);
     private static final long serialVersionUID = -4445655877481869778L;

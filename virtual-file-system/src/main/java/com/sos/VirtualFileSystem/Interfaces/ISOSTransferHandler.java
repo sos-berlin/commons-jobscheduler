@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.sos.VirtualFileSystem.Options.SOSBaseOptions;
 import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 
@@ -22,13 +23,9 @@ public interface ISOSTransferHandler extends ISOSShell {
 
     public boolean isConnected();
 
-    public boolean changeWorkingDirectory(String path) throws IOException;
+    public void setBaseOptions(SOSBaseOptions options);
 
-    public String getReplyString();
-
-    public void mkdir(String path) throws IOException;
-
-    public void rmdir(String path) throws IOException;
+    public SOSBaseOptions getBaseOptions();
 
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException;
 
@@ -40,38 +37,28 @@ public interface ISOSTransferHandler extends ISOSShell {
 
     public SOSFileEntry getFileEntry(String path) throws Exception;
 
+    public ISOSVirtualFile getFileHandle(final String path);
+
+    public boolean isDirectory(String path);
+
+    public void mkdir(String path) throws IOException;
+
+    public void rmdir(String path) throws IOException;
+
+    public void delete(String pathname, boolean checkIsDirectory) throws IOException;
+
+    public void rename(String path, String newPath);
+
+    public long getFileSize(String path);
+
+    public String getModificationDateTime(String path);
+
     public OutputStream getOutputStream(String path, boolean append, boolean resume);
 
     public InputStream getInputStream(String path);
 
-    public void put(String sourcePath, String targetPath);
-
-    public long putFile(String sourcePath, OutputStream out);
-
-    public long putFile(String sourcePath, String targetPath) throws Exception;
-
-    public void delete(String pathname, boolean checkIsDirectory) throws IOException;
-
-    public long getFile(String sourcePath, String targetPath, boolean append) throws Exception;
-
-    public long getFile(String sourcePath, String targetPath) throws Exception;
-
-    public ISOSVirtualFile getFileHandle(final String path);
+    public String getReplyString();
 
     public boolean isNegativeCommandCompletion();
-
-    public long getFileSize(String path);
-
-    public String getModificationTime(String path);
-
-    public String doPWD();
-
-    public boolean isDirectory(String path);
-
-    public void rename(String path, String newPath);
-
-    public boolean isSimulateShell();
-
-    public void setSimulateShell(boolean simulateShell);
 
 }

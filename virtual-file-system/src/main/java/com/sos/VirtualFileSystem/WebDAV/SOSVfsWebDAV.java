@@ -1,6 +1,5 @@
 package com.sos.VirtualFileSystem.WebDAV;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +45,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
-    private boolean simulateShell = false;
 
     public SOSVfsWebDAV() {
         super();
@@ -257,65 +255,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public long getFile(String remoteFile, final String localFile, final boolean append) {
-        String sourceLocation = normalizePath(remoteFile);
-        File transferFile = null;
-        long remoteFileSize = -1;
-        File file = null;
-        WebdavResource res = null;
-        try {
-            remoteFile = normalizePath(remoteFile);
-            file = new File(localFile);
-            res = this.getResource(remoteFile);
-            if (!res.exists()) {
-                throw new Exception("remoteFile not found");
-            }
-            remoteFileSize = res.getGetContentLength();
-            if (res.getMethod(sourceLocation, file)) {
-                transferFile = new File(localFile);
-                if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                    throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-                }
-                remoteFileSize = transferFile.length();
-                reply = "get OK";
-                LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", sourceLocation, localFile, getReplyString())));
-            } else {
-                throw new Exception(res.getStatusMessage());
-            }
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(SOSVfs_E_184.params("getFile", sourceLocation, localFile), ex);
-        } finally {
-            try {
-                if (res != null) {
-                    res.close();
-                }
-            } catch (Exception e) {
-                //
-            }
-        }
-        return remoteFileSize;
-    }
-
-    @Override
-    public long putFile(final String localFile, String remoteFile) {
-        try {
-            remoteFile = getWebdavRessourcePath(remoteFile);
-            remoteFile = normalizePath(remoteFile);
-            if (davClient.putMethod(remoteFile, new File(localFile))) {
-                reply = "put OK";
-                LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
-                return this.size(remoteFile);
-            } else {
-                throw new Exception(getStatusMessage(davClient));
-            }
-        } catch (Exception e) {
-            reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_185.params("putFile()", localFile, remoteFile), e);
-        }
-    }
-
-    @Override
     public void delete(String path, boolean checkIsDirectory) {
         try {
             path = getWebdavRessourcePath(path);
@@ -389,28 +328,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public boolean changeWorkingDirectory(String path) {
-        try {
-            String origPath = davClient.getPath();
-            path = normalizePath("/" + path + "/");
-            davClient.setPath(path);
-            if (davClient.exists()) {
-                reply = "cwd OK";
-                currentDirectory = path;
-                LOGGER.debug(SOSVfs_D_194.params(path, getReplyString()));
-            } else {
-                davClient.setPath(origPath);
-                reply = "cwd failed";
-                LOGGER.debug(SOSVfs_D_194.params(path, getReplyString()));
-                return false;
-            }
-        } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_193.params("cwd", path), ex);
-        }
-        return true;
-    }
-
-    @Override
     public ISOSVirtualFile getFileHandle(String fileName) {
         fileName = adjustFileSeparator(fileName);
         ISOSVirtualFile file = new SOSVfsWebDAVFile(fileName);
@@ -419,7 +336,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String getModificationTime(final String path) {
+    public String getModificationDateTime(final String path) {
         WebdavResource res = null;
         String dateTime = null;
         try {
@@ -679,16 +596,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } else {
             LOGGER.warn(SOSVfs_D_0103.params(host, port));
         }
-    }
-
-    @Override
-    public boolean isSimulateShell() {
-        return simulateShell;
-    }
-
-    @Override
-    public void setSimulateShell(boolean val) {
-        simulateShell = val;
     }
 
 }

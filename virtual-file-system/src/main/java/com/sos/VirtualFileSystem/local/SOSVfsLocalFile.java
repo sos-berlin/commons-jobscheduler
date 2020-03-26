@@ -8,14 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.DataElements.JSDataElementDateTime;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
@@ -51,16 +48,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public void deleteFile() {
-        super.delete();
-    }
-
-    @Override
-    public ISOSVirtualFile getFile() throws Exception {
-        return this;
-    }
-
-    @Override
     public InputStream getFileInputStream() {
         final String method = CLASS_NAME + "::getFileInputStream";
         try {
@@ -75,8 +62,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
         return is;
     }
 
-    @Override
-    public OutputStream getFileOutputStream() {
+    private OutputStream getFileOutputStream() {
         final String method = CLASS_NAME + "::getFileOutputStream";
         try {
             if (os == null) {
@@ -86,11 +72,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
         }
         return os;
-    }
-
-    @Override
-    public Integer getFilePermissions() throws Exception {
-        return 0;
     }
 
     @Override
@@ -104,26 +85,8 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public String getModificationTime() {
-        Date date = new Date(super.lastModified());
-        return new JSDataElementDateTime(date).getFormattedValue();
-    }
-
-    @Override
     public String getName() {
         return super.getPath();
-    }
-
-    @Override
-    public String getParentVfs() {
-        return super.getParent();
-    }
-
-    @Override
-    public ISOSVirtualFile getParentVfsFile() {
-        ISOSVirtualFile file = new SOSVfsLocalFile(super.getParent());
-        file.setHandler(getHandler());
-        return file;
     }
 
     @Override
@@ -132,33 +95,8 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public boolean isEmptyFile() {
-        return super.length() <= 0;
-    }
-
-    @Override
-    public boolean notExists() {
-        return !super.exists();
-    }
-
-    @Override
-    public void putFile(final File file) throws Exception {
-        JSToolBox.notImplemented();
-    }
-
-    @Override
-    public void putFile(final String fileName) throws Exception {
-        JSToolBox.notImplemented();
-    }
-
-    @Override
     public void rename(final String newFileName) {
         super.renameTo(new File(newFileName));
-    }
-
-    @Override
-    public void setFilePermissions(final Integer permission) throws Exception {
-        JSToolBox.notImplemented();
     }
 
     @Override
@@ -231,31 +169,10 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public void flush() {
-        final String method = CLASS_NAME + "::flush";
-        try {
-            getFileOutputStream().flush();
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
-        }
-
-    }
-
-    @Override
     public int read(final byte[] buffer) {
         final String method = CLASS_NAME + "::read";
         try {
             return getFileInputStream().read(buffer);
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
-        }
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int offset, final int length) {
-        final String method = CLASS_NAME + "::read";
-        try {
-            return getFileInputStream().read(buffer, offset, length);
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
         }
@@ -279,18 +196,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
         } catch (IOException e) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(method), e);
         }
-    }
-
-    @Override
-    public void string2File(final String content) {
-        try {
-            OutputStream os = getFileOutputStream();
-            os.write(content.getBytes());
-            os.close();
-        } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("String2File"), e);
-        }
-
     }
 
     @Override
@@ -319,37 +224,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
             }
         }
         return sb.toString();
-    }
-
-    @Override
-    public void putFile(final ISOSVirtualFile file) throws Exception {
-        boolean closed = false;
-        try {
-            byte[] buffer = new byte[4096];
-            int bytes;
-            synchronized (this) {
-                while ((bytes = file.read(buffer)) != -1) {
-                    try {
-                        this.write(buffer, 0, bytes);
-                    } catch (JobSchedulerException e) {
-                        LOGGER.error(String.format("[break]%s", e.toString()), e);
-                        break;
-                    }
-                }
-            }
-            file.closeInput();
-            closeOutput();
-            closed = true;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_266.get(), e);
-        } finally {
-            if (!closed) {
-                file.closeInput();
-                closeOutput();
-                closed = true;
-            }
-        }
     }
 
     @Override
@@ -385,10 +259,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 
     @Override
     public void setModeRestart(final boolean restart) {
-    }
-
-    @Override
-    public void setModeOverwrite(final boolean mode) {
     }
 
 }

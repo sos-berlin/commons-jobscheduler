@@ -3,7 +3,6 @@ package com.sos.VirtualFileSystem.SFTP;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -107,6 +106,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
+    public boolean isConnected() {
+        if (channelSftp != null) {
+            return channelSftp.isConnected();
+        }
+        return sshSession != null && sshSession.isConnected();
+    }
+
+    @Override
     public void connect(final SOSDestinationOptions options) {
         destinationOptions = options;
         if (destinationOptions == null) {
@@ -127,11 +134,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             proxyPort = destinationOptions.proxyPort.value();
             proxyUser = destinationOptions.proxyUser.getValue();
             proxyPassword = destinationOptions.proxyPassword.getValue();
-            doAuthenticate(authenticationOptions);
+            doConnect(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
+        }
+    }
+
+    @Override
+    public void logout() {
+        if (isDebugEnabled) {
+            LOGGER.debug("nop logout");
         }
     }
 
@@ -180,21 +194,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         }
         LOGGER.info(reply);
-    }
-
-    @Override
-    public void logout() {
-        if (isDebugEnabled) {
-            LOGGER.debug("nop logout");
-        }
-    }
-
-    @Override
-    public boolean isConnected() {
-        if (channelSftp != null) {
-            return channelSftp.isConnected();
-        }
-        return sshSession != null && sshSession.isConnected();
     }
 
     @Override
@@ -383,41 +382,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             reply = e.toString();
             return null;
         }
-    }
-
-    @Override
-    public long getFile(final String remoteFile, final String localFile, final boolean append) {
-        String sourceLocation = normalizePath(remoteFile);
-        File transferFile = null;
-        long remoteFileSize = -1;
-        FileOutputStream fos = null;
-        try {
-            remoteFileSize = this.size(remoteFile);
-            fos = new FileOutputStream(localFile, append);
-            channelSftp.get(sourceLocation, fos);
-            fos.flush();
-            fos.close();
-            fos = null;
-            transferFile = new File(localFile);
-            if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-            }
-            remoteFileSize = transferFile.length();
-            reply = "get OK";
-            LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", sourceLocation, localFile, getReplyString())));
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(SOSVfs_E_184.params("getFile", sourceLocation, localFile), ex);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (Exception ex) {
-                    //
-                }
-            }
-        }
-        return remoteFileSize;
     }
 
     @Override
@@ -623,30 +587,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public boolean changeWorkingDirectory(String pathname) {
-        try {
-            pathname = normalizePath(pathname);
-            if (!fileExists(pathname)) {
-                reply = String.format("Filepath '%1$s' does not exist.", pathname);
-                return false;
-            }
-            if (!isDirectory(pathname)) {
-                reply = String.format("Filepath '%1$s' is not a directory.", pathname);
-                return false;
-            }
-            channelSftp.cd(pathname);
-            reply = "cwd OK";
-        } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_193.params("cwd", pathname), ex);
-        } finally {
-            if (isDebugEnabled) {
-                LOGGER.debug(SOSVfs_D_194.params(pathname, getReplyString()));
-            }
-        }
-        return true;
-    }
-
-    @Override
     public ISOSVirtualFile getFileHandle(String fileName) {
         fileName = adjustFileSeparator(fileName);
         ISOSVirtualFile file = new SOSVfsSFtpFileJCraft(fileName);
@@ -655,7 +595,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public String getModificationTime(final String path) {
+    public String getModificationDateTime(final String path) {
         String dateTime = null;
         try {
             SftpATTRS objAttr = channelSftp.stat(path);
@@ -816,7 +756,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return preferredAuthentications;
     }
 
-    private void doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
+    private void doConnect(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         userName = authenticationOptions.getUser().getValue();
         setKnownHostsFile();
@@ -1069,7 +1009,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return exitSignal;
     }
 
-    @Override
     public long putFile(final String source, final String target) {
         try {
             channelSftp.put(source, normalizePath(target), ChannelSftp.OVERWRITE);
@@ -1088,7 +1027,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     public void putFile(File source, String target, int chmod) throws Exception {
-        put(source.getCanonicalPath(), target);
+        putFile(source.getCanonicalPath(), target);
         channelSftp.chmod(chmod, target);
         if (isDebugEnabled) {
             LOGGER.debug(String.format("[put][%s]chmod=%s", target, chmod));
@@ -1239,12 +1178,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return result;
     }
 
-    @Override
     public boolean isSimulateShell() {
         return simulateShell;
     }
 
-    @Override
     public void setSimulateShell(boolean val) {
         simulateShell = val;
     }

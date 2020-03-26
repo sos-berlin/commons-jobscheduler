@@ -228,13 +228,13 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
                 if (objOptions.TransferMethod.isApi()) {
                     objAnswer = getAnswerFromSpooler(pobjJSCmd);
                 } else if (objOptions.TransferMethod.isHttp()) {
-                    SOSXmlCommand sosXmlCommand= new SOSXmlCommand(objOptions.getCommandUrl().getValue()); 
+                    SOSXmlCommand sosXmlCommand = new SOSXmlCommand(objOptions.getCommandUrl().getValue());
                     LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
                     String answer = sosXmlCommand.executeXMLPost(xmlCommand);
                     LOGGER.trace("Answer from JobScheduler:\n" + answer);
                     objAnswer = getAnswer(answer);
                 } else if (objOptions.TransferMethod.isHttps()) {
-                    SOSXmlCommand sosXmlCommand= new SOSXmlCommand(objOptions.getCommandUrl().getValue()); 
+                    SOSXmlCommand sosXmlCommand = new SOSXmlCommand(objOptions.getCommandUrl().getValue());
                     LOGGER.trace("Request sended to JobScheduler:\n" + xmlCommand);
                     sosXmlCommand.setBasicAuthorization(objOptions.basicAuthorization.getValue());
                     sosXmlCommand.setConnectTimeout(WRITE_TIME_OUT);
@@ -242,7 +242,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
                     String answer = sosXmlCommand.executeXMLPost(xmlCommand);
                     LOGGER.trace("Answer from JobScheduler:\n" + answer);
                     objAnswer = getAnswer(answer);
-                    
+
                 } else if (objOptions.TransferMethod.isTcp()) {
                     this.getSocket().setSoTimeout(30000);
                     this.getSocket().sendRequest(xmlCommand);
@@ -286,7 +286,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objAnswer;
     }
 
-    public Answer getAnswerFromSpooler(JSCmdBase pobjJSCmd) {   
+    public Answer getAnswerFromSpooler(JSCmdBase pobjJSCmd) {
         String command = pobjJSCmd.toXMLString();
         strLastAnswer = spooler.execute_xml(command);
         LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
@@ -452,7 +452,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public Object toXMLFile(final Object objO, final ISOSVirtualFile pobjVirtualFile) {
         if (pobjVirtualFile != null) {
-            OutputStream objOutputStream = pobjVirtualFile.getFileOutputStream();
+            OutputStream objOutputStream = pobjVirtualFile.getHandler().getOutputStream(pobjVirtualFile.getName(), false, false);
             try {
                 if (objOutputStream == null) {
                     LOGGER.error(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
@@ -793,7 +793,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         JSObjOrder objOrder = new JSObjOrder(this, pobjVirtualFile);
         String s;
         try {
-            s = pobjVirtualFile.getFile().getName();
+            s = pobjVirtualFile.getName();
             s = new File(s).getName();
             s = s.replaceFirst(".*,(.*)\\.order\\.xml", "$1");
 
@@ -1294,7 +1294,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     }
 
     public void setSpooler(sos.spooler.Spooler spooler) {
-       this.spooler = spooler;
+        this.spooler = spooler;
     }
 
 }

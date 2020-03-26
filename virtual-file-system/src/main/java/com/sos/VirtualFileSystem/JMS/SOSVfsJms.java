@@ -30,12 +30,28 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     private Session session = null;
 
     @Override
+    public boolean isConnected() {
+        return jmsConnection != null;
+    }
+
+    @Override
     public void connect(final SOSDestinationOptions options) {
         destinationOptions = options;
         if (destinationOptions == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("destinationOptions"));
         }
         doConnect(destinationOptions.host.getValue(), destinationOptions.port.value());
+    }
+
+    @Override
+    public void disconnect() {
+        try {
+            if (jmsConnection != null) {
+                jmsConnection.close();
+            }
+        } catch (JMSException e) {
+            LOGGER.error("Error occured closing the jms connection! ", e);
+        }
     }
 
     private void doConnect(final String host, final int port) {
@@ -58,24 +74,8 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         }
     }
 
-    public String createConnectionUrl(String protocol, String hostName, String port) {
-        StringBuilder strb = new StringBuilder();
-        strb.append(protocol).append("://").append(hostName).append(":").append(port);
-        return strb.toString();
-    }
-
-    @Override
-    public void disconnect() {
-        try {
-            jmsConnection.close();
-        } catch (JMSException e) {
-            LOGGER.error("Error occured closing the jms connection! ", e);
-        }
-    }
-
-    @Override
-    public boolean isConnected() {
-        return jmsConnection != null;
+    public String createConnectionUrl(String protocol, String host, String port) {
+        return new StringBuilder(protocol).append("://").append(host).append(":").append(port).toString();
     }
 
     public Connection createConnection(String uri) {
@@ -187,16 +187,6 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
             }
         }
         return messageText;
-    }
-
-    @Override
-    public boolean isSimulateShell() {
-        return false;
-    }
-
-    @Override
-    public void setSimulateShell(boolean simulateShell) {
-        // not implemented, no need
     }
 
     @Override

@@ -315,13 +315,11 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     public String dirtyString() {
-        String strT = "";
         try {
-            strT += "\n" + getAllOptionsAsString(IterationTypes.DirtyToString);
+            return new StringBuilder("\n").append(getAllOptionsAsString(IterationTypes.DirtyToString).trim()).toString();
         } catch (final Exception e) {
             throw new JobSchedulerException("dirtyString failed", e);
         }
-        return strT;
     }
 
     private String getAllOptionsAsString(final IterationTypes type) {
