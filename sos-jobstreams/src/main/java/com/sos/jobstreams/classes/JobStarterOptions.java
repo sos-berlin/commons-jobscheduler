@@ -5,6 +5,7 @@ public class JobStarterOptions {
     private String normalizedJob;
     private String jobStream;
     private String job;
+    private Long taskId;
     
     public String getNormalizedJob() {
         return normalizedJob;
@@ -28,5 +29,15 @@ public class JobStarterOptions {
     
     public void setJob(String job) {
         this.job = job;
+    }
+
+    
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 }

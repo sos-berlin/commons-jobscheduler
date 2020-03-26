@@ -33,10 +33,12 @@ public class JobStreamScheduler {
         String actDate = todayAsString();
         SOSXMLXPath xml = new SOSXMLXPath(new StringBuffer(Globals.xmlMapper.writeValueAsString(XmlSerializer.serializeAbstractSchedule(runTime))));
         RuntimeResolver r = new RuntimeResolver();
+        LOGGER.debug("------->get plan");
         plan = r.resolve(xml, actDate, actDate, "");
         PeriodResolver periodResolver = new PeriodResolver();
         for (Period p : plan.getPeriods()) {
-            periodResolver.addStartTimes(p);
+            LOGGER.debug("-------> period" + p.getAbsoluteRepeat() + " " + p.getSingleStart());
+                periodResolver.addStartTimes(p);
         }
         listOfStartTimes = periodResolver.getStartTimes();
     }

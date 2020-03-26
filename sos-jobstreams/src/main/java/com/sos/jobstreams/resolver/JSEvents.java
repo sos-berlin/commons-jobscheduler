@@ -9,8 +9,12 @@ import java.util.stream.Collectors;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSEvents {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSEvents.class);
 
     private Map<JSEventKey, JSEvent> listOfEvents;
 
@@ -52,8 +56,11 @@ public class JSEvents {
     }
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
+        JSEvent returnEvent;
         if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
-            return this.getEvent(jsEventKey);
+            returnEvent = this.getEvent(jsEventKey);
+            LOGGER.debug("Event direct return: " + returnEvent);
+            return returnEvent;
         } else {
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
                     .getEvent()) && ("*".equals(jsEventKey.getSession()) || jsEventKey.getSession().equals(jsEvent.getKey().getSession()))
@@ -63,7 +70,9 @@ public class JSEvents {
 
                     .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
             try {
-                return collect.entrySet().stream().findAny().get().getValue();
+                returnEvent = collect.entrySet().stream().findAny().get().getValue();
+                LOGGER.debug("Event return: " + returnEvent.getEvent());
+                return returnEvent;
             } catch (NoSuchElementException e) {
                 return null;
             }

@@ -15,8 +15,11 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
+import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
 
 public class JSJobStream {
 
@@ -75,6 +78,11 @@ public class JSJobStream {
             JSJobStreamStarter jobStreamStarter = new JSJobStreamStarter();
             jobStreamStarter.setItemJobStreamStarter(dbItemJobStreamStarter);
             jobStreamStarter.setJobStreamName(itemJobStream.getJobStream());
+            
+            DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
+            FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
+            jobStreamStarter.setListOfJobs(dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0));
+            
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();
             filterJobStreamParameters.setJobStreamStarterId(jobStreamStarter.getItemJobStreamStarter().getId());
             List<DBItemJobStreamParameter> listOfJobStreamParameters = dbLayerJobStreamParameters.getJobStreamParametersList(

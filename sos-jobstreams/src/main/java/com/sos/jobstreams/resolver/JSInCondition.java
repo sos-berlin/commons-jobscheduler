@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
@@ -35,7 +36,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
-    private Set<Long> consumedForContext;
+    private Set<UUID> consumedForContext;
     private boolean jobIsRunning;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
@@ -45,7 +46,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         super();
         haveCalendars = false;
         jobIsRunning = false;
-        this.consumedForContext = new HashSet<Long>();
+        this.consumedForContext = new HashSet<UUID>();
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -102,7 +103,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return listOfInConditionCommands;
     }
 
-    protected void markAsConsumed(SOSHibernateSession sosHibernateSession, Long contextId) throws SOSHibernateException {
+    protected void markAsConsumed(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
         setConsumed(contextId);
         DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
         dbItemConsumedInCondition.setCreated(new Date());
@@ -145,11 +146,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public boolean isConsumed(Long contextId) {
+    public boolean isConsumed(UUID contextId) {
         return consumedForContext.contains(contextId);
     }
 
-    public void setConsumed(Long contextId) {
+    public void setConsumed(UUID contextId) {
         consumedForContext.add(contextId);
     }
 
@@ -182,7 +183,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, Long contextId,
+    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, UUID contextId,
             SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
@@ -215,7 +216,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return this.getExpression() + "::" + SOSString.toString(this);
     }
 
-    public boolean jobIsRunning() {
+    public boolean jobIsRunning(UUID uuid) {
         return jobIsRunning;
     }
 
@@ -227,7 +228,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return this.itemInCondition.getNextPeriod();
     }
 
-    public void removeConsumed(Long contextId) {
+    public void removeConsumed(UUID contextId) {
         consumedForContext.remove(contextId);
     }
 

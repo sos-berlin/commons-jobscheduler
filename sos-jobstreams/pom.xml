@@ -59,6 +59,18 @@
 			<artifactId>engine-kernel</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.sos-berlin.commons</groupId>
+			<artifactId>sos-xml</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 
 		<dependency>

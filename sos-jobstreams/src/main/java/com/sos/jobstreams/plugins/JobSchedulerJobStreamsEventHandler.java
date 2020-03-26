@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +29,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.JobSchedulerEvent;
+import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.TaskEndEvent;
@@ -36,7 +37,6 @@ import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
-import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -65,7 +65,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             globalEventsPollTimer = null;
         }
     }
- 
+
     public void resetGlobalEventsPollTimer() {
         if (globalEventsPollTimer != null) {
             globalEventsPollTimer.cancel();
@@ -77,25 +77,30 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("60s Polling for is activated");
         }
     }
-    
+
     public void resetNextJobStartTimer() {
         if (nextJobStartTimer != null) {
             nextJobStartTimer.cancel();
             nextJobStartTimer.purge();
         }
         nextJobStartTimer = new Timer();
-        nextStarter = this.conditionResolver.getNextStarttime();
-        Long next = nextStarter.getNextStartFromList().getTime();
-        Long now = new Date().getTime();
-        Long delay = next - now;
-        
-        if (delay > 0) {
-         //   LOGGER.debug("Next start:" + nextStarter.getItemJobStreamStarter().getJob() + " at " + nextStarter.getNextStart());
-            nextJobStartTimer.schedule(new JobStartTask(), delay);
-        }else {
-            LOGGER.info("negative delay");
-        }
-        
+        Long delay = -1L;
+        do {
+            nextStarter = this.conditionResolver.getNextStarttime();
+            if (nextStarter != null) {
+                Long next = nextStarter.getNextStartFromList().getTime();
+                Long now = new Date().getTime();
+                delay = next - now;
+
+                if (delay > 0) {
+                    LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+                    nextJobStartTimer.schedule(new JobStartTask(), delay);
+                } else {
+                    LOGGER.info("negative delay");
+                }
+            }
+        } while (delay < 0);
+
     }
 
     public class InputTask extends TimerTask {
@@ -113,16 +118,16 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         }
     }
-    
+
     public class JobStartTask extends TimerTask {
 
         public void run() {
             try {
-             //   LOGGER.debug(nextStarter.getItemJobStreamStarter().getJob() + " at " + nextStarter.getNextStartFromList());
-                startJob();
+                LOGGER.debug(nextStarter.getAllJobNames() + " at " + nextStarter.getNextStartFromList());
+                startJobs();
                 resetNextJobStartTimer();
-                
-             } catch (Exception e) {
+
+            } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.error("Timer Task Error", e);
                 resetNextJobStartTimer();
@@ -130,18 +135,32 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    private void startJob() throws Exception {
-        Long taskId = nextStarter.startJob(getXmlCommandExecutor());
-        conditionResolver.getJobStreamContexts().addTaskToContext(taskId, taskId);
-       // LOGGER.debug(nextStarter.getItemJobStreamStarter().getJob() + " started");
+    private void startJobs() throws Exception {
+        List<JobStarterOptions> listOfStartedJobs = nextStarter.startJobs(getXmlCommandExecutor());
+        UUID uuid = UUID.randomUUID();
+        SOSHibernateSession session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
+        session.beginTransaction();
+        try {
+            for (JobStarterOptions startedJob : listOfStartedJobs) {
+                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, startedJob, session);
+            }
+            LOGGER.debug(nextStarter.getAllJobNames() + " started");
+            session.commit();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
+            session.rollback();
+        } finally {
+            session.close();
+        }
     }
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated, EventRemoved,JobStreamRemoved
+        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved
     }
 
     public static enum CustomEventTypeValue {
         incondition
+
     }
 
     public JobSchedulerJobStreamsEventHandler() {
@@ -179,7 +198,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver.init();
             this.resetGlobalEventsPollTimer();
             this.resetNextJobStartTimer();
- 
+
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -193,7 +212,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         }
 
-        EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent, EventType.OrderFinished };
+        EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
+                EventType.OrderFinished };
         start(observedEventTypes);
     }
 
@@ -226,9 +246,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
-                .getJobPath());
-        
+        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent.getJobPath());
+
         conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
@@ -271,19 +290,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 skippedTask = false;
 
                 List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session);
-                for (JSInCondition jsInCondition : listOfValidatedInconditions) {
-                    publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
-                    if (!jsInCondition.isSkipOutCondition()) {
-                        for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
-                            if (!inConditionCommand.isExecuted()) {
-                                TaskEndEvent taskEndEvent = new TaskEndEvent();
-                                taskEndEvent.setJobPath(jsInCondition.getJob());
-                                taskEndEvent.setReturnCode(0);
-                                taskEndEvent.setTaskId("");
-                                LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
-                                inConditionCommand.setExecuted(true);
-                                performTaskEnd(session, taskEndEvent);
-                                skippedTask = true;
+                if (listOfValidatedInconditions != null) {
+                    for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+                        publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
+                        if (!jsInCondition.isSkipOutCondition()) {
+                            for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                                if (!inConditionCommand.isExecuted()) {
+                                    TaskEndEvent taskEndEvent = new TaskEndEvent();
+                                    taskEndEvent.setJobPath(jsInCondition.getJob());
+                                    taskEndEvent.setReturnCode(0);
+                                    taskEndEvent.setTaskId("");
+                                    LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
+                                    inConditionCommand.setExecuted(true);
+                                    performTaskEnd(session, taskEndEvent);
+                                    skippedTask = true;
+                                }
                             }
                         }
                     }
@@ -292,6 +313,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             if (isDebugEnabled & duration != null) {
                 duration.end("Resolving all InConditions: ");
             }
+
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
         } finally {
@@ -396,8 +418,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             conditionResolver.reInitEvents(reportingFactory);
                             resolveInConditions = true;
                             break;
-                            
-                        
+
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
@@ -433,7 +454,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setJobStream(customEvent.getJobStream());
                             if (customEvent.getSession() == null || customEvent.getSession().isEmpty()) {
                                 event.setSession(Constants.getSession());
-                            }else {
+                            } else {
                                 event.setSession(customEvent.getSession());
                             }
                             event.setSchedulerId(super.getSettings().getSchedulerId());

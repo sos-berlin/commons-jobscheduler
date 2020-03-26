@@ -158,14 +158,19 @@ public class JobStarter {
         List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
-        return xml.asXML();
+        String xmlString = xml.asXML();
+        xmlString = xmlString.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+        return xmlString;
     }
 
     private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
         Element paramsElem = XMLBuilder.create("params");
         if (params != null) {
             for (NameValuePair param : params) {
-                paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                if (param.getValue() != null) {
+                    String value = param.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", value);
+                }
             }
         }
 
@@ -176,11 +181,17 @@ public class JobStarter {
         Element paramsElem = XMLBuilder.create("environment");
         if (envVars != null) {
             for (NameValuePair envVar : envVars) {
-                paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", envVar.getValue());
+                if (envVar.getValue() != null) {
+                    String value = envVar.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    try {
+                    paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", value);
+                    }catch (Exception e) {
+                        
+                    }
+                }
             }
         }
         return paramsElem;
     }
-
 
 }

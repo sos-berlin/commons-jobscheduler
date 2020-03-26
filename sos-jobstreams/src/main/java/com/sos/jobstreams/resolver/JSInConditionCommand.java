@@ -57,11 +57,11 @@ public class JSInConditionCommand {
         String answer = "";
         startJobReturn.setStartedJob("");
         if (inCondition.isStartToday()) {
-            LOGGER.trace("JSInConditionCommand:startJob XML for job start ist: " + jobXml);
+            LOGGER.trace("JSInConditionCommand:startJob XML for job start is: " + jobXml);
             if (schedulerXmlCommandExecutor != null) {
                 answer = schedulerXmlCommandExecutor.executeXml(jobXml);
 
-                SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(answer);
+                SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
                 Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
                 startJobReturn.setTaskId(taskId);
                 LOGGER.trace(answer);

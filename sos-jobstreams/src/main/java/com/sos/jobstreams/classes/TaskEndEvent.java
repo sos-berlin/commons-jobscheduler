@@ -24,6 +24,7 @@ public class TaskEndEvent {
     private String type;
     private String jobPath;
     private String taskId;
+    private Long taskIdLong;
     private Integer eventId;
 
     public TaskEndEvent(JsonObject entry) {
@@ -35,6 +36,11 @@ public class TaskEndEvent {
         if (key != null) {
             this.jobPath = key.getString("jobPath");
             this.taskId = key.getString("taskId");
+            try{
+                this.taskIdLong = Long.valueOf(this.taskId);
+            }catch (NumberFormatException e) {
+                this.taskIdLong = -1L;
+            }
         }
         this.eventId = entry.getInt("eventId");
     }
@@ -61,6 +67,12 @@ public class TaskEndEvent {
 
     public Integer getEventId() {
         return eventId;
+    }
+
+
+    
+    public Long getTaskIdLong() {
+        return taskIdLong;
     }
 
 }

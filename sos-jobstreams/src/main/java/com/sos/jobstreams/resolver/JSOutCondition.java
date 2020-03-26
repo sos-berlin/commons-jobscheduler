@@ -3,6 +3,7 @@ package com.sos.jobstreams.resolver;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 
+ 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);
@@ -64,7 +66,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, JSEvents jsEvents, JSEvents jsNewEvents, JSEvents jsRemoveEvents)
+    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, UUID context, JSEvents jsEvents, JSEvents jsNewEvents, JSEvents jsRemoveEvents)
             throws SOSHibernateException {
         boolean dbChange = false;
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
@@ -77,7 +79,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setJobStream(this.jobStream);
             itemEvent.setGlobalEvent(outConditionEvent.isGlobal());
 
-            itemEvent.setSession(Constants.getSession());
+            itemEvent.setSession(context.toString());
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
