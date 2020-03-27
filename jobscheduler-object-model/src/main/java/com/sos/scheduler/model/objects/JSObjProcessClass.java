@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */

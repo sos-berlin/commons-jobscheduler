@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
+import com.sos.vfs.common.SOSCommandResult;
 
 public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
 

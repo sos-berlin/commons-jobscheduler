@@ -1,6 +1,6 @@
 package com.sos.scheduler.model.objects;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Job.Description;
 

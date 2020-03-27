@@ -26,12 +26,12 @@ import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
-import com.sos.VirtualFileSystem.Options.SOSDestinationOptions;
-import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
-import com.sos.VirtualFileSystem.common.SOSShellInfo;
-import com.sos.VirtualFileSystem.common.SOSShellInfo.Shell;
-import com.sos.VirtualFileSystem.common.SOSVfsEnv;
+import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.sftp.SOSSFTP;
+import com.sos.vfs.common.SOSCommandResult;
+import com.sos.vfs.common.SOSEnv;
+import com.sos.vfs.common.SOSShellInfo;
+import com.sos.vfs.common.SOSShellInfo.Shell;
 import com.sos.exception.SOSSSHAutoDetectionException;
 
 import sos.net.ssh.SOSSSHJobOptions;
@@ -60,7 +60,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     private static final String DEFAULT_WINDOWS_POST_COMMAND_DELETE = "del \"%s\"";
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; exit 0";
 
-    private SOSVfsSFtpJCraft handler;
+    private SOSSFTP handler;
     private SOSDestinationOptions handlerOptions;
 
     private Map<String, String> returnValues = new HashMap<String, String>();
@@ -80,7 +80,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public SOSSSHJob() {
         super(new SOSSSHJobOptions());
 
-        handler = new SOSVfsSFtpJCraft();
+        handler = new SOSSFTP();
 
         UUID uuid = UUID.randomUUID();
         returnValuesFileName = "sos-ssh-return-values-" + uuid + ".txt";
@@ -119,7 +119,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
 
-            SOSVfsEnv envVars = new SOSVfsEnv();
+            SOSEnv envVars = new SOSEnv();
             envVars.setGlobalEnvs(new HashMap<String, String>());
             envVars.setLocalEnvs(new HashMap<String, String>());
             setReturnValuesEnvVar(envVars);
@@ -255,7 +255,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         return target;
     }
 
-    private Future<Void> executeCommand(ExecutorService executor, String cmd, SOSVfsEnv envVars) throws Exception {
+    private Future<Void> executeCommand(ExecutorService executor, String cmd, SOSEnv envVars) throws Exception {
         Callable<Void> runCompleteCmd = new Callable<Void>() {
 
             @Override
@@ -345,7 +345,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                 }
             }
             handler.connect(handlerOptions);
-            handler.login();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("handler connection established");
             }
@@ -450,7 +449,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         return sb;
     }
 
-    private void setReturnValuesEnvVar(SOSVfsEnv envVars) {
+    private void setReturnValuesEnvVar(SOSEnv envVars) {
         resolvedReturnValuesFileName = null;
         if (objOptions.tempDirectory.isDirty()) {
             resolvedReturnValuesFileName = resolveTempFileName(objOptions.tempDirectory.getValue(), returnValuesFileName);
@@ -467,7 +466,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    private void setSOSVfsEnvs(SOSVfsEnv envVars, boolean isWindowsShell) {
+    private void setSOSVfsEnvs(SOSEnv envVars, boolean isWindowsShell) {
         if (schedulerEnvVars != null) {
             for (Object key : schedulerEnvVars.keySet()) {
                 if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
@@ -728,7 +727,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         schedulerEnvVars = val;
     }
 
-    public SOSVfsSFtpJCraft getHandler() {
+    public SOSSFTP getHandler() {
         return handler;
     }
 

@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import javax.xml.bind.JAXBElement;
 
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjLock

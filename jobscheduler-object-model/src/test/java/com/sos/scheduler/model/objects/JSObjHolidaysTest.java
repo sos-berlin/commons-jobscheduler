@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.LiveConnector;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.TestBase;
