@@ -3,7 +3,7 @@ package com.sos.scheduler.model.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */

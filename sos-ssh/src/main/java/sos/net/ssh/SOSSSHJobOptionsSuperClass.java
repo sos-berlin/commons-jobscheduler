@@ -23,12 +23,9 @@ import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
-import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
 
 @JSOptionClass(name = "SOSSSHJobOptionsSuperClass", description = "Option-Class for a SSH-Connection")
-public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSShellOptions {
+public class SOSSSHJobOptionsSuperClass extends JSOptionsClass {
 
     private static final long serialVersionUID = 526076781389979326L;
     private static final String CLASSNAME = SOSSSHJobOptionsSuperClass.class.getSimpleName();
@@ -369,289 +366,204 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
         setAllOptions(super.getSettings());
     }
 
-    @Override
     public SOSOptionInFileName getAuthFile() {
         return authFile;
     }
 
-    @Override
     public void setAuthFile(final SOSOptionInFileName val) {
         authFile = val;
     }
 
-    @Override
     public SOSOptionAuthenticationMethod getAuthMethod() {
         return authMethod;
     }
 
-    @Override
     public void setAuthMethod(final SOSOptionAuthenticationMethod val) {
         authMethod = val;
     }
 
-    @Override
     public SOSOptionCommandString getCommand() {
         return command;
     }
 
-    @Override
     public void setCommand(final SOSOptionCommandString val) {
         command = val;
     }
 
-    @Override
     public SOSOptionRegExp getCommandDelimiter() {
         return commandDelimiter;
     }
 
-    @Override
     public void setCommandDelimiter(final SOSOptionRegExp val) {
         commandDelimiter = val;
     }
 
-    @Override
     public SOSOptionCommandString getCommandScript() {
         return commandScript;
     }
 
-    @Override
     public void setCommandScript(final SOSOptionCommandString val) {
         commandScript = val;
     }
 
-    @Override
     public SOSOptionInFileName getCommandScriptFile() {
         return commandScriptFile;
     }
 
-    @Override
     public void setCommandScriptFile(final SOSOptionInFileName val) {
         commandScriptFile = val;
     }
 
-    @Override
     public SOSOptionString getCommandScriptParam() {
         return commandScriptParam;
     }
 
-    @Override
     public void setCommandScriptParam(final SOSOptionString val) {
         commandScriptParam = val;
     }
 
-    @Override
     public SOSOptionHostName getHost() {
         return host;
     }
 
-    @Override
     public void setHost(final SOSOptionHostName val) {
         host = val;
     }
 
-    @Override
     public SOSOptionBoolean getIgnoreError() {
         return ignoreError;
     }
 
-    @Override
     public void setIgnoreError(final SOSOptionBoolean val) {
         ignoreError = val;
     }
 
-    @Override
     public SOSOptionIntegerArray getIgnoreExitCode() {
         return ignoreExitCode;
     }
 
-    @Override
     public void setIgnoreExitCode(final SOSOptionIntegerArray val) {
         ignoreExitCode = val;
     }
 
-    @Override
     public SOSOptionBoolean getIgnoreSignal() {
         return ignoreSignal;
     }
 
-    @Override
     public void setIgnoreSignal(final SOSOptionBoolean val) {
         ignoreSignal = val;
     }
 
-    @Override
     public SOSOptionBoolean getIgnoreStderr() {
         return ignoreStderr;
     }
 
-    @Override
     public void setIgnoreStderr(final SOSOptionBoolean val) {
         ignoreStderr = val;
     }
 
-    @Override
     public SOSOptionPassword getPassword() {
         return password;
     }
 
-    @Override
     public void setPassword(final SOSOptionPassword val) {
         password = val;
     }
 
-    @Override
     public SOSOptionPassword getPassphrase() {
         return passphrase;
     }
 
-    @Override
     public void setPassphrase(final SOSOptionPassword val) {
         passphrase = val;
     }
 
-    @Override
     public SOSOptionPortNumber getPort() {
         return port;
     }
 
-    @Override
     public void setPort(final SOSOptionPortNumber val) {
         port = val;
     }
 
-    @Override
     public SOSOptionString getProxyHost() {
         return proxyHost;
     }
 
-    @Override
     public void setProxyHost(final SOSOptionString val) {
         proxyHost = val;
     }
 
-    @Override
     public SOSOptionPassword getProxyPassword() {
         return proxyPassword;
     }
 
-    @Override
     public void setProxyPassword(final SOSOptionPassword val) {
         proxyPassword = val;
     }
 
-    @Override
     public SOSOptionPortNumber getProxyPort() {
         return proxyPort;
     }
 
-    @Override
     public void setProxyPort(final SOSOptionPortNumber val) {
         proxyPort = val;
     }
 
-    @Override
     public SOSOptionUserName getProxyUser() {
         return proxyUser;
     }
 
-    @Override
     public void setProxyUser(final SOSOptionUserName val) {
         proxyUser = val;
     }
 
-    @Override
     public SOSOptionBoolean getSimulateShell() {
         return simulateShell;
     }
 
-    @Override
     public void setSimulateShell(final SOSOptionBoolean val) {
         simulateShell = val;
     }
 
-    @Override
     public SOSOptionInteger getSimulateShellInactivityTimeout() {
         return simulateShellInactivityTimeout;
     }
 
-    @Override
     public void setSimulateShellInactivityTimeout(final SOSOptionInteger val) {
         simulateShellInactivityTimeout = val;
     }
 
-    @Override
     public SOSOptionInteger getSimulateShellLoginTimeout() {
         return simulateShellLoginTimeout;
     }
 
-    @Override
     public void setSimulateShellLoginTimeout(final SOSOptionInteger val) {
         simulateShellLoginTimeout = val;
     }
 
-    @Override
     public SOSOptionString getSimulateShellPromptTrigger() {
         return simulateShellPromptTrigger;
     }
 
-    @Override
     public void setSimulateShellPromptTrigger(final SOSOptionString val) {
         simulateShellPromptTrigger = val;
     }
 
-    @Override
     public SOSOptionUserName getUser() {
         return user;
     }
 
-    @Override
     public void setUser(final SOSOptionUserName val) {
         user = val;
     }
 
-    @Override
     public SOSOptionBoolean getIgnoreHangupSignal() {
         return ignoreHangupSignal;
     }
 
-    @Override
     public void setIgnoreHangupSignal(final SOSOptionBoolean val) {
         ignoreHangupSignal = val;
-    }
-
-    @Override
-    public SOSOptionString getAlternativeAccount() {
-        return null;
-    }
-
-    @Override
-    public SOSOptionHostName getAlternativeHost() {
-        return null;
-    }
-
-    @Override
-    public SOSOptionString getAlternativePassiveMode() {
-        return null;
-    }
-
-    @Override
-    public SOSOptionPassword getAlternativePassword() {
-        return null;
-    }
-
-    @Override
-    public SOSOptionPortNumber getAlternativePort() {
-        return null;
-    }
-
-    @Override
-    public void setAlternativeHost(final SOSOptionHostName val) {
-        //
-    }
-
-    @Override
-    public void setAlternativePassword(final SOSOptionPassword val) {
-        //
     }
 
     public void setChildClasses(final HashMap<String, String> settings, final String prefix) throws Exception {

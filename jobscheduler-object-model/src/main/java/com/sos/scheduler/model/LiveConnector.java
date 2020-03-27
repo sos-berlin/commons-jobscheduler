@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.SOSVFSFactory;
+import com.sos.vfs.common.interfaces.ISOSTransferHandler;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.tools.PathResolver;
 
 public class LiveConnector {
@@ -66,7 +66,7 @@ public class LiveConnector {
     private static ISOSTransferHandler connect(String folder) {
         ISOSTransferHandler result = null;
         try {
-            ISOSTransferHandler vfs = VFSFactory.getHandler(folder);
+            ISOSTransferHandler vfs = SOSVFSFactory.getHandler(folder);
             if (vfs == null) {
                 throw new JobSchedulerException();
             }

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.shell.CmdShell;
+import com.sos.vfs.shell.SOSShell;
 import com.sos.dialog.Globals;
 import com.sos.dialog.classes.WindowsSaver;
 import com.sos.dialog.swtdesigner.SWTResourceManager;
@@ -231,7 +231,7 @@ public class TextArea extends StyledText {
         try {
             JSFile objTempF = new JSFile(File.createTempFile("SOS-JOE", ".xml").getAbsolutePath());
             objTempF.write(text);
-            CmdShell objShell = new CmdShell();
+            SOSShell objShell = new SOSShell();
             String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
             objShell.setCommand(strCommandString);
             objShell.run();
