@@ -1,4 +1,4 @@
-package com.sos.vfs.http;
+package com.sos.vfs.http.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

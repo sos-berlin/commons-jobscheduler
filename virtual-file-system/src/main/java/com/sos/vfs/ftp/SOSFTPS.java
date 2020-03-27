@@ -1,4 +1,4 @@
-package com.sos.vfs.ftps;
+package com.sos.vfs.ftp;
 
 import java.io.File;
 import java.net.ProxySelector;
@@ -13,8 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol.Protocol;
-import com.sos.vfs.ftp.SOSFTPClientLogger;
-import com.sos.vfs.ftp.SOSFTPBaseClass;
+import com.sos.vfs.ftp.common.SOSFTPClientLogger;
+import com.sos.vfs.ftp.common.SOSFTPSProxySelector;
+import com.sos.vfs.ftp.common.SOSFTPBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;

@@ -1,4 +1,4 @@
-package com.sos.vfs.ftp;
+package com.sos.vfs.ftp.common;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 

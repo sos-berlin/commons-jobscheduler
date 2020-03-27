@@ -1,4 +1,4 @@
-package com.sos.vfs.ftp;
+package com.sos.vfs.ftp.common;
 
 import org.apache.commons.net.ProtocolCommandEvent;
 import org.apache.commons.net.ProtocolCommandListener;

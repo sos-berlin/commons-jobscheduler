@@ -1,4 +1,4 @@
-package com.sos.vfs.ftp;
+package com.sos.vfs.ftp.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +38,7 @@ import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.ftp.SOSFTPFile;
 import com.sos.vfs.common.SOSCommonTransfer;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;

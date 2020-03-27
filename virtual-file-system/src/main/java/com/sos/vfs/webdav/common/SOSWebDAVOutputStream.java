@@ -1,4 +1,4 @@
-package com.sos.vfs.webdav;
+package com.sos.vfs.webdav.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -9,7 +9,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.exception.SOSYadeSourceConnectionException;
 import com.sos.exception.SOSYadeTargetConnectionException;
 import com.sos.vfs.ftp.SOSFTP;
-import com.sos.vfs.ftps.SOSFTPS;
+import com.sos.vfs.ftp.SOSFTPS;
 import com.sos.vfs.http.SOSHTTP;
 import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.vfs.common.options.SOSBaseOptions;

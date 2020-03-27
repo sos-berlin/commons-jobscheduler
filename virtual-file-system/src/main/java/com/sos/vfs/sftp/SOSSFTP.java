@@ -51,6 +51,8 @@ import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.sftp.common.SOSSFTPLogger;
+import com.sos.vfs.sftp.common.SOSSFTPUserInfo;
 import com.sos.vfs.common.SOSCommandResult;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
