@@ -20,7 +20,7 @@ import com.sos.JSHelper.Options.SOSOptionProxyProtocol.Protocol;
 
 public class SOSFTPSProxySelector extends ProxySelector {
 
-    private final Logger logger = LoggerFactory.getLogger(SOSFTPSProxySelector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPSProxySelector.class);
 
     private Protocol proxyProtocol;
     private String proxyHost;
