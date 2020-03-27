@@ -374,14 +374,14 @@ public class SOSFileList extends SOSVFSMessageCodes {
 
                 if (LOGGER.isDebugEnabled()) {
                     String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
-                    LOGGER.debug(String.format("[%s][target][%s][atomic=%s][%s]", entry.getTransferNumber(), SOSCommonTransfer.normalizePath(
-                            path), entry.getTargetAtomicFileName(), transferStatus));
+                    LOGGER.debug(String.format("[%s][target][%s][atomic=%s][%s]", entry.getTransferNumber(), SOSCommonProvider.normalizePath(path),
+                            entry.getTargetAtomicFileName(), transferStatus));
                 }
                 if (!options.transactional.value() && transferStatus.equals(TransferStatus.transferred)) {
                     if (LOGGER.isDebugEnabled()) {
                         String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
-                        LOGGER.debug(String.format("[%s][target][%s][skip][transactional=false][%s]", entry.getTransferNumber(),
-                                SOSCommonTransfer.normalizePath(path), transferStatus));
+                        LOGGER.debug(String.format("[%s][target][%s][skip][transactional=false][%s]", entry.getTransferNumber(), SOSCommonProvider
+                                .normalizePath(path), transferStatus));
                     }
                     continue;
                 }
@@ -391,7 +391,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                     if (LOGGER.isDebugEnabled()) {
                         String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
                         LOGGER.debug(String.format("[%s][target][%s][skip][transactional=true]atomicFileName is empty", entry.getTransferNumber(),
-                                SOSCommonTransfer.normalizePath(path)));
+                                SOSCommonProvider.normalizePath(path)));
                     }
                     continue;
                 }
@@ -419,7 +419,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                         if (targetFile.fileExists()) {
                             targetFile.delete(false);
                         }
-                        msg = SOSVfs_D_212.params(SOSCommonTransfer.normalizePath(targetFile.getName()));
+                        msg = SOSVfs_D_212.params(SOSCommonProvider.normalizePath(targetFile.getName()));
                         LOGGER.info(msg);
                         JADE_REPORT_LOGGER.info(msg);
                         entry.setStatus(TransferStatus.setBack);

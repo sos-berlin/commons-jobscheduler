@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.SOSCommonTransferFile;
+import com.sos.vfs.common.SOSCommonProviderFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSSFTPFile extends SOSCommonTransferFile {
+public class SOSSFTPFile extends SOSCommonProviderFile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSFTPFile.class);
 

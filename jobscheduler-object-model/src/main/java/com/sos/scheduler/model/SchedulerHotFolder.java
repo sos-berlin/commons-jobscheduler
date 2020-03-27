@@ -38,7 +38,7 @@ public class SchedulerHotFolder extends JSObjBase {
         setHotFolderSrc(pobjVirtualFile);
     }
 
-    public SchedulerHotFolderFileList load() {
+    public SchedulerHotFolderFileList load() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -46,7 +46,7 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList loadOrderObjects() {
+    public SchedulerHotFolderFileList loadOrderObjects() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -54,7 +54,7 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList loadRecursive() {
+    public SchedulerHotFolderFileList loadRecursive() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -62,12 +62,12 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList refresh() {
+    public SchedulerHotFolderFileList refresh() throws Exception {
         objHotFolderFileList = load(this.getHotFolderSrc());
         return objHotFolderFileList;
     }
 
-    private SchedulerHotFolderFileList loadRecursive(final ISOSVirtualFile pobjVirtualDir) {
+    private SchedulerHotFolderFileList loadRecursive(final ISOSVirtualFile pobjVirtualDir) throws Exception {
         SchedulerHotFolderFileList result = load(pobjVirtualDir);
         List<SchedulerHotFolder> folders = result.getFolderList();
         for (SchedulerHotFolder folder : folders) {
@@ -90,11 +90,11 @@ public class SchedulerHotFolder extends JSObjBase {
         return objJob;
     }
 
-    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) {
+    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) throws Exception {
         return load(pobjVirtualDir, ".*");
     }
 
-    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir, String regex) {
+    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir, String regex) throws Exception {
         final String conMethodName = "SchedulerHotFolder::load";
         SchedulerHotFolderFileList result = new SchedulerHotFolderFileList();
         try {

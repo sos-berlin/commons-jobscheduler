@@ -13,7 +13,7 @@ import com.sos.vfs.ftp.SOSFTPS;
 import com.sos.vfs.http.SOSHTTP;
 import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.jms.SOSJMS;
 import com.sos.vfs.sftp.SOSSFTP;
 import com.sos.vfs.smb.SOSSMB;
@@ -97,23 +97,22 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
     public ISOSTransferHandler getConnectedHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
         ISOSTransferHandler client = null;
         try {
-            SOSDestinationOptions destinationOptions;
+            SOSProviderOptions providerOptions;
             String dataType;
             if (isSource) {
-                destinationOptions = options.getTransferOptions().getSource();
+                providerOptions = options.getTransfer().getSource();
                 dataType = options.getDataSourceType();
             } else {
-                destinationOptions = options.getTransferOptions().getTarget();
+                providerOptions = options.getTransfer().getTarget();
                 dataType = options.getDataTargetType();
             }
-            destinationOptions.loadClassName.setIfNotDirty(options.getTransferOptions().loadClassName);
             client = getHandler(dataType);
             try {
-                handleOptions(destinationOptions, isSource);
+                handleOptions(providerOptions, isSource);
                 client.setBaseOptions(options);
-                client.connect(destinationOptions);
+                client.connect(providerOptions);
             } catch (Exception e) {
-                SOSDestinationOptions alternatives = destinationOptions.getAlternatives();
+                SOSProviderOptions alternatives = providerOptions.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
@@ -127,7 +126,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                     client = getHandler(alternatives.protocol.getValue());
                     handleOptions(alternatives, isSource);
                     client.connect(alternatives);
-                    destinationOptions.alternateOptionsUsed.value(true);
+                    providerOptions.alternateOptionsUsed.value(true);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
                     LOGGER.debug(String.format("alternate options are not defined"));
@@ -150,21 +149,21 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         return client;
     }
 
-    private void handleOptions(SOSDestinationOptions destinationOptions, boolean isSource) throws Exception {
-        if (destinationOptions.directory.isDirty()) {
+    private void handleOptions(SOSProviderOptions providerOptions, boolean isSource) throws Exception {
+        if (providerOptions.directory.isDirty()) {
             if (isSource) {
-                options.sourceDir = destinationOptions.directory;
-                options.localDir = destinationOptions.directory;
+                options.sourceDir = providerOptions.directory;
+                options.localDir = providerOptions.directory;
             } else {
-                options.targetDir = destinationOptions.directory;
-                options.remoteDir = destinationOptions.directory;
+                options.targetDir = providerOptions.directory;
+                options.remoteDir = providerOptions.directory;
             }
         }
-        if (destinationOptions.transferMode.isDirty() && destinationOptions.transferMode.isNotEmpty()) {
-            // client.transferMode(destinationOptions.transferMode);
+        if (providerOptions.transferMode.isDirty() && providerOptions.transferMode.isNotEmpty()) {
+            // client.transferMode(providerOptions.transferMode);
         } else {
             // client.transferMode(options.transferMode);
-            destinationOptions.transferMode = options.transferMode;
+            providerOptions.transferMode = options.transferMode;
         }
     }
 }

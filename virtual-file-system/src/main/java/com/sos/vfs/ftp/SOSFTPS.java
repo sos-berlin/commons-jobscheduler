@@ -52,8 +52,8 @@ public class SOSFTPS extends SOSFTPBaseClass {
         if (super.getClient() == null) {
             FTPSClient client = null;
             try {
-                LOGGER.info(String.format("use %s client security", getDestinationOptions().ftpsClientSecurity.getValue()));
-                client = new FTPSClient(getDestinationOptions().ftpsProtocol.getValue(), getDestinationOptions().ftpsClientSecurity.isImplicit());
+                LOGGER.info(String.format("use %s client security", getProviderOptions().ftpsClientSecurity.getValue()));
+                client = new FTPSClient(getProviderOptions().ftpsProtocol.getValue(), getProviderOptions().ftpsClientSecurity.isImplicit());
                 if (usingProxy()) {
                     LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().getValue(),
                             getProxyHost(), getProxyPort(), getProxyUser()));
@@ -67,7 +67,7 @@ public class SOSFTPS extends SOSFTPBaseClass {
                         ProxySelector.setDefault(ps);
                     }
                 }
-                if (!SOSString.isEmpty(getDestinationOptions().keystoreFile.getValue())) {
+                if (!SOSString.isEmpty(getProviderOptions().keystoreFile.getValue())) {
                     setTrustManager(client);
                 }
 
@@ -75,7 +75,7 @@ public class SOSFTPS extends SOSFTPBaseClass {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             setCommandListener(new SOSFTPClientLogger(getHostID("")));
-            if (getDestinationOptions() != null && getDestinationOptions().protocolCommandListener.isTrue()) {
+            if (getProviderOptions() != null && getProviderOptions().protocolCommandListener.isTrue()) {
                 client.addProtocolCommandListener(getCommandListener());
             }
 
@@ -90,10 +90,10 @@ public class SOSFTPS extends SOSFTPBaseClass {
     }
 
     private void setTrustManager(FTPSClient client) throws Exception {
-        LOGGER.info(String.format("using keystore: type = %s, file = %s", getDestinationOptions().keystoreType.getValue(),
-                getDestinationOptions().keystoreFile.getValue()));
-        KeyStore ks = loadKeyStore(getDestinationOptions().keystoreType.getValue(), new File(getDestinationOptions().keystoreFile.getValue()),
-                getDestinationOptions().keystorePassword.getValue());
+        LOGGER.info(String.format("using keystore: type = %s, file = %s", getProviderOptions().keystoreType.getValue(),
+                getProviderOptions().keystoreFile.getValue()));
+        KeyStore ks = loadKeyStore(getProviderOptions().keystoreType.getValue(), new File(getProviderOptions().keystoreFile.getValue()),
+                getProviderOptions().keystorePassword.getValue());
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }
 }

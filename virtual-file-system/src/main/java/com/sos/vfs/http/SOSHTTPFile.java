@@ -3,11 +3,11 @@ package com.sos.vfs.http;
 import java.io.InputStream;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.SOSCommonTransferFile;
+import com.sos.vfs.common.SOSCommonProviderFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSHTTPFile extends SOSCommonTransferFile {
+public class SOSHTTPFile extends SOSCommonProviderFile {
 
     public SOSHTTPFile(final String path) {
         super(path);

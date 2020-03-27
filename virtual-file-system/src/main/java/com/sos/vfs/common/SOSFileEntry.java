@@ -6,7 +6,7 @@ public class SOSFileEntry {
 
     // TODO webdav, http, smb
     public static enum EntryType {
-        FILESYSTEM, HTTP, SMB, ZIP
+        FILESYSTEM, HTTP, SMB
     }
 
     private static final String FILE = "File";

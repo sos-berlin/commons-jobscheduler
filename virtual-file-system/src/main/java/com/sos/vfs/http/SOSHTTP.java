@@ -33,17 +33,17 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.http.common.SOSHTTPRequestEntity;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSHTTP extends SOSCommonTransfer {
+public class SOSHTTP extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHTTP.class);
     private MultiThreadedHttpConnectionManager connectionManager;
@@ -73,14 +73,14 @@ public class SOSHTTP extends SOSCommonTransfer {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
-        proxyHost = destinationOptions.proxyHost.getValue();
-        proxyPort = destinationOptions.proxyPort.value();
-        proxyUser = destinationOptions.proxyUser.getValue();
-        proxyPassword = destinationOptions.proxyPassword.getValue();
+        proxyHost = providerOptions.proxyHost.getValue();
+        proxyPort = providerOptions.proxyPort.value();
+        proxyUser = providerOptions.proxyUser.getValue();
+        proxyPassword = providerOptions.proxyPassword.getValue();
         doConnect();
-        doLogin(destinationOptions.user.getValue(), destinationOptions.password.getValue());
+        doLogin(providerOptions.user.getValue(), providerOptions.password.getValue());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class SOSHTTP extends SOSCommonTransfer {
     }
 
     @Override
-    protected boolean fileExists(final String path) {
+    public boolean fileExists(final String path) {
         GetMethod method = new GetMethod(normalizeHttpPath(path));
         try {
             httpClient.executeMethod(method);
@@ -183,7 +183,7 @@ public class SOSHTTP extends SOSCommonTransfer {
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
                         rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(destinationOptions.verifyCertificateHostname.value());
+                        psf.setCheckHostname(providerOptions.verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
                             LOGGER.info(
                                     "*********************** Security warning *********************************************************************");
@@ -194,7 +194,7 @@ public class SOSHTTP extends SOSCommonTransfer {
                             LOGGER.info(
                                     "**************************************************************************************************************");
                         }
-                        if (destinationOptions.acceptUntrustedCertificate.value()) {
+                        if (providerOptions.acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }

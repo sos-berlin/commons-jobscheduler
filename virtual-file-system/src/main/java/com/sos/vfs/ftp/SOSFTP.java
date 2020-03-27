@@ -37,7 +37,7 @@ public class SOSFTP extends SOSFTPBaseClass {
                 client = new FTPClient();
             }
             setCommandListener(new SOSFTPClientLogger(getHostID("")));
-            if (getDestinationOptions() != null && getDestinationOptions().protocolCommandListener.isTrue()) {
+            if (getProviderOptions() != null && getProviderOptions().protocolCommandListener.isTrue()) {
                 client.addProtocolCommandListener(getCommandListener());
                 LOGGER.debug("ProtocolcommandListener added and activated");
             }

@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.shell.SOSShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -23,10 +23,10 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import sos.util.SOSFile;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSLocal extends SOSCommonTransfer {
+public class SOSLocal extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSLocal.class);
-    private SOSDestinationOptions destinationOptions = null;
+    private SOSProviderOptions providerOptions = null;
     private SOSShell shell = null;
 
     @Override
@@ -35,8 +35,8 @@ public class SOSLocal extends SOSCommonTransfer {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
-        destinationOptions = options;
+    public void connect(final SOSProviderOptions options) throws Exception {
+        providerOptions = options;
     }
 
     @Override
@@ -62,8 +62,8 @@ public class SOSLocal extends SOSCommonTransfer {
         int exitCode = shell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
-            if (destinationOptions != null) {
-                raiseException = destinationOptions.raiseExceptionOnError.value();
+            if (providerOptions != null) {
+                raiseException = providerOptions.raiseExceptionOnError.value();
             }
             if (raiseException) {
                 throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
@@ -196,7 +196,7 @@ public class SOSLocal extends SOSCommonTransfer {
     }
 
     @Override
-    public void reconnect(SOSDestinationOptions options) {
+    public void reconnect(SOSProviderOptions options) {
         //
     }
 

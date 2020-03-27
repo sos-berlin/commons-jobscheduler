@@ -2,6 +2,7 @@ package com.sos.vfs.jms;
 
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -18,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 
-public class SOSJMS extends SOSCommonTransfer {
+public class SOSJMS extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSJMS.class);
     private ConnectionFactory factory = null;
@@ -35,7 +36,7 @@ public class SOSJMS extends SOSCommonTransfer {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
         doConnect();
     }
@@ -188,6 +189,12 @@ public class SOSJMS extends SOSCommonTransfer {
 
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

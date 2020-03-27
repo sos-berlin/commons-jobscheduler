@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 
@@ -14,9 +14,9 @@ public interface ISOSTransferHandler {
 
     public boolean isConnected();
 
-    public void connect(SOSDestinationOptions options) throws Exception;
+    public void connect(SOSProviderOptions options) throws Exception;
 
-    public void reconnect(SOSDestinationOptions options);
+    public void reconnect(SOSProviderOptions options);
 
     public void disconnect() throws IOException;
 
@@ -24,13 +24,15 @@ public interface ISOSTransferHandler {
 
     public SOSBaseOptions getBaseOptions();
 
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException;
+    // files and folders - not recursive
+    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws Exception;
 
-    public List<SOSFileEntry> nList(String path, boolean recursive, boolean checkIfExists);
+    // only files
+    public List<SOSFileEntry> getFilelist(String path, String regexp, int flag, boolean recursive, boolean checkIfExists, String integrityHashType)
+            throws Exception;
 
-    public List<SOSFileEntry> getFilelist(String path, String regexp, int flag, boolean recursive, boolean checkIfExists, String integrityHashType);
-
-    public List<SOSFileEntry> getFolderlist(String path, String regexp, int flag, boolean recursive);
+    // only folders
+    public List<SOSFileEntry> getFolderlist(String path, String regexp, int flag, boolean recursive) throws Exception;
 
     public SOSFileEntry getFileEntry(String path) throws Exception;
 
@@ -45,6 +47,8 @@ public interface ISOSTransferHandler {
     public void delete(String pathname, boolean checkIsDirectory) throws IOException;
 
     public void rename(String path, String newPath);
+
+    public boolean fileExists(final String path);
 
     public long getFileSize(String path);
 

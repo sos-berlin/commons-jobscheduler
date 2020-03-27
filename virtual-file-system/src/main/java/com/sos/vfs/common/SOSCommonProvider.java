@@ -12,19 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.SOSFileListEntry;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSDestinationOptions;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.options.SOSProviderOptions;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements ISOSTransferHandler {
+public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements ISOSTransferHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommonTransfer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommonProvider.class);
 
-    protected SOSDestinationOptions destinationOptions = null;
+    protected SOSProviderOptions providerOptions = null;
 
     private List<SOSFileEntry> directoryListing = null;
     private SOSBaseOptions baseOptions = null;
@@ -34,7 +33,7 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
     protected int port = 0;
     protected String reply = "OK";
 
-    public SOSCommonTransfer() {
+    public SOSCommonProvider() {
         super("SOSVirtualFileSystem");
     }
 
@@ -44,19 +43,19 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSProviderOptions options) throws Exception {
         if (options == null) {
-            throw new Exception("destinationOptions is null");
+            throw new Exception("providerOptions is null");
         }
-        destinationOptions = options;
+        providerOptions = options;
 
-        user = destinationOptions.user.getValue();
-        host = destinationOptions.host.getValue();
-        port = destinationOptions.port.value();
+        user = providerOptions.user.getValue();
+        host = providerOptions.host.getValue();
+        port = providerOptions.port.value();
     }
 
     @Override
-    public void reconnect(SOSDestinationOptions options) {
+    public void reconnect(SOSProviderOptions options) {
         if (!isConnected()) {
             try {
                 connect(options);
@@ -72,19 +71,9 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
     public void disconnect() {
     }
 
-    @Override
-    public List<SOSFileEntry> nList(final String pathname, final boolean recursive, boolean checkIfExists) {
-        try {
-            return getFilenames(pathname, recursive, 0, checkIfExists);
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("nList"), e);
-        }
-    }
-
     private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
         if (recLevel == 0) {
             directoryListing = new ArrayList<SOSFileEntry>();
-            doPWD();
         }
         List<SOSFileEntry> entries = null;
         path = path.trim();
@@ -117,33 +106,43 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
 
     @Override
     public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean recursive, boolean checkIfExists,
-            String integrityHashType) {
-        List<SOSFileEntry> result = nList(folder, recursive, checkIfExists);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s][total] %s files", folder, result.size()));
+            String integrityHashType) throws Exception {
+        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, checkIfExists);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s][total] %s files", folder, result.size()));
         }
 
         List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         Pattern pattern = Pattern.compile(regexp, flag);
-        for (SOSFileEntry fe : result) {
-            Matcher matcher = pattern.matcher(fe.getFilename());
+        for (SOSFileEntry entry : result) {
+            if (entry.isDirectory()) {
+                continue;
+            }
+            // file list should not contain the checksum files
+            if (integrityHashType != null && entry.getFilename().endsWith(integrityHashType)) {
+                continue;
+            }
+            Matcher matcher = pattern.matcher(entry.getFilename());
             if (matcher.find()) {
-                list.add(fe);
+                list.add(entry);
             }
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s][filtered] %s files", folder, list.size()));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s][filtered] %s files", folder, list.size()));
         }
         return list;
     }
 
     @Override
-    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean recursive) {
-        List<SOSFileEntry> result = nList(folder, recursive, true);
+    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean recursive) throws Exception {
+        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, false);
 
         List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
         Pattern pattern = Pattern.compile(regexp, flag);
         for (SOSFileEntry entry : result) {
+            if (!entry.isDirectory()) {
+                continue;
+            }
             Matcher matcher = pattern.matcher(entry.getFilename());
             if (matcher.find()) {
                 list.add(entry);
@@ -172,15 +171,6 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
 
     protected String getHostID(final String msg) {
         return "(" + user + "@" + host + ":" + port + ") " + msg;
-    }
-
-    private String doPWD() {
-        try {
-            LOGGER.debug(SOSVfs_D_141.params("doPWD"));
-            return this.getCurrentPath();
-        } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("pwd"), e);
-        }
     }
 
     protected boolean logReply() {
@@ -234,7 +224,8 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
         return reply;
     }
 
-    protected boolean fileExists(final String filename) {
+    @Override
+    public boolean fileExists(final String filename) {
         return false;
     }
 
@@ -255,10 +246,6 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
 
     @Override
     public abstract OutputStream getOutputStream(final String fileName, boolean append, boolean resume);
-
-    protected String getCurrentPath() {
-        return null;
-    }
 
     @Override
     public void mkdir(final String pathname) throws IOException {
@@ -303,12 +290,6 @@ public abstract class SOSCommonTransfer extends SOSVFSMessageCodes implements IS
 
     @Override
     public String getModificationDateTime(final String fileName) {
-        LOGGER.info("not implemented yet");
-        return null;
-    }
-
-    @Override
-    public List<SOSFileEntry> listNames(final String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         LOGGER.info("not implemented yet");
         return null;
     }

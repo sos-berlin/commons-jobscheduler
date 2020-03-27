@@ -24,17 +24,17 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.webdav.common.SOSWebDAVOutputStream;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSWebDAV extends SOSCommonTransfer {
+public class SOSWebDAV extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSWebDAV.class);
     private HttpURL rootUrl = null;
@@ -56,12 +56,12 @@ public class SOSWebDAV extends SOSCommonTransfer {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
 
-        host = destinationOptions.host.getValue();
-        port = destinationOptions.port.value();
-        if (destinationOptions.authMethod.isURL()) {
+        host = providerOptions.host.getValue();
+        port = providerOptions.port.value();
+        if (providerOptions.authMethod.isURL()) {
             URL url = new URL(host);
             port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
         }
@@ -381,7 +381,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
     }
 
     @Override
-    protected boolean fileExists(final String filename) {
+    public boolean fileExists(final String filename) {
         WebdavResource res = null;
         try {
             res = this.getResource(filename);
@@ -446,7 +446,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
         rootUrl = null;
         HttpURL httpUrl = null;
         String path = "/";
-        if (destinationOptions.authMethod.isURL()) {
+        if (providerOptions.authMethod.isURL()) {
             URL url = new URL(phost);
             String phostRootUrl = url.getProtocol() + "://" + url.getAuthority();
             if (url.getPort() == -1) {
@@ -465,7 +465,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
             if ("https".equalsIgnoreCase(httpUrl.getScheme())) {
                 rootUrl = new HttpsURL(phostRootUrl);
                 StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                psf.setCheckHostname(destinationOptions.verifyCertificateHostname.value());
+                psf.setCheckHostname(providerOptions.verifyCertificateHostname.value());
                 if (!psf.getCheckHostname()) {
                     LOGGER.info("*********************** Security warning *********************************************************************");
                     LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
@@ -473,7 +473,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
                     LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
                     LOGGER.info("**************************************************************************************************************");
                 }
-                if (destinationOptions.acceptUntrustedCertificate.value()) {
+                if (providerOptions.acceptUntrustedCertificate.value()) {
                     psf.useDefaultJavaCiphers();
                     psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                 }
@@ -509,8 +509,8 @@ public class SOSWebDAV extends SOSCommonTransfer {
 
     private String getWebdavRessourcePath(String path) {
         if (!path.startsWith("/")) {
-            String curDir = getCurrentPath();
-            path = curDir + path;
+            //String curDir = getCurrentPath();
+            //path = curDir + path;
         }
         return path;
     }
@@ -521,13 +521,13 @@ public class SOSWebDAV extends SOSCommonTransfer {
     }
 
     private void doLogin() throws Exception {
-        userName = destinationOptions.user.getValue();
-        password = destinationOptions.password.getValue();
+        userName = providerOptions.user.getValue();
+        password = providerOptions.password.getValue();
 
-        proxyHost = destinationOptions.proxyHost.getValue();
-        proxyPort = destinationOptions.proxyPort.value();
-        proxyUser = destinationOptions.proxyUser.getValue();
-        proxyPassword = destinationOptions.proxyPassword.getValue();
+        proxyHost = providerOptions.proxyHost.getValue();
+        proxyPort = providerOptions.proxyPort.value();
+        proxyUser = providerOptions.proxyUser.getValue();
+        proxyPassword = providerOptions.proxyPassword.getValue();
 
         LOGGER.debug(SOSVfs_D_132.params(userName));
         HttpURL httpUrl = this.setRootHttpURL(userName, password, host, port);
@@ -545,8 +545,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(destinationOptions.authMethod.getValue(), destinationOptions.authFile.getValue()),
-                    ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(providerOptions.authMethod.getValue(), providerOptions.authFile.getValue()), ex);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -563,7 +562,7 @@ public class SOSWebDAV extends SOSCommonTransfer {
         }
         if (SOSString.isEmpty(msg)) {
             msg = "no details provided.";
-            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0 && !destinationOptions.acceptUntrustedCertificate.value()) {
+            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0 && !providerOptions.acceptUntrustedCertificate.value()) {
                 msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
             }
         }
