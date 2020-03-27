@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.http.common.SOSHTTPRequestEntity;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSCommonTransfer;

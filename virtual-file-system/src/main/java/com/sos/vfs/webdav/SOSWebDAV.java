@@ -25,6 +25,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.webdav.common.SOSWebDAVOutputStream;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSCommonTransfer;

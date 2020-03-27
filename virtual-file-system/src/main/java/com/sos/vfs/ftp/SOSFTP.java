@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.ftp.common.SOSFTPBaseClass;
+import com.sos.vfs.ftp.common.SOSFTPClientLogger;
 
 import sos.util.SOSString;
 

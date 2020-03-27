@@ -1,4 +1,4 @@
-package com.sos.vfs.ftps;
+package com.sos.vfs.ftp.common;
 
 import java.io.IOException;
 import java.net.Authenticator;

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.SOSCommonFile;
 import com.sos.vfs.common.SOSVFSConstants;
+import com.sos.vfs.ftp.common.SOSFTPBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")

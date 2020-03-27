@@ -1,4 +1,4 @@
-package com.sos.vfs.sftp;
+package com.sos.vfs.sftp.common;
 
 import java.util.Scanner;
 
