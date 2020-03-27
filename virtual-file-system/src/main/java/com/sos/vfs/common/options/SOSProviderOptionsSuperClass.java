@@ -26,18 +26,18 @@ import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@JSOptionClass(name = "SOSDestinationOptionsSuperClass", description = "SOSDestinationOptionsSuperClass")
+@JSOptionClass(name = "SOSProviderOptionsSuperClass", description = "SOSProviderOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSDestinationOptionsSuperClass extends JSOptionsClass {
+public class SOSProviderOptionsSuperClass extends JSOptionsClass {
 
     private static final long serialVersionUID = 1997338600688654140L;
-    private static final String CLASSNAME = SOSDestinationOptionsSuperClass.class.getSimpleName();
+    private static final String CLASSNAME = SOSProviderOptionsSuperClass.class.getSimpleName();
 
-    public SOSDestinationOptionsSuperClass() {
+    public SOSProviderOptionsSuperClass() {
         objParentClass = this.getClass();
     }
 
-    public SOSDestinationOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
+    public SOSProviderOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
         this.setAllOptions(settings);
     }

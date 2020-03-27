@@ -10,16 +10,16 @@ import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSCommonTransferFile extends SOSCommonFile {
+public class SOSCommonProviderFile extends SOSCommonFile {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommonTransferFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommonProviderFile.class);
     protected String fileName = EMPTY_STRING;
 
-    public SOSCommonTransferFile() {
+    public SOSCommonProviderFile() {
         super("SOSVirtualFileSystem");
     }
 
-    public SOSCommonTransferFile(final String path) {
+    public SOSCommonProviderFile(final String path) {
         this();
         fileName = adjustFileSeparator(path);
     }

@@ -25,11 +25,11 @@ import com.sos.vfs.common.interfaces.IJadeTransferDetailHistoryData;
 import com.sos.vfs.common.interfaces.ISOSTransferHandler;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSDestinationOptions;
-import com.sos.vfs.common.options.SOSTransferOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
+import com.sos.vfs.common.options.SOSTransfer;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSDate;
@@ -131,7 +131,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         JADE_REPORT_LOGGER.info(msg);
     }
 
-    private boolean doTransfer(ISOSVirtualFile source, String fileHandlerSourceFileName, ISOSVirtualFile target, String fileHandlerTargetFileName) {
+    private boolean doTransfer(ISOSVirtualFile source, String fileHandlerSourceFileName, ISOSVirtualFile target, String fileHandlerTargetFileName)
+            throws Exception {
         boolean closed = false;
         if (target == null) {
             setTransferStatus(TransferStatus.transfer_aborted);
@@ -298,8 +299,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 }
             }
 
-            LOGGER.info(String.format("[%s][transferred]Source=%s, Target=%s, Bytes=%s %s", transferNumber, SOSCommonTransfer.normalizePath(source
-                    .getName()), SOSCommonTransfer.normalizePath(target.getName()), totalBytesTransferred, getDateTimeInfos(startTime, endTime)));
+            LOGGER.info(String.format("[%s][transferred]Source=%s, Target=%s, Bytes=%s %s", transferNumber, SOSCommonProvider.normalizePath(source
+                    .getName()), SOSCommonProvider.normalizePath(target.getName()), totalBytesTransferred, getDateTimeInfos(startTime, endTime)));
 
             if (parent.getTargetClient().isNegativeCommandCompletion()) {
                 setTransferStatus(TransferStatus.transfer_aborted);
@@ -348,8 +349,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    private ISOSVirtualFile tryReconnect(String range, ISOSTransferHandler transfer, SOSDestinationOptions opt, ISOSVirtualFile file,
-            int retryCount) {
+    private ISOSVirtualFile tryReconnect(String range, ISOSTransferHandler transfer, SOSProviderOptions opt, ISOSVirtualFile file, int retryCount) {
         if (transfer.isConnected()) {
             return null;
         }
@@ -542,15 +542,15 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    public void executeTFNPostCommnands() {
-        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
+    public void executeTFNPostCommnands() throws Exception {
+        SOSProviderOptions target = parent.getOptions().getTransfer().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_target_tfn_post_command", parent.getTargetClient(), target.getAlternatives().tfnPostCommand, target
                     .getAlternatives().commandDelimiter);
         } else {
             executeCommands("target_tfn_post_command", parent.getTargetClient(), target.tfnPostCommand, target.commandDelimiter);
         }
-        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
+        SOSProviderOptions source = parent.getOptions().getTransfer().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             executeCommands("alternative_source_tfn_post_command", parent.getSourceClient(), source.getAlternatives().tfnPostCommand, source
                     .getAlternatives().commandDelimiter);
@@ -559,7 +559,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    public void executePostCommands() {
+    public void executePostCommands() throws Exception {
         boolean isTransferred = transferStatus.equals(TransferStatus.transferred);
         String status = transferStatus.name();
         Map<String, String> env = new HashMap<String, String>();
@@ -568,7 +568,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         SOSEnv envs = new SOSEnv();
         envs.setLocalEnvs(env);
 
-        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
+        SOSProviderOptions target = parent.getOptions().getTransfer().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && target.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[%s][alternative_target_post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber,
@@ -585,7 +585,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 executeCommands("target_post_command", parent.getTargetClient(), target.postCommand, target.commandDelimiter, envs);
             }
         }
-        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
+        SOSProviderOptions source = parent.getOptions().getTransfer().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (!isTransferred && source.getAlternatives().post_command_disable_for_skipped_transfer.value()) {
                 LOGGER.info(String.format("[%s][alternative_source_post_command][skip]disable_for_skipped_transfer=true, status=%s", transferNumber,
@@ -603,8 +603,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    private void executePreCommands(boolean isSkipped) {
-        SOSDestinationOptions target = parent.getOptions().getTransferOptions().getTarget();
+    private void executePreCommands(boolean isSkipped) throws Exception {
+        SOSProviderOptions target = parent.getOptions().getTransfer().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (target.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
@@ -625,7 +625,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 executeCommands("target_pre_command", parent.getTargetClient(), target.preCommand, target.commandDelimiter);
             }
         }
-        SOSDestinationOptions source = parent.getOptions().getTransferOptions().getSource();
+        SOSProviderOptions source = parent.getOptions().getTransfer().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
             if (isSkipped) {
                 if (source.getAlternatives().pre_command_enable_for_skipped_transfer.value()) {
@@ -837,7 +837,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 targetFile.delete(true);
                 parent.getOptions().setCumulativeTargetDeleted(true);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(String.format("[%s][target][%s]cumulative file deleted", transferNumber, SOSCommonTransfer.normalizePath(targetFile
+                    LOGGER.debug(String.format("[%s][target][%s]cumulative file deleted", transferNumber, SOSCommonProvider.normalizePath(targetFile
                             .getName())));
                 }
             }
@@ -859,7 +859,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         if (targetFile.fileExists()) {
             targetFileExistsBeforeTransfer = true;
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[%s][target][%s]targetFileExistsBeforeTransfer=true", transferNumber, SOSCommonTransfer.normalizePath(
+                LOGGER.debug(String.format("[%s][target][%s]targetFileExistsBeforeTransfer=true", transferNumber, SOSCommonProvider.normalizePath(
                         targetFile.getName())));
             }
             if (parent.getOptions().isDoNotOverwrite()) {
@@ -867,7 +867,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[%s][target][%s]targetFileExistsBeforeTransfer=false", transferNumber, SOSCommonTransfer.normalizePath(
+                LOGGER.debug(String.format("[%s][target][%s]targetFileExistsBeforeTransfer=false", transferNumber, SOSCommonProvider.normalizePath(
                         targetFile.getName())));
             }
         }
@@ -875,8 +875,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return targetFile;
     }
 
-    public void setRenamedSourceFilename() {
-        SOSDestinationOptions sourceOptions = parent.getOptions().getSource();
+    public void setRenamedSourceFilename() throws Exception {
+        SOSProviderOptions sourceOptions = parent.getOptions().getSource();
         if (sourceOptions.replacing.isDirty() && !parent.getOptions().removeFiles.value()) {
             String replaceWith = sourceOptions.replacement.getValue();
             try {
@@ -1051,17 +1051,17 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         targetFileNewName = resolveDotsInPath(targetFileNewName);
         boolean equals = fileNamesAreEqual(targetTransferFile.getName(), targetFileNewName, false);
         if (isTraceEnabled) {
-            LOGGER.trace(String.format("[%s][target][%s][%s]equals=%s", transferNumber, SOSCommonTransfer.normalizePath(targetTransferFile.getName()),
-                    SOSCommonTransfer.normalizePath(targetFileNewName), equals));
+            LOGGER.trace(String.format("[%s][target][%s][%s]equals=%s", transferNumber, SOSCommonProvider.normalizePath(targetTransferFile.getName()),
+                    SOSCommonProvider.normalizePath(targetFileNewName), equals));
         }
         if (!equals) {
             try {
-                String targetFileOldName = SOSCommonTransfer.normalizePath(targetTransferFile.getName());
+                String targetFileOldName = SOSCommonProvider.normalizePath(targetTransferFile.getName());
                 if (parent.getOptions().overwriteFiles.isTrue() && targetFileExistsBeforeTransfer) {
                     try {
                         targetFile.delete(false);
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug(String.format("[%s][target][%s][overwriteFiles=true]deleted", transferNumber, SOSCommonTransfer
+                            LOGGER.debug(String.format("[%s][target][%s][overwriteFiles=true]deleted", transferNumber, SOSCommonProvider
                                     .normalizePath(targetFile.getName())));
                         }
                     } catch (Throwable e) {
@@ -1074,7 +1074,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     }
                 }
                 targetTransferFile.rename(targetFileNewName);
-                LOGGER.info(String.format("[%s]%s", transferNumber, SOSVFSMessageCodes.SOSVfs_I_150.params(targetFileOldName, SOSCommonTransfer
+                LOGGER.info(String.format("[%s]%s", transferNumber, SOSVFSMessageCodes.SOSVfs_I_150.params(targetFileOldName, SOSCommonProvider
                         .normalizePath(targetFileNewName))));
             } catch (Exception e) {
                 throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
@@ -1214,7 +1214,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     } catch (Exception e) {
                         transferStatus = TransferStatus.transfer_aborted;
                         targetFile.delete(false);
-                        LOGGER.info(String.format("[%s][transfer_aborted]Target=%s deleted", transferNumber, SOSCommonTransfer.normalizePath(
+                        LOGGER.info(String.format("[%s][transfer_aborted]Target=%s deleted", transferNumber, SOSCommonProvider.normalizePath(
                                 targetFile.getName())));
                         throw e;
                     }
@@ -1230,9 +1230,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    public void setNoOfBytesTransferred(final long bytes, long fileSize) {
+    public void setNoOfBytesTransferred(final long bytes, long fileSize) throws Exception {
         bytesTransferred = bytes;
-        SOSTransferOptions connectionOptions = parent.getOptions().getTransferOptions();
+        SOSTransfer connectionOptions = parent.getOptions().getTransfer();
         if (!(parent.getOptions().checkSize.isFalse() || parent.getOptions().compressFiles.isTrue() || parent.getOptions().transferMode.isAscii()
                 || connectionOptions.getSource().transferMode.isAscii() || connectionOptions.getTarget().transferMode.isAscii())) {
             if (sourceFileSize <= 0) {
@@ -1255,7 +1255,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     public void setNotOverwritten(ISOSVirtualFile targetFile) {
         transferStatus = TransferStatus.notOverwritten;
         endTime = Instant.now();
-        LOGGER.info(String.format("[%s][notOverwritten]Target=%s", transferNumber, SOSCommonTransfer.normalizePath(targetFile.getName())));
+        LOGGER.info(String.format("[%s][notOverwritten]Target=%s", transferNumber, SOSCommonProvider.normalizePath(targetFile.getName())));
     }
 
     public boolean isNotOverwritten() {
@@ -1311,7 +1311,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         setStatus(TransferStatus.transferred);
     }
 
-    public void setStatusEndTransfer(final long val, long fileSize) {
+    public void setStatusEndTransfer(final long val, long fileSize) throws Exception {
         setNoOfBytesTransferred(val, fileSize);
         setStatusEndTransfer();
     }

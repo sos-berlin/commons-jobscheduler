@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.SOSCommonTransferFile;
+import com.sos.vfs.common.SOSCommonProviderFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSSMBFile extends SOSCommonTransferFile {
+public class SOSSMBFile extends SOSCommonProviderFile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSMBFile.class);
 

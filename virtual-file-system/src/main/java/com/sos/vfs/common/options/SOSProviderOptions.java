@@ -33,18 +33,18 @@ import sos.util.SOSString;
 
 @JSOptionClass(name = "SOSDestinationOptions", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSDestinationOptions extends SOSDestinationOptionsSuperClass {
+public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSDestinationOptions.class);
-    private static final String CLASSNAME = SOSDestinationOptions.class.getSimpleName();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSProviderOptions.class);
+    private static final String CLASSNAME = SOSProviderOptions.class.getSimpleName();
     private String destinationPrefix = "";
     private boolean isSource = false;
 
-    public SOSDestinationOptions() {
+    public SOSProviderOptions() {
     }
 
-    public SOSDestinationOptions(boolean source) {
+    public SOSProviderOptions(boolean source) {
         isSource = source;
     }
 
@@ -71,9 +71,9 @@ public class SOSDestinationOptions extends SOSDestinationOptionsSuperClass {
         }
     }
 
-    public SOSDestinationOptions getAlternatives() {
+    public SOSProviderOptions getAlternatives() {
         if (alternativeOptions == null) {
-            alternativeOptions = new SOSDestinationOptions(isSource);
+            alternativeOptions = new SOSProviderOptions(isSource);
         }
         return alternativeOptions;
     }
@@ -385,7 +385,7 @@ public class SOSDestinationOptions extends SOSDestinationOptionsSuperClass {
             "Alternate Options used for connection and/or authentication", "false", "false", false);
 
     @JSOptionClass(description = "", name = "SOSDestinationOptions", prefix = "alternate_")
-    private SOSDestinationOptions alternativeOptions = null;
+    private SOSProviderOptions alternativeOptions = null;
 
     @JSOptionClass(description = "", name = "SOSCredentialStoreOptions")
     private SOSCredentialStoreOptions credentialStoreOptions = null;

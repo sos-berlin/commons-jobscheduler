@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSCommonTransfer;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.shell.SOSShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -36,7 +36,7 @@ import jcifs.smb.SmbFileOutputStream;
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSSMB extends SOSCommonTransfer {
+public class SOSSMB extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSMB.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
@@ -47,7 +47,6 @@ public class SOSSMB extends SOSCommonTransfer {
 
     private String domain = null;
 
-    private String currentDirectory = "";
     private SOSShell shell = null;
     private String logPrefix = null;
 
@@ -61,15 +60,15 @@ public class SOSSMB extends SOSCommonTransfer {
     }
 
     @Override
-    public void connect(final SOSDestinationOptions options) throws Exception {
+    public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
 
         try {
-            domain = destinationOptions.domain.getValue();
-            port = destinationOptions.port.isDirty() ? port : DEFAULT_PORT;
+            domain = providerOptions.domain.getValue();
+            port = providerOptions.port.isDirty() ? port : DEFAULT_PORT;
             setLogPrefix();
             try {
-                createContext(domain, host, port, user, destinationOptions.password.getValue());
+                createContext(domain, host, port, user, providerOptions.password.getValue());
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
@@ -110,8 +109,8 @@ public class SOSSMB extends SOSCommonTransfer {
     }
 
     private Properties setConfigFromFiles(Properties properties) {
-        if (!SOSString.isEmpty(destinationOptions.configuration_files.getValue())) {
-            String[] files = destinationOptions.configuration_files.getValue().split(";");
+        if (!SOSString.isEmpty(providerOptions.configuration_files.getValue())) {
+            String[] files = providerOptions.configuration_files.getValue().split(";");
             for (int i = 0; i < files.length; i++) {
                 String file = files[i].trim();
                 LOGGER.info(String.format("%s[setConfigFromFiles][%s]", logPrefix, file));
@@ -151,7 +150,7 @@ public class SOSSMB extends SOSCommonTransfer {
     }
 
     @Override
-    protected boolean fileExists(String filename) {
+    public boolean fileExists(String filename) {
         SmbFile smbFile = null;
         try {
             smbFile = getSmbFile(normalizePath(filename));
@@ -416,8 +415,8 @@ public class SOSSMB extends SOSCommonTransfer {
         int exitCode = shell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
-            if (destinationOptions != null) {
-                raiseException = destinationOptions.raiseExceptionOnError.value();
+            if (providerOptions != null) {
+                raiseException = providerOptions.raiseExceptionOnError.value();
             }
             if (raiseException) {
                 throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
@@ -517,11 +516,6 @@ public class SOSSMB extends SOSCommonTransfer {
                 smbFile.close();
             }
         }
-    }
-
-    @Override
-    protected String getCurrentPath() {
-        return currentDirectory;
     }
 
     private String getSmbFilePath(String path) {

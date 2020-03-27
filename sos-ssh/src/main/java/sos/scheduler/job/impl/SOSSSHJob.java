@@ -26,7 +26,7 @@ import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
-import com.sos.vfs.common.options.SOSDestinationOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.SOSSFTP;
 import com.sos.vfs.common.SOSCommandResult;
 import com.sos.vfs.common.SOSEnv;
@@ -61,7 +61,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     private static final String DEFAULT_LINUX_POST_COMMAND_DELETE = "test -r %s && rm %s; exit 0";
 
     private SOSSFTP handler;
-    private SOSDestinationOptions handlerOptions;
+    private SOSProviderOptions handlerOptions;
 
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map<String, String> schedulerEnvVars;
@@ -591,7 +591,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     private void setHandlerOptions(SOSSSHJobOptions jobOptions, TransferTypes protocol) {
-        handlerOptions = new SOSDestinationOptions();
+        handlerOptions = new SOSProviderOptions();
         handlerOptions.strictHostKeyChecking.value(jobOptions.strictHostKeyChecking.value());
         handlerOptions.host.setValue(jobOptions.getHost().getValue());
         handlerOptions.port.value(jobOptions.getPort().value());
@@ -634,7 +634,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
-    private void mapBackOptionsFromCS(SOSDestinationOptions options) {
+    private void mapBackOptionsFromCS(SOSProviderOptions options) {
         objOptions.host.setValue(options.host.getValue());
         objOptions.port.setValue(options.port.getValue());
         objOptions.user.setValue(options.user.getValue());
