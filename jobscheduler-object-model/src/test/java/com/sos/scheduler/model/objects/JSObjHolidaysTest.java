@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.io.Files;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.LiveConnector;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.TestBase;

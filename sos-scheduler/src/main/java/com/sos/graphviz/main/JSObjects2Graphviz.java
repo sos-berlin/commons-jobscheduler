@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSTransferHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.SOSVFSFactory;
+import com.sos.vfs.common.interfaces.ISOSTransferHandler;
+import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.graphviz.enums.FileType;
 import com.sos.graphviz.jobchain.diagram.JobChainDiagramCreator;
 import com.sos.scheduler.model.SchedulerHotFolder;
@@ -40,7 +40,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
-        fileSystemHandler = VFSFactory.getHandler("local");
+        fileSystemHandler = SOSVFSFactory.getHandler("local");
         schedulerObjectFactory = new SchedulerObjectFactory();
         schedulerObjectFactory.initMarshaller(Spooler.class);
         ISOSVirtualFile hotFolder = fileSystemHandler.getFileHandle(liveFolderName);

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
-import com.sos.VirtualFileSystem.common.SOSCommandResult;
+import com.sos.vfs.common.SOSCommandResult;
 
 public class SOSSSHCheckRemotePidJob extends SOSSSHJob {
 
