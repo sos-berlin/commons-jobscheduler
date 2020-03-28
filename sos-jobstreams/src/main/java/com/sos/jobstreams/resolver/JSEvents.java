@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
+
+import sos.util.SOSString;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +62,7 @@ public class JSEvents {
         JSEvent returnEvent;
         if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
             returnEvent = this.getEvent(jsEventKey);
+            LOGGER.trace("EventKey:" + SOSString.toString(jsEventKey));
             LOGGER.debug("Event direct return: " + returnEvent);
             return returnEvent;
         } else {

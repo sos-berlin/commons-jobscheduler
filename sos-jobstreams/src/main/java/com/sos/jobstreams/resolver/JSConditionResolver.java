@@ -63,6 +63,8 @@ public class JSConditionResolver {
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private JSJobInConditions jsJobInConditions;
     private JSJobOutConditions jsJobOutConditions;
+    private JSHistory jsHistory;
+
     private JSEvents jsEvents;
     private SOSHibernateSession sosHibernateSession;
     private BooleanExp booleanExpression;
@@ -459,65 +461,72 @@ public class JSConditionResolver {
 
     public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws NumberFormatException, Exception {
 
+        LOGGER.debug("JSConditionResolver::resolveInConditions");
+        
         List<JSInCondition> listOfValidatedInconditions = null;
-        for (Map.Entry<UUID, List<Long>> context : jobStreamContexts.getListOfContexts().entrySet()) {
-            UUID contextId = context.getKey();
-            listOfValidatedInconditions = new ArrayList<JSInCondition>();
-            if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
-                LOGGER.debug("No in conditions defined. Nothing to do");
-
-            } else {
-
-                LOGGER.debug("JSConditionResolver::resolveInConditions");
-                session.beginTransaction();
-                try {
-                    for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                        for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                            String logPrompt = "";
-                            if (isTraceEnabled) {
-                                logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream() + " Expression: "
-                                        + inCondition.getExpression();
-                            }
-                            if (!inCondition.isConsumed(contextId)) {
-                                if (!inCondition.jobIsRunning(contextId)) {
-
+        for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
+            LOGGER.debug("Resolving jobstream" + jobStream.getValue().getJobStream());
+            if (jobStream.getValue().getListOfJobStreamHistory() != null) {
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found",jsHistoryEntry.getItemJobStreamHistory().getJobStream(),jsHistoryEntry.getContextId()));
+                    jsHistoryEntry.getContextId();
+                    UUID contextId = jsHistoryEntry.getContextId();
+                    listOfValidatedInconditions = new ArrayList<JSInCondition>();
+                    if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
+                        LOGGER.debug("No in conditions defined. Nothing to do");
+                    } else {
+                        session.beginTransaction();
+                        try {
+                            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                                    String logPrompt = "";
                                     if (isTraceEnabled) {
-                                        LOGGER.trace("---InCondition is: " + inCondition.toStr());
+                                        logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream() + " Expression: "
+                                                + inCondition.getExpression();
                                     }
-                                    if (validate(null, contextId, inCondition)) {
-                                        StartJobReturn startJobReturn = inCondition.executeCommand(session, contextId, schedulerXmlCommandExecutor);
-                                        if (!startJobReturn.getStartedJob().isEmpty()) {
-                                            JobStarterOptions jobStarterOptions = new JobStarterOptions();
-                                            jobStarterOptions.setJob(startJobReturn.getStartedJob());
-                                            jobStarterOptions.setJobStream(inCondition.getJobStream());
-                                            jobStarterOptions.setTaskId(startJobReturn.getTaskId());
-                                            jobStreamContexts.addTaskToContext(contextId, jobStarterOptions, session);
-                                            // TODO: disable for this context only
-                                            this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob());
+                                    if (!inCondition.isConsumed(contextId)) {
+                                        if (!inCondition.jobIsRunning(contextId)) {
+
+                                            if (isTraceEnabled) {
+                                                LOGGER.trace("---InCondition is: " + inCondition.toStr());
+                                            }
+                                            if (validate(null, contextId, inCondition)) {
+                                                StartJobReturn startJobReturn = inCondition.executeCommand(session, contextId,
+                                                        schedulerXmlCommandExecutor);
+                                                if (!startJobReturn.getStartedJob().isEmpty()) {
+                                                    JobStarterOptions jobStarterOptions = new JobStarterOptions();
+                                                    jobStarterOptions.setJob(startJobReturn.getStartedJob());
+                                                    jobStarterOptions.setJobStream(inCondition.getJobStream());
+                                                    jobStarterOptions.setTaskId(startJobReturn.getTaskId());
+                                                    jobStreamContexts.addTaskToContext(contextId, jobStarterOptions, session);
+                                                    // TODO: disable for this context only
+                                                    this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob());
+                                                }
+                                                listOfValidatedInconditions.add(inCondition);
+                                            } else {
+                                                if (isTraceEnabled) {
+                                                    LOGGER.trace(logPrompt + " evaluated to --> false");
+                                                }
+                                            }
+                                        } else {
+                                            if (isTraceEnabled) {
+                                                LOGGER.trace(logPrompt + " not executed --> job is running");
+                                            }
                                         }
-                                        listOfValidatedInconditions.add(inCondition);
                                     } else {
                                         if (isTraceEnabled) {
-                                            LOGGER.trace(logPrompt + " evaluated to --> false");
+                                            LOGGER.trace(logPrompt + " not executed --> already consumed");
                                         }
                                     }
-                                } else {
-                                    if (isTraceEnabled) {
-                                        LOGGER.trace(logPrompt + " not executed --> job is running");
-                                    }
-                                }
-                            } else {
-                                if (isTraceEnabled) {
-                                    LOGGER.trace(logPrompt + " not executed --> already consumed");
                                 }
                             }
+                            session.commit();
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(),e);
+                            session.rollback();
                         }
                     }
-                    session.commit();
-                } catch (Exception e) {
-                    session.rollback();
                 }
-
             }
         }
         return listOfValidatedInconditions;
@@ -554,7 +563,7 @@ public class JSConditionResolver {
                         } else {
                             LOGGER.trace(expression + "-->false");
                         }
-                        LOGGER.trace("");
+                        LOGGER.trace("------------------------------------");
                     }
                 } else {
                     LOGGER.debug("No out conditions for job " + job + " found. Nothing to do");
@@ -718,6 +727,11 @@ public class JSConditionResolver {
 
     public JobStreamContexts getJobStreamContexts() {
         return jobStreamContexts;
+    }
+
+    
+    public JSJobStreams getJsJobStreams() {
+        return jsJobStreams;
     }
 
 }

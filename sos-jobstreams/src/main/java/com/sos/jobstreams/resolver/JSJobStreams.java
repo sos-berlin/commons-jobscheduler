@@ -6,16 +6,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
+import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JSJobStreams {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStreams.class);
@@ -40,7 +44,9 @@ public class JSJobStreams {
 
     public void setListOfJobStreams(List<DBItemJobStream> listOfJobStreams, SOSHibernateSession sosHibernateSession) throws JsonParseException,
             JsonMappingException, JsonProcessingException, IOException, Exception {
+        
         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
 
         for (DBItemJobStream itemJobStream : listOfJobStreams) {
             JSJobStream jsStreamStream = new JSJobStream();
@@ -49,6 +55,14 @@ public class JSJobStreams {
             filterJobStreamStarters.setJobStreamId(itemJobStream.getId());
             List<DBItemJobStreamStarter> listOfJobStreamStarters = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0);
             jsStreamStream.setJobStreamStarters(listOfJobStreamStarters, sosHibernateSession);
+            
+            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+            filterJobStreamHistory.setJobStreamId(itemJobStream.getId());
+            filterJobStreamHistory.setRunning(true);
+            List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+            jsStreamStream.setJobStreamHistory(listOfJobStreamHistory, sosHibernateSession);
+
+            
             addJobStream(jsStreamStream);
         }
     }
@@ -73,7 +87,6 @@ public class JSJobStreams {
                         nextJsJobStreamStarter.setNextStart(next);
                     }
                 }
-
             }
         }
         return nextJsJobStreamStarter;

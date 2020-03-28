@@ -109,14 +109,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         dbItemConsumedInCondition.setCreated(new Date());
         dbItemConsumedInCondition.setInConditionId(this.getId());
         dbItemConsumedInCondition.setSession(String.valueOf(contextId));
-        try {
-            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-        }
+        DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+        dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
     }
 
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {

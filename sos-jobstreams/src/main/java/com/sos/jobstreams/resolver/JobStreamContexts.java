@@ -44,7 +44,7 @@ public class JobStreamContexts {
         dbItemJobStreamTaskContext.setTaskId(startedJob.getTaskId());
         LOGGER.debug("store contextid:" +  contextId);
         dbLayerJobStreamsTaskContext.store(dbItemJobStreamTaskContext);
-        LOGGER.debug("adding contextid" +  contextId);
+        LOGGER.debug("adding contextid:" +  contextId);
         listOfContexts.get(contextId).add(startedJob.getTaskId());
         LOGGER.debug("adding taskid " + startedJob.getTaskId());
         listOfTaskIds.put(startedJob.getTaskId(), contextId);

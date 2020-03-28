@@ -23,6 +23,7 @@ import com.sos.jitl.eventhandler.handler.LoopEventHandler;
 import com.sos.jitl.eventhandler.plugin.notifier.Notifier;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -34,8 +35,11 @@ import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
+import com.sos.jobstreams.resolver.JSHistory;
+import com.sos.jobstreams.resolver.JSHistoryEntry;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
+import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
@@ -141,6 +145,23 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         SOSHibernateSession session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
         session.beginTransaction();
         try {
+            
+            DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
+            dbItemJobStreamHistory.setContextId(uuid.toString());
+            dbItemJobStreamHistory.setCreated(new Date());
+            dbItemJobStreamHistory.setJobStream(nextStarter.getItemJobStreamStarter().getJobStream());
+            dbItemJobStreamHistory.setJobStreamStarter(nextStarter.getItemJobStreamStarter().getId());
+            dbItemJobStreamHistory.setRunning(true);
+            dbItemJobStreamHistory.setStarted(new Date());
+
+            JSHistoryEntry historyEntry = new JSHistoryEntry();
+            historyEntry.setCreated(new Date());
+            historyEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
+            
+            JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(nextStarter.getItemJobStreamStarter().getJobStream());
+            LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s",dbItemJobStreamHistory.getContextId(), jobStream.getJobStream()));
+            jobStream.getJsHistory().addHistoryEntry(historyEntry, session);
+                       
             for (JobStarterOptions startedJob : listOfStartedJobs) {
                 conditionResolver.getJobStreamContexts().addTaskToContext(uuid, startedJob, session);
             }
@@ -277,7 +298,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private void resolveInConditions() throws Exception {
         DurationCalculator duration = null;
         if (isDebugEnabled) {
-            LOGGER.debug("Resolve inconditinons");
+            LOGGER.debug("Resolve in-conditions");
             duration = new DurationCalculator();
         }
 

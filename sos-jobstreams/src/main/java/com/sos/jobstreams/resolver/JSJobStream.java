@@ -13,9 +13,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
-import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
@@ -25,14 +25,16 @@ public class JSJobStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStream.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
- 
+
     private DBItemJobStream itemJobStream;
     private List<JSJobStreamStarter> listOfJobStreamStarter;
+    private JSHistory jsHistory;
 
     public JSJobStream() {
         super();
         itemJobStream = new DBItemJobStream();
         listOfJobStreamStarter = new ArrayList<JSJobStreamStarter>();
+        jsHistory = new JSHistory();
     }
 
     public void setItemJobStream(DBItemJobStream itemJobStream) {
@@ -71,6 +73,8 @@ public class JSJobStream {
         listOfJobStreamStarter.add(jobStreamStarter);
     }
 
+ 
+
     public void setJobStreamStarters(List<DBItemJobStreamStarter> listOfJobStreamStarters, SOSHibernateSession sosHibernateSession)
             throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
@@ -78,11 +82,11 @@ public class JSJobStream {
             JSJobStreamStarter jobStreamStarter = new JSJobStreamStarter();
             jobStreamStarter.setItemJobStreamStarter(dbItemJobStreamStarter);
             jobStreamStarter.setJobStreamName(itemJobStream.getJobStream());
-            
+
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
             jobStreamStarter.setListOfJobs(dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0));
-            
+
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();
             filterJobStreamParameters.setJobStreamStarterId(jobStreamStarter.getItemJobStreamStarter().getId());
             List<DBItemJobStreamParameter> listOfJobStreamParameters = dbLayerJobStreamParameters.getJobStreamParametersList(
@@ -92,9 +96,28 @@ public class JSJobStream {
         }
     }
 
-    
     public List<JSJobStreamStarter> getListOfJobStreamStarter() {
+        if (listOfJobStreamStarter == null) {
+            listOfJobStreamStarter = new ArrayList<JSJobStreamStarter>();
+        }
         return listOfJobStreamStarter;
+    }
+
+    public List<JSHistoryEntry> getListOfJobStreamHistory() {
+        return this.jsHistory.getListOfHistoryEntries();
+    }
+
+    public void setJobStreamHistory(List<DBItemJobStreamHistory> listOfJobStreamHistory, SOSHibernateSession sosHibernateSession) {
+        for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfJobStreamHistory) {
+            JSHistoryEntry jsHistoryEntry = new JSHistoryEntry();
+            jsHistoryEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
+            this.jsHistory.getListOfHistoryEntries().add(jsHistoryEntry);
+        }
+    }
+
+    
+    public JSHistory getJsHistory() {
+        return jsHistory;
     }
 
 }

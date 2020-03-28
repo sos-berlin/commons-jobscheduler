@@ -11,7 +11,7 @@ import com.sos.joc.model.common.NameValuePair;
 
 class EnvVarCreator {
 
-    public NameValuePair getEnvVar(JobStarterOptions inCondition, String envVarName) {
+    public NameValuePair getEnvVar(JobStarterOptions jobStarterOptions, String envVarName) {
         String functionName = envVarName.toUpperCase();
         SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 
@@ -23,7 +23,7 @@ class EnvVarCreator {
         switch (functionName) {
         case "JS_JOBSTREAM":
             envVar.setName(envVarName);
-            envVar.setValue(inCondition.getJobStream());
+            envVar.setValue(jobStarterOptions.getJobStream());
             return envVar;
         case "JS_TIME":
             outFormat = new SimpleDateFormat("HH:mm:ss");
@@ -74,11 +74,11 @@ class EnvVarCreator {
             return envVar;
         case "JS_FOLDER":
             envVar.setName(envVarName);
-            envVar.setValue(Globals.getParent(inCondition.getJob()));
+            envVar.setValue(Globals.getParent(jobStarterOptions.getJob()));
             return envVar;
         case "JS_JOBNAME":
             envVar.setName(envVarName);
-            envVar.setValue(inCondition.getJob());
+            envVar.setValue(jobStarterOptions.getJob());
             return envVar;
         default:
             break;
