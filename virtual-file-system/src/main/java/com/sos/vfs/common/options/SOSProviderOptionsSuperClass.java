@@ -1,7 +1,5 @@
 package com.sos.vfs.common.options;
 
-import java.util.HashMap;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -35,16 +33,6 @@ public class SOSProviderOptionsSuperClass extends JSOptionsClass {
 
     public SOSProviderOptionsSuperClass() {
         objParentClass = this.getClass();
-    }
-
-    public SOSProviderOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
-        this();
-        this.setAllOptions(settings);
-    }
-
-    @Override
-    public void setAllOptions(final HashMap<String, String> settings) {
-        super.setAllOptions(settings);
     }
 
     @Override
