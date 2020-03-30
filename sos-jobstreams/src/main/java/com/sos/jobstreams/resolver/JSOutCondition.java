@@ -18,7 +18,8 @@ import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 
- 
+import sos.util.SOSString;
+
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);
@@ -66,9 +67,10 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, UUID context, JSEvents jsEvents, JSEvents jsNewEvents, JSEvents jsRemoveEvents)
-            throws SOSHibernateException {
+    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, String context, JSEvents jsEvents, JSEvents jsNewEvents,
+            JSEvents jsRemoveEvents) throws SOSHibernateException {
         boolean dbChange = false;
+        sosHibernateSession.setAutoCommit(false);
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
             sosHibernateSession.setAutoCommit(false);
 
@@ -79,10 +81,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setJobStream(this.jobStream);
             itemEvent.setGlobalEvent(outConditionEvent.isGlobal());
 
-            itemEvent.setSession(context.toString());
+            itemEvent.setSession(context);
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
+            LOGGER.trace("---> Add event: " + SOSString.toString(event));
 
             if (outConditionEvent.isCreateCommand()) {
                 jsEvents.addEvent(event);
@@ -95,7 +98,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                     event.setEvent(jsCondition.getEventName());
                     event.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
                     if (jsCondition.getConditionJobStream() != "") {
-                       event.setJobStream(jsCondition.getConditionJobStream());
+                        event.setJobStream(jsCondition.getConditionJobStream());
                     }
                     jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);

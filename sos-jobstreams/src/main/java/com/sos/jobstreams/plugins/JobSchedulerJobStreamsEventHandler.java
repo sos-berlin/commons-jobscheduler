@@ -268,8 +268,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
         boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent.getJobPath());
-
-        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
+        UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(),contextId);
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
@@ -410,7 +410,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         break;
                     case "TaskClosed":
                         taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath());
+                        UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(),contextId);
                         break;
 
                     case "VariablesCustomEvent":
@@ -496,7 +497,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
                             filterConsumedInConditions.setJobSchedulerId(super.getSettings().getSchedulerId());
-                            filterConsumedInConditions.setSession(Constants.getSession());
+                            filterConsumedInConditions.setSession(customEvent.getSession());
                             filterConsumedInConditions.setJobStream(customEvent.getJobStream());
                             filterConsumedInConditions.setJob(customEvent.getJob());
 

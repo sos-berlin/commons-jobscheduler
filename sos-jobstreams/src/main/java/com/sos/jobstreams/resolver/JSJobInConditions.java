@@ -3,6 +3,7 @@ package com.sos.jobstreams.resolver;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,16 @@ public class JSJobInConditions {
             }
             JSInConditionCommand inConditionCommand = new JSInConditionCommand();
             inConditionCommand.setItemInConditionCommand(itemInConditionWithCommand.getDbItemInConditionCommand());
-           // TODO: jsInCondition.setConsumed(itemInConditionWithCommand.isConsumed());
+
+            if (itemInConditionWithCommand.getConsumedForContext() != null) {
+                for (String context : itemInConditionWithCommand.getConsumedForContext()) {
+                    try {
+                        jsInCondition.setConsumed(UUID.fromString(context));
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.warn("Could not create the contextId from: " + context);
+                    }
+                }
+            }
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
             jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());

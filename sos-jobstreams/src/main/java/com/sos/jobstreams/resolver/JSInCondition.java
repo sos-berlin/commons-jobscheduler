@@ -5,12 +5,12 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,6 @@ import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.JobStreamCalendar;
 import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 import sos.util.SOSString;
@@ -37,7 +36,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
     private Set<UUID> consumedForContext;
-    private boolean jobIsRunning;
+    private Map<UUID,Boolean> listOfRunningJobs;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
     private boolean haveCalendars;
@@ -45,7 +44,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public JSInCondition() {
         super();
         haveCalendars = false;
-        jobIsRunning = false;
+        listOfRunningJobs = new HashMap<UUID,Boolean>();
         this.consumedForContext = new HashSet<UUID>();
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
@@ -210,12 +209,16 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return this.getExpression() + "::" + SOSString.toString(this);
     }
 
-    public boolean jobIsRunning(UUID uuid) {
-        return jobIsRunning;
+    public boolean jobIsRunning(UUID contextId) {
+        Boolean b = listOfRunningJobs.get(contextId);
+        if (b == null) {
+            b = false;
+        }
+        return b;
     }
 
-    public void setJobIsRunning(boolean jobIsRunning) {
-        this.jobIsRunning = jobIsRunning;
+    public void setJobIsRunning(UUID contextId, boolean jobIsRunning) {
+        this.listOfRunningJobs.put(contextId,jobIsRunning);
     }
 
     public Date getNextPeriod() {
