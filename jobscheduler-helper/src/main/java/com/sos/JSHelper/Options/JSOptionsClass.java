@@ -688,10 +688,10 @@ public class JSOptionsClass extends I18NBase implements Serializable {
                         // iterateAllDataElementsByAnnotation(el.getClass(), el, enuIterate4What, sb, prefix);
                     }
 
-                } catch (final ClassCastException objException) {
+                } catch (final ClassCastException e) {
                     //
-                } catch (final Exception objE) {
-                    throw new RuntimeException(objE);
+                } catch (final Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
         } catch (final Exception x) {

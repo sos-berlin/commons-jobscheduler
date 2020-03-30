@@ -17,22 +17,21 @@ public class SOSTransfer {
     private SOSProviderOptions targetOptions = null;
 
     public SOSTransfer(final HashMap<String, String> settings) throws Exception {
-        LOGGER.trace("[destination options]source");
-        sourceOptions = new SOSProviderOptions(true);
-        setProviderOptions(settings, sourceOptions, "source_", SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
+        LOGGER.trace("[provider options]source");
+        sourceOptions = new SOSProviderOptions(false, true);
+        setProviderOptions(settings, sourceOptions, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
 
-        LOGGER.trace("[destination options]target");
-        targetOptions = new SOSProviderOptions(false);
-        setProviderOptions(settings, targetOptions, "target_", SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
+        LOGGER.trace("[provider options]target");
+        targetOptions = new SOSProviderOptions(false, false);
+        setProviderOptions(settings, targetOptions, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
     }
 
-    private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String prefix, String settingsKey)
-            throws Exception {
-        options.setAllOptions(settings, prefix);
+    private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String settingsKey) throws Exception {
+        options.setAllOptions(settings);
         if (settings.containsKey(settingsKey)) {
             options.alternateOptionsUsed.value(true);
         }
-        options.setChildClasses(settings, prefix);
+        options.setChildClasses(settings);
     }
 
     public SOSProviderOptions getSource() {

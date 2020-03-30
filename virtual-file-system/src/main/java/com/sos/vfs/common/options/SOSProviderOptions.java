@@ -31,51 +31,58 @@ import com.sos.keepass.SOSKeePassPath;
 import sos.util.ParameterSubstitutor;
 import sos.util.SOSString;
 
-@JSOptionClass(name = "SOSDestinationOptions", description = "Options for a connection to an uri (server, site, e.g.)")
+@JSOptionClass(name = "SOSProviderOptions", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSProviderOptions.class);
     private static final String CLASSNAME = SOSProviderOptions.class.getSimpleName();
-    private String destinationPrefix = "";
+
+    private SOSProviderOptions alternativeOptions = null;
+    private SOSCredentialStoreOptions credentialStoreOptions = null;
+    private String prefix = null;
+    private boolean isAlternative = false;
     private boolean isSource = false;
 
     public SOSProviderOptions() {
     }
 
-    public SOSProviderOptions(boolean source) {
+    public SOSProviderOptions(boolean alternative, boolean source) {
+        isAlternative = alternative;
         isSource = source;
+
+        setPrefix();
     }
 
-    public void setChildClasses(final HashMap<String, String> settings, final String prefix) throws Exception {
-        destinationPrefix = prefix;
+    @Override
+    public void setAllOptions(final HashMap<String, String> params) {
+        try {
+            super.setAllOptions(params, prefix);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-        if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_USE_CREDENTIAL_STORE, destinationPrefix))) {
+    public void setChildClasses(final HashMap<String, String> settings) throws Exception {
+        if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_USE_CREDENTIAL_STORE, prefix))) {
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(String.format("[destination options]credential store %s", destinationPrefix));
+                LOGGER.trace(String.format("[provider options][credential store]%s", prefix));
             }
-            getCredentialStore().setAllOptions(settings, destinationPrefix);
+            getCredentialStore().setAllOptions(settings, prefix);
         }
         if (alternateOptionsUsed.value()) {
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(String.format("[destination options]alternative_%s", destinationPrefix));
+                LOGGER.trace(String.format("[provider options][alternative]%s", getAlternatives().getPrefix()));
             }
-            getAlternatives().setAllOptions(settings, "alternative_" + destinationPrefix);
-            if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, destinationPrefix))) {
+            getAlternatives().setAllOptions(settings);
+            if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, prefix))) {
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace(String.format("[destination options]alternative_%s credential store", destinationPrefix));
+                    LOGGER.trace(String.format("[provider options][alternative][credential store]%s", getAlternatives().getPrefix()));
                 }
-                getAlternatives().getCredentialStore().setAllOptions(settings, "alternative_" + destinationPrefix);
+                getAlternatives().getCredentialStore().setAllOptions(settings, getAlternatives().getPrefix());
             }
         }
-    }
-
-    public SOSProviderOptions getAlternatives() {
-        if (alternativeOptions == null) {
-            alternativeOptions = new SOSProviderOptions(isSource);
-        }
-        return alternativeOptions;
     }
 
     public void setCredentialStore(SOSCredentialStoreOptions opt) {
@@ -349,6 +356,25 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     public void setIsSource(boolean val) {
         isSource = val;
+        setPrefix();
+    }
+
+    public SOSProviderOptions getAlternatives() {
+        if (alternativeOptions == null) {
+            alternativeOptions = new SOSProviderOptions(true, isSource);
+        }
+        return alternativeOptions;
+    }
+
+    private void setPrefix() {
+        prefix = isSource ? "source_" : "target_";
+        if (isAlternative) {
+            prefix = "alternative_" + prefix;
+        }
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
@@ -383,12 +409,6 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
     @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication", key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean alternateOptionsUsed = new SOSOptionBoolean(this, CLASSNAME + ".AlternateOptionsUsed",
             "Alternate Options used for connection and/or authentication", "false", "false", false);
-
-    @JSOptionClass(description = "", name = "SOSDestinationOptions", prefix = "alternate_")
-    private SOSProviderOptions alternativeOptions = null;
-
-    @JSOptionClass(description = "", name = "SOSCredentialStoreOptions")
-    private SOSCredentialStoreOptions credentialStoreOptions = null;
 
     @JSOptionDefinition(name = "user_info", description = "User Info implementation", key = "user_info", type = "SOSOptionObject", mandatory = false)
     public SOSOptionObject user_info = new SOSOptionObject(this, CLASSNAME + ".user_info", "user_info", "", "", false);
