@@ -502,8 +502,8 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionInteger jump_server_alive_count_max = new SOSOptionInteger(this, CLASS_NAME + ".jump_server_alive_count_max",
             "Sets the number of keep-alive messages which may be sent without receiving any messages back from the server.", "", "", false);
 
-    @JSOptionDefinition(name = "jump_session_connect_timeout", description = "Sets the interval for session connect", key = "jump_session_connect_timeout", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_session_connect_timeout = new SOSOptionString(this, CLASS_NAME + ".jump_session_connect_timeout",
+    @JSOptionDefinition(name = "jump_connect_timeout", description = "Sets the interval for jump socket connect", key = "jump_connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_connect_timeout = new SOSOptionString(this, CLASS_NAME + ".jump_connect_timeout",
             "Sets the interval for session connect", "", "", false);
 
     @JSOptionDefinition(name = "jump_channel_connect_timeout", description = "Sets the interval for channel connect", key = "jump_channel_connect_timeout", type = "SOSOptionString", mandatory = false)

@@ -837,7 +837,7 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setSessionConnectTimeout() throws Exception {
-        String ct = providerOptions.session_connect_timeout.getValue();
+        String ct = providerOptions.connect_timeout.getValue();
         if (!SOSString.isEmpty(ct)) {
             sessionConnectTimeout = SOSDate.resolveAge("ms", ct).intValue();
         }

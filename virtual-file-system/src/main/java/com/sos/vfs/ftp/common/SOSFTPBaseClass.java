@@ -45,6 +45,7 @@ import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.ftp.SOSFTPFile;
 
+import sos.util.SOSDate;
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -120,7 +121,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
                 LOGGER.debug(SOSVfs_D_132.params(user));
             }
             getClient().login(user, providerOptions.password.getValue());
-            logReply();
+            logReply("login");
             if (ftpReply.isSuccessCode()) {
                 commandListener.setClientId(getHostID(""));
                 LOGGER.info(getHostID(SOSVfs_D_133.params(user)));
@@ -152,7 +153,6 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         if (!isConnected()) {
             try {
                 connect(options);
-
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
@@ -178,16 +178,32 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
                 LOGGER.debug(SOSVfs_D_0101.params(host, port));
             }
 
-            if (!isConnected()) {
-                getClient().connect(host, port);
-                LOGGER.info(SOSVfs_D_0102.params(host, port));
-                logReply();
-                getClient().setControlKeepAliveTimeout(180);
-            } else {
-                LOGGER.warn(SOSVfs_D_0103.params(host, port));
-            }
+            setConnectTimeout();
+            getClient().connect(host, port);
+            LOGGER.info(SOSVfs_D_0102.params(host, port));
+            logReply("connect");
+            getClient().setControlKeepAliveTimeout(180);
+
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
+        }
+    }
+
+    private void setConnectTimeout() throws Exception {
+        String ct = providerOptions.connect_timeout.getValue();
+        int timeout = 0;
+        if (!SOSString.isEmpty(ct)) {
+            timeout = SOSDate.resolveAge("ms", ct).intValue();
+        }
+        if (timeout > 0) {
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("connect timeout = %s", (ct == null ? timeout : ct)));
+                }
+                getClient().setConnectTimeout(timeout);
+            } catch (Exception ex) {
+                LOGGER.warn(String.format("[setConnectTimeout]%s", ex.toString()), ex);
+            }
         }
     }
 
@@ -373,7 +389,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
                 LOGGER.trace(SOSVfs_D_127.params(path));
             }
             x = cd(path);
-            logReply();
+            logReply("cd][" + path);
         } catch (SocketException e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("doCD")), e);
         } catch (IOException e) {
@@ -460,7 +476,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         } catch (IOException e) {
             throw new JobSchedulerException("command failed: " + command, e);
         }
-        logReply();
+        logReply("sendCommand][" + command);
     }
 
     private final String getCurrentPath() {
@@ -525,13 +541,13 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         return size;
     }
 
-    public long size(final String remoteFile) throws Exception {
+    public long size(final String path) throws Exception {
         long size = -1L;
         if (transferMode.isAscii()) {
             this.binary();
         }
-        getClient().sendCommand("SIZE " + remoteFile);
-        logReply();
+        getClient().sendCommand("SIZE " + path);
+        logReply("size][" + path);
         if (getClient().getReplyCode() == FTPReply.FILE_STATUS) {
             size = Long.parseLong(trimResponseCode(getReplyString()));
         }
@@ -570,7 +586,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         } catch (IOException e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
         } finally {
-            logReply();
+            logReply("getInputStream][" + fileName);
         }
         return is;
     }
@@ -580,7 +596,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         OutputStream os = null;
         try {
             os = getClient().storeFileStream(fileName);
-            logReply();
+            logReply("getOutputStream][" + fileName);
         } catch (IOException e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("getOutputStream", e.toString())), e);
         }
@@ -819,11 +835,11 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         return x <= 300;
     }
 
-    protected boolean logReply() {
+    protected boolean logReply(String caller) {
         reply = getReplyString();
         if (LOGGER.isTraceEnabled()) {
-            if (providerOptions.protocolCommandListener.isFalse()) {
-                LOGGER.trace(reply);
+            if (providerOptions.protocolCommandListener.isFalse() && !SOSString.isEmpty(reply)) {
+                LOGGER.trace(String.format("[%s]%s", caller, reply));
             }
         }
         return true;
