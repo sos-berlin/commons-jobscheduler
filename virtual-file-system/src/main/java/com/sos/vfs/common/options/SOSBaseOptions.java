@@ -420,17 +420,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     }
 
-    @Override
-    public void setAllOptions(final HashMap<String, String> settings) {
-        HashMap<String, String> map = settings;
-        if (!settingsFileProcessed && !readSettingsFileIsActive && configurationFile.isNotEmpty()) {
-            readSettingsFileIsActive = true;
-            map = readSettingsFile();
-            readSettingsFileIsActive = false;
-            settingsFileProcessed = true;
-        }
+    public void setOptions(HashMap<String, String> map) {
+        LOGGER.trace("[set options]start");
         super.setAllOptions(map);
         setChildClasses(map);
+        LOGGER.trace("[set options]end");
     }
 
     public void setAllOptionsOnJob(HashMap<String, String> params) {
@@ -447,10 +441,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
         handleFileOrderSource(params);
 
-        LOGGER.trace("[set options]start");
-        super.setAllOptions(params);
-        setChildClasses(params);
-        LOGGER.trace("[set options]end");
+        setOptions(params);
     }
 
     private boolean isEmpty(HashMap<String, String> params, String key) {
@@ -482,10 +473,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
                             + "and no file_spec has been specified", basename, params.get("scheduler_file_path"), path));
             params.put("file_path", basename);
         }
-    }
-
-    public HashMap<String, String> readSettingsFile() {
-        return readSettingsFile(null);
     }
 
     public HashMap<String, String> readSettingsFile(Map<String, String> beatParams) {

@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.JSOptionsClass;
-import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSProviderOptions;
 
 public class SOSTransfer {
 
