@@ -80,7 +80,7 @@ public class JSJobStreams {
         JSJobStreamStarter nextJsJobStreamStarter = null;
         for (JSJobStream jsJobStream : listOfJobStreams.values()) {
             for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-                if (next == null || jsJobStreamStarter.getNextStartFromList().before(next)) {
+                if (next == null || (jsJobStreamStarter.getNextStartFromList() != null) && jsJobStreamStarter.getNextStartFromList().before(next)) {
                     next = jsJobStreamStarter.getNextStartFromList();
                     if (next != null) {
                         nextJsJobStreamStarter = jsJobStreamStarter;

@@ -68,7 +68,9 @@ public class JSConditionResolver {
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private JSJobInConditions jsJobInConditions;
+    private JSJobStreamInConditions jsJobStreamInConditions;
     private JSJobOutConditions jsJobOutConditions;
+    private JSJobStreamOutConditions jsJobStreamOutConditions;
     private JSEvents jsEvents;
     private SOSHibernateSession sosHibernateSession;
     private BooleanExp booleanExpression;
@@ -104,7 +106,9 @@ public class JSConditionResolver {
     public void reInit() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
         jsJobInConditions = null;
+        jsJobStreamInConditions = null;
         jsJobOutConditions = null;
+        jsJobStreamOutConditions = null;
         jsJobStreams = null;
         jsEvents = null;
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
@@ -129,6 +133,11 @@ public class JSConditionResolver {
 
     public void reinitCalendarUsage() {
         for (JSInConditions jsInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
+            }
+        }
+        for (JSInConditions jsInConditions : jsJobStreamInConditions.getListOfJobStreamInConditions().values()) {
             for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                 jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
             }
@@ -198,6 +207,21 @@ public class JSConditionResolver {
             jsJobInConditions = new JSJobInConditions(settings);
             jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
 
+            jsJobStreamInConditions = new JSJobStreamInConditions(settings);
+
+            for (Map.Entry<JSJobConditionKey, JSInConditions> entry : jsJobInConditions.getListOfJobInConditions().entrySet()) {
+                for (JSInCondition jsIncondition : entry.getValue().getListOfInConditions().values()) {
+                    JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
+                    jsJobStreamConditionKey.setJobSchedulerId(entry.getKey().getJobSchedulerId());
+                    jsJobStreamConditionKey.setJobStream(jsIncondition.getJobStream());
+                    if (jsJobStreamInConditions.getListOfJobStreamInConditions().get(jsJobStreamConditionKey) == null) {
+                        jsJobStreamInConditions.getListOfJobStreamInConditions().put(jsJobStreamConditionKey, new JSInConditions());
+                    }
+                    jsJobStreamInConditions.getListOfJobStreamInConditions().get(jsJobStreamConditionKey).getListOfInConditions().put(jsIncondition
+                            .getId(), jsIncondition);
+                }
+            }
+
         }
         if (jsJobOutConditions == null) {
             FilterOutConditions filterOutConditions = new FilterOutConditions();
@@ -206,6 +230,8 @@ public class JSConditionResolver {
             List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
             jsJobOutConditions = new JSJobOutConditions();
             jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+            jsJobStreamOutConditions = new JSJobStreamOutConditions();
+            jsJobStreamOutConditions.setListOfJobStreamOutConditions(listOfOutConditions);
         }
 
         if (jsJobStreams == null) {
@@ -497,6 +523,7 @@ public class JSConditionResolver {
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             LOGGER.debug("Resolving jobstream" + jobStream.getValue().getJobStream());
             if (jobStream.getValue().getListOfJobStreamHistory() != null) {
+                boolean historyValidated2True = false;
                 for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                     LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                             .getJobStream(), jsHistoryEntry.getContextId()));
@@ -522,6 +549,7 @@ public class JSConditionResolver {
                                                 LOGGER.trace("---InCondition is: " + inCondition.toStr());
                                             }
                                             if (validate(null, contextId, inCondition)) {
+                                                historyValidated2True = true;
                                                 StartJobReturn startJobReturn = inCondition.executeCommand(session, contextId,
                                                         schedulerXmlCommandExecutor);
                                                 if (!startJobReturn.getStartedJob().isEmpty()) {
@@ -555,6 +583,24 @@ public class JSConditionResolver {
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                             session.rollback();
+                        }
+                    }
+
+                    if (!historyValidated2True) {
+                        if (!jsHistoryEntry.checkReady(this)) {
+                            try {
+                                session.beginTransaction();
+                                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(session);
+                                DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
+                                        .getId());
+                                dbItemJobStreamHistory.setRunning(false);
+                                dbLayerJobStreamHistory.store(dbItemJobStreamHistory);
+                                jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
+                                session.commit();
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                                session.rollback();
+                            }
                         }
                     }
                 }
@@ -603,6 +649,11 @@ public class JSConditionResolver {
                 }
             }
         }
+
+        // durch alle jobs des streams gehen
+        // wenn keine out condition oder die erzeugten events in keiner in condition verwendet werden
+        // wenn alle jobs gelaufen sind --> job stream ist fertig
+
         return dbChange;
     }
 
@@ -770,6 +821,14 @@ public class JSConditionResolver {
 
     public JSJobStreams getJsJobStreams() {
         return jsJobStreams;
+    }
+
+    public JSJobStreamInConditions getJsJobStreamInConditions() {
+        return jsJobStreamInConditions;
+    }
+
+    public JSJobStreamOutConditions getJsJobStreamOutConditions() {
+        return jsJobStreamOutConditions;
     }
 
 }

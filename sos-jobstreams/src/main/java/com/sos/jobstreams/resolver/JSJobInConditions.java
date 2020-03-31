@@ -55,6 +55,9 @@ public class JSJobInConditions {
             JSInConditionCommand inConditionCommand = new JSInConditionCommand();
             inConditionCommand.setItemInConditionCommand(itemInConditionWithCommand.getDbItemInConditionCommand());
 
+            jsInCondition.addCommand(inConditionCommand);
+            jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
+            jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
             if (itemInConditionWithCommand.getConsumedForContext() != null) {
                 for (String context : itemInConditionWithCommand.getConsumedForContext()) {
                     try {
@@ -64,10 +67,6 @@ public class JSJobInConditions {
                     }
                 }
             }
-            jsInCondition.addCommand(inConditionCommand);
-            jsInCondition.setItemInCondition(itemInConditionWithCommand.getDbItemInCondition());
-            jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
-
             addInCondition(jsInCondition);
         }
     }

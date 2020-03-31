@@ -140,10 +140,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public boolean isConsumed(UUID contextId) {
+        LOGGER.debug("check consumed " + this.getExpression() + " is consumed for context " + contextId + " ---> " + consumedForContext.contains(contextId));
         return consumedForContext.contains(contextId);
     }
 
     public void setConsumed(UUID contextId) {
+        LOGGER.debug(this.getExpression() + " is consumed for context " + contextId);
         consumedForContext.add(contextId);
     }
 
