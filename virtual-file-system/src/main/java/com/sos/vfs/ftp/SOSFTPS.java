@@ -33,11 +33,11 @@ public class SOSFTPS extends SOSFTPBaseClass {
 
                 FTPSClient client = (FTPSClient) super.getClient();
                 client.execPBSZ(0);
-                logReply();
+                logReply("execPBSZ");
                 client.execPROT("P");
-                logReply();
+                logReply("execPROT");
                 getClient().enterLocalPassiveMode();
-                logReply();
+                logReply("enterLocalPassiveMode");
             } else {
                 LOGGER.warn(SOSVfs_D_0102.params(getHost(), getPort()));
             }

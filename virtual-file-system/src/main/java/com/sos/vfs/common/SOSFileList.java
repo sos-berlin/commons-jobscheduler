@@ -371,12 +371,6 @@ public class SOSFileList extends SOSVFSMessageCodes {
             JADE_REPORT_LOGGER.info(msg);
             for (SOSFileListEntry entry : fileListEntries) {
                 TransferStatus transferStatus = entry.getTransferStatus();
-
-                if (LOGGER.isDebugEnabled()) {
-                    String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
-                    LOGGER.debug(String.format("[%s][target][%s][atomic=%s][%s]", entry.getTransferNumber(), SOSCommonProvider.normalizePath(path),
-                            entry.getTargetAtomicFileName(), transferStatus));
-                }
                 if (!options.transactional.value() && transferStatus.equals(TransferStatus.transferred)) {
                     if (LOGGER.isDebugEnabled()) {
                         String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
@@ -395,6 +389,11 @@ public class SOSFileList extends SOSVFSMessageCodes {
                     }
                     continue;
                 }
+                if (LOGGER.isDebugEnabled()) {
+                    String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
+                    LOGGER.debug(String.format("[%s][target][%s][atomic=%s][%s]", entry.getTransferNumber(), SOSCommonProvider.normalizePath(path),
+                            entry.getTargetAtomicFileName(), transferStatus));
+                }
                 atomicFileName = makeFullPathName(options.targetDir.getValue(), entry.getTargetAtomicFileName());
                 if (isNotEmpty(entry.getTargetAtomicFileName())) {
                     try {
@@ -409,7 +408,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                         entry.setTargetAtomicFileName(EMPTY_STRING);
                         entry.setStatus(TransferStatus.setBack);
                     } catch (Exception e) {
-                        LOGGER.error(e.toString());
+                        LOGGER.error(e.toString(), e);
                     }
                 }
                 if (transferStatus.equals(TransferStatus.transferred)) {
@@ -437,7 +436,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                         LOGGER.info(msg);
                         JADE_REPORT_LOGGER.info(msg);
                     } catch (Exception e) {
-                        LOGGER.error(e.toString());
+                        LOGGER.error(e.toString(), e);
                     }
                 }
                 entry.rollbackRenameSourceFile();

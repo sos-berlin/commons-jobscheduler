@@ -255,9 +255,9 @@ public class SOSProviderOptionsSuperClass extends JSOptionsClass {
     public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", "Using a keyagent to get the privat key file",
             "false", "false", false);
 
-    @JSOptionDefinition(name = "session_connect_timeout", description = "Sets the interval for session connect", key = "session_connect_timeout", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString session_connect_timeout = new SOSOptionString(this, CLASSNAME + ".session_connect_timeout",
-            "Sets the interval for session connect", "", "", false);
+    @JSOptionDefinition(name = "connect_timeout", description = "Sets the interval for socket connect", key = "connect_timeout", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString connect_timeout = new SOSOptionString(this, CLASSNAME + ".connect_timeout", "Sets the interval for connect", "", "",
+            false);
 
     @JSOptionDefinition(name = "channel_connect_timeout", description = "Sets the interval for channel connect", key = "channel_connect_timeout", type = "SOSOptionString", mandatory = false)
     public SOSOptionString channel_connect_timeout = new SOSOptionString(this, CLASSNAME + ".channel_connect_timeout",
