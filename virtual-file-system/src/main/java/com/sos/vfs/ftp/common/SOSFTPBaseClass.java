@@ -180,12 +180,23 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
 
             setConnectTimeout();
             getClient().connect(host, port);
-            LOGGER.info(SOSVfs_D_0102.params(host, port));
             logReply("connect");
+            LOGGER.info(SOSVfs_D_0102.params(host, port));
             getClient().setControlKeepAliveTimeout(180);
 
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
+        }
+    }
+
+    private String ms2string(int val) {
+        if (val <= 0) {
+            return String.valueOf(val).concat("ms");
+        }
+        try {
+            return String.valueOf(Math.round(val / 1000)).concat("s");
+        } catch (Throwable e) {
+            return String.valueOf(val).concat("ms");
         }
     }
 
@@ -197,10 +208,8 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         }
         if (timeout > 0) {
             try {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(String.format("connect timeout = %s", (ct == null ? timeout : ct)));
-                }
                 getClient().setConnectTimeout(timeout);
+                LOGGER.info("ConnectTimeout=" + ms2string(getClient().getConnectTimeout()));
             } catch (Exception ex) {
                 LOGGER.warn(String.format("[setConnectTimeout]%s", ex.toString()), ex);
             }
