@@ -19,6 +19,7 @@ public class SpoolerProcess {
 
     public void setOrder(Order o) {
         order = o;
+        currentOrderState = null;
     }
 
     public boolean isOrderJob() {
