@@ -59,8 +59,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             LOGGER.info(VersionInfo.VERSION_STRING);
 
             if (spoolerProcess == null) {
-                spoolerProcess = new SpoolerProcess(spooler_task, spooler_job);
+                spoolerProcess = new SpoolerProcess(spooler_job);
             }
+            spoolerProcess.setOrder(spooler_task.order());
             return spoolerProcess.isOrderJob();
         } catch (Throwable e) {
             return false;
@@ -383,7 +384,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public boolean spooler_process_before() throws Exception {
         setLogger();
-        spoolerProcess = new SpoolerProcess(spooler_task, spooler_job);
+        spoolerProcess = new SpoolerProcess(spooler_job);
+        if (spooler_task != null) {
+            spoolerProcess.setOrder(spooler_task.order());
+        }
         return true;
     }
 

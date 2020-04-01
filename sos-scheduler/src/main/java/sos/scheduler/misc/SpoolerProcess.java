@@ -2,7 +2,6 @@ package sos.scheduler.misc;
 
 import sos.spooler.Job;
 import sos.spooler.Order;
-import sos.spooler.Task;
 
 public class SpoolerProcess {
 
@@ -10,13 +9,16 @@ public class SpoolerProcess {
     private String currentOrderState = null;
     private boolean isOrderJob = false;
 
-    public SpoolerProcess(Task task, Job job) {
-        order = task.order();
+    public SpoolerProcess(Job job) {
         isOrderJob = job.order_queue() == null ? false : true;
     }
 
     public Order getOrder() {
         return order;
+    }
+
+    public void setOrder(Order o) {
+        order = o;
     }
 
     public boolean isOrderJob() {
