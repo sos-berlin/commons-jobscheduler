@@ -190,7 +190,7 @@ public class SOSHTTP extends SOSCommonProvider {
                             LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
                             LOGGER.info(
                                     "The certificate verification process will not verify the DNS name of the certificate presented by the server,");
-                            LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
+                            LOGGER.info("with the hostname of the server in the URL used by the Yade client.");
                             LOGGER.info(
                                     "**************************************************************************************************************");
                         }

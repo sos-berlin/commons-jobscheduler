@@ -229,6 +229,9 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         if (file == null) {
             return null;
         }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s]found", pathname));
+        }
         Path parent = Paths.get(pathname).getParent();
         return getFileEntry(file, parent == null ? null : parent.toString());
     }

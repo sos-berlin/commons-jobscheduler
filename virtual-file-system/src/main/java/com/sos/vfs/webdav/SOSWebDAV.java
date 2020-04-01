@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -100,12 +101,14 @@ public class SOSWebDAV extends SOSCommonProvider {
     public void mkdir(final String path) {
         WebdavResource res = null;
         try {
-            SOSOptionFolderName objF = new SOSOptionFolderName(path);
+            SOSOptionFolderName folderName = new SOSOptionFolderName(path);
             reply = "";
-            LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", path)));
-            String[] subfolders = objF.getSubFolderArrayReverse();
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[mkdir][%s]try to create ...", path));
+            }
+            String[] subfolders = folderName.getSubFolderArrayReverse();
             int idx = subfolders.length;
-            for (String strSubFolder : objF.getSubFolderArrayReverse()) {
+            for (String strSubFolder : folderName.getSubFolderArrayReverse()) {
                 res = this.getResource(strSubFolder);
                 if (res.isCollection()) {
                     LOGGER.debug(SOSVfs_E_180.params(strSubFolder));
@@ -115,19 +118,21 @@ public class SOSWebDAV extends SOSCommonProvider {
                 }
                 idx--;
             }
-            subfolders = objF.getSubFolderArray();
+            subfolders = folderName.getSubFolderArray();
             for (int i = idx; i < subfolders.length; i++) {
                 subfolders[i] = getWebdavRessourcePath(subfolders[i]);
                 if (davClient.mkcolMethod(subfolders[i])) {
                     reply = "mkdir OK";
-                    LOGGER.debug(getHostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format("[mkdir][%s]created", subfolders[i]));
+                    }
                 } else {
                     throw new Exception(getStatusMessage(davClient));
                 }
             }
         } catch (Exception e) {
             reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_134.params("[mkdir]"), e);
+            throw new JobSchedulerException(String.format("[%s] mkdir failed", path), e);
         } finally {
             if (res != null) {
                 try {
@@ -182,7 +187,16 @@ public class SOSWebDAV extends SOSCommonProvider {
     public SOSFileEntry getFileEntry(String path) throws Exception {
         WebdavResource file = getResource(path);
         if (file != null && !file.isCollection()) {
-            return getFileEntry(file, file.getPath());// TODO parentPath
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s]found", path));
+            }
+            String parent = "/";
+            try {
+                parent = SOSCommonProvider.normalizePath(Paths.get(path).getParent().toString());
+            } catch (Exception e) {
+                LOGGER.error(String.format("[%s][can't get parent path]%s", path, e.toString()), e);
+            }
+            return getFileEntry(file, parent);
         }
         return null;
     }
@@ -214,6 +228,9 @@ public class SOSWebDAV extends SOSCommonProvider {
                 return result;
             }
             WebdavResource[] list = res.listWebdavResources();
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s][listWebdavResources] %s files or folders", path, list.length));
+            }
             for (int i = 0; i < list.length; i++) {
                 result.add(getFileEntry(list[i], path));
             }
@@ -470,7 +487,7 @@ public class SOSWebDAV extends SOSCommonProvider {
                     LOGGER.info("*********************** Security warning *********************************************************************");
                     LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
                     LOGGER.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
-                    LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
+                    LOGGER.info("with the hostname of the server in the URL used by the Yade client.");
                     LOGGER.info("**************************************************************************************************************");
                 }
                 if (providerOptions.acceptUntrustedCertificate.value()) {
@@ -509,8 +526,8 @@ public class SOSWebDAV extends SOSCommonProvider {
 
     private String getWebdavRessourcePath(String path) {
         if (!path.startsWith("/")) {
-            //String curDir = getCurrentPath();
-            //path = curDir + path;
+            // String curDir = getCurrentPath();
+            // path = curDir + path;
         }
         return path;
     }

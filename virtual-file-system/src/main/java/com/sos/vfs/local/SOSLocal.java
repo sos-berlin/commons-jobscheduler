@@ -91,6 +91,9 @@ public class SOSLocal extends SOSCommonProvider {
     public SOSFileEntry getFileEntry(final String pathname) throws Exception {
         File file = new File(pathname);
         if (file.exists() && file.isFile()) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s]found", pathname));
+            }
             return getFileEntry(file);
         }
         return null;

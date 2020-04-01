@@ -767,7 +767,6 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         ISOSVirtualFile sourceFile = parent.getSourceClient().getFileHandle(sourceFileName);
         sourceTransferFileName = sourceFile.getName();
         targetFileName = sourceFile.getName();
-        boolean recursive = parent.getOptions().recursive.value();
         if (parent.getOptions().compressFiles.isTrue()) {
             targetFileName = targetFileName + parent.getOptions().compressedFileExtension.getValue();
         }
@@ -789,6 +788,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         if (parent.getOptions().isAtomicTransfer() || parent.getOptions().transactionMode.isTrue()) {
             targetTransferFileName = getTargetAtomicFileName(parent.getOptions());
         }
+        boolean recursive = parent.getOptions().recursive.value() && !parent.getOptions().oneOrMoreSingleFilesSpecified();
         if (recursive) {
             String sourceDir = getPathWithoutFileName(sourceFile.getName());
             String sourceDirOrig = parent.getOptions().sourceDir.getValue();

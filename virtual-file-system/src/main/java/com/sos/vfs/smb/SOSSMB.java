@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -243,7 +244,9 @@ public class SOSSMB extends SOSCommonProvider {
                 return;
             }
             smbFile.mkdirs();
-            LOGGER.info(String.format("%s[mkdir][%s]%s", logPrefix, path, getReplyString()));
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("%s[mkdir][%s]created", logPrefix, path));
+            }
         } catch (Exception e) {
             reply = e.toString();
             throw new JobSchedulerException(String.format("%s[mkdir][%s]%s", logPrefix, path, e.toString()), e);
@@ -291,7 +294,17 @@ public class SOSSMB extends SOSCommonProvider {
         if (file == null) {
             return null;
         }
-        SOSFileEntry entry = getFileEntry(file, file.getParent());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s]found", pathname));
+        }
+        String parent = "/";
+        try {
+            parent = SOSCommonProvider.normalizePath(Paths.get(pathname).getParent().toString());
+        } catch (Exception e) {
+            LOGGER.error(String.format("[%s][can't get parent path]%s", pathname, e.toString()), e);
+        }
+
+        SOSFileEntry entry = getFileEntry(file, parent);
         return entry;
     }
 
@@ -300,7 +313,6 @@ public class SOSSMB extends SOSCommonProvider {
         entry.setDirectory(file.isDirectory());
         entry.setFilename(file.getName());
         entry.setFilesize(file.length());
-        // entry.setLastModified(file.getLastModified());
         entry.setParentPath(parentPath);
         return entry;
     }
@@ -310,13 +322,9 @@ public class SOSSMB extends SOSCommonProvider {
         SmbFile smbFile = null;
         try {
             List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
-            if (isDebugEnabled) {
-                LOGGER.debug(String.format("%s[listNames]%s", logPrefix, path));
-            }
             if (path.isEmpty()) {
                 path = ".";
             }
-
             smbFile = getSmbFile(normalizePath(path));
             if (checkIfExists && !smbFile.exists()) {
                 return result;
@@ -328,6 +336,11 @@ public class SOSSMB extends SOSCommonProvider {
 
             path = path.endsWith("/") ? path : path + "/";
             SmbFile[] list = smbFile.listFiles();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s][listFiles] %s files or folders", path, list.length));
+            }
+
             for (int i = 0; i < list.length; i++) {
                 SmbFile file = list[i];
                 result.add(getFileEntry(file, path));

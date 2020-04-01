@@ -177,8 +177,8 @@ public class SOSSFTP extends SOSCommonProvider {
             String p = path.replaceAll("//+", "/").replaceFirst("/$", "");
             SOSOptionFolderName folderName = new SOSOptionFolderName(path);
             reply = "mkdir OK";
-            if (isDebugEnabled) {
-                LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", p)));
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[mkdir][%s]try to create ...", p));
             }
             String[] subfolders = folderName.getSubFolderArrayReverse();
             int idx = subfolders.length;
@@ -199,7 +199,7 @@ public class SOSSFTP extends SOSCommonProvider {
             for (int i = idx; i < subfolders.length; i++) {
                 channelSftp.mkdir(subfolders[i]);
                 if (isDebugEnabled) {
-                    LOGGER.debug(getHostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
+                    LOGGER.debug(String.format("[mkdir][%s]created", subfolders[i]));
                 }
             }
         } catch (Exception e) {
@@ -292,11 +292,15 @@ public class SOSSFTP extends SOSCommonProvider {
 
     @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
-        Path path = Paths.get(pathname);
-        SftpATTRS attrs = getAttributes(path.toString());
+        SftpATTRS attrs = getAttributes(pathname);
         if (attrs != null && !attrs.isDir()) {
-            Path parent = Paths.get(pathname).getParent();
-            return getFileEntry(attrs, path.getFileName().toString(), parent == null ? null : parent.toString());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[%s]found", pathname));
+            }
+
+            Path tmpPath = Paths.get(pathname);
+            Path parent = tmpPath.getParent();
+            return getFileEntry(attrs, tmpPath.getFileName().toString(), parent == null ? null : parent.toString());
         }
         return null;
     }
