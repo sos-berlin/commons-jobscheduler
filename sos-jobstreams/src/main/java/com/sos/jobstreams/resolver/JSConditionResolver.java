@@ -208,19 +208,8 @@ public class JSConditionResolver {
             jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
 
             jsJobStreamInConditions = new JSJobStreamInConditions(settings);
+            jsJobStreamInConditions.setListOfJobInConditions(jsJobInConditions);
 
-            for (Map.Entry<JSJobConditionKey, JSInConditions> entry : jsJobInConditions.getListOfJobInConditions().entrySet()) {
-                for (JSInCondition jsIncondition : entry.getValue().getListOfInConditions().values()) {
-                    JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
-                    jsJobStreamConditionKey.setJobSchedulerId(entry.getKey().getJobSchedulerId());
-                    jsJobStreamConditionKey.setJobStream(jsIncondition.getJobStream());
-                    if (jsJobStreamInConditions.getListOfJobStreamInConditions().get(jsJobStreamConditionKey) == null) {
-                        jsJobStreamInConditions.getListOfJobStreamInConditions().put(jsJobStreamConditionKey, new JSInConditions());
-                    }
-                    jsJobStreamInConditions.getListOfJobStreamInConditions().get(jsJobStreamConditionKey).getListOfInConditions().put(jsIncondition
-                            .getId(), jsIncondition);
-                }
-            }
 
         }
         if (jsJobOutConditions == null) {
@@ -231,7 +220,7 @@ public class JSConditionResolver {
             jsJobOutConditions = new JSJobOutConditions();
             jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
             jsJobStreamOutConditions = new JSJobStreamOutConditions();
-            jsJobStreamOutConditions.setListOfJobStreamOutConditions(listOfOutConditions);
+            jsJobStreamOutConditions.setListOfJobStreamOutConditions(jsJobOutConditions);
         }
 
         if (jsJobStreams == null) {

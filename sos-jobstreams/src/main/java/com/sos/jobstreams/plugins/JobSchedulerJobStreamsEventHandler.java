@@ -35,7 +35,6 @@ import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
-import com.sos.jobstreams.resolver.JSHistory;
 import com.sos.jobstreams.resolver.JSHistoryEntry;
 import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
@@ -145,7 +144,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         SOSHibernateSession session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
         session.beginTransaction();
         try {
-            
+
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
             dbItemJobStreamHistory.setContextId(uuid.toString());
             dbItemJobStreamHistory.setCreated(new Date());
@@ -157,18 +156,19 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             JSHistoryEntry historyEntry = new JSHistoryEntry();
             historyEntry.setCreated(new Date());
             historyEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
-            
+
             JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(nextStarter.getItemJobStreamStarter().getJobStream());
-            LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s",dbItemJobStreamHistory.getContextId(), jobStream.getJobStream()));
+            LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
+                    .getJobStream()));
             jobStream.getJsHistory().addHistoryEntry(historyEntry, session);
-                       
+
             for (JobStarterOptions startedJob : listOfStartedJobs) {
                 conditionResolver.getJobStreamContexts().addTaskToContext(uuid, startedJob, session);
             }
             LOGGER.debug(nextStarter.getAllJobNames() + " started");
             session.commit();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             session.rollback();
         } finally {
             session.close();
@@ -269,7 +269,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent.getJobPath());
         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(),contextId);
+        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
@@ -411,7 +411,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     case "TaskClosed":
                         taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(),contextId);
+                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
                         break;
 
                     case "VariablesCustomEvent":
@@ -447,10 +447,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             JSEvent event = new JSEvent();
                             event.setCreated(new Date());
                             event.setEvent(customEvent.getEvent());
-                            event.setSession(customEvent.getSession());
                             event.setJobStream(customEvent.getJobStream());
                             event.setSchedulerId(super.getSettings().getSchedulerId());
                             event.setGlobalEvent(customEvent.isGlobalEvent());
+                            if (customEvent.isGlobalEvent()) {
+                                event.setSession(Constants.getSession());
+                            } else {
+                                event.setSession(customEvent.getSession());
+                            }
 
                             try {
                                 event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
@@ -460,6 +464,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             }
 
                             conditionResolver.addEvent(event);
+                            if (!customEvent.isGlobalEvent()) {
+                                event.setSession(Constants.getSession());
+                                conditionResolver.addEvent(event);
+                            }
+
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
                             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
                             if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
@@ -474,15 +483,22 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setCreated(new Date());
                             event.setEvent(customEvent.getEvent());
                             event.setJobStream(customEvent.getJobStream());
-                            if (customEvent.getSession() == null || customEvent.getSession().isEmpty()) {
+
+                            if (customEvent.isGlobalEvent()) {
                                 event.setSession(Constants.getSession());
                             } else {
                                 event.setSession(customEvent.getSession());
                             }
+
                             event.setSchedulerId(super.getSettings().getSchedulerId());
                             event.setGlobalEvent(customEvent.isGlobalEvent());
 
                             conditionResolver.removeEvent(event);
+                            if (!customEvent.isGlobalEvent()) {
+                                event.setSession(Constants.getSession());
+                                conditionResolver.removeEvent(event);
+                            }
+
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
                             if (!conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
                                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());

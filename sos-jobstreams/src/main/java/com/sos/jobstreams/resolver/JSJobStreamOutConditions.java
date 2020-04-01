@@ -8,13 +8,13 @@ import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 
 public class JSJobStreamOutConditions {
 
-    Map<JSJobStreamConditionKey, JSOutConditions> listOfJobStreamOutConditions;    
+    Map<JSJobStreamConditionKey, JSOutConditions> listOfJobStreamOutConditions;
 
     public JSJobStreamOutConditions() {
         super();
         this.listOfJobStreamOutConditions = new HashMap<JSJobStreamConditionKey, JSOutConditions>();
     }
-    
+
     public void addOutCondition(JSOutCondition outCondition) {
         JSJobStreamConditionKey jobConditionKey = new JSJobStreamConditionKey(outCondition);
         JSOutConditions jsOutConditions = listOfJobStreamOutConditions.get(jobConditionKey);
@@ -30,22 +30,17 @@ public class JSJobStreamOutConditions {
         return this.listOfJobStreamOutConditions.get(jobConditionKey);
     }
 
-    public void setListOfJobStreamOutConditions(List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions) {
-        for (DBItemOutConditionWithConfiguredEvent itemOutConditionWithEvent : listOfOutConditions) {
-            JSOutCondition jsOutCondition=null;
-            JSJobStreamConditionKey jobStreamConditionKey = new JSJobStreamConditionKey(itemOutConditionWithEvent);
-            JSOutConditions outConditions = listOfJobStreamOutConditions.get(jobStreamConditionKey);
-            if (outConditions != null && outConditions.getListOfOutConditions() != null) {
-                jsOutCondition = outConditions.getListOfOutConditions().get(itemOutConditionWithEvent.getDbItemOutCondition().getId());
+    public void setListOfJobStreamOutConditions(JSJobOutConditions jsJobOutConditions) {
+        for (Map.Entry<JSJobConditionKey, JSOutConditions> entry : jsJobOutConditions.getListOfJobOutConditions().entrySet()) {
+            for (JSOutCondition jsOutcondition : entry.getValue().getListOfOutConditions().values()) {
+                JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
+                jsJobStreamConditionKey.setJobSchedulerId(entry.getKey().getJobSchedulerId());
+                jsJobStreamConditionKey.setJobStream(jsOutcondition.getJobStream());
+                if (this.listOfJobStreamOutConditions.get(jsJobStreamConditionKey) == null) {
+                    this.listOfJobStreamOutConditions.put(jsJobStreamConditionKey, new JSOutConditions());
+                }
+                this.listOfJobStreamOutConditions.get(jsJobStreamConditionKey).getListOfOutConditions().put(jsOutcondition.getId(), jsOutcondition);
             }
-            if (jsOutCondition == null) {
-                jsOutCondition = new JSOutCondition();
-            }
-            JSOutConditionEvent outConditionEvent = new JSOutConditionEvent();
-            outConditionEvent.setItemOutCondition(itemOutConditionWithEvent.getDbItemOutConditionEvent());
-            jsOutCondition.addEvent(outConditionEvent);
-            jsOutCondition.setItemOutCondition(itemOutConditionWithEvent.getDbItemOutCondition());
-            addOutCondition(jsOutCondition);
         }
     }
 

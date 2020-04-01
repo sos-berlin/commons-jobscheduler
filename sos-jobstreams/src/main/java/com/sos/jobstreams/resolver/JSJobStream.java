@@ -85,6 +85,7 @@ public class JSJobStream {
 
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
+            filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
             jobStreamStarter.setListOfJobs(dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0));
 
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();

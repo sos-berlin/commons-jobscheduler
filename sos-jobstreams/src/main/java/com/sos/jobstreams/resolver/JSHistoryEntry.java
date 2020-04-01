@@ -61,7 +61,7 @@ public class JSHistoryEntry {
         // running is true if there is at least one local not global event in the not consumed conditions that is created by a local out condition
 
         LOGGER.debug("- CheckReady - ");
-        
+
         boolean running = false;
         JSJobStream jsJobStream = jsConditionResolver.getJsJobStreams().getJobStream(itemJobStreamHistory.getJobStream());
         JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
@@ -74,13 +74,13 @@ public class JSHistoryEntry {
 
         JSOutConditions jsOutConditions = jsConditionResolver.getJsJobStreamOutConditions().getListOfJobOutConditions().get(jsJobStreamConditionKey);
         Set<String> localEvents = new HashSet<String>();
-        if (jsOutConditions.getListOfOutConditions() != null) {
+        if (jsOutConditions != null && jsOutConditions.getListOfOutConditions() != null) {
             for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
                 for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                     if (!jsOutConditionEvent.isGlobal()) {
                         localEvents.add(jsOutConditionEvent.getEvent());
                         LOGGER.debug("- Event: " + jsOutConditionEvent.getEvent());
-                        
+
                     }
                 }
 
@@ -88,27 +88,29 @@ public class JSHistoryEntry {
         }
 
         LOGGER.debug("- InCondition Events: ");
-        
+
         JSInConditions jsInConditions = jsConditionResolver.getJsJobStreamInConditions().getListOfJobStreamInConditions().get(
                 jsJobStreamConditionKey);
-        for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
-            LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
-            LOGGER.debug(SOSString.toString(jsInCondition));
-            if (!jsInCondition.isConsumed(this.getContextId())) {
-                List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
-                LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
-                for (JSCondition jsCondition : listOfConditions) {
-                    if (jsCondition.getConditionJobStream() == null || jsCondition.getConditionJobStream().isEmpty()) {
-                        LOGGER.debug("- InCondition event : " + jsCondition.getEventName());
-                        if (jsCondition.typeIsLocalEvent() && localEvents.contains(jsCondition.getEventName())) {
-                            LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " is still running the context " + this.getContextId());
-                            running = true;
-                            break;
+        if (jsInConditions != null) {
+            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
+                LOGGER.debug(SOSString.toString(jsInCondition));
+                if (!jsInCondition.isConsumed(this.getContextId())) {
+                    List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
+                    LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
+                    for (JSCondition jsCondition : listOfConditions) {
+                        if (jsCondition.getConditionJobStream() == null || jsCondition.getConditionJobStream().isEmpty()) {
+                            LOGGER.debug("- InCondition event : " + jsCondition.getEventName());
+                            if (jsCondition.typeIsLocalEvent() && localEvents.contains(jsCondition.getEventName())) {
+                                LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " is still running the context " + this.getContextId());
+                                running = true;
+                                break;
+                            }
                         }
                     }
-                }
-                if (running) {
-                    break;
+                    if (running) {
+                        break;
+                    }
                 }
             }
         }

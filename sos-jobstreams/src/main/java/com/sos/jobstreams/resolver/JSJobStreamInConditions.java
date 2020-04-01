@@ -39,10 +39,22 @@ public class JSJobStreamInConditions {
         return this.listOfJobStreamInConditions.get(jobConditionKey);
     }
 
-   
     public Map<JSJobStreamConditionKey, JSInConditions> getListOfJobStreamInConditions() {
         return listOfJobStreamInConditions;
     }
- 
+
+    public void setListOfJobInConditions(JSJobInConditions jsJobInConditions) {
+        for (Map.Entry<JSJobConditionKey, JSInConditions> entry : jsJobInConditions.getListOfJobInConditions().entrySet()) {
+            for (JSInCondition jsIncondition : entry.getValue().getListOfInConditions().values()) {
+                JSJobStreamConditionKey jsJobStreamConditionKey = new JSJobStreamConditionKey();
+                jsJobStreamConditionKey.setJobSchedulerId(entry.getKey().getJobSchedulerId());
+                jsJobStreamConditionKey.setJobStream(jsIncondition.getJobStream());
+                if (this.getListOfJobStreamInConditions().get(jsJobStreamConditionKey) == null) {
+                    this.getListOfJobStreamInConditions().put(jsJobStreamConditionKey, new JSInConditions());
+                }
+                this.getListOfJobStreamInConditions().get(jsJobStreamConditionKey).getListOfInConditions().put(jsIncondition.getId(), jsIncondition);
+            }
+        }
+    }
 
 }
