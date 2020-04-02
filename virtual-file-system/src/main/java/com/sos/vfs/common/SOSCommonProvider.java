@@ -164,9 +164,9 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
         try {
             return size(normalizePath(fileName));
         } catch (Exception e) {
-            LOGGER.trace(SOSVfs_E_134.params("getFileSize") + ":" + e.toString(), e);
+            LOGGER.trace(SOSVfs_E_134.params("getFileSize") + ":" + e.getMessage(), e);
         }
-        return 0;
+        return -1;
     }
 
     protected String getHostID(final String msg) {
@@ -279,7 +279,7 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     protected long size(final String fileName) throws Exception {
         LOGGER.info("not implemented yet");
-        return 0;
+        return -1;
     }
 
     @Override

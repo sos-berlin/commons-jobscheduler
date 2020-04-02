@@ -310,7 +310,7 @@ public class SOSSFTP extends SOSCommonProvider {
         entry.setDirectory(attrs.isDir());
         entry.setFilename(fileName);
         entry.setFilesize(attrs.getSize());
-        entry.setLastModified(attrs.getMTime());
+        // entry.setLastModified(attrs.getMTime());
         entry.setParentPath(parentPath);
         return entry;
     }

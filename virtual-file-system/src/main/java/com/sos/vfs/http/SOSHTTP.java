@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.SOSCommonProvider;
+import com.sos.vfs.common.SOSFileEntry;
+import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.interfaces.ISOSVirtualFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.http.common.SOSHTTPRequestEntity;
-import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSCommonProvider;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
 
@@ -468,7 +470,11 @@ public class SOSHTTP extends SOSCommonProvider {
         try {
             httpClient.executeMethod(method);
             if (!isSuccessStatusCode(method.getStatusCode())) {
-                throw new Exception(this.getHttpMethodExceptionText(method, uri));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(getHttpMethodExceptionText(method, uri));
+                }
+                return size;
+                // throw new Exception(this.getHttpMethodExceptionText(method, uri));
             }
             size = method.getResponseContentLength();
             if (size < 0) {
@@ -488,9 +494,31 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     @Override
-    public SOSFileEntry getFileEntry(String pathname) throws Exception {
+    public SOSFileEntry getFileEntry(String path) throws Exception {
         reply = "get OK";
-        return new SOSFileEntry(EntryType.HTTP);// TODO
+        long size = size(path);
+        if (size < 0) {
+            return null;
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s]found", path));
+        }
+
+        Path tmpPath = Paths.get(path);
+        SOSFileEntry entry = new SOSFileEntry(EntryType.HTTP);
+        entry.setDirectory(false);
+        entry.setFilename(tmpPath.getFileName().toString());
+        entry.setFilesize(size);
+
+        String parent = "/";
+        try {
+            parent = SOSCommonProvider.normalizePath(tmpPath.getParent().toString());
+        } catch (Exception e) {
+            LOGGER.error(String.format("[%s][can't get parent path]%s", path, e.toString()), e);
+        }
+        entry.setParentPath(parent);
+
+        return entry;
     }
 
     @Override
@@ -536,23 +564,21 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     private int getMethodStatusCode(HttpMethod method) {
-        int val = -1;
         try {
-            val = method.getStatusCode();
+            return method.getStatusCode();
         } catch (Exception ex) {
             //
         }
-        return val;
+        return -1;
     }
 
     private String getMethodStatusText(HttpMethod method) {
-        String val = "";
         try {
-            val = method.getStatusText();
+            return method.getStatusText();
         } catch (Exception ex) {
             //
         }
-        return val;
+        return "";
     }
 
     public void resetLastInputStreamGetMethod() {

@@ -206,7 +206,7 @@ public class SOSWebDAV extends SOSCommonProvider {
         entry.setDirectory(file.isCollection());
         entry.setFilename(file.getName());
         entry.setFilesize(file.getGetContentLength());
-        entry.setLastModified(file.getGetLastModified());
+        // entry.setLastModified(file.getGetLastModified());
         entry.setParentPath(parentPath);
         return entry;
     }

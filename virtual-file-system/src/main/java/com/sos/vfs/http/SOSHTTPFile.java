@@ -14,12 +14,6 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
     }
 
     @Override
-    public boolean fileExists() {
-        Long fs = getHandler().getFileSize(fileName);
-        return fs >= 0;
-    }
-
-    @Override
     public int read(byte[] buffer) {
         try {
             InputStream is = getFileInputStream();
