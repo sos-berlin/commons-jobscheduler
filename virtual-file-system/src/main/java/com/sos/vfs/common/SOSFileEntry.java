@@ -4,7 +4,6 @@ import java.io.File;
 
 public class SOSFileEntry {
 
-    // TODO webdav, http, smb
     public static enum EntryType {
         FILESYSTEM, HTTP, SMB
     }
@@ -16,8 +15,8 @@ public class SOSFileEntry {
     private String filename;
     private long filesize;
     private boolean directory;
-    private long lastModified = -1;
     private String parentPath;
+    //private long lastModified; last modified info is currently used only by YADE check steady state - get the current timestamp after an interval  
 
     public SOSFileEntry(final EntryType val) {
         type = val;
@@ -45,14 +44,6 @@ public class SOSFileEntry {
 
     public void setDirectory(boolean val) {
         directory = val;
-    }
-
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(long val) {
-        lastModified = val;
     }
 
     public String getParentPath() {

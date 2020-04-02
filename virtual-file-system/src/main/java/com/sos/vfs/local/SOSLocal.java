@@ -104,7 +104,7 @@ public class SOSLocal extends SOSCommonProvider {
         entry.setDirectory(file.isDirectory());
         entry.setFilename(file.getName());
         entry.setFilesize(file.length());
-        entry.setLastModified(file.lastModified());
+        // entry.setLastModified(file.lastModified());
         entry.setParentPath(file.getParent());
         return entry;
     }
