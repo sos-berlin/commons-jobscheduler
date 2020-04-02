@@ -10,6 +10,7 @@ public class ConditionCustomEvent {
     private String event;
     private boolean globalEvent;
     private String outConditionId;
+    private Long JobStreamStarterId;
     private String source;
     private String jobStream;
     private String job;
@@ -30,8 +31,13 @@ public class ConditionCustomEvent {
             this.jobStream = variables.getString("jobStream", "");
             this.state = variables.getString("state", "");
             this.job = variables.getString("job", "");
-            this.globalEvent = "true".equals(variables.getString("globalEvent","false"));
+            this.globalEvent = "true".equals(variables.getString("globalEvent", "false"));
             this.outConditionId = variables.getString("outConditionId", "");
+            try {
+                this.JobStreamStarterId = Long.valueOf(variables.getString("starterId", ""));
+            } catch (NumberFormatException e) {
+                this.JobStreamStarterId = -1L;
+            }
         }
         this.eventId = entry.getInt("eventId");
     }
@@ -72,14 +78,17 @@ public class ConditionCustomEvent {
         return globalEvent;
     }
 
-    
     public String getOutConditionId() {
         return outConditionId;
     }
 
-    
     public String getState() {
         return state;
+    }
+
+    
+    public Long getJobStreamStarterId() {
+        return JobStreamStarterId;
     }
 
 }

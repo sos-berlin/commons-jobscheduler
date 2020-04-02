@@ -3,6 +3,7 @@ package com.sos.jobstreams.resolver;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ public class JSHistoryEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSHistoryEntry.class);
 
     private DBItemJobStreamHistory itemJobStreamHistory;
+    private Map<String,String> listOfParameters;
 
     public JSHistoryEntry() {
         super();

@@ -156,6 +156,17 @@ public class JobStarter {
 
         List<NameValuePair> envVars = getDefaultEnvVars(jobStartOptions);
         List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
+        if (jobStartOptions.getListOfParameters() != null) {
+            if (params == null) {
+                params = new ArrayList<NameValuePair>();
+            }
+            for (Entry<String, String> param : jobStartOptions.getListOfParameters().entrySet()) {
+                NameValuePair nameValuePair = new NameValuePair();
+                nameValuePair.setName(param.getKey());
+                nameValuePair.setValue(param.getValue());
+                params.add(nameValuePair);
+            }
+        }
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
         String xmlString = xml.asXML();
@@ -184,9 +195,9 @@ public class JobStarter {
                 if (envVar.getValue() != null) {
                     String value = envVar.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
                     try {
-                    paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", value);
-                    }catch (Exception e) {
-                        
+                        paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", value);
+                    } catch (Exception e) {
+
                     }
                 }
             }

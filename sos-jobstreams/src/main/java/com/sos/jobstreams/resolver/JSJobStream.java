@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
+import com.sos.joc.model.jobstreams.JobStreamStarter;
 
 public class JSJobStream {
 
@@ -75,7 +77,7 @@ public class JSJobStream {
 
  
 
-    public void setJobStreamStarters(List<DBItemJobStreamStarter> listOfJobStreamStarters, SOSHibernateSession sosHibernateSession)
+    public void setJobStreamStarters(List<DBItemJobStreamStarter> listOfJobStreamStarters, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession)
             throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
         for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfJobStreamStarters) {
@@ -93,6 +95,7 @@ public class JSJobStream {
             List<DBItemJobStreamParameter> listOfJobStreamParameters = dbLayerJobStreamParameters.getJobStreamParametersList(
                     filterJobStreamParameters, 0);
             jobStreamStarter.setListOfParameters(listOfJobStreamParameters);
+            listOfJobStreamStarterGlobal.put(dbItemJobStreamStarter.getId(), jobStreamStarter);
             this.addJobStreamStarter(jobStreamStarter);
         }
     }

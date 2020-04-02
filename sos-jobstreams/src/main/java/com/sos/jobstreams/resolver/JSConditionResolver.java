@@ -58,6 +58,7 @@ import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
+import com.sos.joc.model.jobstreams.JobStreamStarter;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JSConditionResolver {
@@ -83,6 +84,8 @@ public class JSConditionResolver {
     private JSEvents removeJsEvents = new JSEvents();
     private JSJobStreams jsJobStreams;
     private JobStreamContexts jobStreamContexts;
+    private Map<UUID,Map<String, String>> listOfParameters;
+    private Map<Long,JSJobStreamStarter> listOfJobStreamStarter;
 
     public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
             EventHandlerSettings settings) {
@@ -152,8 +155,10 @@ public class JSConditionResolver {
 
         LOGGER.debug("JSConditionResolver::Init");
         DurationCalculator duration = new DurationCalculator();
+        listOfParameters = new HashMap<UUID,Map<String,String>>();
+        listOfJobStreamStarter = new HashMap<Long,JSJobStreamStarter>();
+
         if (jobStreamContexts == null) {
-            // TODO: init from database
             jobStreamContexts = new JobStreamContexts();
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
             filterJobStreamHistory.setRunning(true);
@@ -229,8 +234,7 @@ public class JSConditionResolver {
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
             jsJobStreams = new JSJobStreams();
-            jsJobStreams.setListOfJobStreams(listOfJobStreams, sosHibernateSession);
-
+            jsJobStreams.setListOfJobStreams(listOfJobStreams,listOfJobStreamStarter, sosHibernateSession);
         }
 
         if (listOfCheckHistoryChacheRules == null) {
@@ -539,7 +543,7 @@ public class JSConditionResolver {
                                             }
                                             if (validate(null, contextId, inCondition)) {
                                                 historyValidated2True = true;
-                                                StartJobReturn startJobReturn = inCondition.executeCommand(session, contextId,
+                                                StartJobReturn startJobReturn = inCondition.executeCommand(session, contextId,listOfParameters.get(contextId),
                                                         schedulerXmlCommandExecutor);
                                                 if (!startJobReturn.getStartedJob().isEmpty()) {
                                                     JobStarterOptions jobStarterOptions = new JobStarterOptions();
@@ -586,6 +590,7 @@ public class JSConditionResolver {
                                 dbLayerJobStreamHistory.store(dbItemJobStreamHistory);
                                 jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
                                 session.commit();
+                                this.listOfParameters.remove(contextId);
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                                 session.rollback();
@@ -818,6 +823,15 @@ public class JSConditionResolver {
 
     public JSJobStreamOutConditions getJsJobStreamOutConditions() {
         return jsJobStreamOutConditions;
+    }
+
+    public void addParameters(UUID uuid, Map<String, String> listOfParameters) {
+        this.listOfParameters.put(uuid, listOfParameters);
+    }
+
+    
+    public Map<Long, JSJobStreamStarter> getListOfJobStreamStarter() {
+        return listOfJobStreamStarter;
     }
 
 }

@@ -127,7 +127,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         public void run() {
             try {
                 LOGGER.debug(nextStarter.getAllJobNames() + " at " + nextStarter.getNextStartFromList());
-                startJobs();
+                startJobs(nextStarter);
                 resetNextJobStartTimer();
 
             } catch (Exception e) {
@@ -138,8 +138,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    private void startJobs() throws Exception {
-        List<JobStarterOptions> listOfStartedJobs = nextStarter.startJobs(getXmlCommandExecutor());
+    private void startJobs(JSJobStreamStarter jobStreamStarter) throws Exception {
+        List<JobStarterOptions> listOfStartedJobs = jobStreamStarter.startJobs(getXmlCommandExecutor());
         UUID uuid = UUID.randomUUID();
         SOSHibernateSession session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
         session.beginTransaction();
@@ -148,16 +148,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
             dbItemJobStreamHistory.setContextId(uuid.toString());
             dbItemJobStreamHistory.setCreated(new Date());
-            dbItemJobStreamHistory.setJobStream(nextStarter.getItemJobStreamStarter().getJobStream());
-            dbItemJobStreamHistory.setJobStreamStarter(nextStarter.getItemJobStreamStarter().getId());
+            dbItemJobStreamHistory.setJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
+            dbItemJobStreamHistory.setJobStreamStarter(jobStreamStarter.getItemJobStreamStarter().getId());
             dbItemJobStreamHistory.setRunning(true);
             dbItemJobStreamHistory.setStarted(new Date());
 
             JSHistoryEntry historyEntry = new JSHistoryEntry();
             historyEntry.setCreated(new Date());
             historyEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
+            conditionResolver.addParameters(uuid, jobStreamStarter.getListOfParameters());
 
-            JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(nextStarter.getItemJobStreamStarter().getJobStream());
+            JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
             LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
                     .getJobStream()));
             jobStream.getJsHistory().addHistoryEntry(historyEntry, session);
@@ -165,7 +166,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             for (JobStarterOptions startedJob : listOfStartedJobs) {
                 conditionResolver.getJobStreamContexts().addTaskToContext(uuid, startedJob, session);
             }
-            LOGGER.debug(nextStarter.getAllJobNames() + " started");
+            LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
             session.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -243,7 +244,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         String method = "onEmptyEvent";
         LOGGER.debug(String.format("%s: eventId=%s", method, eventId));
 
-        // execute(false, eventId, null);
     }
 
     @Override
@@ -425,6 +425,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             this.resetGlobalEventsPollTimer();
 
                             resolveInConditions = true;
+                            break;
+                        case "StartJobStream":
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            JSJobStreamStarter jsJobStreamStarter = conditionResolver.getListOfJobStreamStarter().get(customEvent
+                                    .getJobStreamStarterId());
+                            if (jsJobStreamStarter != null) {
+                                startJobs(jsJobStreamStarter);
+                            } else {
+                                LOGGER.warn("Could not find JobStream starter with id: " + customEvent.getJobStreamStarterId());
+                            }
+                            this.resetGlobalEventsPollTimer();
+
                             break;
                         case "CalendarUsageUpdated":
                         case "CalendarDeleted":

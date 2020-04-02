@@ -1,11 +1,13 @@
 package com.sos.jobstreams.classes;
 
+import java.util.Map;
 
 public class JobStarterOptions {
     private String normalizedJob;
     private String jobStream;
     private String job;
     private Long taskId;
+    private Map<String,String>listOfParameters;
     
     public String getNormalizedJob() {
         return normalizedJob;
@@ -39,5 +41,15 @@ public class JobStarterOptions {
     
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
+    }
+
+    
+    public Map<String, String> getListOfParameters() {
+        return listOfParameters;
+    }
+
+    
+    public void setListOfParameters(Map<String, String> listOfParameters) {
+        this.listOfParameters = listOfParameters;
     }
 }

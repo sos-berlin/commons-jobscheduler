@@ -1,5 +1,7 @@
 package com.sos.jobstreams.resolver;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +47,14 @@ public class JSInConditionCommand {
         return itemInConditionCommand.getCommandParam();
     }
 
-    private StartJobReturn startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws NumberFormatException, Exception  {
+    private StartJobReturn startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition, Map<String, String> listOfParameters) throws NumberFormatException, Exception  {
 
         StartJobReturn startJobReturn = new StartJobReturn();
         JobStarter jobStarter = new JobStarter();
         JobStarterOptions jobStartOptions = new JobStarterOptions();
         jobStartOptions.setJob(inCondition.getNormalizedJob());
         jobStartOptions.setJobStream(inCondition.getJobStream());
+        jobStartOptions.setListOfParameters(listOfParameters);
         jobStartOptions.setNormalizedJob(inCondition.getNormalizedJob());
         String jobXml = jobStarter.buildJobStartXml(jobStartOptions, getCommandParam());
         String answer = "";
@@ -78,7 +81,7 @@ public class JSInConditionCommand {
         return startJobReturn;
     }
 
-    public StartJobReturn executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws NumberFormatException, Exception  {
+    public StartJobReturn executeCommand(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition, Map<String, String> listOfParameters) throws NumberFormatException, Exception  {
 
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
@@ -92,7 +95,7 @@ public class JSInConditionCommand {
         }
         if ("startjob".equalsIgnoreCase(command)) {
             LOGGER.debug("....starting job:" + inCondition.getJob());
-            startJobReturn = startJob(schedulerXmlCommandExecutor, inCondition);
+            startJobReturn = startJob(schedulerXmlCommandExecutor, inCondition, listOfParameters);
         }
         return startJobReturn;
     }

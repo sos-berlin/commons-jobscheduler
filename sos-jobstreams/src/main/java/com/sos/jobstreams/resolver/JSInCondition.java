@@ -179,7 +179,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, UUID contextId,
-            SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
+            Map<String, String> listOfParameters, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
@@ -189,7 +189,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
+            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this,listOfParameters);
         }
         return startJobReturn;
     }

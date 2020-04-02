@@ -119,6 +119,7 @@ public class JSJobStreamStarter {
             JobStarterOptions jobStartOptions = new JobStarterOptions();
             jobStartOptions.setJob(dbItemJobStreamStarterJob.getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
+            jobStartOptions.setListOfParameters(listOfParameters);
             jobStartOptions.setNormalizedJob(normalizePath(dbItemJobStreamStarterJob.getJob()));
             String at = "";
             if (dbItemJobStreamStarterJob.getDelay() != null) {
