@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
+import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
+import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
