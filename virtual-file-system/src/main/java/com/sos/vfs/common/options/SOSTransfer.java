@@ -2,26 +2,17 @@ package com.sos.vfs.common.options;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sos.JSHelper.Options.JSOptionsClass;
-
 public class SOSTransfer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClass.class);
-
-    private SOSProviderOptions sourceOptions = null;
-    private SOSProviderOptions targetOptions = null;
+    private SOSProviderOptions source = null;
+    private SOSProviderOptions target = null;
 
     public SOSTransfer(final HashMap<String, String> settings) throws Exception {
-        LOGGER.trace("[provider options]source");
-        sourceOptions = new SOSProviderOptions(false, true);
-        setProviderOptions(settings, sourceOptions, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
+        source = new SOSProviderOptions(false, true);
+        setProviderOptions(settings, source, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
 
-        LOGGER.trace("[provider options]target");
-        targetOptions = new SOSProviderOptions(false, false);
-        setProviderOptions(settings, targetOptions, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
+        target = new SOSProviderOptions(false, false);
+        setProviderOptions(settings, target, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
     }
 
     private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String settingsKey) throws Exception {
@@ -33,24 +24,24 @@ public class SOSTransfer {
     }
 
     public SOSProviderOptions getSource() {
-        return sourceOptions;
+        return source;
     }
 
     public void setSource(final SOSProviderOptions val) {
-        sourceOptions = val;
-        if (sourceOptions != null) {
-            sourceOptions.setIsSource(true);
+        source = val;
+        if (source != null) {
+            source.setIsSource(true);
         }
     }
 
     public SOSProviderOptions getTarget() {
-        return targetOptions;
+        return target;
     }
 
     public void setTarget(final SOSProviderOptions val) {
-        targetOptions = val;
-        if (targetOptions != null) {
-            targetOptions.setIsSource(false);
+        target = val;
+        if (target != null) {
+            target.setIsSource(false);
         }
     }
 

@@ -59,7 +59,7 @@ public class SOSSMBFile extends SOSCommonProviderFile {
         try {
             if (getOutputStream() == null) {
                 fileName = super.adjustRelativePathName(fileName);
-                SOSSMB handler = (SOSSMB) getHandler();
+                SOSSMB handler = (SOSSMB) getProvider();
                 setOutputStream(handler.getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class SOSSMBFile extends SOSCommonProviderFile {
     @Override
     public long setModificationDateTime(final long timeStamp) {
         try {
-            SOSSMB handler = (SOSSMB) getHandler();
+            SOSSMB handler = (SOSSMB) getProvider();
             handler.setModificationTimeStamp(fileName, timeStamp);
             return timeStamp;
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class SOSSMBFile extends SOSCommonProviderFile {
     @Override
     public long getModificationDateTime() {
         try {
-            SOSSMB handler = (SOSSMB) getHandler();
+            SOSSMB handler = (SOSSMB) getProvider();
             return handler.getModificationTimeStamp(fileName);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

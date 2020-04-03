@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.objects.JSObjBase;
 import com.sos.scheduler.model.objects.JSObjSpooler;
 import com.sos.scheduler.model.objects.Spooler;
@@ -30,7 +30,7 @@ public class JSConfiguration extends JSObjBase {
         objConfig = getConfig();
     }
 
-    public JSConfiguration(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSConfiguration(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         super();
         objFactory = schedulerObjectFactory;
         objSpooler = objFactory.createSpooler(pobjVirtualFile);

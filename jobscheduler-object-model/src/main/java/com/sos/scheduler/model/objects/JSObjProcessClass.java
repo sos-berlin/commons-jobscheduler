@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */
@@ -31,7 +31,7 @@ public class JSObjProcessClass extends ProcessClass {
     }
 
     @SuppressWarnings("unchecked")
-    public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom(objJAXBElement.getValue());

@@ -36,7 +36,7 @@ public class SOSFTPFile extends SOSCommonFile {
     @Override
     public boolean fileExists() {
         boolean result = false;
-        if (getHandler().getFileSize(fileName) >= 0) {
+        if (getProvider().getFileSize(fileName) >= 0) {
             result = true;
         }
         if (LOGGER.isTraceEnabled()) {
@@ -48,7 +48,7 @@ public class SOSFTPFile extends SOSCommonFile {
     @Override
     public boolean delete(boolean chekIsDirectory) {
         try {
-            getHandler().delete(fileName, chekIsDirectory);
+            getProvider().delete(fileName, chekIsDirectory);
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(String.format("[%s]deleted", fileName));
             }
@@ -62,7 +62,7 @@ public class SOSFTPFile extends SOSCommonFile {
     public InputStream getFileInputStream() {
         try {
             if (getInputStream() == null) {
-                setInputStream(getHandler().getInputStream(fileName));
+                setInputStream(getProvider().getInputStream(fileName));
             }
         } catch (JobSchedulerException e) {
             throw e;
@@ -75,9 +75,9 @@ public class SOSFTPFile extends SOSCommonFile {
     private OutputStream getFileOutputStream() {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
                 if (getOutputStream() == null) {
-                    throw new JobSchedulerException(getHandler().getReplyString());
+                    throw new JobSchedulerException(getProvider().getReplyString());
                 }
             }
         } catch (JobSchedulerException e) {
@@ -92,7 +92,7 @@ public class SOSFTPFile extends SOSCommonFile {
     public long getFileSize() {
         long result = -1;
         try {
-            result = getHandler().getFileSize(fileName);
+            result = getProvider().getFileSize(fileName);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
         }
@@ -109,12 +109,12 @@ public class SOSFTPFile extends SOSCommonFile {
 
     @Override
     public boolean isDirectory() {
-        return getHandler().isDirectory(fileName);
+        return getProvider().isDirectory(fileName);
     }
 
     @Override
     public void rename(final String newPath) {
-        getHandler().rename(fileName, newPath);
+        getProvider().rename(fileName, newPath);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class SOSFTPFile extends SOSCommonFile {
                 try {
                     getInputStream().close();
                     setInputStream(null);
-                    ((SOSFTPBaseClass) getHandler()).completePendingCommand();
+                    ((SOSFTPBaseClass) getProvider()).completePendingCommand();
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                     throw new JobSchedulerException(e);
@@ -145,9 +145,9 @@ public class SOSFTPFile extends SOSCommonFile {
             if (getOutputStream() != null) {
                 getOutputStream().flush();
                 getOutputStream().close();
-                ((SOSFTPBaseClass) getHandler()).completePendingCommand();
-                if (getHandler().isNegativeCommandCompletion()) {
-                    throw new JobSchedulerException(SOSVfs_E_175.params(fileName, getHandler().getReplyString()));
+                ((SOSFTPBaseClass) getProvider()).completePendingCommand();
+                if (getProvider().isNegativeCommandCompletion()) {
+                    throw new JobSchedulerException(SOSVfs_E_175.params(fileName, getProvider().getReplyString()));
                 }
             }
         } catch (JobSchedulerException e) {
@@ -196,7 +196,7 @@ public class SOSFTPFile extends SOSCommonFile {
 
     @Override
     public long getModificationDateTime() {
-        String dateTime = getHandler().getModificationDateTime(fileName);
+        String dateTime = getProvider().getModificationDateTime(fileName);
         long result = -1;
         if (dateTime != null) {
             if (dateTime.startsWith("213 ")) {
@@ -217,7 +217,7 @@ public class SOSFTPFile extends SOSCommonFile {
     @Override
     public long setModificationDateTime(final long dateTime) {
         try {
-            SOSFTP handler = (SOSFTP) getHandler();
+            SOSFTP handler = (SOSFTP) getProvider();
             Date d = new Date(dateTime);
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
             handler.getClient().setModificationTime(fileName, df.format(d));

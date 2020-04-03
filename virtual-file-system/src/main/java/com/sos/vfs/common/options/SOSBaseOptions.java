@@ -154,15 +154,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
     private void setChildClasses(final HashMap<String, String> settings) {
         try {
-            LOGGER.trace("[setChildClasses]map");
-
             if (transfer == null) {
-                LOGGER.trace("[transfer]main");
                 transfer = new SOSTransfer(settings);
             }
             if (mailOptions == null) {
                 if (settings.containsKey(SETTINGS_KEY_MAIL_SMTP)) {
-                    LOGGER.trace("[smtpmail options]");
                     mailOptions = new SOSSmtpMailOptions(settings);
                 } else {
                     mailOptions = new SOSSmtpMailOptions();
@@ -243,12 +239,12 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             }
             setDefaultHostPort(getSource().protocol, getSource().port, getSource().host);
             setDefaultHostPort(getTarget().protocol, getTarget().port, getTarget().host);
-            setDefaultHostPort(getSource().getAlternatives().protocol, getSource().getAlternatives().port, getSource().getAlternatives().host);
-            setDefaultHostPort(getTarget().getAlternatives().protocol, getTarget().getAlternatives().port, getTarget().getAlternatives().host);
+            setDefaultHostPort(getSource().getAlternative().protocol, getSource().getAlternative().port, getSource().getAlternative().host);
+            setDefaultHostPort(getTarget().getAlternative().protocol, getTarget().getAlternative().port, getTarget().getAlternative().host);
             setDefaultAuth(getSource().protocol, getSource());
             setDefaultAuth(getTarget().protocol, getTarget());
-            setDefaultAuth(getSource().getAlternatives().protocol, getSource().getAlternatives());
-            setDefaultAuth(getTarget().getAlternatives().protocol, getTarget().getAlternatives());
+            setDefaultAuth(getSource().getAlternative().protocol, getSource().getAlternative());
+            setDefaultAuth(getTarget().getAlternative().protocol, getTarget().getAlternative());
             if (filePath.isDirty() && fileSpec.isDirty()) {
                 filePath.setValue("");
             }
@@ -421,10 +417,8 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     }
 
     public void setOptions(HashMap<String, String> map) {
-        LOGGER.trace("[set options]start");
         super.setAllOptions(map);
         setChildClasses(map);
-        LOGGER.trace("[set options]end");
     }
 
     public void setAllOptionsOnJob(HashMap<String, String> params) {

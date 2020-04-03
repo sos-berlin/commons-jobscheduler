@@ -13,25 +13,24 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.i18n.annotation.I18NResourceBundle;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements ISOSTransferHandler {
+public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements ISOSProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSCommonProvider.class);
-
-    protected SOSProviderOptions providerOptions = null;
-
-    private List<SOSFileEntry> directoryListing = null;
-    private SOSBaseOptions baseOptions = null;
 
     protected String user = EMPTY_STRING;
     protected String host = EMPTY_STRING;
     protected int port = 0;
     protected String reply = "OK";
+
+    private List<SOSFileEntry> directoryListing = null;
+    private SOSBaseOptions baseOptions = null;
+    private SOSProviderOptions providerOptions = null;
 
     public SOSCommonProvider() {
         super("SOSVirtualFileSystem");
@@ -235,7 +234,7 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(final String filename) {
+    public ISOSProviderFile getFile(final String filename) {
         return null;
     }
 
@@ -300,6 +299,10 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     public void setBaseOptions(SOSBaseOptions val) {
         baseOptions = val;
+    }
+
+    public SOSProviderOptions getProviderOptions() {
+        return providerOptions;
     }
 
 }

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.answers.Answer;
 import com.sos.scheduler.model.answers.ERROR;
 import com.sos.scheduler.model.answers.HistoryEntry;
@@ -375,7 +375,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objC;
     }
 
-    public Object unMarshall(final ISOSVirtualFile pobjVirtualFile) {
+    public Object unMarshall(final ISOSProviderFile pobjVirtualFile) {
         Object objC = null;
         if (pobjVirtualFile != null) {
             InputStream objInputStream = pobjVirtualFile.getFileInputStream();
@@ -450,9 +450,9 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return baos.toString();
     }
 
-    public Object toXMLFile(final Object objO, final ISOSVirtualFile pobjVirtualFile) {
+    public Object toXMLFile(final Object objO, final ISOSProviderFile pobjVirtualFile) {
         if (pobjVirtualFile != null) {
-            OutputStream objOutputStream = pobjVirtualFile.getHandler().getOutputStream(pobjVirtualFile.getName(), false, false);
+            OutputStream objOutputStream = pobjVirtualFile.getProvider().getOutputStream(pobjVirtualFile.getName(), false, false);
             try {
                 if (objOutputStream == null) {
                     LOGGER.error(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
@@ -634,12 +634,12 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objJSC;
     }
 
-    public JSConfiguration createJSConfiguration(final ISOSVirtualFile pobjVirtualFile) {
+    public JSConfiguration createJSConfiguration(final ISOSProviderFile pobjVirtualFile) {
         JSConfiguration objJSC = new JSConfiguration(this, pobjVirtualFile);
         return objJSC;
     }
 
-    public SchedulerHotFolder createSchedulerHotFolder(final ISOSVirtualFile objDir) {
+    public SchedulerHotFolder createSchedulerHotFolder(final ISOSProviderFile objDir) {
         SchedulerHotFolder objSchedulerHotFolder = new SchedulerHotFolder(this, objDir);
         return objSchedulerHotFolder;
     }
@@ -663,12 +663,12 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objJob;
     }
 
-    public JSObjJob createJob(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjJob createJob(final ISOSProviderFile pobjVirtualFile) {
         JSObjJob objJob = new JSObjJob(this, pobjVirtualFile);
         return objJob;
     }
 
-    public JSObjParams createParams(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjParams createParams(final ISOSProviderFile pobjVirtualFile) {
         JSObjParams objParams = new JSObjParams(this, pobjVirtualFile);
         return objParams;
     }
@@ -690,7 +690,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objJobChain;
     }
 
-    public JSObjJobChain createJobChain(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjJobChain createJobChain(final ISOSProviderFile pobjVirtualFile) {
         JSObjJobChain objJobChain = new JSObjJobChain(this, pobjVirtualFile);
         return objJobChain;
     }
@@ -749,7 +749,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objLock;
     }
 
-    public JSObjLock createLock(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjLock createLock(final ISOSProviderFile pobjVirtualFile) {
         JSObjLock objLock = new JSObjLock(this, pobjVirtualFile);
         return objLock;
     }
@@ -778,7 +778,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objSpooler;
     }
 
-    public JSObjSpooler createSpooler(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjSpooler createSpooler(final ISOSProviderFile pobjVirtualFile) {
         JSObjSpooler objSpooler = new JSObjSpooler(this, pobjVirtualFile);
         return objSpooler;
     }
@@ -789,7 +789,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objOrder;
     }
 
-    public JSObjOrder createOrder(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjOrder createOrder(final ISOSProviderFile pobjVirtualFile) {
         JSObjOrder objOrder = new JSObjOrder(this, pobjVirtualFile);
         String s;
         try {
@@ -804,7 +804,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objOrder;
     }
 
-    public JSObjHolidays createHolidays(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjHolidays createHolidays(final ISOSProviderFile pobjVirtualFile) {
         JSObjHolidays objHolidays = new JSObjHolidays(this, pobjVirtualFile);
         return objHolidays;
     }
@@ -814,7 +814,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objSchedule;
     }
 
-    public JSObjSchedule createSchedule(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjSchedule createSchedule(final ISOSProviderFile pobjVirtualFile) {
         JSObjSchedule objSchedule = new JSObjSchedule(this, pobjVirtualFile);
         return objSchedule;
     }
@@ -825,7 +825,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objProcessClass;
     }
 
-    public JSObjProcessClass createProcessClass(final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjProcessClass createProcessClass(final ISOSProviderFile pobjVirtualFile) {
         JSObjProcessClass objProcessClass = new JSObjProcessClass(this, pobjVirtualFile);
         return objProcessClass;
     }
@@ -1289,8 +1289,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return liveFolder;
     }
 
-    public ISOSVirtualFile getFileHandleOrNull(final String pstrFilename) {
-        return liveConnector != null ? liveConnector.getFileSystemHandler().getFileHandle(pstrFilename) : null;
+    public ISOSProviderFile getFileHandleOrNull(final String pstrFilename) {
+        return liveConnector != null ? liveConnector.getFileSystemHandler().getFile(pstrFilename) : null;
     }
 
     public void setSpooler(sos.spooler.Spooler spooler) {

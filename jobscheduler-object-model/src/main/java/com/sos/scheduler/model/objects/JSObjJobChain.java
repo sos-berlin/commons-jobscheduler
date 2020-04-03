@@ -1,8 +1,8 @@
 package com.sos.scheduler.model.objects;
 
 import com.sos.vfs.common.SOSVFSFactory;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(origOrder);
     }
 
-    public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         this(schedulerObjectFactory);
         super.objVirtualFile = pobjVirtualFile;
         setHotFolderSrc(super.objVirtualFile);
@@ -48,8 +48,8 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(jobChain);
         if (super.objVirtualFile == null) {
             try {
-                ISOSTransferHandler sosVFSFileTransfer = SOSVFSFactory.getHandler("local");
-                ISOSVirtualFile virtualFile = sosVFSFileTransfer.getFileHandle(file.getAbsolutePath());
+                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local");
+                ISOSProviderFile virtualFile = sosVFSFileTransfer.getFile(file.getAbsolutePath());
                 super.objVirtualFile = virtualFile;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);

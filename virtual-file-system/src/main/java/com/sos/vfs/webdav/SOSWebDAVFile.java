@@ -38,7 +38,7 @@ public class SOSWebDAVFile extends SOSCommonProviderFile {
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
@@ -54,7 +54,7 @@ public class SOSWebDAVFile extends SOSCommonProviderFile {
     public void write(final byte[] bteBuffer) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
@@ -75,7 +75,7 @@ public class SOSWebDAVFile extends SOSCommonProviderFile {
     @Override
     public long getModificationDateTime() {
         try {
-            SOSWebDAV handler = (SOSWebDAV) getHandler();
+            SOSWebDAV handler = (SOSWebDAV) getProvider();
             return handler.getModificationTimeStamp(fileName);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

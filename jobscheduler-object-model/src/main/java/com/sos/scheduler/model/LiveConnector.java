@@ -10,16 +10,16 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.vfs.common.SOSVFSFactory;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.tools.PathResolver;
 
 public class LiveConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LiveConnector.class);
     private final String liveFolder;
-    private final ISOSTransferHandler fileSystemHandler;
-    private final ISOSVirtualFile hotFolderHandle;
+    private final ISOSProvider fileSystemHandler;
+    private final ISOSProviderFile hotFolderHandle;
     private String workingDirectory;
 
     public LiveConnector(SOSOptionFolderName folderName) throws MalformedURLException {
@@ -34,7 +34,7 @@ public class LiveConnector {
         this.fileSystemHandler = connect(url.toExternalForm());
         this.liveFolder = getUrl(url.toExternalForm()).getPath();
         setCurrentFolder(liveFolder);
-        this.hotFolderHandle = fileSystemHandler.getFileHandle(liveFolder);
+        this.hotFolderHandle = fileSystemHandler.getFile(liveFolder);
     }
 
     public static URL getUrl(String urlPath) {
@@ -63,10 +63,10 @@ public class LiveConnector {
         return result;
     }
 
-    private static ISOSTransferHandler connect(String folder) {
-        ISOSTransferHandler result = null;
+    private static ISOSProvider connect(String folder) {
+        ISOSProvider result = null;
         try {
-            ISOSTransferHandler vfs = SOSVFSFactory.getHandler(folder);
+            ISOSProvider vfs = SOSVFSFactory.getProvider(folder);
             if (vfs == null) {
                 throw new JobSchedulerException();
             }
@@ -77,7 +77,7 @@ public class LiveConnector {
         return result;
     }
 
-    public ISOSVirtualFile getHotFolderHandle() {
+    public ISOSProviderFile getHotFolderHandle() {
         return hotFolderHandle;
     }
 
@@ -108,7 +108,7 @@ public class LiveConnector {
         return (baseName.startsWith("/")) ? getLiveFolder() : getCurrentFolder();
     }
 
-    public ISOSTransferHandler getFileSystemHandler() {
+    public ISOSProvider getFileSystemHandler() {
         return fileSystemHandler;
     }
 

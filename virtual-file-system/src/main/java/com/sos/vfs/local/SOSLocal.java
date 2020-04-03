@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
@@ -81,9 +81,9 @@ public class SOSLocal extends SOSCommonProvider {
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(final String fileName) {
+    public ISOSProviderFile getFile(final String fileName) {
         SOSLocalFile file = new SOSLocalFile(fileName);
-        file.setHandler(this);
+        file.setProvider(this);
         return file;
     }
 

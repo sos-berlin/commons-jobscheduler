@@ -10,7 +10,7 @@ import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 
-public interface ISOSTransferHandler {
+public interface ISOSProvider {
 
     public boolean isConnected();
 
@@ -36,7 +36,7 @@ public interface ISOSTransferHandler {
 
     public SOSFileEntry getFileEntry(String path) throws Exception;
 
-    public ISOSVirtualFile getFileHandle(final String path);
+    public ISOSProviderFile getFile(final String path);
 
     public boolean isDirectory(String path);
 

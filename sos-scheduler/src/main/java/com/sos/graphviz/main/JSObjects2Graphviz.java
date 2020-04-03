@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.SOSVFSFactory;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.graphviz.enums.FileType;
 import com.sos.graphviz.jobchain.diagram.JobChainDiagramCreator;
 import com.sos.scheduler.model.SchedulerHotFolder;
@@ -27,7 +27,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 
     private static final String CLASSNAME = "JSObjects2Graphviz";
     private static final Logger LOGGER = LoggerFactory.getLogger(JSObjects2Graphviz.class);
-    private ISOSTransferHandler fileSystemHandler = null;
+    private ISOSProvider fileSystemHandler = null;
     private SchedulerObjectFactory schedulerObjectFactory = null;
     private SchedulerHotFolderFileList schedulerHotFolderFileList = null;
     private String outputFolderName = "";
@@ -40,10 +40,10 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
-        fileSystemHandler = SOSVFSFactory.getHandler("local");
+        fileSystemHandler = SOSVFSFactory.getProvider("local");
         schedulerObjectFactory = new SchedulerObjectFactory();
         schedulerObjectFactory.initMarshaller(Spooler.class);
-        ISOSVirtualFile hotFolder = fileSystemHandler.getFileHandle(liveFolderName);
+        ISOSProviderFile hotFolder = fileSystemHandler.getFile(liveFolderName);
         SchedulerHotFolder schedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(hotFolder);
         LOGGER.info(String.format("... load %1$s", liveFolderName));
         schedulerHotFolderFileList = schedulerHotFolder.loadRecursive();

@@ -38,7 +38,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.http.common.SOSHTTPRequestEntity;
 
@@ -77,12 +77,12 @@ public class SOSHTTP extends SOSCommonProvider {
     @Override
     public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
-        proxyHost = providerOptions.proxyHost.getValue();
-        proxyPort = providerOptions.proxyPort.value();
-        proxyUser = providerOptions.proxyUser.getValue();
-        proxyPassword = providerOptions.proxyPassword.getValue();
+        proxyHost = getProviderOptions().proxyHost.getValue();
+        proxyPort = getProviderOptions().proxyPort.value();
+        proxyUser = getProviderOptions().proxyUser.getValue();
+        proxyPassword = getProviderOptions().proxyPassword.getValue();
         doConnect();
-        doLogin(providerOptions.user.getValue(), providerOptions.password.getValue());
+        doLogin(getProviderOptions().user.getValue(), getProviderOptions().password.getValue());
     }
 
     @Override
@@ -119,10 +119,10 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(String fileName) {
+    public ISOSProviderFile getFile(String fileName) {
         fileName = adjustFileSeparator(fileName);
-        ISOSVirtualFile file = new SOSHTTPFile(fileName);
-        file.setHandler(this);
+        ISOSProviderFile file = new SOSHTTPFile(fileName);
+        file.setProvider(this);
         return file;
     }
 
@@ -185,7 +185,7 @@ public class SOSHTTP extends SOSCommonProvider {
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
                         rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(providerOptions.verifyCertificateHostname.value());
+                        psf.setCheckHostname(getProviderOptions().verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
                             LOGGER.info(
                                     "*********************** Security warning *********************************************************************");
@@ -196,7 +196,7 @@ public class SOSHTTP extends SOSCommonProvider {
                             LOGGER.info(
                                     "**************************************************************************************************************");
                         }
-                        if (providerOptions.acceptUntrustedCertificate.value()) {
+                        if (getProviderOptions().acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }

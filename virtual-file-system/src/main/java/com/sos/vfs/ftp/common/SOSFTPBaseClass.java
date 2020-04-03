@@ -39,8 +39,8 @@ import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSFileListEntry;
 import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.ftp.SOSFTPFile;
@@ -49,7 +49,7 @@ import sos.util.SOSDate;
 import sos.util.SOSString;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferHandler {
+public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFTPBaseClass.class);
     private static final String CLASS_NAME = SOSFTPBaseClass.class.getSimpleName();
@@ -217,9 +217,9 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(final String filename) {
-        ISOSVirtualFile file = new SOSFTPFile(SOSCommonProvider.normalizePath(filename));
-        file.setHandler(this);
+    public ISOSProviderFile getFile(final String filename) {
+        ISOSProviderFile file = new SOSFTPFile(SOSCommonProvider.normalizePath(filename));
+        file.setProvider(this);
         return file;
     }
 
@@ -765,7 +765,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSTransferH
         }
     }
 
-    private final ISOSVirtualFile transferMode(final SOSOptionTransferMode mode) {
+    private final ISOSProviderFile transferMode(final SOSOptionTransferMode mode) {
         transferMode = mode;
         if (transferMode.isAscii()) {
             ascii();

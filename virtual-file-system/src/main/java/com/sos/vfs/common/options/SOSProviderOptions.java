@@ -39,8 +39,8 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSProviderOptions.class);
     private static final String CLASSNAME = SOSProviderOptions.class.getSimpleName();
 
-    private SOSProviderOptions alternativeOptions = null;
-    private SOSCredentialStoreOptions credentialStoreOptions = null;
+    private SOSProviderOptions alternative = null;
+    private SOSCredentialStoreOptions credentialStore = null;
     private String prefix = null;
     private boolean isAlternative = false;
     private boolean isSource = false;
@@ -73,52 +73,52 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         }
         if (alternateOptionsUsed.value()) {
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(String.format("[provider options][alternative]%s", getAlternatives().getPrefix()));
+                LOGGER.trace(String.format("[provider options][alternative]%s", getAlternative().getPrefix()));
             }
-            getAlternatives().setAllOptions(settings);
+            getAlternative().setAllOptions(settings);
             if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, prefix))) {
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace(String.format("[provider options][alternative][credential store]%s", getAlternatives().getPrefix()));
+                    LOGGER.trace(String.format("[provider options][alternative][credential store]%s", getAlternative().getPrefix()));
                 }
-                getAlternatives().getCredentialStore().setAllOptions(settings, getAlternatives().getPrefix());
+                getAlternative().getCredentialStore().setAllOptions(settings, getAlternative().getPrefix());
             }
         }
     }
 
     public void setCredentialStore(SOSCredentialStoreOptions opt) {
-        credentialStoreOptions = opt;
+        credentialStore = opt;
     }
 
     public SOSCredentialStoreOptions getCredentialStore() {
-        if (credentialStoreOptions == null) {
-            credentialStoreOptions = new SOSCredentialStoreOptions();
+        if (credentialStore == null) {
+            credentialStore = new SOSCredentialStoreOptions();
         }
-        return credentialStoreOptions;
+        return credentialStore;
     }
 
     public void checkCredentialStoreOptions() {
-        if (credentialStoreOptions.useCredentialStore.isTrue()) {
+        if (credentialStore.useCredentialStore.isTrue()) {
             SOSKeePassDatabase kpd = null;
             if (keepass_database.value() == null) {
-                Path databaseFile = Paths.get(credentialStoreOptions.credentialStoreFileName.getValue());
+                Path databaseFile = Paths.get(credentialStore.credentialStoreFileName.getValue());
 
                 LOGGER.debug(String.format("load KeePass from file %s", SOSKeePassDatabase.getFilePath(databaseFile)));
-                credentialStoreOptions.credentialStoreFileName.checkMandatory(true);
+                credentialStore.credentialStoreFileName.checkMandatory(true);
 
                 String keePassPassword = null;
                 Path keePassKeyFile = null;
-                if (credentialStoreOptions.credentialStorePassword.isDirty()) {
-                    keePassPassword = credentialStoreOptions.credentialStorePassword.getValue();
+                if (credentialStore.credentialStorePassword.isDirty()) {
+                    keePassPassword = credentialStore.credentialStorePassword.getValue();
                 }
 
                 try {
-                    if (credentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
-                        keePassKeyFile = Paths.get(credentialStoreOptions.credentialStoreKeyFileName.getValue());
+                    if (credentialStore.credentialStoreKeyFileName.isDirty()) {
+                        keePassKeyFile = Paths.get(credentialStore.credentialStoreKeyFileName.getValue());
                         if (Files.notExists(keePassKeyFile)) {
                             throw new Exception(String.format("[%s]key file not found", SOSKeePassDatabase.getFilePath(keePassKeyFile)));
                         }
                     } else {
-                        if ("privatekey".equals(credentialStoreOptions.credentialStoreAuthenticationMethod.getValue())) {
+                        if ("privatekey".equals(credentialStore.credentialStoreAuthenticationMethod.getValue())) {
                             Path defaultKeyFile = SOSKeePassDatabase.getDefaultKeyFile(databaseFile);
                             if (Files.notExists(defaultKeyFile)) {
                                 if (SOSString.isEmpty(keePassPassword)) {
@@ -229,8 +229,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         Entry<?, ?, ?, ?> entry = keePass2OptionsByKeePassSyntax(kpd);
         if (sshAuthFile.isNotEmpty()) {
             String optionName = sshAuthFile.getShortKey();
-            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), credentialStoreOptions.credentialStoreKeyPath
-                    .getValue());
+            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), credentialStore.credentialStoreKeyPath.getValue());
             if (keePassPath.isValid()) {
                 LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
                 if (entry == null || !keePassPath.getEntryPath().equals(entry.getPath())) {
@@ -254,20 +253,20 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
     private Entry<?, ?, ?, ?> getKeePassEntry(final SOSKeePassDatabase kpd, final String entryPath) throws Exception {
         Entry<?, ?, ?, ?> entry = kpd.getEntryByPath(entryPath);
         if (entry == null) {
-            throw new Exception(String.format("[%s][%s]entry not found", credentialStoreOptions.credentialStoreFileName.getValue(), entryPath));
+            throw new Exception(String.format("[%s][%s]entry not found", credentialStore.credentialStoreFileName.getValue(), entryPath));
         }
         if (entry.getExpires()) {
-            throw new Exception(String.format("[%s][%s]entry is expired (%s)", credentialStoreOptions.credentialStoreFileName.getValue(), entryPath,
-                    entry.getExpiryTime()));
+            throw new Exception(String.format("[%s][%s]entry is expired (%s)", credentialStore.credentialStoreFileName.getValue(), entryPath, entry
+                    .getExpiryTime()));
         }
         return entry;
     }
 
     private Entry<?, ?, ?, ?> keePass2OptionByKeePassSyntax(final SOSKeePassDatabase kpd, final SOSOptionElement option, Entry<?, ?, ?, ?> lastEntry)
             throws Exception {
-        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), credentialStoreOptions.credentialStoreKeyPath.getValue());
+        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), credentialStore.credentialStoreKeyPath.getValue());
         Entry<?, ?, ?, ?> entry = null;
-        String fileName = credentialStoreOptions.credentialStoreFileName.getValue();
+        String fileName = credentialStore.credentialStoreFileName.getValue();
         String optionName = option.getShortKey();
         if (keePassPath.isValid()) {
             if (lastEntry == null || !keePassPath.getEntryPath().equals(lastEntry.getPath())) {
@@ -359,11 +358,11 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         setPrefix();
     }
 
-    public SOSProviderOptions getAlternatives() {
-        if (alternativeOptions == null) {
-            alternativeOptions = new SOSProviderOptions(true, isSource);
+    public SOSProviderOptions getAlternative() {
+        if (alternative == null) {
+            alternative = new SOSProviderOptions(true, isSource);
         }
-        return alternativeOptions;
+        return alternative;
     }
 
     private void setPrefix() {

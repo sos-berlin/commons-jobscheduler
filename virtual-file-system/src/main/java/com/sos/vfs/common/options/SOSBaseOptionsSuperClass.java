@@ -2,9 +2,6 @@ package com.sos.vfs.common.options;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -46,7 +43,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptionsSuperClass.class);
     private static final long serialVersionUID = -4445655877481869778L;
     private static final String CLASS_NAME = SOSBaseOptionsSuperClass.class.getSimpleName();
 
@@ -56,14 +52,6 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
 
     public SOSBaseOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        setAllOptions(settings);
-    }
-
-    @Override
-    public void setAllOptions(final HashMap<String, String> settings) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("[setAllOptions]map");
-        }
         super.setAllOptions(settings);
     }
 

@@ -3,7 +3,7 @@ package com.sos.scheduler.model.objects;
 import javax.xml.bind.JAXBElement;
 
 
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjSchedule
@@ -49,7 +49,7 @@ public class JSObjSchedule extends RunTime {
     }
 
     @SuppressWarnings("unchecked")
-    public JSObjSchedule(SchedulerObjectFactory schedulerObjectFactory, ISOSVirtualFile pobjVirtualFile) {
+    public JSObjSchedule(SchedulerObjectFactory schedulerObjectFactory, ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         this.objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom((RunTime) this.objJAXBElement.getValue());

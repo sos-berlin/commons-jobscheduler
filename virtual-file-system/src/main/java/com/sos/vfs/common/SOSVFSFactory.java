@@ -11,7 +11,7 @@ import com.sos.exception.SOSYadeTargetConnectionException;
 import com.sos.vfs.ftp.SOSFTP;
 import com.sos.vfs.ftp.SOSFTPS;
 import com.sos.vfs.http.SOSHTTP;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
+import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.jms.SOSJMS;
@@ -47,39 +47,38 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         options = opt;
     }
 
-    public static ISOSTransferHandler getHandler(final SOSOptionTransferType.TransferTypes type) throws Exception {
-        return getHandler(type.name());
+    public static ISOSProvider getProvider(final SOSOptionTransferType.TransferTypes type) throws Exception {
+        return getProvider(type.name());
     }
 
-    public static ISOSTransferHandler getHandler(String protocol) throws Exception {
-        ISOSTransferHandler handler = null;
-
+    public static ISOSProvider getProvider(String protocol) throws Exception {
+        ISOSProvider provider = null;
         protocol = protocol.toLowerCase();
 
         if (protocol.equals(TransferTypes.sftp.name()) || protocol.equals(TransferTypes.ssh.name())) {
-            handler = new SOSSFTP();
+            provider = new SOSSFTP();
         } else if (protocol.equals(TransferTypes.local.name())) {
-            handler = new SOSLocal();
+            provider = new SOSLocal();
         } else if (protocol.equals(TransferTypes.ftp.name())) {
-            handler = new SOSFTP();
+            provider = new SOSFTP();
         } else if (protocol.equals(TransferTypes.ftps.name())) {
-            handler = new SOSFTPS();
+            provider = new SOSFTPS();
         } else if (protocol.equals(TransferTypes.webdav.name())) {
-            handler = new SOSWebDAV();
+            provider = new SOSWebDAV();
         } else if (protocol.equals(TransferTypes.http.name())) {
-            handler = new SOSHTTP();
+            provider = new SOSHTTP();
         } else if (protocol.equals(TransferTypes.smb.name())) {
-            handler = new SOSSMB();
+            provider = new SOSSMB();
         } else if (protocol.equals(TransferTypes.mq.name())) {
-            handler = new SOSJMS();
+            provider = new SOSJMS();
         }
-        if (handler == null) {
+        if (provider == null) {
             throw new Exception(SOSVfs_E_0203.params(protocol));
         }
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(handler.getClass().getName());
+            LOGGER.trace(provider.getClass().getName());
         }
-        return handler;
+        return provider;
     }
 
     public static void setParentLogger(final String name) {
@@ -94,8 +93,8 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         return name;
     }
 
-    public ISOSTransferHandler getConnectedHandler(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
-        ISOSTransferHandler client = null;
+    public ISOSProvider getConnectedProvider(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
+        ISOSProvider provider = null;
         try {
             SOSProviderOptions providerOptions;
             String dataType;
@@ -106,26 +105,26 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                 providerOptions = options.getTransfer().getTarget();
                 dataType = options.getDataTargetType();
             }
-            client = getHandler(dataType);
+            provider = getProvider(dataType);
             try {
                 handleOptions(providerOptions, isSource);
-                client.setBaseOptions(options);
-                client.connect(providerOptions);
+                provider.setBaseOptions(options);
+                provider.connect(providerOptions);
             } catch (Exception e) {
-                SOSProviderOptions alternatives = providerOptions.getAlternatives();
-                if (alternatives.optionsHaveMinRequirements()) {
+                SOSProviderOptions alternative = providerOptions.getAlternative();
+                if (alternative.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
-                    LOGGER.debug(alternatives.dirtyString());
+                    LOGGER.debug(alternative.dirtyString());
                     JobSchedulerException.LastErrorMessage = "";
                     try {
-                        client.disconnect();
+                        provider.disconnect();
                     } catch (Exception ce) {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
-                    client = getHandler(alternatives.protocol.getValue());
-                    handleOptions(alternatives, isSource);
-                    client.connect(alternatives);
+                    provider = getProvider(alternative.protocol.getValue());
+                    handleOptions(alternative, isSource);
+                    provider.connect(alternative);
                     providerOptions.alternateOptionsUsed.value(true);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
@@ -146,7 +145,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                 throw new SOSYadeTargetConnectionException(ex);
             }
         }
-        return client;
+        return provider;
     }
 
     private void handleOptions(SOSProviderOptions providerOptions, boolean isSource) throws Exception {

@@ -2,11 +2,11 @@ package com.sos.vfs.common.interfaces;
 
 import java.io.InputStream;
 
-public interface ISOSVirtualFile {
+public interface ISOSProviderFile {
 
-    public ISOSTransferHandler getHandler();
+    public ISOSProvider getProvider();
 
-    public void setHandler(final ISOSTransferHandler handler);
+    public void setProvider(final ISOSProvider provider);
 
     public boolean isDirectory() throws Exception;
 
