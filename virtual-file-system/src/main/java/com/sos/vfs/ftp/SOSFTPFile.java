@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.SOSCommonFile;
-import com.sos.vfs.common.SOSVFSConstants;
+import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.ftp.common.SOSFTPBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -24,12 +24,12 @@ public class SOSFTPFile extends SOSCommonFile {
     private String fileName = EMPTY_STRING;
 
     public SOSFTPFile(final String path) {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(SOSVFSFactory.BUNDLE_NAME);
         fileName = path;
     }
 
     public SOSFTPFile(final FTPFile file) {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(SOSVFSFactory.BUNDLE_NAME);
         fileName = file.getName();
     }
 

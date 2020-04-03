@@ -28,6 +28,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVFSFactory extends SOSVFSMessageCodes {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVFSFactory.class);
+    
+    public final static String BUNDLE_NAME = "SOSVirtualFileSystem";
+    public static String LOGGER_NAME = "SOSVfsReportLog";
 
     @I18NMessages(value = { @I18NMessage("%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "en_UK", explanation = "%1$s returns instance of %2$s"),
@@ -40,7 +43,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
     private SOSBaseOptions options = null;
 
     public SOSVFSFactory() {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(BUNDLE_NAME);
     }
 
     public SOSVFSFactory(final SOSBaseOptions opt) {
@@ -86,7 +89,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
     }
 
     public static String getLoggerName() {
-        String name = SOSVFSConstants.LOGGER_NAME;
+        String name = LOGGER_NAME;
         if (!PARENT_LOGGER_NAME.isEmpty()) {
             name = PARENT_LOGGER_NAME + "." + name;
         }
