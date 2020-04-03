@@ -56,9 +56,9 @@ import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSShellInfo;
-import com.sos.vfs.common.SOSShellInfo.OS;
-import com.sos.vfs.common.SOSShellInfo.Shell;
+import com.sos.vfs.sftp.common.SOSSFTPShellInfo;
+import com.sos.vfs.sftp.common.SOSSFTPShellInfo.OS;
+import com.sos.vfs.sftp.common.SOSSFTPShellInfo.Shell;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.common.SOSSFTPLogger;
@@ -85,7 +85,7 @@ public class SOSSFTP extends SOSCommonProvider {
     private StringBuilder stdOut;
     private StringBuilder stdErr;
 
-    private SOSShellInfo shellInfo = null;
+    private SOSSFTPShellInfo shellInfo = null;
     private boolean simulateShell = false;
 
     private int proxyPort = 0;
@@ -1000,9 +1000,9 @@ public class SOSSFTP extends SOSCommonProvider {
         }
     }
 
-    public SOSShellInfo getShellInfo() {
+    public SOSSFTPShellInfo getShellInfo() {
         if (shellInfo == null) {
-            SOSShellInfo info = new SOSShellInfo("uname");
+            SOSSFTPShellInfo info = new SOSSFTPShellInfo("uname");
             try {
                 info.setCommandResult(executeResultCommand(info.getCommand()));
 

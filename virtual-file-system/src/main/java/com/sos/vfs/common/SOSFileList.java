@@ -19,7 +19,6 @@ import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSVFSConstants;
 import com.sos.vfs.common.SOSVFSMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -54,7 +53,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private int retryInterval = 0;// in seconds
 
     public SOSFileList(SOSBaseOptions opt, IJobSchedulerEventHandler handler) {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(SOSVFSFactory.BUNDLE_NAME);
         options = opt;
         eventHandler = handler;
         setRetrySettings();

@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.vfs.common.interfaces.ISOSShellOptions;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSVFSMessageCodes;
 
@@ -21,7 +20,6 @@ public class SOSShell extends SOSVFSMessageCodes implements Runnable {
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private static final String CHARACTER_ENCODING = "Cp1252";
 
-    private ISOSShellOptions options = null;
     private String stdOut = "";
     private String stdErr = "";
     private int exitValue = 0;
@@ -30,10 +28,6 @@ public class SOSShell extends SOSVFSMessageCodes implements Runnable {
 
     public SOSShell() {
         //
-    }
-
-    public SOSShell(final ISOSShellOptions opt) {
-        options = opt;
     }
 
     public boolean isWindows() {
@@ -82,7 +76,7 @@ public class SOSShell extends SOSVFSMessageCodes implements Runnable {
         }
     }
 
-    private int executeCommand(final String[] commands, final boolean showCommand) throws Exception {
+    public int executeCommand(final String[] commands, final boolean showCommand) throws Exception {
         return executeCommand(commands, showCommand, null);
     }
 
@@ -139,52 +133,6 @@ public class SOSShell extends SOSVFSMessageCodes implements Runnable {
 
     public int executeCommand(final String cmd, SOSEnv env) throws Exception {
         return executeCommand(createCommand(cmd), true, env);
-    }
-
-    public int executeCommand(final ISOSShellOptions opt) throws Exception {
-        options = opt;
-        return executeCommand(createCommandUsingOptions(), true);
-    }
-
-    private String[] createCommands(final String envComSpecName, final String defaultComSpec, final String startParam) {
-        final String[] command = { " ", " ", " " };
-        String comSpec = "";
-        int indx = 0;
-        String startShellCommandParam = startParam;
-        if (options.getStartShellCommand().isDirty()) {
-            comSpec = options.getStartShellCommand().getValue();
-            if (!"none".equalsIgnoreCase(comSpec)) {
-                command[indx++] = comSpec;
-                if (options.getStartShellCommandParameter().isDirty()) {
-                    startShellCommandParam = options.getStartShellCommandParameter().getValue();
-                    command[indx++] = startShellCommandParam;
-                }
-                command[indx++] = options.getShellCommand().getValue() + " " + options.getCommandLineOptions().getValue() + " " + options
-                        .getShellCommandParameter().getValue();
-            } else {
-                command[indx++] = options.getShellCommand().getValue();
-                command[indx++] = options.getCommandLineOptions().getValue() + " " + options.getShellCommandParameter().getValue();
-            }
-        } else {
-            comSpec = System.getenv(envComSpecName);
-            if (comSpec == null) {
-                comSpec = defaultComSpec;
-            }
-            command[indx++] = comSpec;
-            command[indx++] = startShellCommandParam;
-            command[indx++] = options.getShellCommand().getValue() + " " + options.getCommandLineOptions().getValue() + " " + options
-                    .getShellCommandParameter().getValue();
-        }
-        LOGGER.debug(SOSVfs_D_230.params(comSpec));
-        return command;
-    }
-
-    private String[] createCommandUsingOptions() {
-        if (isWindows()) {
-            return createCommands("comspec", "cmd.exe", "/C");
-        } else {
-            return createCommands("SHELL", "bin.sh", "-c");
-        }
     }
 
     private String[] createCommand(final String cmd) {

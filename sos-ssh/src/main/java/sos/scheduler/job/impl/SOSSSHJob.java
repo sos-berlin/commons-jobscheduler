@@ -30,8 +30,8 @@ import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.SOSSFTP;
 import com.sos.vfs.common.SOSCommandResult;
 import com.sos.vfs.common.SOSEnv;
-import com.sos.vfs.common.SOSShellInfo;
-import com.sos.vfs.common.SOSShellInfo.Shell;
+import com.sos.vfs.sftp.common.SOSSFTPShellInfo;
+import com.sos.vfs.sftp.common.SOSSFTPShellInfo.Shell;
 import com.sos.exception.SOSSSHAutoDetectionException;
 
 import sos.net.ssh.SOSSSHJobOptions;
@@ -668,7 +668,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (!forceAutoDetection) {
             LOGGER.info("*** parameter 'auto_detect_os' was set to 'false', only checking without setting commands automatically! ***");
         }
-        SOSShellInfo info = handler.getShellInfo();
+        SOSSFTPShellInfo info = handler.getShellInfo();
 
         StringBuilder sb = new StringBuilder();
         sb.append("Can´t detect OS and shell automatically!\r\n");

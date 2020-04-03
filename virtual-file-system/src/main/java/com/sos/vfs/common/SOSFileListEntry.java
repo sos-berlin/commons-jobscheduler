@@ -20,17 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.vfs.common.SOSVFSFactory;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.interfaces.IJadeTransferDetailHistoryData;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.options.SOSTransfer;
-import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.vfs.common.SOSCommonProvider;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -101,7 +97,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     }
 
     public SOSFileListEntry() {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(SOSVFSFactory.BUNDLE_NAME);
     }
 
     public SOSFileListEntry(final SOSFileEntry val) {
@@ -114,7 +110,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     }
 
     public SOSFileListEntry(final String targetFile, final String sourceFile, final long transferred) {
-        super(SOSVFSConstants.BUNDLE_NAME);
+        super(SOSVFSFactory.BUNDLE_NAME);
         targetFileName = targetFile;
         sourceFileName = sourceFile;
         bytesTransferred = transferred;

@@ -1,6 +1,8 @@
-package com.sos.vfs.common;
+package com.sos.vfs.sftp.common;
 
-public class SOSShellInfo {
+import com.sos.vfs.common.SOSCommandResult;
+
+public class SOSSFTPShellInfo {
 
     public enum OS {
         UNKNOWN, UNIX, WINDOWS
@@ -16,7 +18,7 @@ public class SOSShellInfo {
     private Throwable commandError;
     private String command;
 
-    public SOSShellInfo(String cmd) {
+    public SOSSFTPShellInfo(String cmd) {
         command = cmd;
     }
 
