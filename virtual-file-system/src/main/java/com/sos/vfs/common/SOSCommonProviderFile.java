@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
+import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -27,7 +27,7 @@ public class SOSCommonProviderFile extends SOSCommonFile {
     @Override
     public boolean fileExists() {
         boolean result = false;
-        if (getHandler().getFileSize(fileName) >= 0) {
+        if (getProvider().getFileSize(fileName) >= 0) {
             result = true;
         }
         LOGGER.debug(String.format("[%s]%s", fileName, result));
@@ -37,7 +37,7 @@ public class SOSCommonProviderFile extends SOSCommonFile {
     @Override
     public boolean delete(boolean checkIsDirectory) {
         try {
-            getHandler().delete(fileName, checkIsDirectory);
+            getProvider().delete(fileName, checkIsDirectory);
         } catch (Exception e) {
             SOSVfs_E_158.get();
             throw new JobSchedulerException(SOSVfs_E_158.params("delete()", fileName), e);
@@ -50,7 +50,7 @@ public class SOSCommonProviderFile extends SOSCommonFile {
         try {
             if (getInputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                setInputStream(getHandler().getInputStream(fileName));
+                setInputStream(getProvider().getInputStream(fileName));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
@@ -66,7 +66,7 @@ public class SOSCommonProviderFile extends SOSCommonFile {
     public long getFileSize() {
         long lngFileSize = -1;
         try {
-            lngFileSize = getHandler().getFileSize(fileName);
+            lngFileSize = getProvider().getFileSize(fileName);
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
         }
@@ -80,17 +80,17 @@ public class SOSCommonProviderFile extends SOSCommonFile {
 
     @Override
     public boolean isDirectory() {
-        return getHandler().isDirectory(fileName);
+        return getProvider().isDirectory(fileName);
     }
 
     @Override
     public void rename(final String newPath) {
-        getHandler().rename(fileName, newPath);
+        getProvider().rename(fileName, newPath);
     }
 
     @Override
-    public void setHandler(final ISOSTransferHandler handler) {
-        super.setHandler(handler);
+    public void setProvider(final ISOSProvider provider) {
+        super.setProvider(provider);
     }
 
     @Override

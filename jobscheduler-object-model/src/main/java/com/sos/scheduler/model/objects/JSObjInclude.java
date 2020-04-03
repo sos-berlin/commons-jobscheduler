@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.tools.PathResolver;
 
@@ -21,14 +21,14 @@ public class JSObjInclude extends Include {
     }
 
     @Override
-    public void setHotFolderSrc(ISOSVirtualFile pobjVirtualFile) {
+    public void setHotFolderSrc(ISOSProviderFile pobjVirtualFile) {
         if (pobjVirtualFile != null) {
             if (getFile() != null) {
                 String fileName = replaceEnvVariables(getFile());
                 if (!PathResolver.isAbsolutePath(fileName)) {
                     throw new JobSchedulerException("only an absolute path for the attribute 'file' is allowed (path is '" + fileName + "')");
                 }
-                ISOSVirtualFile vfInclude = objFactory.getFileHandleOrNull(fileName);
+                ISOSProviderFile vfInclude = objFactory.getFileHandleOrNull(fileName);
                 super.setHotFolderSrc(vfInclude);
             } else {
                 File f = new File(pobjVirtualFile.getName());
@@ -37,7 +37,7 @@ public class JSObjInclude extends Include {
                 if (objFactory.getLiveFolderOrNull() != null) {
                     liveFolder = objFactory.getLiveFolderOrNull().getHotFolderSrc().getName();
                     String fileName = PathResolver.getAbsolutePath(liveFolder, baseFolder, getLiveFileResolved(getLiveFile()));
-                    ISOSVirtualFile vfInclude = objFactory.getFileHandleOrNull(fileName);
+                    ISOSProviderFile vfInclude = objFactory.getFileHandleOrNull(fileName);
                     super.setHotFolderSrc(vfInclude);
                 }
             }

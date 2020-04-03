@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */
@@ -39,7 +39,7 @@ public class JSObjOrder extends Order {
     }
 
     @SuppressWarnings("unchecked")
-    public JSObjOrder(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjOrder(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom(objJAXBElement.getValue());

@@ -47,7 +47,7 @@ public class SOSSFTPFile extends SOSCommonProviderFile {
                 } else if (isModeRestart()) {
                     mode = ChannelSftp.RESUME;
                 }
-                SOSSFTP handler = (SOSSFTP) getHandler();
+                SOSSFTP handler = (SOSSFTP) getProvider();
                 setInputStream(handler.getChannelSftp().get(fileName, mode));
             }
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class SOSSFTPFile extends SOSCommonProviderFile {
         try {
             if (getOutputStream() == null) {
                 fileName = adjustRelativePathName(fileName);
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileOutputStream()", fileName), e);
@@ -95,7 +95,7 @@ public class SOSSFTPFile extends SOSCommonProviderFile {
         String path = "";
         try {
             path = adjustRelativePathName(fileName);
-            SOSSFTP handler = (SOSSFTP) getHandler();
+            SOSSFTP handler = (SOSSFTP) getProvider();
             SftpATTRS attrs = handler.getAttributes(path);
             if (attrs == null) {
                 throw new Exception("SftpATTRS is null");
@@ -110,7 +110,7 @@ public class SOSSFTPFile extends SOSCommonProviderFile {
     @Override
     public long setModificationDateTime(final long timestamp) {
         try {
-            SOSSFTP handler = (SOSSFTP) getHandler();
+            SOSSFTP handler = (SOSSFTP) getProvider();
             int mTime = (int) (timestamp / 1000L);
             handler.getChannelSftp().setMtime(adjustRelativePathName(fileName), mTime);
             return timestamp;

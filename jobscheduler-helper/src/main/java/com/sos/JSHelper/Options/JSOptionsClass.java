@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Exceptions.ParametersMissingButRequiredException;
 import com.sos.i18n.I18NBase;
 import com.sos.i18n.Msg;
 import com.sos.i18n.Msg.BundleBaseName;
@@ -119,9 +118,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     public void setAllOptions(final HashMap<String, String> params, final String prefix) throws Exception {
         settings = params;
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[setAllOptions][%s][%s]map", getClass().getSimpleName(), prefix));
-        }
         if (alternativePrefix.isEmpty()) {
             alternativePrefix = prefix;
         }
@@ -129,9 +125,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     public void setAllOptions(final HashMap<String, String> params) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[setAllOptions][%s]map", getClass().getSimpleName()));
-        }
         settings = params;
         setAllCommonOptions(settings);
     }
@@ -142,7 +135,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     private void setAllCommonOptions(final HashMap<String, String> params, String prefix) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[setAllCommonOptions][%s][%s]map", getClass().getSimpleName(), prefix));
+            LOGGER.trace(String.format("[setAllCommonOptions][%s]%s", getClass().getSimpleName(), prefix == null ? "" : prefix));
         }
         settings = params;
         if (objParentClass != null) {
@@ -370,8 +363,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     public void commandLineArgs(final String[] args) {
         final String method = CLASS_NAME + "::CommandLineArgs ";
-        if (allowEmptyParameterList.isFalse() && args.length <= 0) {
-            throw new ParametersMissingButRequiredException(applicationName.getValue(), applicationDocuUrl.getValue());
+        if (args.length <= 0) {
+            throw new JobSchedulerException("missing parameters");
         }
         commandLineArgs = args;
         boolean isOption = true;
@@ -787,18 +780,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     public SOSOptionBoolean checkNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions",
             "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
 
-    @JSOptionDefinition(name = "XmlId", description = "This ist the ...", key = "XmlId", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString xmlId = new SOSOptionString(this, CLASS_NAME + ".XmlId", "This ist the ...", "root", "root", true);
-
-    @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean testMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
-
-    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
-
-    @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
-    public SOSOptionInteger debugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
-
     @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Einträgen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionLogFileName logFilename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename", "Name der Datei mit den Logging-Einträgen",
             "stdout", "stdout", false);
@@ -814,18 +795,6 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName",
             "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
-
-    @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString applicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application",
-            "env:SOSApplicationName", "env:SOSApplicationName", false);
-
-    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
-    public SOSOptionUrl applicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl",
-            "The Url of the Documentation of this Application", "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
-
-    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean allowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList",
-            "If true, an empty parameter list leads not into an error", "true", "true", false);
 
     public String getPrefix() {
         return alternativePrefix;

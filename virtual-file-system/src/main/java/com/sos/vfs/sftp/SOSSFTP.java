@@ -59,7 +59,7 @@ import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSShellInfo;
 import com.sos.vfs.common.SOSShellInfo.OS;
 import com.sos.vfs.common.SOSShellInfo.Shell;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.common.SOSSFTPLogger;
 import com.sos.vfs.sftp.common.SOSSFTPUserInfo;
@@ -112,8 +112,8 @@ public class SOSSFTP extends SOSCommonProvider {
     public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
 
-        LOGGER.info(new StringBuilder("[").append(providerOptions.protocol.getValue()).append("]").append(SOSVfs_D_0101.params(providerOptions.host
-                .getValue(), providerOptions.port.value())).toString());
+        LOGGER.info(new StringBuilder("[").append(getProviderOptions().protocol.getValue()).append("]").append(SOSVfs_D_0101.params(
+                getProviderOptions().host.getValue(), getProviderOptions().port.value())).toString());
 
         try {
             doConnect();
@@ -499,13 +499,13 @@ public class SOSSFTP extends SOSCommonProvider {
             reply = "OK";
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
-            if (providerOptions.raiseExceptionOnError.value()) {
+            if (getProviderOptions().raiseExceptionOnError.value()) {
                 throw ex;
             }
             LOGGER.info(String.format("[%s]%s", cmd, reply));
         } catch (Exception ex) {
             reply = ex.toString();
-            if (providerOptions.raiseExceptionOnError.value()) {
+            if (getProviderOptions().raiseExceptionOnError.value()) {
                 throw new JobSchedulerException(SOSVfs_E_134.params("ExecuteCommand"), ex);
             }
             LOGGER.info(String.format("[%s]%s", cmd, reply));
@@ -566,10 +566,10 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(String fileName) {
+    public ISOSProviderFile getFile(String fileName) {
         fileName = adjustFileSeparator(fileName);
-        ISOSVirtualFile file = new SOSSFTPFile(fileName);
-        file.setHandler(this);
+        ISOSProviderFile file = new SOSSFTPFile(fileName);
+        file.setProvider(this);
         return file;
     }
 
@@ -591,9 +591,9 @@ public class SOSSFTP extends SOSCommonProvider {
 
     private void usePublicKeyMethod() throws Exception {
         String method = "usePublicKeyMethod";
-        Object kd = providerOptions.keepass_database.value();
-        Object ke = providerOptions.keepass_database_entry.value();
-        if (providerOptions.useKeyAgent.isTrue()) {
+        Object kd = getProviderOptions().keepass_database.value();
+        Object ke = getProviderOptions().keepass_database_entry.value();
+        if (getProviderOptions().useKeyAgent.isTrue()) {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("[%s]isUseKeyAgent", method));
             }
@@ -614,23 +614,23 @@ public class SOSSFTP extends SOSCommonProvider {
         } else {
 
             if (kd == null || ke == null) {
-                SOSOptionInFileName authenticationFile = providerOptions.authFile;
+                SOSOptionInFileName authenticationFile = getProviderOptions().authFile;
                 authenticationFile.checkMandatory(true);
                 if (authenticationFile.isNotEmpty()) {
                     try {
-                        if (providerOptions.passphrase.isNotEmpty()) {
+                        if (getProviderOptions().passphrase.isNotEmpty()) {
                             if (isDebugEnabled) {
-                                LOGGER.debug(String.format("[%s]file=%s, passphrase=?", method, providerOptions.authFile.getValue()));
+                                LOGGER.debug(String.format("[%s]file=%s, passphrase=?", method, getProviderOptions().authFile.getValue()));
                             }
-                            secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), providerOptions.passphrase.getValue());
+                            secureChannel.addIdentity(authenticationFile.getJSFile().getPath(), getProviderOptions().passphrase.getValue());
                         } else {
                             if (isDebugEnabled) {
-                                LOGGER.debug(String.format("[%s]file=%s", method, providerOptions.authFile.getValue()));
+                                LOGGER.debug(String.format("[%s]file=%s", method, getProviderOptions().authFile.getValue()));
                             }
                             secureChannel.addIdentity(authenticationFile.getJSFile().getPath());
                         }
                     } catch (JSchException e) {
-                        throw new Exception(String.format("[%s][%s]%s", method, providerOptions.authFile.getValue(), e.toString()), e);
+                        throw new Exception(String.format("[%s][%s]%s", method, getProviderOptions().authFile.getValue(), e.toString()), e);
                     }
                 } else {
                     if (isDebugEnabled) {
@@ -641,14 +641,15 @@ public class SOSSFTP extends SOSCommonProvider {
                 SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
                 org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry = (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) ke;
                 try {
-                    byte[] pr = kpd.getAttachment(entry, providerOptions.keepass_attachment_property_name.getValue());
-                    String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + providerOptions.keepass_attachment_property_name
+                    byte[] pr = kpd.getAttachment(entry, getProviderOptions().keepass_attachment_property_name.getValue());
+                    String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + getProviderOptions().keepass_attachment_property_name
                             .getValue();
-                    if (providerOptions.passphrase.isNotEmpty()) {
+                    if (getProviderOptions().passphrase.isNotEmpty()) {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s, passphrase=?", method, keePassPath));
                         }
-                        secureChannel.addIdentity(SOSSFTP.class.getSimpleName(), pr, (byte[]) null, providerOptions.passphrase.getValue().getBytes());
+                        secureChannel.addIdentity(SOSSFTP.class.getSimpleName(), pr, (byte[]) null, getProviderOptions().passphrase.getValue()
+                                .getBytes());
                     } else {
                         if (isDebugEnabled) {
                             LOGGER.debug(String.format("[%s][keepass]attachment=%s", method, keePassPath));
@@ -664,14 +665,14 @@ public class SOSSFTP extends SOSCommonProvider {
 
     private void usePasswordMethod() throws Exception {
         LOGGER.debug("[password]");
-        sshSession.setPassword(providerOptions.password.getValue());
+        sshSession.setPassword(getProviderOptions().password.getValue());
     }
 
     private void useKeyboardInteractive() throws Exception {
         if (isDebugEnabled) {
             LOGGER.debug("useKeyboardInteractive");
         }
-        Object ui = providerOptions.user_info.value();
+        Object ui = getProviderOptions().user_info.value();
         if (ui == null) {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("use default %s implementation", SOSSFTPUserInfo.class.getSimpleName()));
@@ -690,7 +691,7 @@ public class SOSSFTP extends SOSCommonProvider {
         } catch (Exception e) {
             LOGGER.warn(e.toString());
         }
-        if (providerOptions.authMethod.isKeyboardInteractive()) {
+        if (getProviderOptions().authMethod.isKeyboardInteractive()) {
             useKeyboardInteractive();
         } else {
             usePasswordMethod();
@@ -708,7 +709,7 @@ public class SOSSFTP extends SOSCommonProvider {
         sshSession.setConfig("userauth.publickey", SOSRequiredAuthPublicKey.class.getName());
 
         usePublicKeyMethod();
-        if (providerOptions.authMethod.isKeyboardInteractive()) {
+        if (getProviderOptions().authMethod.isKeyboardInteractive()) {
             sshSession.setConfig("userauth.keyboard-interactive", SOSRequiredAuthKeyboardInteractive.class.getName());
             useKeyboardInteractive();
         } else {
@@ -724,20 +725,21 @@ public class SOSSFTP extends SOSCommonProvider {
         createSession();
 
         String preferredAuthentications = null;
-        if (providerOptions.preferred_authentications.isNotEmpty()) {
-            preferredAuthentications = usePreferredAuthentications("preferred_authentications", providerOptions.preferred_authentications.getValue());
-        } else if (providerOptions.required_authentications.isNotEmpty()) {
-            preferredAuthentications = useRequiredAuthentications(providerOptions.required_authentications.getValue());
+        if (getProviderOptions().preferred_authentications.isNotEmpty()) {
+            preferredAuthentications = usePreferredAuthentications("preferred_authentications", getProviderOptions().preferred_authentications
+                    .getValue());
+        } else if (getProviderOptions().required_authentications.isNotEmpty()) {
+            preferredAuthentications = useRequiredAuthentications(getProviderOptions().required_authentications.getValue());
         } else {
-            if (providerOptions.password.isNotEmpty() && providerOptions.authFile.isNotEmpty()) {
+            if (getProviderOptions().password.isNotEmpty() && getProviderOptions().authFile.isNotEmpty()) {
                 preferredAuthentications = usePreferredAuthentications("password,publickey", "password,publickey");
             } else {
-                preferredAuthentications = providerOptions.authMethod.getValue();
-                if (providerOptions.authMethod.isPublicKey()) {
+                preferredAuthentications = getProviderOptions().authMethod.getValue();
+                if (getProviderOptions().authMethod.isPublicKey()) {
                     usePublicKeyMethod();
-                } else if (providerOptions.authMethod.isPassword()) {
+                } else if (getProviderOptions().authMethod.isPassword()) {
                     usePasswordMethod();
-                } else if (providerOptions.authMethod.isKeyboardInteractive()) {
+                } else if (getProviderOptions().authMethod.isKeyboardInteractive()) {
                     useKeyboardInteractive();
                 }
             }
@@ -752,14 +754,14 @@ public class SOSSFTP extends SOSCommonProvider {
             printConnectionInfos();
 
             sshSession.connect();
-            if (providerOptions.protocol.getValue().equals(TransferTypes.sftp.name())) {
+            if (getProviderOptions().protocol.getValue().equals(TransferTypes.sftp.name())) {
                 createSftpClient();
             }
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.toString()), e);
         }
         reply = "OK";
-        LOGGER.info(SOSVfs_D_133.params(providerOptions.user.getValue()));
+        LOGGER.info(SOSVfs_D_133.params(getProviderOptions().user.getValue()));
         this.logReply();
     }
 
@@ -792,11 +794,11 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setServerAlive() {
-        String sai = providerOptions.server_alive_interval.getValue();
+        String sai = getProviderOptions().server_alive_interval.getValue();
         if (!SOSString.isEmpty(sai)) {
             try {
                 sshSession.setServerAliveInterval(SOSDate.resolveAge("ms", sai).intValue());
-                String sacm = providerOptions.server_alive_count_max.getValue();
+                String sacm = getProviderOptions().server_alive_count_max.getValue();
                 if (!SOSString.isEmpty(sacm)) {
                     sshSession.setServerAliveCountMax(Integer.parseInt(sacm));
                 }
@@ -807,8 +809,8 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setConfigFromFiles() {
-        if (!SOSString.isEmpty(providerOptions.configuration_files.getValue())) {
-            String[] arr = providerOptions.configuration_files.getValue().split(";");
+        if (!SOSString.isEmpty(getProviderOptions().configuration_files.getValue())) {
+            String[] arr = getProviderOptions().configuration_files.getValue().split(";");
             for (int i = 0; i < arr.length; i++) {
                 String file = arr[i].trim();
                 LOGGER.info(String.format("use configuration file: %s", file));
@@ -841,7 +843,7 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setSessionConnectTimeout() throws Exception {
-        String ct = providerOptions.connect_timeout.getValue();
+        String ct = getProviderOptions().connect_timeout.getValue();
         if (!SOSString.isEmpty(ct)) {
             sessionConnectTimeout = SOSDate.resolveAge("ms", ct).intValue();
         }
@@ -858,14 +860,14 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setChannelConnectTimeout() throws Exception {
-        String ct = providerOptions.channel_connect_timeout.getValue();
+        String ct = getProviderOptions().channel_connect_timeout.getValue();
         if (!SOSString.isEmpty(ct)) {
             channelConnectTimeout = SOSDate.resolveAge("ms", ct).intValue();
         }
     }
 
     private void setKnownHostsFile() throws JSchException {
-        if (secureChannel != null && providerOptions.strictHostKeyChecking.isTrue()) {
+        if (secureChannel != null && getProviderOptions().strictHostKeyChecking.isTrue()) {
             File knownHostsFile = new File(System.getProperty("user.home"), ".ssh/known_hosts");
             secureChannel.setKnownHosts(knownHostsFile.getAbsolutePath());
         }
@@ -879,14 +881,14 @@ public class SOSSFTP extends SOSCommonProvider {
         sshSession = secureChannel.getSession(user, host, port);
 
         java.util.Properties config = new java.util.Properties();
-        // JSch.setConfig("StrictHostKeyChecking", providerOptions.strictHostKeyChecking.getValue());
-        config.put("StrictHostKeyChecking", providerOptions.strictHostKeyChecking.getValue());
-        if (providerOptions.useZlibCompression.value()) {
+        // JSch.setConfig("StrictHostKeyChecking", getProviderOptions().strictHostKeyChecking.getValue());
+        config.put("StrictHostKeyChecking", getProviderOptions().strictHostKeyChecking.getValue());
+        if (getProviderOptions().useZlibCompression.value()) {
             config.put("compression.s2c", "zlib@openssh.com,zlib,none");
             config.put("compression.c2s", "zlib@openssh.com,zlib,none");
-            config.put("compression_level", providerOptions.zlibCompressionLevel.getValue());
+            config.put("compression_level", getProviderOptions().zlibCompressionLevel.getValue());
             LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s", config.getProperty(
-                    "compression.s2c"), config.getProperty("compression.c2s"), providerOptions.zlibCompressionLevel.getValue()));
+                    "compression.s2c"), config.getProperty("compression.c2s"), getProviderOptions().zlibCompressionLevel.getValue()));
         }
         sshSession.setConfig(config);
         setCommandsTimeout();
@@ -898,10 +900,10 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     private void setProxy() throws Exception {
-        SOSOptionProxyProtocol proxyProtocol = providerOptions.proxyProtocol;
-        String proxyHost = providerOptions.proxyHost.getValue();
-        String proxyUser = providerOptions.proxyUser.getValue();
-        String proxyPassword = providerOptions.proxyPassword.getValue();
+        SOSOptionProxyProtocol proxyProtocol = getProviderOptions().proxyProtocol;
+        String proxyHost = getProviderOptions().proxyHost.getValue();
+        String proxyUser = getProviderOptions().proxyUser.getValue();
+        String proxyPassword = getProviderOptions().proxyPassword.getValue();
 
         if (!SOSString.isEmpty(proxyHost)) {
             LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%s, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
@@ -937,7 +939,7 @@ public class SOSSFTP extends SOSCommonProvider {
             throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
         }
         channelSftp = (ChannelSftp) sshSession.openChannel("sftp");
-        sshSession.setConfig("compression_level", providerOptions.zlibCompressionLevel.getValue());
+        sshSession.setConfig("compression_level", getProviderOptions().zlibCompressionLevel.getValue());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("createSftpClient connect timeout = %s", channelConnectTimeout));

@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
@@ -29,7 +29,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
     @XmlTransient
     protected SchedulerObjectFactory objFactory = null;
     @XmlTransient
-    private ISOSVirtualFile hotFolderSrc = null;
+    private ISOSProviderFile hotFolderSrc = null;
     @XmlTransient
     protected JAXBElement<JSObjBase> objJAXBElement = null;
     @XmlTransient
@@ -37,7 +37,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
     @XmlTransient
     protected String strFileNameExtension = "";
     @XmlTransient
-    protected ISOSVirtualFile objVirtualFile = null;
+    protected ISOSProviderFile objVirtualFile = null;
     @XmlTransient
     protected boolean flgIsInit = false;
 
@@ -87,7 +87,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
         return objFactory.unMarshall(pobjString);
     }
 
-    public Object unMarshal(final ISOSVirtualFile pobjVirtualFile) {
+    public Object unMarshal(final ISOSProviderFile pobjVirtualFile) {
         return objFactory.unMarshall(pobjVirtualFile);
     }
 
@@ -117,11 +117,11 @@ public class JSObjBase implements Comparable<JSObjBase> {
         return objFactory.marshal(objO);
     }
 
-    public Object toXMLFile(final Object objO, final ISOSVirtualFile pobjVirtualFile) {
+    public Object toXMLFile(final Object objO, final ISOSProviderFile pobjVirtualFile) {
         return objFactory.toXMLFile(objO, pobjVirtualFile);
     }
 
-    public Object toXMLFile(final ISOSVirtualFile pobjVirtualFile) {
+    public Object toXMLFile(final ISOSProviderFile pobjVirtualFile) {
         Object objO = null;
         if (objJAXBElement == null) {
             objO = this;
@@ -164,11 +164,11 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     @XmlTransient
-    public void setHotFolderSrc(final ISOSVirtualFile pobjVirtualFile) {
+    public void setHotFolderSrc(final ISOSProviderFile pobjVirtualFile) {
         hotFolderSrc = pobjVirtualFile;
     }
 
-    public ISOSVirtualFile getHotFolderSrc() {
+    public ISOSProviderFile getHotFolderSrc() {
         return hotFolderSrc;
     }
 
@@ -286,11 +286,11 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     protected void changeSourceName(final String pstrName) {
-        ISOSVirtualFile objF = getHotFolderSrc();
+        ISOSProviderFile objF = getHotFolderSrc();
         if (objF != null) {
             String name = objF.getName();
             name = name.replace(getObjectName(), pstrName);
-            ISOSVirtualFile objNF = objF.getHandler().getFileHandle(name);
+            ISOSProviderFile objNF = objF.getProvider().getFile(name);
             setHotFolderSrc(objNF);
         }
     }

@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
@@ -65,11 +65,11 @@ public class SOSSMB extends SOSCommonProvider {
         super.connect(options);
 
         try {
-            domain = providerOptions.domain.getValue();
-            port = providerOptions.port.isDirty() ? port : DEFAULT_PORT;
+            domain = getProviderOptions().domain.getValue();
+            port = getProviderOptions().port.isDirty() ? port : DEFAULT_PORT;
             setLogPrefix();
             try {
-                createContext(domain, host, port, user, providerOptions.password.getValue());
+                createContext(domain, host, port, user, getProviderOptions().password.getValue());
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
@@ -110,8 +110,8 @@ public class SOSSMB extends SOSCommonProvider {
     }
 
     private Properties setConfigFromFiles(Properties properties) {
-        if (!SOSString.isEmpty(providerOptions.configuration_files.getValue())) {
-            String[] files = providerOptions.configuration_files.getValue().split(";");
+        if (!SOSString.isEmpty(getProviderOptions().configuration_files.getValue())) {
+            String[] files = getProviderOptions().configuration_files.getValue().split(";");
             for (int i = 0; i < files.length; i++) {
                 String file = files[i].trim();
                 LOGGER.info(String.format("%s[setConfigFromFiles][%s]", logPrefix, file));
@@ -428,8 +428,8 @@ public class SOSSMB extends SOSCommonProvider {
         int exitCode = shell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
-            if (providerOptions != null) {
-                raiseException = providerOptions.raiseExceptionOnError.value();
+            if (getProviderOptions() != null) {
+                raiseException = getProviderOptions().raiseExceptionOnError.value();
             }
             if (raiseException) {
                 throw new JobSchedulerException(SOSVfs_E_191.params(exitCode + ""));
@@ -470,10 +470,10 @@ public class SOSSMB extends SOSCommonProvider {
     }
 
     @Override
-    public ISOSVirtualFile getFileHandle(String fileName) {
+    public ISOSProviderFile getFile(String fileName) {
         fileName = adjustFileSeparator(fileName);
-        ISOSVirtualFile file = new SOSSMBFile(fileName);
-        file.setHandler(this);
+        ISOSProviderFile file = new SOSSMBFile(fileName);
+        file.setProvider(this);
         return file;
     }
 

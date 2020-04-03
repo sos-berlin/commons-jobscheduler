@@ -15,8 +15,8 @@ import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.vfs.common.SOSFileListEntry.TransferStatus;
 import com.sos.vfs.common.SOSVFSFactory;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSVFSConstants;
@@ -32,8 +32,8 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileList.class);
     private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.getLoggerName());
 
-    private ISOSTransferHandler sourceClient = null;
-    private ISOSTransferHandler targetClient = null;
+    private ISOSProvider sourceProvider = null;
+    private ISOSProvider targetProvider = null;
     private SOSBaseOptions options = null;
     private IJobSchedulerEventHandler eventHandler = null;
     private List<SOSFileListEntry> fileListEntries = new ArrayList<>();
@@ -272,7 +272,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
             if (options.resultSetFileName.isDirty() && options.resultSetFileName.isNotEmpty()) {
                 resultSetFile = options.resultSetFileName.getJSFile();
                 if ("getlist".equalsIgnoreCase(options.getDmzOption("operation")) && !options.getDmzOption("resultfile").isEmpty()) {
-                    ISOSVirtualFile jumpResultSetFile = sourceClient.getFileHandle(options.getDmzOption("resultfile"));
+                    ISOSProviderFile jumpResultSetFile = sourceProvider.getFile(options.getDmzOption("resultfile"));
                     if (jumpResultSetFile.fileExists()) {
                         counterRecordsInResultSetFile = writeResultSetFileFromJumpFile(resultSetFile, jumpResultSetFile);
                     }
@@ -307,7 +307,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
         }
     }
 
-    private long writeResultSetFileFromJumpFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
+    private long writeResultSetFileFromJumpFile(JSFile localResultSetFile, ISOSProviderFile jumpResultSetFile) {
         byte[] buffer = new byte[options.bufferSize.value()];
         int bytesTransferred = 0;
         FileOutputStream fos = null;
@@ -397,7 +397,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                 atomicFileName = makeFullPathName(options.targetDir.getValue(), entry.getTargetAtomicFileName());
                 if (isNotEmpty(entry.getTargetAtomicFileName())) {
                     try {
-                        ISOSVirtualFile atomicFile = targetClient.getFileHandle(atomicFileName);
+                        ISOSProviderFile atomicFile = targetProvider.getFile(atomicFileName);
                         if (atomicFile.fileExists()) {
                             atomicFile.delete(false);
 
@@ -414,7 +414,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                 if (transferStatus.equals(TransferStatus.transferred)) {
                     try {
                         String path = makeFullPathName(options.targetDir.getValue(), entry.getTargetFileName());
-                        ISOSVirtualFile targetFile = targetClient.getFileHandle(path);
+                        ISOSProviderFile targetFile = targetProvider.getFile(path);
                         if (targetFile.fileExists()) {
                             targetFile.delete(false);
                         }
@@ -428,7 +428,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                 }
                 if (entry.hasTargetChecksumFile()) {
                     try {
-                        ISOSVirtualFile targetChecksumFile = entry.getTargetChecksumFile();
+                        ISOSProviderFile targetChecksumFile = entry.getTargetChecksumFile();
                         if (targetChecksumFile.fileExists()) {
                             targetChecksumFile.delete(false);
                         }
@@ -540,20 +540,20 @@ public class SOSFileList extends SOSVFSMessageCodes {
         return counterBytesTransferred;
     }
 
-    public ISOSTransferHandler getTargetClient() {
-        return targetClient;
+    public ISOSProvider getTargetProvider() {
+        return targetProvider;
     }
 
-    public void setTargetClient(ISOSTransferHandler val) {
-        targetClient = val;
+    public void setTargetProvider(ISOSProvider val) {
+        targetProvider = val;
     }
 
-    public ISOSTransferHandler getSourceClient() {
-        return sourceClient;
+    public ISOSProvider getSourceProvider() {
+        return sourceProvider;
     }
 
-    public void setSourceClient(ISOSTransferHandler val) {
-        sourceClient = val;
+    public void setSourceProvider(ISOSProvider val) {
+        sourceProvider = val;
     }
 
     public String getLastErrorMessage() {

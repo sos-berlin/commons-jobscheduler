@@ -31,7 +31,7 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
@@ -46,7 +46,7 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
     public void write(final byte[] buffer) {
         try {
             if (getOutputStream() == null) {
-                setOutputStream(getHandler().getOutputStream(fileName, isModeAppend(), isModeRestart()));
+                setOutputStream(getProvider().getOutputStream(fileName, isModeAppend(), isModeRestart()));
             }
             if (getOutputStream() == null) {
                 throw new Exception(SOSVfs_E_147.get());
@@ -60,7 +60,7 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
     @Override
     public void closeInput() {
         super.closeInput();
-        ((SOSHTTP) getHandler()).resetLastInputStreamGetMethod();
+        ((SOSHTTP) getProvider()).resetLastInputStreamGetMethod();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
                 getOutputStream().flush();
                 getOutputStream().close();
 
-                ((SOSHTTP) getHandler()).put(fileName);
+                ((SOSHTTP) getProvider()).put(fileName);
             }
         } catch (JobSchedulerException e) {
             throw e;

@@ -15,19 +15,19 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.vfs.common.interfaces.ISOSTransferHandler;
-import com.sos.vfs.common.interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.SOSVFSMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSLocalFile extends JSFile implements ISOSVirtualFile {
+public class SOSLocalFile extends JSFile implements ISOSProviderFile {
 
     private static final long serialVersionUID = 7478704922673917684L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSLocalFile.class);
 
     private static final String CLASS_NAME = SOSLocalFile.class.getSimpleName();
-    private ISOSTransferHandler handler = null;
+    private ISOSProvider provider = null;
     private InputStream is = null;
     private OutputStream os = null;
     private boolean append = false;
@@ -80,8 +80,13 @@ public class SOSLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public ISOSTransferHandler getHandler() {
-        return handler;
+    public ISOSProvider getProvider() {
+        return provider;
+    }
+
+    @Override
+    public void setProvider(final ISOSProvider val) {
+        provider = val;
     }
 
     @Override
@@ -97,11 +102,6 @@ public class SOSLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public void rename(final String newFileName) {
         super.renameTo(new File(newFileName));
-    }
-
-    @Override
-    public void setHandler(final ISOSTransferHandler val) {
-        handler = val;
     }
 
     public void compressFile(final File outputFile) throws Exception {
