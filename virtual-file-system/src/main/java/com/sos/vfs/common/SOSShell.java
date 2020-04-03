@@ -1,4 +1,4 @@
-package com.sos.vfs.shell;
+package com.sos.vfs.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

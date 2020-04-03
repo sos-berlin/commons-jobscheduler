@@ -23,7 +23,7 @@ import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
-import com.sos.vfs.shell.SOSShell;
+import com.sos.vfs.common.SOSShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import jcifs.CIFSContext;

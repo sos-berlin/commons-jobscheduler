@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.vfs.shell.SOSShell;
+import com.sos.vfs.common.SOSShell;
 import com.sos.dialog.Globals;
 import com.sos.dialog.classes.WindowsSaver;
 import com.sos.dialog.swtdesigner.SWTResourceManager;
