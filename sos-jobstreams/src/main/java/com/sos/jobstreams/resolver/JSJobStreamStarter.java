@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.jitl.jobstreams.classes.JobStreamScheduler;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jobstreams.classes.JobStarter;
 import com.sos.jobstreams.classes.JobStarterOptions;
-import com.sos.jobstreams.classes.JobStreamScheduler;
 import com.sos.joc.Globals;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
@@ -32,7 +32,7 @@ public class JSJobStreamStarter {
     private DBItemJobStreamStarter itemJobStreamStarter;
     private Date nextStart;
     private List<DBItemJobStreamStarterJob> listOfJobs;
-    JobStreamScheduler jobStreamScheduler;
+    private JobStreamScheduler jobStreamScheduler;
     private String jobStreamName;
 
     public Map<String, String> getListOfParameters() {
@@ -64,7 +64,7 @@ public class JSJobStreamStarter {
         this.itemJobStreamStarter = itemJobStreamStarter;
         jobStreamScheduler = new JobStreamScheduler();
         if (this.getRunTime() != null) {
-            jobStreamScheduler.schedule(this.getRunTime());
+            jobStreamScheduler.schedule(new Date(),new Date(),this.getRunTime(), true);
         }
     }
 
@@ -80,8 +80,6 @@ public class JSJobStreamStarter {
 
     public Date getNextStartFromList() {
         if (jobStreamScheduler.getListOfStartTimes() != null) {
-            jobStreamScheduler.getListOfStartTimes().sort(null);
-            //Collections.reverse(jobStreamScheduler.getListOfStartTimes());
             Date now = new Date();
             for (Long start : jobStreamScheduler.getListOfStartTimes()) {
                 if (start > now.getTime()) {
