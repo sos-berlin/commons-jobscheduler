@@ -13,7 +13,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
     protected JSJobUtilities objJSJobUtilities = this;
     protected IJSCommands objJSCommands = this;
     protected T objOptions = null;
-    protected int intCC = 0;
+    protected int exitCode = 0;
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobUtilitiesClass.class);
 
     @Deprecated
@@ -76,12 +76,8 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
     }
 
     @Override
-    public void setCC(final int pintCC) {
-        intCC = pintCC;
-    }
-
-    public int getCC() {
-        return intCC;
+    public void setExitCode(final int code) {
+        exitCode = code;
     }
 
     @Override

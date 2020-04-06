@@ -401,7 +401,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
                     objJSJobUtilities.setJSParam("exit_code_ignored", "true");
                 } else {
-                    objJSJobUtilities.setCC(exitCode);
+                    objJSJobUtilities.setExitCode(exitCode);
                     if (objOptions.raiseExceptionOnError.isTrue()) {
                         throw new SSHExecutionError("SOS-SSH-E-150: remote command terminated with exit code: " + exitCode);
                     }
@@ -698,13 +698,14 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     public List<Integer> getParamPids() {
+        String pids2kill = objOptions.getItem(PARAM_PIDS_TO_KILL);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("PIDs from param: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
+            LOGGER.debug(String.format("[%s][param=%s]%s", getClass().getSimpleName(), PARAM_PIDS_TO_KILL, pids2kill));
         }
 
         String[] param = null;
-        if (objOptions.getItem(PARAM_PIDS_TO_KILL) != null && objOptions.getItem(PARAM_PIDS_TO_KILL).length() > 0) {
-            param = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+        if (!SOSString.isEmpty(pids2kill)) {
+            param = pids2kill.split(",");
         }
         List<Integer> pids = new ArrayList<Integer>();
         if (param != null) {

@@ -79,7 +79,7 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJob {
         } finally {
             if (result != null && result.getExitCode() != 0) {
                 if (result.getStdErr().toString().contains("No such process")) {
-                    LOGGER.debug("meanwhile the remote process is not available anymore!");
+                    LOGGER.info("meanwhile the remote process is not available anymore!");
                 }
             }
         }

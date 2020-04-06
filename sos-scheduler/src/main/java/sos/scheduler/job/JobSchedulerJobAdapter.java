@@ -419,10 +419,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     @Override
-    public void setCC(final int cc) {
+    public void setExitCode(final int exitCode) {
         if (spooler_task != null) {
-            LOGGER.debug(String.format("CC set to %1$d", cc));
-            spooler_task.set_exit_code(cc);
+            LOGGER.debug(String.format("exit code set to %1$d", exitCode));
+            spooler_task.set_exit_code(exitCode);
         }
     }
 

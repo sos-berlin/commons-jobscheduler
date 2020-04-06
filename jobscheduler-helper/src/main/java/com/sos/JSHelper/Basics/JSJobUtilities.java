@@ -12,7 +12,7 @@ public interface JSJobUtilities {
 
     public void setStateText(final String val);
 
-    public void setCC(final int val);
+    public void setExitCode(final int val);
 
     public void setNextNodeState(final String val);
 

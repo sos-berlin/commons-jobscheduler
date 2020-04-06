@@ -13,6 +13,7 @@ import sos.scheduler.job.impl.SOSSSHCheckRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHKillRemotePidJob;
 import sos.scheduler.job.impl.SOSSSHTerminateRemotePidJob;
 import sos.spooler.Variable_set;
+import sos.util.SOSString;
 
 public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
 
@@ -42,64 +43,80 @@ public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
     private boolean doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
         allParams.putAll(getJobOrOrderParameters(getSpoolerProcess().getOrder()));
+
+        String currentNodeName = getCurrentNodeName(getSpoolerProcess().getOrder(), false);
+        SOSSSHCheckRemotePidJob job = executeCheckPids(currentNodeName);
+        Variable_set orderParams = null;
+        if (getSpoolerProcess().getOrder() != null) {
+            orderParams = getSpoolerProcess().getOrder().params();
+        }
+        if (job.getPids() != null && orderParams != null) {
+            orderParams.set_var(PARAM_PIDS_TO_KILL, job.getPids());
+        }
+
         boolean taskIsActive = true;
         boolean timeoutAfterKillIsSet = false;
-        if (allParams.get(PARAM_SSH_JOB_TASK_ID) != null && !allParams.get(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
-            taskIsActive = isTaskActive(allParams.get(PARAM_SSH_JOB_TASK_ID));
+
+        String sshJobTaskId = allParams.get(PARAM_SSH_JOB_TASK_ID);
+        if (!SOSString.isEmpty(sshJobTaskId)) {
+            taskIsActive = isTaskActive(sshJobTaskId);
         } else {
             taskIsActive = false;
         }
         if (allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()) {
             timeoutAfterKillIsSet = true;
         }
-        LOGGER.info("Task is still active: " + taskIsActive);
+        LOGGER.info(String.format("Task is still active: %s", taskIsActive));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Task %s", sshJobTaskId));
+        }
 
-        String currentNodeName = getCurrentNodeName(getSpoolerProcess().getOrder(), false);
-        SOSSSHCheckRemotePidJob job = executeCheckPids(currentNodeName);
-        if (job.getPids() != null) {
-            LOGGER.trace(job.getPids());
-            if (getSpoolerProcess().getOrder() != null) {
-                Variable_set orderParams = getSpoolerProcess().getOrder().params();
-                if (orderParams != null) {
-                    orderParams.set_var(PARAM_PIDS_TO_KILL, job.getPids());
+        String runningPids = null;
+        if (orderParams != null) {
+            runningPids = orderParams.value(PARAM_PIDS_TO_KILL);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("running pids=%s", runningPids));
+        }
+        if (taskIsActive) {
+            if (SOSString.isEmpty(runningPids)) {
+                // if task is still running but remote pid is not available anymore (finished) --> kill task
+                LOGGER.info("Task is still active, try to end task!");
+                String killTaskXml = new String("<kill_task job=\"" + allParams.get(PARAM_SSH_JOB_NAME) + "\" id=\"" + allParams.get(
+                        PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
+                String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
+                LOGGER.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
+                return true;
+            } else {
+                // if task is still running and remote pids are still available -->
+                // do nothing check again after some delay
+                LOGGER.info("Task and remote processes are still active, do nothing!");
+                return false;
+            }
+        } else {
+            if (SOSString.isEmpty(runningPids)) {
+                // if task is not running anymore AND remote pid is not available anymore --> do nothing
+                LOGGER.info("Task is not active anymore, remote pids not available anymore. Nothing to do!");
+                return true;
+            } else {
+                if (timeoutAfterKillIsSet) {
+                    LOGGER.info("Task is not active anymore, processing terminate remote pids!");
+                    // if task is not running anymore but remote pid is still available
+                    // and a timeout_kill_after is set --> terminate remote pid
+                    // if timeout_kill_after is set, try terminate first and kill after
+                    // timeout
+                    allParams.put(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
+                    executeTerminatePids(currentNodeName);
+                    return true;
+                } else {
+                    LOGGER.info("Task is not active anymore, processing kill remote pids!");
+                    // if task is not running anymore but remote pid is still available
+                    // and a timeout_kill_after is not set --> kill remote pid immediately
+                    executeKillPids(currentNodeName);
+                    return true;
                 }
             }
         }
-        String runningPids = spooler_task.order().params().value(PARAM_PIDS_TO_KILL);
-        if (taskIsActive && runningPids != null && !runningPids.isEmpty()) {
-            // if task is still running and remote pids are still available -->
-            // do nothing check again after some delay
-            LOGGER.info("Task and remote processes are still active, do nothing!");
-            return false;
-        } else if (taskIsActive && (runningPids == null || runningPids.isEmpty())) {
-            // if task is still running but remote pid is not available anymore (finished) --> kill task
-            LOGGER.info("Task is still active, try to end task!");
-            String killTaskXml = new String("<kill_task job=\"" + allParams.get(PARAM_SSH_JOB_NAME) + "\" id=\"" + allParams.get(
-                    PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
-            String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
-            LOGGER.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
-            return true;
-        } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && !timeoutAfterKillIsSet) {
-            LOGGER.info("Task is not active anymore, processing kill remote pids!");
-            // if task is not running anymore but remote pid is still available
-            // and a timeout_kill_after is not set --> kill remote pid immediately
-            executeKillPids(currentNodeName);
-            return true;
-        } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && timeoutAfterKillIsSet) {
-            LOGGER.info("Task is not active anymore, processing kill remote pids!");
-            // if task is not running anymore but remote pid is still available
-            // and a timeout_kill_after is set --> terminate remote pid
-            // if timeout_kill_after is set, try terminate first and kill after
-            // timeout
-            allParams.put(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
-            executeTerminatePids(currentNodeName);
-            return true;
-        } else if (!taskIsActive && (runningPids == null || runningPids.isEmpty())) {
-            // if task is not running anymore AND remote pid is not available anymore --> do nothing
-            LOGGER.info("Task is not active anymore, remote pids not available anymore. Nothing to do!");
-            return true;
-        }
-        return true;
     }
 
     private boolean isTaskActive(String taskId) {
