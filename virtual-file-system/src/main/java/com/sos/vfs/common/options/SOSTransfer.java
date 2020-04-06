@@ -15,9 +15,9 @@ public class SOSTransfer {
         setProviderOptions(settings, target, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
     }
 
-    private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String settingsKey) throws Exception {
+    private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String alternativeSettingsKey) throws Exception {
         options.setAllOptions(settings);
-        if (settings.containsKey(settingsKey)) {
+        if (settings.containsKey(alternativeSettingsKey)) {
             options.alternateOptionsUsed.value(true);
         }
         options.setChildClasses(settings);

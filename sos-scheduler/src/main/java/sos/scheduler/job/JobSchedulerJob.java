@@ -331,7 +331,7 @@ public class JobSchedulerJob extends Job_impl {
                 spooler_log.debug("No ini file available. Continuing without settings.");
                 return;
             }
-            setJobSettings(new SOSProfileSettings(spooler.ini_path()));
+            setJobSettings(new SOSProfileSettings(schedulerIniFile.get().getCanonicalPath()));
             setJobProperties(getJobSettings().getSection("job " + jobName));
             if (getJobProperties().isEmpty()) {
                 return;
