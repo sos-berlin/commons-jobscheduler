@@ -40,6 +40,7 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
+import com.sos.joc.model.calendar.Period;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -57,6 +58,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private int waitInterval = 2;
     private String session;
     JSConditionResolver conditionResolver;
+    private String peridodBegin;
 
     public void removeTimer() {
         if (isDebugEnabled) {
@@ -205,7 +207,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         super.onActivate(notifier);
 
         String method = "onActivate";
-        session = Constants.getSession();
+        session = Constants.getSession(peridodBegin);
         SOSHibernateSession sosHibernateSession = null;
 
         try {
@@ -581,6 +583,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         reportingFactory.addClassMapping(com.sos.jitl.notification.db.DBLayer.getNotificationClassMapping());
         reportingFactory.addClassMapping(Constants.getConditionsClassMapping());
         reportingFactory.build();
+    }
+
+    public void setPeriodBegin(String periodBegin) {
+        LOGGER.debug("Period starts at: " + periodBegin);
+        this.peridodBegin = periodBegin;
     }
 
 }
