@@ -60,6 +60,9 @@ public class JSEvents {
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
         JSEvent returnEvent;
+        if (jsEventKey.getSession() == null){
+            return null;
+        }
         if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
             returnEvent = this.getEvent(jsEventKey);
             LOGGER.trace("EventKey:" + SOSString.toString(jsEventKey));
