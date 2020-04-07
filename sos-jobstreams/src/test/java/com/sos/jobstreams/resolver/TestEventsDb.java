@@ -98,7 +98,7 @@ public class TestEventsDb {
 
         try {
             FilterEvents filter = new FilterEvents();
-            filter.setSession(Constants.getSession());
+            filter.setSession(Constants.getSession("00:00"));
             filter.setSchedulerId("scheduler_joc_cockpit");
             filter.setJobStream("test");
             DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);

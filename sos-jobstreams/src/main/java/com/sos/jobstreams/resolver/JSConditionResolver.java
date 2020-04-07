@@ -293,7 +293,7 @@ public class JSConditionResolver {
                                 DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
                                 dbItemConsumedInCondition.setCreated(new Date());
                                 dbItemConsumedInCondition.setInConditionId(inCondition.getId());
-                                dbItemConsumedInCondition.setSession(Constants.getSession());
+                                dbItemConsumedInCondition.setSession(contextId.toString());
                                 dbLayerCoumsumedInConditions.store(dbItemConsumedInCondition);
                                 if (isTraceEnabled) {
                                     LOGGER.trace(String.format("Consumed In Condition stored %s", inCondition.toStr()));
@@ -604,7 +604,7 @@ public class JSConditionResolver {
 
     }
 
-    public boolean resolveOutConditions(TaskEndEvent taskEndEvent, String jobSchedulerId, String job) throws SOSHibernateException {
+    public boolean resolveOutConditions(TaskEndEvent taskEndEvent, String jobSchedulerId, String job, String defaultSession) throws SOSHibernateException {
 
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
         boolean dbChange = false;
@@ -632,7 +632,7 @@ public class JSConditionResolver {
                             LOGGER.trace("create/remove events ------>");
                             dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), jsEvents, newJsEvents,
                                     removeJsEvents);
-                            outCondition.storeOutConditionEvents(sosHibernateSession, Constants.getSession(), jsEvents, newJsEvents, removeJsEvents);
+                            outCondition.storeOutConditionEvents(sosHibernateSession, defaultSession, jsEvents, newJsEvents, removeJsEvents);
                         } else {
                             LOGGER.trace(expression + "-->false");
                         }
