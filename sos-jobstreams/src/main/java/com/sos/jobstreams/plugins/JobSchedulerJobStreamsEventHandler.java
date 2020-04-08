@@ -40,11 +40,8 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
-import com.sos.joc.model.calendar.Period;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
-
-import akka.actor.ActorSystem.Settings;
 
 public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
@@ -150,6 +147,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         try {
 
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
+            dbItemJobStreamHistory.setSchedulerId(super.getSettings().getSchedulerId());
             dbItemJobStreamHistory.setContextId(uuid.toString());
             dbItemJobStreamHistory.setCreated(new Date());
             dbItemJobStreamHistory.setJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
@@ -161,6 +159,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             historyEntry.setCreated(new Date());
             historyEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
             conditionResolver.addParameters(uuid, jobStreamStarter.getListOfParameters());
+            
 
             JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
             LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
@@ -172,6 +171,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
             session.commit();
+            conditionResolver.getListOfHistoryIds().put(uuid, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             session.rollback();
