@@ -44,6 +44,8 @@ import com.sos.joc.model.calendar.Period;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import akka.actor.ActorSystem.Settings;
+
 public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJobStreamsEventHandler.class);
@@ -166,7 +168,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             jobStream.getJsHistory().addHistoryEntry(historyEntry, session);
 
             for (JobStarterOptions startedJob : listOfStartedJobs) {
-                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, startedJob, session);
+                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, super.getSettings().getSchedulerId(), startedJob, session);
             }
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
             session.commit();
@@ -312,7 +314,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             do {
                 skippedTask = false;
 
-                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session);
+                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session, super.getSettings().getSchedulerId());
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                         publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());

@@ -63,7 +63,7 @@ public class TestEvents {
 
         JSConditionResolver expressionResolver = new JSConditionResolver(session,null,settings );
         expressionResolver.init();
-        expressionResolver.resolveInConditions(session);
+        expressionResolver.resolveInConditions(session,settings.getSchedulerId());
     }
 
     @Test

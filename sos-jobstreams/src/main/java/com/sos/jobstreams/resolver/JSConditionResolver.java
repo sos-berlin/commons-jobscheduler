@@ -507,7 +507,7 @@ public class JSConditionResolver {
         return evaluatedExpression;
     }
 
-    public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws NumberFormatException, Exception {
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession session, String jobSchedulerId) throws NumberFormatException, Exception {
 
         LOGGER.debug("JSConditionResolver::resolveInConditions");
 
@@ -550,7 +550,7 @@ public class JSConditionResolver {
                                                     jobStarterOptions.setJob(startJobReturn.getStartedJob());
                                                     jobStarterOptions.setJobStream(inCondition.getJobStream());
                                                     jobStarterOptions.setTaskId(startJobReturn.getTaskId());
-                                                    jobStreamContexts.addTaskToContext(contextId, jobStarterOptions, session);
+                                                    jobStreamContexts.addTaskToContext(contextId, jobSchedulerId, jobStarterOptions, session);
                                                     this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(),
                                                             contextId);
                                                 }

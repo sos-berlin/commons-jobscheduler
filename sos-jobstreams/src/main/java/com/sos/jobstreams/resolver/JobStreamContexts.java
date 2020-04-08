@@ -28,7 +28,7 @@ public class JobStreamContexts {
         listOfTaskIds = new HashMap<Long, UUID>();
     }
 
-    public void addTaskToContext(UUID contextId, JobStarterOptions startedJob, SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+    public void addTaskToContext(UUID contextId, String schedulerId, JobStarterOptions startedJob, SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         LOGGER.debug(String.format("adding task %s to context %s", startedJob.getTaskId(), contextId.toString()));
         if (listOfContexts.get(contextId) == null) {
             LOGGER.debug("init list of tasks for context " + contextId.toString());
@@ -42,6 +42,7 @@ public class JobStreamContexts {
         dbItemJobStreamTaskContext.setJob(startedJob.getJob());
         dbItemJobStreamTaskContext.setJobStream(startedJob.getJobStream());
         dbItemJobStreamTaskContext.setTaskId(startedJob.getTaskId());
+        dbItemJobStreamTaskContext.setSchedulerId(schedulerId);
         LOGGER.debug("store contextid:" + contextId);
         dbLayerJobStreamsTaskContext.store(dbItemJobStreamTaskContext);
         LOGGER.debug("adding contextid:" + contextId);
