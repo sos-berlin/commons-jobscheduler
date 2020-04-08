@@ -34,27 +34,19 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSBaseOptions.class);
     private static final long serialVersionUID = -8219289268940238015L;
 
-    public static final String SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE = "alternative_source_include";
-    public static final String SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE = "alternative_target_include";
-    public static final String SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD = "alternative_%scredentialstore_authenticationmethod";
-    public static final String SETTINGS_KEY_USE_CREDENTIAL_STORE = "%suse_credential_store";
-    public static final String SETTINGS_KEY_MAIL_SMTP = "mail_smtp";
-
+    private static final String SETTINGS_KEY_MAIL_SMTP = "mail_smtp";
     private static final String PREFIX_FILE_URI = "file://";
     private static final String PREFIX_SCHEDULER_ENV_VAR = "scheduler_param_";
     private static final String PREFIX_SOSFTP_ENV_VAR = "sosftp_";
     private static final String FILE_SEPARATOR = "file.separator";
+
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private SOSTransfer transfer;// source/target options
     private Properties allEnvVars = null;
     private Properties envVars = null;
     private Properties schedulerParams = null;
-    private boolean checkMandatoryDone = false;
-    private boolean readSettingsFileIsActive = false;
-    private boolean settingsFileProcessed = false;
-    private boolean deleteSettingsFileOnExit = false;
-    private boolean cumulativeTargetDeleted = false;
+
     private String originalSettingsFile = null;
     private String jobSchedulerId;
     private String jobChain;
@@ -63,7 +55,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private String orderId;
     private String taskId;
     private Long parentTransferId;
-
+    private boolean checkMandatoryDone = false;
+    private boolean readSettingsFileIsActive = false;
+    private boolean settingsFileProcessed = false;
+    private boolean deleteSettingsFileOnExit = false;
+    private boolean cumulativeTargetDeleted = false;
     private final Map<String, String> includeDirectives = new HashMap<String, String>() {
 
         private static final long serialVersionUID = 1L;
@@ -87,86 +83,8 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     };
 
-    public SOSBaseOptions(final TransferTypes source, final TransferTypes target) throws Exception {
-        super();
-        switch (source) {
-        case webdav:
-            protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            break;
-        default:
-            break;
-        }
-        changeDefaults(source, getSource());
-        changeDefaults(target, getTarget());
-    }
-
     public SOSBaseOptions() {
         super();
-    }
-
-    public SOSBaseOptions(final HashMap<String, String> settings) throws Exception {
-        super(settings);
-    }
-
-    private void changeDefaults(final TransferTypes type, final SOSProviderOptions options) {
-        switch (type) {
-        case sftp:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(TransferTypes.sftp.name(), TransferTypes.sftp.name());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
-            break;
-        case ssh:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(TransferTypes.ssh.name(), TransferTypes.ssh.name());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
-            break;
-        case local:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(TransferTypes.local.name(), TransferTypes.local.name());
-            options.port.changeDefaults(0, 0);
-            break;
-        case ftp:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(TransferTypes.ftp.name(), TransferTypes.ftp.name());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4FTP, SOSOptionPortNumber.conPort4FTP);
-            break;
-        case ftps:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
-            options.protocol.changeDefaults(TransferTypes.ftps.name(), TransferTypes.ftps.name());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4FTPS, SOSOptionPortNumber.conPort4FTPS);
-            break;
-        case webdav:
-            options.authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            options.protocol.changeDefaults(TransferTypes.webdav.name(), TransferTypes.webdav.name());
-            options.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
-            break;
-        default:
-            break;
-        }
-    }
-
-    public SOSSmtpMailOptions getMailOptions() {
-        if (mailOptions == null) {
-            mailOptions = new SOSSmtpMailOptions();
-        }
-        return mailOptions;
-    }
-
-    private void setChildClasses(final HashMap<String, String> settings) {
-        try {
-            if (transfer == null) {
-                transfer = new SOSTransfer(settings);
-            }
-            if (mailOptions == null) {
-                if (settings.containsKey(SETTINGS_KEY_MAIL_SMTP)) {
-                    mailOptions = new SOSSmtpMailOptions(settings);
-                } else {
-                    mailOptions = new SOSSmtpMailOptions();
-                }
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerException(e);
-        }
     }
 
     @Override
@@ -262,8 +180,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
                 }
             }
 
-            getDataSourceType();
-            getDataTargetType();
+            changeDirValues();
             if (checkNotProcessedOptions.value()) {
                 checkNotProcessedOptions();
             }
@@ -271,6 +188,30 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Throwable e) {
+            throw new JobSchedulerException(e);
+        }
+    }
+
+    public SOSSmtpMailOptions getMailOptions() {
+        if (mailOptions == null) {
+            mailOptions = new SOSSmtpMailOptions();
+        }
+        return mailOptions;
+    }
+
+    private void setChildClasses(final HashMap<String, String> settings) {
+        try {
+            if (transfer == null) {
+                transfer = new SOSTransfer(settings);
+            }
+            if (mailOptions == null) {
+                if (settings.containsKey(SETTINGS_KEY_MAIL_SMTP)) {
+                    mailOptions = new SOSSmtpMailOptions(settings);
+                } else {
+                    mailOptions = new SOSSmtpMailOptions();
+                }
+            }
+        } catch (Exception e) {
             throw new JobSchedulerException(e);
         }
     }
@@ -306,6 +247,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         TransferTypes transferType = type.getEnum();
         switch (transferType) {
         case sftp:
+        case ssh:
             port.setDefaultValue("" + SOSOptionPortNumber.conPort4SFTP);
             break;
         case ftp:
@@ -694,32 +636,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
     public boolean oneOrMoreSingleFilesSpecified() {
         return filePath.isNotEmpty() || fileListName.isNotEmpty();
-    }
-
-    public String getDataTargetType() throws Exception {
-        String targetType = getTransfer().getTarget().protocol.getValue();
-        if (targetType.isEmpty()) {
-            targetType = TransferTypes.local.name();
-        }
-        changeDirValues();
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[target]%s", targetType));
-        }
-        return targetType;
-    }
-
-    public String getDataSourceType() throws Exception {
-        String sourceType = getTransfer().getSource().protocol.getValue();
-        if (sourceType.isEmpty()) {
-            sourceType = TransferTypes.local.name();
-        }
-        changeDirValues();
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[source]%s", sourceType));
-        }
-        return sourceType;
     }
 
     private void changeDirValues() throws Exception {

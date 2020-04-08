@@ -39,7 +39,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     private static final String CLASS_NAME = JSOptionsClass.class.getSimpleName();
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClass.class);
 
-    public Class<?> objParentClass = this.getClass();
+    public Class<?> currentClass = this.getClass();
 
     private static Properties properties = new Properties();
     private HashMap<String, String> settings = null;
@@ -138,8 +138,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
             LOGGER.trace(String.format("[setAllCommonOptions][%s]%s", getClass().getSimpleName(), prefix == null ? "" : prefix));
         }
         settings = params;
-        if (objParentClass != null) {
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, buffer, prefix);
+        if (currentClass != null) {
+            iterateAllDataElementsByAnnotation(currentClass, this, IterationTypes.setRecord, buffer, prefix);
         }
     }
 
@@ -317,8 +317,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     private String getAllOptionsAsString(final IterationTypes type) {
         StringBuilder sb = new StringBuilder();
-        if (objParentClass != null) {
-            sb.append(iterateAllDataElementsByAnnotation(objParentClass, this, type, new StringBuilder(""), null));
+        if (currentClass != null) {
+            sb.append(iterateAllDataElementsByAnnotation(currentClass, this, type, new StringBuilder(""), null));
         }
         return sb.toString();
     }
@@ -328,12 +328,12 @@ public class JSOptionsClass extends I18NBase implements Serializable {
     }
 
     public void checkMandatory() throws Exception {
-        if (objParentClass != null) {
+        if (currentClass != null) {
             // if (LOGGER.isDebugEnabled()) {
             // LOGGER.debug(String.format("[checkMandatory]%s", getClass().getSimpleName()));
             // }
 
-            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, buffer, null);
+            iterateAllDataElementsByAnnotation(currentClass, this, IterationTypes.CheckMandatory, buffer, null);
         }
     }
 
@@ -458,7 +458,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
         Class<?> clazz = this.getClass();
         value = getOptionValue(clazz, name);
         if (value == null) {
-            clazz = objParentClass.getClass();
+            clazz = currentClass.getClass();
             value = getOptionValue(clazz, name);
         }
         return value;
@@ -697,8 +697,8 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     private StringBuilder iterate(final IterationTypes enuIterate4What) {
         StringBuilder sb = new StringBuilder();
-        if (objParentClass != null) {
-            sb = iterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, sb, null);
+        if (currentClass != null) {
+            sb = iterateAllDataElementsByAnnotation(currentClass, this, enuIterate4What, sb, null);
         }
         return sb;
     }
@@ -731,7 +731,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     public Preferences getPreferenceStore() {
         if (preferenceStore == null) {
-            preferenceStore = Preferences.userNodeForPackage(objParentClass);
+            preferenceStore = Preferences.userNodeForPackage(currentClass);
         }
         return preferenceStore;
     }

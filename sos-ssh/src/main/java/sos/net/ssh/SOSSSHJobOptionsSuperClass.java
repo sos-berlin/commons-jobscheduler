@@ -31,7 +31,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass {
     private static final String CLASSNAME = SOSSSHJobOptionsSuperClass.class.getSimpleName();
 
     public SOSSSHJobOptionsSuperClass() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public SOSSSHJobOptionsSuperClass(final JSListener listener) {

@@ -16,7 +16,7 @@ public class JSObjects2GraphvizOptionsSuperClass extends JSOptionsClass {
     private static final String CLASSNAME = "JSObjects2GraphvizOptionsSuperClass";
 
     public JSObjects2GraphvizOptionsSuperClass() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public JSObjects2GraphvizOptionsSuperClass(final JSListener pobjListener) {

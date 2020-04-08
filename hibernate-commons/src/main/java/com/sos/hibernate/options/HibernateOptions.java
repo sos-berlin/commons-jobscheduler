@@ -180,7 +180,7 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     }
 
     public HibernateOptions() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public HibernateOptions(HashMap<String, String> JSSettings) throws Exception {

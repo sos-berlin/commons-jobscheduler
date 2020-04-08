@@ -198,9 +198,4 @@ public class SOSLocal extends SOSCommonProvider {
         new File(folderName).delete();
     }
 
-    @Override
-    public void reconnect(SOSProviderOptions options) {
-        //
-    }
-
 }

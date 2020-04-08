@@ -28,7 +28,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVFSFactory extends SOSVFSMessageCodes {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVFSFactory.class);
-    
+
     public final static String BUNDLE_NAME = "SOSVirtualFileSystem";
     public static String LOGGER_NAME = "SOSVfsReportLog";
 
@@ -96,21 +96,16 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         return name;
     }
 
-    public ISOSProvider getConnectedProvider(final boolean isSource) throws SOSYadeSourceConnectionException, SOSYadeTargetConnectionException {
+    public ISOSProvider getConnectedProvider(SOSProviderOptions providerOptions) throws SOSYadeSourceConnectionException,
+            SOSYadeTargetConnectionException {
         ISOSProvider provider = null;
         try {
-            SOSProviderOptions providerOptions;
-            String dataType;
-            if (isSource) {
-                providerOptions = options.getTransfer().getSource();
-                dataType = options.getDataSourceType();
-            } else {
-                providerOptions = options.getTransfer().getTarget();
-                dataType = options.getDataTargetType();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s]%s", providerOptions.getRange(), providerOptions.getProtocol()));
             }
-            provider = getProvider(dataType);
+            provider = getProvider(providerOptions.getProtocol());
             try {
-                handleOptions(providerOptions, isSource);
+                handleOptions(providerOptions);
                 provider.setBaseOptions(options);
                 provider.connect(providerOptions);
             } catch (Exception e) {
@@ -126,7 +121,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
                     provider = getProvider(alternative.protocol.getValue());
-                    handleOptions(alternative, isSource);
+                    handleOptions(alternative);
                     provider.connect(alternative);
                     providerOptions.alternateOptionsUsed.value(true);
                 } else {
@@ -136,13 +131,13 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                 }
             }
         } catch (JobSchedulerException ex) {
-            if (isSource) {
+            if (providerOptions.isSource()) {
                 throw new SOSYadeSourceConnectionException(ex.getCause());
             } else {
                 throw new SOSYadeTargetConnectionException(ex.getCause());
             }
         } catch (Exception ex) {
-            if (isSource) {
+            if (providerOptions.isSource()) {
                 throw new SOSYadeSourceConnectionException(ex);
             } else {
                 throw new SOSYadeTargetConnectionException(ex);
@@ -151,9 +146,9 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         return provider;
     }
 
-    private void handleOptions(SOSProviderOptions providerOptions, boolean isSource) throws Exception {
+    private void handleOptions(SOSProviderOptions providerOptions) throws Exception {
         if (providerOptions.directory.isDirty()) {
-            if (isSource) {
+            if (providerOptions.isSource()) {
                 options.sourceDir = providerOptions.directory;
                 options.localDir = providerOptions.directory;
             } else {

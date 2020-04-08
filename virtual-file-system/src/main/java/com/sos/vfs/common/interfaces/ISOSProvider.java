@@ -16,13 +16,15 @@ public interface ISOSProvider {
 
     public void connect(SOSProviderOptions options) throws Exception;
 
-    public void reconnect(SOSProviderOptions options);
+    public void reconnect();
 
     public void disconnect() throws IOException;
 
     public void setBaseOptions(SOSBaseOptions options);
 
     public SOSBaseOptions getBaseOptions();
+
+    public SOSProviderOptions getProviderOptions();
 
     // files and folders - not recursive
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws Exception;
