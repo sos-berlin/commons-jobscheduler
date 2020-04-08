@@ -1,10 +1,7 @@
 package com.sos.vfs.common.options;
 
-import java.util.HashMap;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
-import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Options.JSJobChain;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionArrayList;
@@ -47,27 +44,7 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     private static final String CLASS_NAME = SOSBaseOptionsSuperClass.class.getSimpleName();
 
     public SOSBaseOptionsSuperClass() {
-        objParentClass = getClass();
-    }
-
-    public SOSBaseOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
-        this();
-        super.setAllOptions(settings);
-    }
-
-    @Override
-    public void checkMandatory() throws com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing {
-        try {
-            super.checkMandatory();
-        } catch (Exception e) {
-            throw new JSExceptionMandatoryOptionMissing(e.toString());
-        }
-    }
-
-    @Override
-    public void commandLineArgs(final String[] args) {
-        super.commandLineArgs(args);
-        setAllOptions(super.getSettings());
+        currentClass = getClass();
     }
 
     @JSOptionDefinition(name = "Lazy_Connection_Mode", description = "Connect to Target as late as possible", key = "Lazy_Connection_Mode", type = "SOSOptionBoolean", mandatory = false)

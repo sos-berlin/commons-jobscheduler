@@ -309,7 +309,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     }
 
     public SOSSmtpMailOptionsSuperClass() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public SOSSmtpMailOptionsSuperClass(final JSListener pobjListener) {

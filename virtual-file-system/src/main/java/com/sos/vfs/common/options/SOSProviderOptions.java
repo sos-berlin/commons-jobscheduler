@@ -13,17 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Annotations.JSOptionClass;
-import com.sos.JSHelper.Annotations.JSOptionDefinition;
-import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
-import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.JSHelper.Options.SOSOptionObject;
 import com.sos.JSHelper.Options.SOSOptionPassword;
-import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
+import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
@@ -37,10 +32,14 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSProviderOptions.class);
-    private static final String CLASSNAME = SOSProviderOptions.class.getSimpleName();
+
+    private static final String SETTINGS_KEY_USE_CREDENTIAL_STORE = "%suse_credential_store";
+    private static final String SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD = "alternative_%scredentialstore_authenticationmethod";
 
     private SOSProviderOptions alternative = null;
     private SOSCredentialStoreOptions credentialStore = null;
+
+    private String range;
     private String prefix = null;
     private boolean isAlternative = false;
     private boolean isSource = false;
@@ -52,6 +51,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         isAlternative = alternative;
         isSource = source;
 
+        setRange();
         setPrefix();
     }
 
@@ -65,7 +65,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
     }
 
     public void setChildClasses(final HashMap<String, String> settings) throws Exception {
-        if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_USE_CREDENTIAL_STORE, prefix))) {
+        if (settings.containsKey(String.format(SETTINGS_KEY_USE_CREDENTIAL_STORE, prefix))) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(String.format("[provider options][credential store]%s", prefix));
             }
@@ -76,7 +76,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                 LOGGER.trace(String.format("[provider options][alternative]%s", getAlternative().getPrefix()));
             }
             getAlternative().setAllOptions(settings);
-            if (settings.containsKey(String.format(SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, prefix))) {
+            if (settings.containsKey(String.format(SETTINGS_KEY_ALTERNATIVE_CREDENTIAL_STORE_AUTH_METHOD, prefix))) {
                 if (LOGGER.isTraceEnabled()) {
                     LOGGER.trace(String.format("[provider options][alternative][credential store]%s", getAlternative().getPrefix()));
                 }
@@ -321,15 +321,6 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         }
     }
 
-    @Override
-    public void checkMandatory() {
-        try {
-            super.checkMandatory();
-        } catch (Exception e) {
-            throw new JSExceptionMandatoryOptionMissing(e.toString());
-        }
-    }
-
     public boolean optionsHaveMinRequirements() {
         if (alternateOptionsUsed.isTrue()) {
             return false;
@@ -355,6 +346,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     public void setIsSource(boolean val) {
         isSource = val;
+        setRange();
         setPrefix();
     }
 
@@ -363,6 +355,22 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
             alternative = new SOSProviderOptions(true, isSource);
         }
         return alternative;
+    }
+
+    public String getProtocol() throws Exception {
+        String p = protocol.getValue();
+        if (p.isEmpty()) {
+            p = TransferTypes.local.name();
+        }
+        return p;
+    }
+
+    private void setRange() {
+        range = isSource ? "source" : "target";
+    }
+
+    public String getRange() {
+        return range;
     }
 
     private void setPrefix() {
@@ -375,51 +383,5 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
     public String getPrefix() {
         return prefix;
     }
-
-    @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString preTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".pre_transfer_commands",
-            "FTP commands, which has to be executed before the transfer started.", "", "", false);
-
-    public SOSOptionCommandString preFtpCommands = (SOSOptionCommandString) preTransferCommands.setAlias("pre_transfer_commands");
-
-    @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands",
-            "FTP commands, which has to be executed after the transfer ended.", "", "", false);
-
-    public SOSOptionCommandString postFtpCommands = (SOSOptionCommandString) postTransferCommands.setAlias("post_Transfer_commands");
-
-    @JSOptionDefinition(name = "post_transfer_commands_on_error", description = "Commands, which has to be executed after the transfer ended with errors.", key = "post_transfer_commands_on_error", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommandsOnError = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_commands_on_error",
-            "Commands, which has to be executed after the transfer ended with errors.", "", "", false);
-
-    @JSOptionDefinition(name = "post_transfer_commands_final", description = "Commands, which has to be executed always after the transfer ended independent of "
-            + "the transfer status.", key = "post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString postTransferCommandsFinal = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_commands_final",
-            "Commands, which has to be executed always after the transfer ended independent of the transfer status.", "", "", false);
-
-    @JSOptionDefinition(name = "IgnoreCertificateError", description = "Ignore a SSL Certificate Error", key = "IgnoreCertificateError", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean ignoreCertificateError = new SOSOptionBoolean(this, CLASSNAME + ".IgnoreCertificateError",
-            "Ignore a SSL Certificate Error", "true", "true", true);
-
-    @JSOptionDefinition(name = "command_delimiter", description = "Command delimiter for pre and post commands", key = "command_delimiter", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString commandDelimiter = new SOSOptionString(this, CLASSNAME + ".command_delimiter",
-            "Command delimiter for pre and post commands", ";", ";", true);
-
-    @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication", key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean alternateOptionsUsed = new SOSOptionBoolean(this, CLASSNAME + ".AlternateOptionsUsed",
-            "Alternate Options used for connection and/or authentication", "false", "false", false);
-
-    @JSOptionDefinition(name = "user_info", description = "User Info implementation", key = "user_info", type = "SOSOptionObject", mandatory = false)
-    public SOSOptionObject user_info = new SOSOptionObject(this, CLASSNAME + ".user_info", "user_info", "", "", false);
-
-    @JSOptionDefinition(name = "keepass_database", description = "Keepass database", key = "keepass_database", type = "SOSOptionObject", mandatory = false)
-    public SOSOptionObject keepass_database = new SOSOptionObject(this, CLASSNAME + ".keepass_database", "Keepass database", "", "", false);
-
-    @JSOptionDefinition(name = "keepass_database_entry", description = "Keepass entry", key = "keepass_database_entry", type = "SOSOptionObject", mandatory = false)
-    public SOSOptionObject keepass_database_entry = new SOSOptionObject(this, CLASSNAME + ".keepass_database_entry", "Keepass entry", "", "", false);
-
-    @JSOptionDefinition(name = "keepass_attachment_property_name", description = "Keepass attachment property name", key = "keepass_database_entry", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString keepass_attachment_property_name = new SOSOptionString(this, CLASSNAME + ".keepass_attachment_property_name",
-            "Keepass attachment property name", "", "", false);
 
 }

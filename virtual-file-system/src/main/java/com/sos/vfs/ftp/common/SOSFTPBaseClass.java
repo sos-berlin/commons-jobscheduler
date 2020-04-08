@@ -37,7 +37,6 @@ import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
-import com.sos.vfs.common.SOSFileListEntry;
 import com.sos.vfs.common.SOSVFSMessageCodes;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
@@ -149,10 +148,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     @Override
-    public void reconnect(SOSProviderOptions options) {
+    public void reconnect() {
         if (!isConnected()) {
             try {
-                connect(options);
+                connect(providerOptions);
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
@@ -577,10 +576,6 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         } catch (Exception e) {
             throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
         }
-    }
-
-    public SOSFileListEntry getNewVirtualFile(final String fileName) {
-        return new SOSFileListEntry(fileName);
     }
 
     @Override

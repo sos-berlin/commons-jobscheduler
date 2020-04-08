@@ -13,14 +13,11 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.interfaces.IJobSchedulerEventHandler;
 import com.sos.JSHelper.io.Files.JSFile;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSFileListEntry.TransferStatus;
-import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -37,8 +34,8 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private IJobSchedulerEventHandler eventHandler = null;
     private List<SOSFileListEntry> fileListEntries = new ArrayList<>();
     private final HashMap<String, String> subFolders = new HashMap<>();
-    private boolean transferCountersCounted = false;
-    private boolean resultSetFileCreated = false;
+
+    private String lastErrorMessage;
     private long sumFileSizes = 0L;
     private long counterSuccessfulTransfers = 0;
     private long counterFailedTransfers = 0;
@@ -48,9 +45,10 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private long counterSkippedZeroByteFiles = 0;// TransferZeroBytes=relaxed
     private long counterBytesTransferred = 0;
     private long counterRecordsInResultSetFile = 0;
-    private String lastErrorMessage;
     private int retryCountMax = 0;
     private int retryInterval = 0;// in seconds
+    private boolean transferCountersCounted = false;
+    private boolean resultSetFileCreated = false;
 
     public SOSFileList(SOSBaseOptions opt, IJobSchedulerEventHandler handler) {
         super(SOSVFSFactory.BUNDLE_NAME);
@@ -64,7 +62,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
         if (maxFiles > entries.size()) {
             int i = 0;
             for (SOSFileEntry entry : entries) {
-                this.add(entry);
+                add(entry);
                 i++;
                 if (i == maxFiles) {
                     break;
@@ -72,7 +70,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
             }
         } else {
             for (SOSFileEntry entry : entries) {
-                this.add(entry);
+                add(entry);
             }
         }
     }
@@ -530,7 +528,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
         return subFolders;
     }
 
-    public SOSBaseOptions getOptions() {
+    public SOSBaseOptions getBaseOptions() {
         return options;
     }
 

@@ -18,7 +18,7 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
     }
 
     private void init() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public SOSSSHJobOptions(final HashMap<String, String> JSSettings) throws Exception {

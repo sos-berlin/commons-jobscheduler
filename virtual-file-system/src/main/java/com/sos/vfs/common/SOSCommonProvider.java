@@ -33,7 +33,7 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     private SOSProviderOptions providerOptions = null;
 
     public SOSCommonProvider() {
-        super("SOSVirtualFileSystem");
+        super(SOSVFSFactory.BUNDLE_NAME);
     }
 
     @Override
@@ -54,10 +54,10 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     }
 
     @Override
-    public void reconnect(SOSProviderOptions options) {
+    public void reconnect() {
         if (!isConnected()) {
             try {
-                connect(options);
+                connect(providerOptions);
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
@@ -152,10 +152,6 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     public static String normalizePath(String path) {
         return path.replaceAll("\\\\", "/");
-    }
-
-    public SOSFileListEntry getNewVirtualFile(final String fileName) {
-        return new SOSFileListEntry(fileName);
     }
 
     @Override

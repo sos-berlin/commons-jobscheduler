@@ -4,15 +4,18 @@ import java.util.HashMap;
 
 public class SOSTransfer {
 
+    private static final String SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE = "alternative_source_include";
+    private static final String SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE = "alternative_target_include";
+
     private SOSProviderOptions source = null;
     private SOSProviderOptions target = null;
 
     public SOSTransfer(final HashMap<String, String> settings) throws Exception {
         source = new SOSProviderOptions(false, true);
-        setProviderOptions(settings, source, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
+        setProviderOptions(settings, source, SETTINGS_KEY_ALTERNATIVE_SOURCE_INCLUDE);
 
         target = new SOSProviderOptions(false, false);
-        setProviderOptions(settings, target, SOSBaseOptions.SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
+        setProviderOptions(settings, target, SETTINGS_KEY_ALTERNATIVE_TARGET_INCLUDE);
     }
 
     private void setProviderOptions(HashMap<String, String> settings, SOSProviderOptions options, String alternativeSettingsKey) throws Exception {

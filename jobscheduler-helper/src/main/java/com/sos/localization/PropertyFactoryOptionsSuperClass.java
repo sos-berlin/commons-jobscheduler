@@ -50,7 +50,7 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
     }
 
     public PropertyFactoryOptionsSuperClass() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public PropertyFactoryOptionsSuperClass(HashMap<String, String> JSSettings) {

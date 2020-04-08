@@ -24,7 +24,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
     private boolean flgIgnoreValueDelimiter = true;
 
     public JSCsvFileOptions() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public JSCsvFileOptions(final JSListener pobjListener) {
