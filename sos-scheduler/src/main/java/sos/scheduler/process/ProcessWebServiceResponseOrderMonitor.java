@@ -5,7 +5,6 @@ import sos.spooler.Web_service_operation;
 import sos.spooler.Web_service_request;
 import sos.spooler.Web_service_response;
 import sos.spooler.Xslt_stylesheet;
-import sos.util.SOSSchedulerLogger;
 
 /** @author andreas pueschel */
 public class ProcessWebServiceResponseOrderMonitor extends ProcessOrderMonitor {

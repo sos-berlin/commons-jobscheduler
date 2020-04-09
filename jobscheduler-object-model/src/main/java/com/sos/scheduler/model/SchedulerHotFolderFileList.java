@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.objects.JSObjBase;
 import com.sos.scheduler.model.objects.JSObjJob;
 import com.sos.scheduler.model.objects.JSObjJobChain;
@@ -27,7 +27,7 @@ public class SchedulerHotFolderFileList {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerHotFolderFileList.class);
     private List<JSObjBase> fileList = new ArrayList<JSObjBase>();
-    private ISOSVirtualFile hotFolderSrc = null;
+    private ISOSProviderFile hotFolderSrc = null;
 
     public static enum HotFolderObject {
         folder, job, job_chain, order, lock, process_class, schedule, params;
@@ -127,10 +127,10 @@ public class SchedulerHotFolderFileList {
         return orders;
     }
 
-    public List<ISOSVirtualFile> getOrderList(String filter) {
+    public List<ISOSProviderFile> getOrderList(String filter) {
         Pattern pattern = Pattern.compile(filter);
         List<JSObjOrder> orders = getOrderList();
-        List<ISOSVirtualFile> result = new ArrayList<ISOSVirtualFile>();
+        List<ISOSProviderFile> result = new ArrayList<ISOSProviderFile>();
         for (JSObjOrder object : orders) {
             File f = new File(object.getHotFolderSrc().getName());
             Matcher m = pattern.matcher(f.getName());
@@ -204,11 +204,11 @@ public class SchedulerHotFolderFileList {
         return filteredFileList;
     }
 
-    public void setHotFolderSrc(ISOSVirtualFile hotFolderSrc) {
+    public void setHotFolderSrc(ISOSProviderFile hotFolderSrc) {
         this.hotFolderSrc = hotFolderSrc;
     }
 
-    public ISOSVirtualFile getHotFolderSrc() {
+    public ISOSProviderFile getHotFolderSrc() {
         return hotFolderSrc;
     }
 

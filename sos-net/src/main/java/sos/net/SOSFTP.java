@@ -10,8 +10,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sos.util.SOSLogger;
-
 import java.io.*;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -35,15 +33,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     public SOSFTP(final String host, final int port) throws SocketException, IOException, UnknownHostException {
         connect(host, port);
     }
-
-    public SOSFTP(final String host, final int port, final SOSLogger logger) {
-        try {
-            connect(host, port);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
+   
     public SOSFTP(final String ftpHost, final int ftpPort, final String proxyHost, final int proxyPort) throws SocketException, IOException,
             UnknownHostException {
         this.connect(ftpHost, ftpPort);

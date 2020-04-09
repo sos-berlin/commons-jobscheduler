@@ -7,16 +7,15 @@ import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 
-/** @author KB */
 public interface ISOSConnectionOptions {
 
     public SOSOptionHostName getHost();
 
-    public void setAlternativeHost(SOSOptionHostName pAlternativeHost);
+    public void setAlternativeHost(SOSOptionHostName host);
 
     public SOSOptionHostName getAlternativeHost();
 
-    public void setAlternativePassword(SOSOptionPassword pAlternativePassword);
+    public void setAlternativePassword(SOSOptionPassword password);
 
     public SOSOptionPassword getAlternativePassword();
 

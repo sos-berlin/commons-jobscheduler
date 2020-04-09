@@ -117,7 +117,7 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
     }
 
     public SchedulerObjectFactoryOptions() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
 }

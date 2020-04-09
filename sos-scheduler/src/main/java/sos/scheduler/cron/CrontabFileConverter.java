@@ -34,16 +34,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import sos.util.SOSDate;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
+import sos.util.SOSDate;
 
 /** @author Andreas Liebert */
 public class CrontabFileConverter extends JSToolBox {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrontabFileConverter.class);
+    
     protected Pattern cronRegExPattern;
     protected Pattern cronRegExSystemPattern;
     protected Pattern cronRegExAliasPattern;
@@ -55,7 +55,6 @@ public class CrontabFileConverter extends JSToolBox {
     protected Pattern currentCronPattern;
     protected String strBaseDirectory = "CronConverter";
     protected String strMockCommand = "ping -n 20 localhost";
-    private static final Logger LOGGER = LoggerFactory.getLogger(CrontabFileConverter.class);
     private static final String TRUE = "true";
     private static final String SYSTEM_CRONTAB_NAME = "/etc/crontab";
     private static final String STATE_ERROR = "error";
@@ -130,7 +129,6 @@ public class CrontabFileConverter extends JSToolBox {
     public static void main(final String[] args) {
         LOGGER.info("SOS CronConverter - Main");
         try {
-            SOSLogger sosLogger;
             String sourceFile = "";
             String targetFile = "";
             String changeUser = "";
@@ -196,7 +194,7 @@ public class CrontabFileConverter extends JSToolBox {
                 sysTab = true;
             }
             targetFile = getWholeArgument(line.getOptionValues(OPTION_TARGET));
-            String ll = line.getOptionValue(OPTION_VERBOSE, "" + SOSStandardLogger.INFO);
+            String ll = line.getOptionValue(OPTION_VERBOSE, "1");
             logLevel = Integer.parseInt(ll);
             if (line.hasOption(optSysTab.getOpt())) {
                 sysTab = "1".equals(line.getOptionValue(optSysTab.getOpt()).trim());
@@ -208,12 +206,11 @@ public class CrontabFileConverter extends JSToolBox {
             }
             jobTimeout = line.getOptionValue(OPTION_TIMEOUT);
             if (logLevel == 0) {
-                logLevel = SOSLogger.INFO;
+                logLevel = 1;
             }
-            sosLogger = new SOSStandardLogger(logLevel);
             target = new File(targetFile);
             source = new File(sourceFile);
-            CrontabFileConverter cc = new CrontabFileConverter(sosLogger);
+            CrontabFileConverter cc = new CrontabFileConverter();
             if (jobTimeout != null && !jobTimeout.isEmpty()) {
                 cc.setTimeout(jobTimeout);
             }
@@ -245,7 +242,7 @@ public class CrontabFileConverter extends JSToolBox {
         return value;
     }
 
-    public CrontabFileConverter(final SOSLogger log) throws Exception {
+    public CrontabFileConverter() throws Exception {
         docBuilder = docFactory.newDocumentBuilder();
         cronRegExAliasPattern = Pattern.compile(CRON_REGEX_ALIAS);
         cronRegExPattern = Pattern.compile(CRON_REGEX);

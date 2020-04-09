@@ -28,8 +28,6 @@ import sos.spooler.Job;
 import sos.spooler.Variable_set;
 import sos.util.SOSFile;
 import sos.util.SOSFileOperations;
-import sos.util.SOSLogger;
-import sos.util.SOSSchedulerLogger;
 import sos.xml.SOSXMLXPath;
 
 public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {

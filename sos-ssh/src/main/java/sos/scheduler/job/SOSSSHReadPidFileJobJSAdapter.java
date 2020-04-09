@@ -2,13 +2,17 @@ package sos.scheduler.job;
 
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobOptions;
-import sos.net.ssh.exceptions.SSHExecutionError;
+import sos.scheduler.job.impl.SOSSSHReadPidFileJob;
 
-public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+public class SOSSSHReadPidFileJobJSAdapter extends JobSchedulerJobAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHReadPidFileJobJSAdapter.class);
 
     private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
     private HashMap<String, String> allParams;
@@ -18,40 +22,38 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
         try {
             super.spooler_process();
             doProcessing();
+            return getSpoolerProcess().isOrderJob();
         } catch (Exception e) {
-            logger.error(stackTrace2String(e));
+            LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
         }
-        return signalSuccess();
     }
 
     private void doProcessing() throws Exception {
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getParameters());
+        allParams.putAll(getJobOrOrderParameters(getSpoolerProcess().getOrder()));
         SOSSSHJobOptions options = null;
         try {
-            SOSSSHJob2 sshJob = new SOSSSHReadPidFileJob();
-            ((SOSSSHReadPidFileJob) sshJob).setTempPidFileName(allParams.get(PID_FILE_NAME_KEY));
-            logger.debug("SOSSSHReadPidFileJob instantiated!");
-            options = sshJob.getOptions();
-            options.setCurrentNodeName(this.getCurrentNodeName(false));
+            SOSSSHReadPidFileJob job = new SOSSSHReadPidFileJob(allParams.get(PID_FILE_NAME_KEY));
+            job.setJSJobUtilites(this);
+
+            options = job.getOptions();
+            options.setCurrentNodeName(this.getCurrentNodeName(getSpoolerProcess().getOrder(), false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
-            sshJob.setJSJobUtilites(this);
             options.checkMandatory();
-            sshJob.execute();
+
+            job.execute();
         } catch (Exception e) {
-            if (options.raiseExceptionOnError.value()) {
+            if (options != null && options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        logger.debug(this.stackTrace2String(e));
+                        LOGGER.debug(e.toString(), e);
                     } else {
-                        logger.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e, e);
+                        throw e;
                     }
                 } else {
-                    logger.error(this.stackTrace2String(e));
-                    throw new SSHExecutionError("Exception raised: " + e, e);
+                    throw e;
                 }
             }
         }

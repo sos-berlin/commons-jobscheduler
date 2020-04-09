@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
-import sos.util.SOSLogger;
 
 public class JobSchedulerLiveXml {
 
@@ -28,12 +27,10 @@ public class JobSchedulerLiveXml {
     private HashMap tableNames;
     private LinkedHashSet listOfElements;
     private SOSConnection conn = null;
-    private SOSLogger sosLogger = null;
-
-    public JobSchedulerLiveXml(SOSConnection conn_, SOSLogger sosLogger_, File xmlFile_) throws Exception {
+  
+    public JobSchedulerLiveXml(SOSConnection conn_, File xmlFile_) throws Exception {
         this.xmlFile = xmlFile_;
         this.conn = conn_;
-        this.sosLogger = sosLogger_;
         getXml();
         listOfElements = new LinkedHashSet();
         tableNames = new HashMap();
@@ -71,7 +68,7 @@ public class JobSchedulerLiveXml {
             String[] t3 = fileName.split("\\,");
             jobChainName = t3[0];
             fileName = t3[1];
-            sosLogger.debug1("jobChainName: " + jobChainName + " fileName: " + fileName);
+            LOGGER.debug("jobChainName: " + jobChainName + " fileName: " + fileName);
         }
         String[] t = fileName.split("\\.");
         String objectName = "";
@@ -127,11 +124,11 @@ public class JobSchedulerLiveXml {
                 log("Parent_id(" + element.element_path + ")=" + parent_id);
             }
         }
-        sosLogger.info("File has been imported: " + xmlFile.getAbsolutePath());
+        LOGGER.info("File has been imported: " + xmlFile.getAbsolutePath());
     }
 
     private void log(String s) throws Exception {
-        sosLogger.debug3(s);
+        LOGGER.debug(s);
     }
 
     private void fillTableNames() throws Exception {

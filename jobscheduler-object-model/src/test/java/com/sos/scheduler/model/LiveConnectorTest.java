@@ -50,32 +50,6 @@ public class LiveConnectorTest extends TestBase {
         expected.add(liveFolder + "folder2/folder2.1/chain,order1.order.xml");
     }
 
-    @Test
-    @Ignore("Test set to Ignore for later examination")
-    public final void testLocal() throws MalformedURLException {
-        LiveConnector connector = new LiveConnector(getLiveFolder());
-        SchedulerHotFolder hotFolder = factory.createSchedulerHotFolder(connector.getHotFolderHandle());
-        SchedulerHotFolderFileList fileList = hotFolder.loadRecursive();
-        List<JSObjOrder> orders = fileList.getOrderList();
-        for (JSObjOrder order : orders) {
-            LOGGER.debug("" + order.getHotFolderSrc());
-        }
-    }
-
-    @Test
-    @Ignore("Test set to Ignore for later examination, fails in Jenkins build")
-    public final void testFTP() throws MalformedURLException {
-        final String liveFolderName = "ftp://Administrator@8of9.sos:21" + liveFolder;
-        LOGGER.debug("liveFolderName=" + liveFolderName);
-        LiveConnector connector = new LiveConnector(new URL(liveFolderName));
-        SchedulerHotFolder hotFolder = factory.createSchedulerHotFolder(connector.getHotFolderHandle());
-        SchedulerHotFolderFileList fileList = hotFolder.loadRecursive();
-
-        List<JSObjOrder> orders = fileList.getOrderList();
-        for (int i = 0; i < orders.size(); i++) {
-            String name = orders.get(0).getHotFolderSrc().getName();
-            assertEquals(name + " not expected", true, expected.contains(name));
-        }
-    }
+   
 
 }

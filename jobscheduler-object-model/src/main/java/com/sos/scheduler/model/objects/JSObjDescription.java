@@ -1,6 +1,6 @@
 package com.sos.scheduler.model.objects;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Job.Description;
 
@@ -19,7 +19,7 @@ public class JSObjDescription extends Description {
         afterUnmarshal();
     }
 
-    public JSObjDescription(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjDescription(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         final Job ObjDescription = (Job) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom(ObjDescription);

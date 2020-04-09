@@ -1,6 +1,5 @@
 package com.sos.JSHelper.Listener;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +26,12 @@ public class JSListenerClass implements JSListener {
         //
     }
 
-    public void message(final String pstrMsg) {
-        String strT = pstrMsg;
-        strT = getTime() + " " + strT;
+    public void message(String msg) {
+        StringBuilder sb = new StringBuilder(getTime()).append(" ").append(msg);
         if (JSListener != null) {
-            JSListener.message(strT);
+            JSListener.message(sb.toString());
         } else {
-            LOGGER.info(strT);
+            LOGGER.info(sb.toString());
         }
     }
 
@@ -45,53 +43,50 @@ public class JSListenerClass implements JSListener {
         JSListener = l;
     }
 
-    public void signalAbort(final String strS) throws Exception {
-        String strT = " ###ProgramAbort### ";
-        strT = strT + strS + strT;
-        message(strT);
-        final JobSchedulerException expE = new JobSchedulerException(strT);
-        throw expE;
+    public void signalAbort(final String msg) throws Exception {
+        String def = " ###ProgramAbort### ";
+        String message = def + msg + def;
+        message(message);
+        throw new JobSchedulerException(message);
     }
 
-    public void signalInfo(final String strS) {
-        message(strS);
+    public void signalInfo(final String msg) {
+        message(msg);
     }
 
-    public void signalError(final JobSchedulerException expE, final String strS) {
-        String strT = " ### Error ### ";
-        strT = strT + strS + strT;
-        message(strT);
-        if (expE != null) {
-            expE.message(strS);
-            expE.setStatus(JobSchedulerException.ERROR);
-            throw expE;
+    public void signalError(final JobSchedulerException ex, final String msg) {
+        String def = " ### Error ### ";
+        String message = def + msg + def;
+        message(msg);
+        if (ex != null) {
+            ex.message(message);
+            throw ex;
         }
     }
 
-    public void signalError(final String strS) {
-        this.signalError(new JobSchedulerException(strS), strS);
+    public void signalError(final String msg) {
+        this.signalError(new JobSchedulerException(msg), msg);
     }
 
-    public void signalDebug(final String pstrDebugMessage) {
-        this.signalDebug(pstrDebugMessage, 5);
+    public void signalDebug(final String msg) {
+        this.signalDebug(msg, 5);
     }
 
-    public void signalDebug(final String pstrMsg, final Integer pintDebugLevel) {
-        final String strT = pstrMsg;
+    public void signalDebug(final String msg, final Integer level) {
         if (!JSListenerClass.bolLogDebugInformation) {
             return;
         }
         if (intMaxDebugLevel == null) {
             intMaxDebugLevel = JSListenerClass.DEBUG_LEVEL9;
         }
-        if (pintDebugLevel.intValue() > JSListenerClass.intMaxDebugLevel.intValue()) {
+        if (level.intValue() > JSListenerClass.intMaxDebugLevel.intValue()) {
             return;
         }
-        message("DEBUG(" + pintDebugLevel + "):>>> " + strT + " <<<");
+        message("DEBUG(" + level + "):>>> " + msg + " <<<");
     }
 
-    public String getDateTimeFormatted(final String pstrEditMask) {
-        final java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat(pstrEditMask);
+    public String getDateTimeFormatted(final String dateTime) {
+        final java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat(dateTime);
         final java.util.Calendar now = java.util.Calendar.getInstance();
         return formatter.format(now.getTime()).toString();
     }

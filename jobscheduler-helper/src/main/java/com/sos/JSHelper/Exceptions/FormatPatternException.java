@@ -7,7 +7,6 @@ public class FormatPatternException extends JobSchedulerException {
     public FormatPatternException(String pstrMessage) {
         super(pstrMessage);
         this.message(pstrMessage);
-        this.setStatus(JobSchedulerException.PENDING);
     }
 
     public FormatPatternException() {

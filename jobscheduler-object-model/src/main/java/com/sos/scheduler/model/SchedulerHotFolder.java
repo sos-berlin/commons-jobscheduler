@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.SOSFileEntry;
 import com.sos.scheduler.model.objects.JSObjBase;
 import com.sos.scheduler.model.objects.JSObjJob;
 import com.sos.scheduler.model.objects.JSObjJobChain;
@@ -33,12 +33,12 @@ public class SchedulerHotFolder extends JSObjBase {
         objFactory = schedulerObjectFactory;
     }
 
-    public SchedulerHotFolder(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public SchedulerHotFolder(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         setHotFolderSrc(pobjVirtualFile);
     }
 
-    public SchedulerHotFolderFileList load() {
+    public SchedulerHotFolderFileList load() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -46,7 +46,7 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList loadOrderObjects() {
+    public SchedulerHotFolderFileList loadOrderObjects() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -54,7 +54,7 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList loadRecursive() {
+    public SchedulerHotFolderFileList loadRecursive() throws Exception {
         if (isLoaded) {
             return getHotFolderFileList();
         }
@@ -62,12 +62,12 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
-    public SchedulerHotFolderFileList refresh() {
+    public SchedulerHotFolderFileList refresh() throws Exception {
         objHotFolderFileList = load(this.getHotFolderSrc());
         return objHotFolderFileList;
     }
 
-    private SchedulerHotFolderFileList loadRecursive(final ISOSVirtualFile pobjVirtualDir) {
+    private SchedulerHotFolderFileList loadRecursive(final ISOSProviderFile pobjVirtualDir) throws Exception {
         SchedulerHotFolderFileList result = load(pobjVirtualDir);
         List<SchedulerHotFolder> folders = result.getFolderList();
         for (SchedulerHotFolder folder : folders) {
@@ -90,11 +90,11 @@ public class SchedulerHotFolder extends JSObjBase {
         return objJob;
     }
 
-    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) {
+    private SchedulerHotFolderFileList load(final ISOSProviderFile pobjVirtualDir) throws Exception {
         return load(pobjVirtualDir, ".*");
     }
 
-    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir, String regex) {
+    private SchedulerHotFolderFileList load(final ISOSProviderFile pobjVirtualDir, String regex) throws Exception {
         final String conMethodName = "SchedulerHotFolder::load";
         SchedulerHotFolderFileList result = new SchedulerHotFolderFileList();
         try {
@@ -106,12 +106,12 @@ public class SchedulerHotFolder extends JSObjBase {
             LOGGER.error(objJSException.getMessage(), objJSException);
             throw objJSException;
         }
-        ISOSVfsFileTransfer objVFSHandler = pobjVirtualDir.getHandler();
+        ISOSProvider objVFSHandler = pobjVirtualDir.getProvider();
         List<SOSFileEntry> entries = objVFSHandler.getFolderlist(pobjVirtualDir.getName(), ".*", 0, false);
         result.setHotFolderSrc(pobjVirtualDir);
         for (SOSFileEntry entry : entries) {
             if (!entry.getFilename().contains(".svn")) {
-                ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(entry.getFilename());
+                ISOSProviderFile objVirtualFile1 = objVFSHandler.getFile(entry.getFilename());
                 try {
                     if (objVirtualFile1.isDirectory()) {
                         LOGGER.debug("load SchedulerHotFolder = " + entry.getFilename());
@@ -126,7 +126,7 @@ public class SchedulerHotFolder extends JSObjBase {
         LOGGER.debug("getFilelist from: " + pobjVirtualDir.getName());
         entries = objVFSHandler.getFilelist(pobjVirtualDir.getName(), regex, 0, false, true, null);
         for (SOSFileEntry entry : entries) {
-            ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(entry.getFilename());
+            ISOSProviderFile objVirtualFile1 = objVFSHandler.getFile(entry.getFilename());
             String lowerFilename = entry.getFilename().toLowerCase();
             try {
                 if (objVirtualFile1.isDirectory()) {

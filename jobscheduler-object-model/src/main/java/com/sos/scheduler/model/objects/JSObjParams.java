@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */
@@ -25,7 +25,7 @@ public class JSObjParams extends Params {
         setObjectFieldsFrom(params);
     }
 
-    public JSObjParams(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjParams(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         Params objParams = (Params) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom(objParams);

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjSpooler
@@ -42,7 +42,7 @@ public class JSObjSpooler extends Spooler {
         objFactory = schedulerObjectFactory;
     }
 
-    public JSObjSpooler(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjSpooler(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         super();
         objFactory = schedulerObjectFactory;
         final Spooler objSpooler = (Spooler) unMarshal(pobjVirtualFile);

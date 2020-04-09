@@ -24,7 +24,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
     private boolean flgIgnoreValueDelimiter = true;
 
     public JSCsvFileOptions() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public JSCsvFileOptions(final JSListener pobjListener) {
@@ -54,21 +54,28 @@ public class JSCsvFileOptions extends JSOptionsClass {
     }
 
     @Override
-    public void setAllOptions(final HashMap<String, String> JSSettings) {
+    public void setAllOptions(final HashMap<String, String> settings) {
         try {
-            objSettings = JSSettings;
-            super.setSettings(objSettings);
+            super.setAllOptions(settings);
             final String strT = super.getItem(DELIMITER_SETTINGS_KEY);
             if (isNotEmpty(strT)) {
                 this.setDelimiter(strT);
             } else {
                 this.setDelimiter(super.getItem(CSV_COLUMN_DELIMITER_SETTINGS_KEY));
             }
-            this.setSkipFirstLine(super.getBoolItem(SKIP_FIRST_LINE_SETTINGS_KEY));
-            this.setIgnoreValueDelimiter(super.getBoolItem(IGNORE_VALUE_DELIMITER_SETTINGS_KEY));
+            this.setSkipFirstLine(getBoolItem(SKIP_FIRST_LINE_SETTINGS_KEY));
+            this.setIgnoreValueDelimiter(getBoolItem(IGNORE_VALUE_DELIMITER_SETTINGS_KEY));
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         }
+    }
+    
+    private boolean getBoolItem(final String pstrKey) {
+        boolean flgT = false;
+        if (isNotEmpty(pstrKey)) {
+            flgT = super.string2Bool(this.getItem(pstrKey));
+        }
+        return flgT;
     }
 
     @Override
@@ -86,7 +93,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
 
     public JSCsvFileOptions setDelimiter(final String pstrDelimiter) throws Exception {
         if (pstrDelimiter == null) {
-            signalError(CLASSNAME + ":Delimiter" + conNullButMandatory);
+            signalError(CLASSNAME + ":Delimiter is mandatory, must be not null");
         } else {
             if (pstrDelimiter.matches("^[0-9]+$")) {
                 strDelimiter = String.valueOf((char) Integer.parseInt(pstrDelimiter));

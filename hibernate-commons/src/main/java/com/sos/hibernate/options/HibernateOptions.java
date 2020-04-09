@@ -180,7 +180,7 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     }
 
     public HibernateOptions() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public HibernateOptions(HashMap<String, String> JSSettings) throws Exception {
@@ -188,10 +188,8 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
         this.setAllOptions(JSSettings);
     }
 
-    public void setAllOptions(HashMap<String, String> pobjJSSettings) {
-        objSettings = pobjJSSettings;
-        super.setSettings(objSettings);
-        super.setAllOptions(pobjJSSettings);
+    public void setAllOptions(HashMap<String, String> settings) {
+        super.setAllOptions(settings);
     }
 
     @Override
@@ -206,7 +204,7 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     @Override
     public void commandLineArgs(String[] pstrArgs) {
         super.commandLineArgs(pstrArgs);
-        this.setAllOptions(super.objSettings);
+        this.setAllOptions(super.getSettings());
     }
 
 }

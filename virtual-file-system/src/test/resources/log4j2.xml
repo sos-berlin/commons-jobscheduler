@@ -3,7 +3,7 @@
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout
-				pattern="%d{HH:mm:ss.SSS}[%5p][%t](%F:%L) - %m%n" />
+				pattern="%d{HH:mm:ss.SSS} (%F:%L) [%5p][%t] - [%M] %m%n" /><!-- F:L with spaces to make clickable -->
 		</Console>
 
 	</Appenders>

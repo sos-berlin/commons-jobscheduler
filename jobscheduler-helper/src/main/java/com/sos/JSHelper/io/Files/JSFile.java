@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import sos.util.SOSGZip;
 
-import com.sos.JSHelper.Archiver.IJSArchiver;
-import com.sos.JSHelper.Archiver.JSArchiver;
-import com.sos.JSHelper.Archiver.JSArchiverOptions;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDataElementTimeStampISO;
@@ -46,7 +43,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
-public class JSFile extends java.io.File implements JSListener, IJSArchiver {
+public class JSFile extends java.io.File implements JSListener {
 
     protected String strFileName;
     protected File fleFile;
@@ -75,7 +72,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     private boolean flgIsZipfile = false;
     private Messages Messages = null;
     private JSListener JSListener;
-    private JSArchiver objArchiver = null;
     public static final String conPropertySOS_JSFILE_PREFIX_4_TEMPFILE = "sos.jsfile.prefix.4.tempfile";
     public static final String conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE = "sos.jsfile.extension.4.tempfile";
     public static final String conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE = "sos.jsfile.extension.4.exclusivefile";
@@ -771,26 +767,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
         strT = strT + strS + strS;
         LOGGER.error(strT);
         throw new JobSchedulerException(strT);
-    }
-
-    @Override
-    public JSArchiver getArchiver() throws Exception {
-        if (objArchiver == null) {
-            objArchiver = new JSArchiver();
-            objArchiver.registerMessageListener(this);
-            objArchiver.getOptions().setFileName(super.getAbsoluteFile().toString());
-        }
-        return objArchiver;
-    }
-
-    public JSArchiver getArchiver(final JSArchiverOptions pobjArchiverOptions) throws Exception {
-        if (objArchiver == null) {
-            objArchiver = new JSArchiver();
-            objArchiver.registerMessageListener(this);
-            pobjArchiverOptions.setFileName(super.getAbsoluteFile().toString());
-            objArchiver.setOptions(pobjArchiverOptions);
-        }
-        return objArchiver;
     }
 
     public void close() throws IOException {

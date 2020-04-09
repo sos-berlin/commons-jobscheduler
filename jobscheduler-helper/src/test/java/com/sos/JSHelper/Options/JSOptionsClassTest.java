@@ -1,9 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -13,22 +9,8 @@ import org.slf4j.LoggerFactory;
 /** @author KB */
 public class JSOptionsClassTest {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(JSOptionsClassTest.class);
-
-    @Test
-    public void testIsOption() throws Exception {
-        JSOptionsClass o = new JSOptionsClass();
-        assertTrue(o.isOption("Scheduler_Data"));
-        assertFalse(o.isOption("not_valid"));
-    }
-
-    @Test
-    public void testGetValuePairs() throws Exception {
-        JSOptionsClass objOC = new JSOptionsClass();
-        objOC.locale.setValue("DE");
-        LOGGER.info(objOC.getOptionsAsKeyValuePairs());
-    }
-
+      
+   
     @Test
     public final void testSettings4StepName() throws Exception {
         JSOptionsClass objOC = new JSOptionsClass();
@@ -60,18 +42,9 @@ public class JSOptionsClassTest {
         objHsh.put("target_pre_command", strCmd);
         objOC.setCurrentNodeName("test");
         objOC.setAllOptions(objHsh);
-        HashMap<String, String> objS4SN = objOC.getSettings4StepName();
-        LOGGER.info(objS4SN.get("source/source_user") + " / " + objS4SN.get("target_user"));
+        
+        
     }
 
-    @Test
-    public final void testStoreOptionValues() {
-        JSOptionsClass objOC = new JSOptionsClass();
-        objOC.locale.setValue("en_EN");
-        objOC.storeOptionValues();
-        objOC = new JSOptionsClass();
-        objOC.initializeOptionValues();
-        assertEquals("locale is wrong", "en_EN", objOC.locale.getValue());
-    }
-
+    
 }
