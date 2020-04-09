@@ -170,7 +170,7 @@ public class JobStarter {
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
         String xmlString = xml.asXML();
-        xmlString = xmlString.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+        xmlString =  xmlString.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
         return xmlString;
     }
 

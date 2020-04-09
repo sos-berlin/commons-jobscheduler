@@ -59,7 +59,7 @@ class EnvVarCreator {
             return envVar;
         case "JS_MONTH_NAME":
             envVar.setName("JS_MONTH_NAME");
-            envVar.setValue(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+            envVar.setValue(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.UK));
             return envVar;
         case "JS_DATE_YY":
             outFormat = new SimpleDateFormat("yyMMdd");
