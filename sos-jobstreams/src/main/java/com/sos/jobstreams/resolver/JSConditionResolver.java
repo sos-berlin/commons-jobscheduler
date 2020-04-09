@@ -598,15 +598,17 @@ public class JSConditionResolver {
                     if (!historyValidated2True) {
                         if (!jsHistoryEntry.checkReady(this)) {
                             try {
-                                session.beginTransaction();
                                 DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(session);
                                 DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
                                         .getId());
-                                dbItemJobStreamHistory.setRunning(false);
-                                dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
-                                jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
-                                session.commit();
-                                this.listOfParameters.remove(contextId);
+                                if (dbItemJobStreamHistory != null) {
+                                    session.beginTransaction();
+                                    dbItemJobStreamHistory.setRunning(false);
+                                    dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
+                                    jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
+                                    session.commit();
+                                    this.listOfParameters.remove(contextId);
+                                }
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                                 session.rollback();

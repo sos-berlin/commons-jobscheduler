@@ -163,7 +163,9 @@ public class JobStarter {
             for (Entry<String, String> param : jobStartOptions.getListOfParameters().entrySet()) {
                 NameValuePair nameValuePair = new NameValuePair();
                 nameValuePair.setName(param.getKey());
-                nameValuePair.setValue(param.getValue());
+                if (param.getValue() == null) {
+                    nameValuePair.setValue("");
+                }
                 params.add(nameValuePair);
             }
         }
