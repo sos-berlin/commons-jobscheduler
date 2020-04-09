@@ -49,10 +49,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     public SOSProviderOptions(boolean alternative, boolean source) {
         isAlternative = alternative;
-        isSource = source;
-
-        setRange();
-        setPrefix();
+        setIsSource(source);
     }
 
     @Override

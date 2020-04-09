@@ -2,39 +2,39 @@ package com.sos.vfs.common;
 
 public class SOSCommandResult {
 
-    private String _command;
-    private int _exitCode;
-    private StringBuilder _stdOut;
-    private StringBuilder _stdErr;
+    private String command;
+    private int exitCode;
+    private StringBuilder stdOut;
+    private StringBuilder stdErr;
 
     public SOSCommandResult(String cmd) {
-        _command = cmd;
-        _stdOut = new StringBuilder();
-        _stdErr = new StringBuilder();
+        command = cmd;
+        stdOut = new StringBuilder();
+        stdErr = new StringBuilder();
     }
 
     public int getExitCode() {
-        return _exitCode;
+        return exitCode;
     }
 
     public void setExitCode(int val) {
-        _exitCode = val;
+        exitCode = val;
     }
 
     public StringBuilder getStdOut() {
-        return _stdOut;
+        return stdOut;
     }
 
     public StringBuilder getStdErr() {
-        return _stdErr;
+        return stdErr;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[").append(_command).append("]");
-        sb.append("[exitCode=").append(_exitCode).append("]");
-        sb.append("[std:out=").append(_stdOut.toString().trim()).append("]");
-        sb.append("[std:err=").append(_stdErr.toString().trim()).append("]");
+        StringBuilder sb = new StringBuilder("[").append(command).append("]");
+        sb.append("[exitCode=").append(exitCode).append("]");
+        sb.append("[std:out=").append(stdOut.toString().trim()).append("]");
+        sb.append("[std:err=").append(stdErr.toString().trim()).append("]");
         return sb.toString();
     }
 }

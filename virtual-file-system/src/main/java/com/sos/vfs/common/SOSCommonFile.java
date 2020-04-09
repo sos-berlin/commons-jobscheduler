@@ -3,12 +3,11 @@ package com.sos.vfs.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.zip.ZipOutputStream;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSCommonFile extends SOSVFSMessageCodes implements ISOSProviderFile {
@@ -16,14 +15,9 @@ public abstract class SOSCommonFile extends SOSVFSMessageCodes implements ISOSPr
     private ISOSProvider provider = null;
     private InputStream inputStream = null;
     private OutputStream outputStream = null;
-    private ZipOutputStream entryOutputStream = null;
 
     private boolean modeAppend = false;  // Append Mode for output file
     private boolean modeRestart = false;
-
-    public SOSCommonFile() {
-        //
-    }
 
     public SOSCommonFile(final String name) {
         super(name);
@@ -43,6 +37,7 @@ public abstract class SOSCommonFile extends SOSVFSMessageCodes implements ISOSPr
         return inputStream;
     }
 
+    
     public void setInputStream(InputStream is) {
         inputStream = is;
     }
@@ -53,14 +48,6 @@ public abstract class SOSCommonFile extends SOSVFSMessageCodes implements ISOSPr
 
     public void setOutputStream(OutputStream os) {
         outputStream = os;
-    }
-
-    public ZipOutputStream getEntryOutputStream() {
-        return entryOutputStream;
-    }
-
-    public void setEntryOutputStream(ZipOutputStream os) {
-        entryOutputStream = os;
     }
 
     @Override
