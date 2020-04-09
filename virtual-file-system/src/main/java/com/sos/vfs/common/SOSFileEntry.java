@@ -12,11 +12,11 @@ public class SOSFileEntry {
     private static final String FOLDER = "Folder";
 
     private EntryType type;
+    private String parentPath;
     private String filename;
     private long filesize;
     private boolean directory;
-    private String parentPath;
-    //private long lastModified; last modified info is currently used only by YADE check steady state - get the current timestamp after an interval  
+    // private long lastModified; last modified info is currently used only by YADE check steady state - get the current timestamp after an interval
 
     public SOSFileEntry(final EntryType val) {
         type = val;
@@ -60,9 +60,8 @@ public class SOSFileEntry {
         } else {
             if (type.equals(EntryType.FILESYSTEM)) {
                 // TODO use nio
-                parentPath = new File(parent).getPath().replaceAll("\\\\", "/");
+                parentPath = SOSCommonProvider.normalizePath(new File(parent).getPath());
             } else {
-                // TODO not tested
                 parentPath = parent;
             }
         }
@@ -71,10 +70,8 @@ public class SOSFileEntry {
     public String getFullPath() {
         if (type.equals(EntryType.FILESYSTEM)) {
             // TODO use nio Path
-            String path = new File(parentPath, filename).getPath();
-            return path.replaceAll("\\\\", "/");
+            return SOSCommonProvider.normalizePath(new File(parentPath, filename).getPath());
         } else {
-            // TODO not tested
             if (parentPath == null) {
                 return filename;
             } else {
