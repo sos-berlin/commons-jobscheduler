@@ -501,15 +501,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         String stdErr = "";
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
-                ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName,true);
-                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
                 LOGGER.debug("tempFileName to delete: " + tempFileName);
                 String postCommandDelete = null;
                 if (objOptions.postCommandDelete.isDirty()) {
-                    postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tempFileName, tempFileName);
+                    postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tempFileName);
                 } else {
                     if (flgIsWindowsShell) {
-                        postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tempFileName, tempFileName);
+                        postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tempFileName);
                     } else {
                         postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tempFileName, tempFileName);
                     }
@@ -539,12 +537,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                     String postCommandDelete = null;
                     if (objOptions.postCommandDelete.isDirty()) {
-                        postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tmpFileName, tmpFileName);
+                        postCommandDelete = String.format(objOptions.postCommandDelete.getValue(), tmpFileName);
                     } else {
                         if (flgIsWindowsShell) {
-                            postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tmpFileName, tmpFileName);
+                            postCommandDelete = String.format(DEFAULT_WINDOWS_POST_COMMAND_DELETE, tmpFileName);
                         } else {
-                            postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tmpFileName, tmpFileName);
+                            postCommandDelete = String.format(DEFAULT_LINUX_POST_COMMAND_DELETE, tmpFileName);
                         }
                     }
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
