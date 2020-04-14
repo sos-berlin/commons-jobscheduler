@@ -21,7 +21,6 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
-import com.sos.joc.model.jobstreams.JobStreamStarter;
 
 public class JSJobStream {
 

@@ -29,6 +29,7 @@ import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamTaskContext;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
@@ -236,6 +237,15 @@ public class JSConditionResolver {
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
             jsJobStreams = new JSJobStreams();
             jsJobStreams.setListOfJobStreams(listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
+
+            sosHibernateSession.beginTransaction();
+            for (Map.Entry<Long, JSJobStreamStarter> entry:listOfJobStreamStarter.entrySet()) {
+                DBItemJobStreamStarter dbItemJobStreamStarter = entry.getValue().getItemJobStreamStarter();
+                entry.getValue().getNextStartFromList();
+                dbItemJobStreamStarter.setNextStart(entry.getValue().getNextStartFromList());
+                sosHibernateSession.update(dbItemJobStreamStarter);
+            }
+            sosHibernateSession.commit();
         }
 
         if (listOfHistoryIds == null) {

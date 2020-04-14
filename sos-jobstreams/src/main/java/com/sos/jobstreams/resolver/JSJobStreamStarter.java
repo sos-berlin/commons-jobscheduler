@@ -1,7 +1,9 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ import sos.xml.SOSXMLXPath;
 
 public class JSJobStreamStarter {
 
+    private static final String MAX_DATE = "01-01-2038";
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStreamStarter.class);
     private Map<String, String> listOfParameters;
     private DBItemJobStreamStarter itemJobStreamStarter;
@@ -64,7 +67,20 @@ public class JSJobStreamStarter {
         this.itemJobStreamStarter = itemJobStreamStarter;
         jobStreamScheduler = new JobStreamScheduler();
         if (this.getRunTime() != null) {
-            jobStreamScheduler.schedule(new Date(),new Date(),this.getRunTime(), true);
+            Date from = new Date();
+            Date to = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+            String max = MAX_DATE;
+            Date maxDate = formatter.parse(max);
+            Calendar c = Calendar.getInstance();
+            
+            do {
+                jobStreamScheduler.schedule(from, to, this.getRunTime(), true);
+                c.setTime(to);
+                c.add(Calendar.MONTH, 1);
+                from = to;
+                to = c.getTime(); 
+            } while (jobStreamScheduler.getListOfStartTimes().isEmpty() || to.after(maxDate));
         }
     }
 
@@ -83,7 +99,7 @@ public class JSJobStreamStarter {
             Date now = new Date();
             for (Long start : jobStreamScheduler.getListOfStartTimes()) {
                 if (start > now.getTime()) {
-                    return  new Date(start);
+                    return new Date(start);
                 }
             }
         }

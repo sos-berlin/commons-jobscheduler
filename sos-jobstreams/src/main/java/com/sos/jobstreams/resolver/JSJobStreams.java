@@ -20,7 +20,6 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
-import com.sos.joc.model.jobstreams.JobStreamStarter;
 
 public class JSJobStreams {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStreams.class);
@@ -65,7 +64,7 @@ public class JSJobStreams {
 
             
             addJobStream(jsStreamStream);
-        }
+         }
     }
 
     public Map<Long, JSJobStream> getListOfJobStreams() {
