@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import javax.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -105,11 +107,20 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     try {
                         if (sosHibernateSession != null) {
                             sosHibernateSession.beginTransaction();
+
+                            // Damit in der DB UTC landet.
+                            TimeZone tDefault = TimeZone.getDefault();
+                            TimeZone tUtc = TimeZone.getTimeZone("UTC");
+                            TimeZone.setDefault(tUtc);
+
+                            sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
                             dbItemJobStreamStarter.setNextStart(nextStarter.getNextStart());
                             sosHibernateSession.update(dbItemJobStreamStarter);
+                            TimeZone.setDefault(tDefault);
                             sosHibernateSession.commit();
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter.getItemJobStreamStarter().getId()));
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
+                                    .getItemJobStreamStarter().getId()));
 
                         }
                     } catch (SOSHibernateException e) {
