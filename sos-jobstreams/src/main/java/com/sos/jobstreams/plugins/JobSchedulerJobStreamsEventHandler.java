@@ -106,7 +106,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
                     try {
                         if (sosHibernateSession != null) {
-                            sosHibernateSession.beginTransaction();
 
                             // Damit in der DB UTC landet.
                             TimeZone tDefault = TimeZone.getDefault();
@@ -247,6 +246,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public void onActivate(Notifier notifier) {
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
+        LOGGER.debug("TimeZone: " + TimeZone.getDefault().getID());
 
         super.onActivate(notifier);
         String method = "onActivate";
