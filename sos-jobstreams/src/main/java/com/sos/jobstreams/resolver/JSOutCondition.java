@@ -21,6 +21,7 @@ import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 
 import sos.util.SOSString;
 
+ 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);

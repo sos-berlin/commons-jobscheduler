@@ -2,6 +2,7 @@ package com.sos.jobstreams.plugins;
 
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -237,7 +238,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
 
         super.onActivate(notifier);
-
         String method = "onActivate";
         session = Constants.getSession(periodBegin);
         SOSHibernateSession sosHibernateSession = null;

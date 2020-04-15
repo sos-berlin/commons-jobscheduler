@@ -30,6 +30,8 @@ import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 import sos.util.SOSString;
 
+ 
+
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);

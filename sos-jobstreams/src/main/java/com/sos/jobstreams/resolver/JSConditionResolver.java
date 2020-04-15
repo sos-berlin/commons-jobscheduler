@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.ibm.icu.util.GregorianCalendar;
+import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
@@ -239,12 +242,20 @@ public class JSConditionResolver {
             jsJobStreams.setListOfJobStreams(listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
 
             sosHibernateSession.beginTransaction();
-            for (Map.Entry<Long, JSJobStreamStarter> entry:listOfJobStreamStarter.entrySet()) {
+
+            //Damit in der DB UTC landet.
+            TimeZone tDefault = TimeZone.getDefault();
+            TimeZone tUtc = TimeZone.getTimeZone("UTC");
+            TimeZone.setDefault(tUtc);
+
+            for (Map.Entry<Long, JSJobStreamStarter> entry : listOfJobStreamStarter.entrySet()) {
                 DBItemJobStreamStarter dbItemJobStreamStarter = entry.getValue().getItemJobStreamStarter();
-                entry.getValue().getNextStartFromList();
-                dbItemJobStreamStarter.setNextStart(entry.getValue().getNextStartFromList());
+
+                dbItemJobStreamStarter.setNextStart(new Date(entry.getValue().getNextStartFromList().getTime()));
                 sosHibernateSession.update(dbItemJobStreamStarter);
             }
+            TimeZone.setDefault(tDefault);
+
             sosHibernateSession.commit();
         }
 

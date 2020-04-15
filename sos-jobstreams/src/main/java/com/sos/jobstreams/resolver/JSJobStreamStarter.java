@@ -69,7 +69,7 @@ public class JSJobStreamStarter {
         if (this.getRunTime() != null) {
             Date from = new Date();
             Date to = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             String max = MAX_DATE;
             Date maxDate = formatter.parse(max);
             Calendar c = Calendar.getInstance();
@@ -99,7 +99,7 @@ public class JSJobStreamStarter {
             Date now = new Date();
             for (Long start : jobStreamScheduler.getListOfStartTimes()) {
                 if (start > now.getTime()) {
-                    return new Date(start);
+                     return new Date(start);
                 }
             }
         }

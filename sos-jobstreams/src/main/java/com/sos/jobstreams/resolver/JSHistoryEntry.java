@@ -13,6 +13,7 @@ import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 
 import sos.util.SOSString;
 
+ 
 public class JSHistoryEntry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSHistoryEntry.class);
