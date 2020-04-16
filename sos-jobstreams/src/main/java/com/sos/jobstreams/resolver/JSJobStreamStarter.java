@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JobStreamScheduler;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
@@ -64,8 +65,9 @@ public class JSJobStreamStarter {
 
     public void setItemJobStreamStarter(DBItemJobStreamStarter itemJobStreamStarter) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, Exception {
+        LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
         this.itemJobStreamStarter = itemJobStreamStarter;
-        jobStreamScheduler = new JobStreamScheduler();
+        jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
         if (this.getRunTime() != null) {
             Date from = new Date();
             Date to = new Date();

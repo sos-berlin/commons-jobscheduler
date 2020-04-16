@@ -2,10 +2,8 @@ package com.sos.jobstreams.plugins;
 
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -29,8 +27,10 @@ import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
 import com.sos.jobstreams.classes.DurationCalculator;
@@ -45,6 +45,8 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -63,6 +65,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private String session;
     JSConditionResolver conditionResolver;
     private String periodBegin;
+ 
+    public static enum CustomEventType {
+        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, StartTime
+    }
+
+    public static enum CustomEventTypeValue {
+        incondition
+
+    }
 
     public void removeTimer() {
         if (isDebugEnabled) {
@@ -94,6 +105,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         nextJobStartTimer = new Timer();
         Long delay = -1L;
+        // Damit in der DB UTC landet.
+
         do {
             nextStarter = this.conditionResolver.getNextStarttime();
 
@@ -107,16 +120,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     try {
                         if (sosHibernateSession != null) {
 
-                            // Damit in der DB UTC landet.
-                            TimeZone tDefault = TimeZone.getDefault();
-                            TimeZone tUtc = TimeZone.getTimeZone("UTC");
-                            TimeZone.setDefault(tUtc);
-
+                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            dbItemJobStreamStarter.setNextStart(nextStarter.getNextStart());
-                            sosHibernateSession.update(dbItemJobStreamStarter);
-                            TimeZone.setDefault(tDefault);
+                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
                                     .getItemJobStreamStarter().getId()));
@@ -132,7 +140,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     LOGGER.info("negative delay");
                 }
             }
-        } while (delay < 0);
+        } while (delay < 0 || nextStarter == null);
+        if (nextStarter == null) {
+            LOGGER.info("no more start times found");
+        }
 
     }
 
@@ -164,7 +175,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
 
             try {
-                LOGGER.debug(nextStarter.getAllJobNames() + " at " + nextStarter.getNextStartFromList());
+                LOGGER.debug("Start of jobs ==>" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
                 startJobs(nextStarter);
                 resetNextJobStartTimer(sosHibernateSession);
 
@@ -221,15 +232,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    public static enum CustomEventType {
-        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, StartTime
-    }
-
-    public static enum CustomEventTypeValue {
-        incondition
-
-    }
-
     public JobSchedulerJobStreamsEventHandler() {
         super();
         addQueuedEvents = new QueuedEvents();
@@ -244,6 +246,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     @Override
     public void onActivate(Notifier notifier) {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
         LOGGER.debug("TimeZone: " + TimeZone.getDefault().getID());
@@ -265,7 +269,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver.init();
             this.resetGlobalEventsPollTimer();
             this.resetNextJobStartTimer(sosHibernateSession);
-
+ 
             LOGGER.debug("onActivate initEventHandler");
             LOGGER.debug("Session: " + this.session);
 
@@ -470,10 +474,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             conditionResolver.reInit();
                             this.resetGlobalEventsPollTimer();
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
-
                             resolveInConditions = true;
-
+                            resetNextJobStartTimer(sosHibernateSession);
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
                             break;
                         case "StartJobStream":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
@@ -491,8 +494,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "CalendarDeleted":
 
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            conditionResolver.reInit();
                             conditionResolver.reinitCalendarUsage();
+
                             this.resetGlobalEventsPollTimer();
+                            resetNextJobStartTimer(sosHibernateSession);
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
 
                             resolveInConditions = true;
                             break;
