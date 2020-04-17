@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.jobstreams.classes.JobStarter;
+import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -46,8 +47,13 @@ public class JSInConditionCommand {
 
     private String startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition) throws JocException, JAXBException  {
 
-        JobStarter jobStarter = new JobStarter();
-        String jobXml = jobStarter.buildJobStartXml(inCondition, getCommandParam());
+    	 JobStarter jobStarter = new JobStarter();
+         JobStarterOptions jobStartOptions = new JobStarterOptions();
+         jobStartOptions.setJob(inCondition.getNormalizedJob());
+         jobStartOptions.setJobStream(inCondition.getJobStream());
+         jobStartOptions.setNormalizedJob(inCondition.getNormalizedJob());
+         String jobXml = jobStarter.buildJobStartXml(jobStartOptions, getCommandParam());
+
         String answer = "";
         String job = inCondition.getNormalizedJob();
         String startedJob = "";
