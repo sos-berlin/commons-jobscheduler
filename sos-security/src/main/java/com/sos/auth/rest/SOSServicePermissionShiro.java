@@ -5,8 +5,8 @@ import java.util.Base64;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
-/*import javax.servlet.http.HttpServletRequest;
- * 
+/*
+ * import javax.servlet.http.HttpServletRequest;
  */
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -44,6 +44,8 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
 
+import sos.util.SOSSerializerUtil;
+
 @Path("/security")
 public class SOSServicePermissionShiro {
 
@@ -59,12 +61,10 @@ public class SOSServicePermissionShiro {
 
     private SOSShiroCurrentUser currentUser;
     private SOSlogin sosLogin;
-    
+
     @Context
     UriInfo uriInfo;
-    
- 
-    
+
     public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
@@ -101,8 +101,11 @@ public class SOSServicePermissionShiro {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
 
         try {
-
             String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, EMPTY_STRING);
+
+            SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
+
             sosWebserviceAuthenticationRecord.setAccessToken(accessToken);
 
             setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(),
@@ -150,6 +153,9 @@ public class SOSServicePermissionShiro {
 
             String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, EMPTY_STRING);
             sosWebserviceAuthenticationRecord.setAccessToken(accessToken);
+
+            SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+            sosPermissionsCreator.loginFromAccessToken(accessToken);
 
             setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(),
                     sosWebserviceAuthenticationRecord.getPassword());
@@ -219,27 +225,25 @@ public class SOSServicePermissionShiro {
             return JOCDefaultResponse.responseStatus200(s);
         }
     }
-    
-    
+
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse loginPost(@Context HttpServletRequest request, @HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
-        return  login(request, basicAuthorization, user, pwd);
+    public JOCDefaultResponse loginPost(@Context HttpServletRequest request, @HeaderParam("Authorization") String basicAuthorization,
+            @QueryParam("user") String user, @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
+        return login(request, basicAuthorization, user, pwd);
     }
 
-/*    @POST
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse loginPost( @HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException {
-        return login(basicAuthorization, user, pwd);
-    }
-  */  
-     
+    /*
+     * @POST
+     * @Path("/login")
+     * @Consumes(MediaType.APPLICATION_JSON)
+     * @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON }) public JOCDefaultResponse loginPost( @HeaderParam("Authorization") String
+     * basicAuthorization, @QueryParam("user") String user,
+     * @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException { return login(basicAuthorization, user, pwd); }
+     */
+
     private JOCDefaultResponse logout(String accessToken) {
 
         if (accessToken == null || accessToken.isEmpty()) {
@@ -410,7 +414,7 @@ public class SOSServicePermissionShiro {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-        SOSListOfPermissions sosListOfPermissions = new SOSListOfPermissions(currentUser,forUser);
+        SOSListOfPermissions sosListOfPermissions = new SOSListOfPermissions(currentUser, forUser);
         return sosListOfPermissions.getSosPermissionShiro();
 
     }
@@ -426,7 +430,6 @@ public class SOSServicePermissionShiro {
         return accessTokenFromQuery;
     }
 
- 
     private void createUser() throws Exception {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
             Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
@@ -453,6 +456,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
+        currentUser.getCurrentSubject().getSession().setAttribute("username_joc_permissions", SOSSerializerUtil.object2toString(sosPermissionJocCockpitMasters));
 
         currentUser.initFolders();
 
@@ -465,6 +469,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
+        currentUser.getCurrentSubject().getSession().setAttribute("username_command_permissions", SOSSerializerUtil.object2toString(sosPermissionCommandsMasters));
 
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
@@ -538,9 +543,10 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException, SOSHibernateException {
+    private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException,
+            SOSHibernateException {
         Globals.setServletBaseUri(uriInfo);
-        
+
         Globals.sosShiroProperties = new JocCockpitProperties();
         Globals.jocTimeZone = TimeZone.getDefault();
         Globals.setProperties();
@@ -568,10 +574,10 @@ public class SOSServicePermissionShiro {
             }
 
             currentUser.setAuthorization(basicAuthorization);
-            currentUser.setHttpServletRequest(request); 
-             
+            currentUser.setHttpServletRequest(request);
+
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
-            
+
             if (request != null) {
                 sosShiroCurrentUserAnswer.setCallerIpAddress(request.getRemoteAddr());
                 sosShiroCurrentUserAnswer.setCallerHostName(request.getRemoteHost());
