@@ -46,7 +46,8 @@ import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.scheduler.engine.eventbus.EventPublisher;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
@@ -140,7 +141,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     LOGGER.info("negative delay");
                 }
             }
-        } while (delay < 0 || nextStarter == null);
+        } while (delay < 0 && nextStarter != null);
         if (nextStarter == null) {
             LOGGER.info("no more start times found");
         }
@@ -259,18 +260,31 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         try {
             LOGGER.debug("onActivate createReportingFactory");
+            LOGGER.debug("onActivate openSession");
             createReportingFactory(getSettings().getHibernateConfigurationReporting());
-            Constants.settings = getSettings();
-            Constants.baseUrl = this.getBaseUrl();
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:onActivate");
+
+            if (getSettings().getTimezone() == null) {
+                getSettings().setTimezone(timeZoneFromInstances(sosHibernateSession));
+            }
+            Constants.settings = getSettings();
+            
+            Constants.baseUrl = this.getBaseUrl();
 
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
             conditionResolver.setWorkingDirectory(System.getProperty("user.dir"));
+            LOGGER.debug("onActivate init condition resolver");
             conditionResolver.init();
+            LOGGER.debug("onActivate reset timers");
             this.resetGlobalEventsPollTimer();
             this.resetNextJobStartTimer(sosHibernateSession);
  
             LOGGER.debug("onActivate initEventHandler");
+            
+            EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
+                    EventType.OrderFinished };
+            start(observedEventTypes);
+
             LOGGER.debug("Session: " + this.session);
 
         } catch (Exception e) {
@@ -282,10 +296,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 sosHibernateSession.close();
             }
         }
-
-        EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
-                EventType.OrderFinished };
-        start(observedEventTypes);
     }
 
     @Override
@@ -345,6 +355,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
+    private String timeZoneFromInstances(SOSHibernateSession sosHibernateSesssion) throws DBInvalidDataException, DBConnectionRefusedException {
+        InventoryInstancesDBLayer inventoryInstancesDBLayer = new InventoryInstancesDBLayer(sosHibernateSesssion);
+        
+        List<DBItemInventoryInstance> l = inventoryInstancesDBLayer.getInventoryInstancesBySchedulerId(getSettings().getSchedulerId());
+        if (l.size() > 0) {
+            return l.get(0).getTimeZone();
+        }else {
+            return "Europe/Berlin";
+        }
+    }
+    
     private void resolveInConditions() throws Exception {
         DurationCalculator duration = null;
         if (isDebugEnabled) {

@@ -512,7 +512,7 @@ public class JSConditionResolver {
                     jsEventKey.setSession(session);
                 } else {
                     String session = contextId.toString();
-                    LOGGER.debug("NOT Global: setting context to: " + session);
+                    LOGGER.debug("NOT Global: setting session to: " + session);
                     jsEventKey.setSession(session);
                 }
 
@@ -523,6 +523,15 @@ public class JSConditionResolver {
                 } else {
                     jsEventKey.setJobStream(jsCondition.getConditionJobStream());
                 }
+                
+                if (jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty()) {
+                    String session = eventDate.getEventDate(date);
+                    LOGGER.debug("Jobstream context: setting session to: " + session);
+                    jsEventKey.setSession(session);
+                }  
+
+                
+                
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
