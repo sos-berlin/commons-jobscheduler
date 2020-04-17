@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobchainnodeparameter.JobchainNodeConfiguration;
 import com.sos.jitl.jobstreams.Constants;
-import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.exceptions.JocException;
@@ -117,7 +116,7 @@ public class JobStarter {
         return parameters;
     }
 
-    private List<NameValuePair> getDefaultEnvVars(JSInCondition inCondition) {
+    private List<NameValuePair> getDefaultEnvVars(JobStarterOptions inCondition) {
 
         EnvVarCreator envVarCreator = new EnvVarCreator();
 
@@ -144,10 +143,10 @@ public class JobStarter {
         return getMapOfAttributes(commandParam);
     }
 
-    public String buildJobStartXml(JSInCondition inCondition, String commandParam) throws JocException, JAXBException {
-        JobV jobV = this.getJob(inCondition.getNormalizedJob());
+    public String buildJobStartXml(JobStarterOptions jobStartOptions, String commandParam) throws JocException, JAXBException {
+        JobV jobV = this.getJob(jobStartOptions.getNormalizedJob());
         XMLBuilder xml = new XMLBuilder("start_job");
-        xml.addAttribute("job", inCondition.getNormalizedJob());
+        xml.addAttribute("job", jobStartOptions.getNormalizedJob());
 
         Map<String, String> listOfAttributes = getMapOfAttributes(commandParam);
         if (listOfAttributes.get("force") == null) {
@@ -155,18 +154,36 @@ public class JobStarter {
         }
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
 
-        List<NameValuePair> envVars = getDefaultEnvVars(inCondition);
+        List<NameValuePair> envVars = getDefaultEnvVars(jobStartOptions);
         List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
+        if (jobStartOptions.getListOfParameters() != null) {
+            if (params == null) {
+                params = new ArrayList<NameValuePair>();
+            }
+            for (Entry<String, String> param : jobStartOptions.getListOfParameters().entrySet()) {
+                NameValuePair nameValuePair = new NameValuePair();
+                nameValuePair.setName(param.getKey());
+                if (param.getValue() == null) {
+                    nameValuePair.setValue("");
+                }
+                params.add(nameValuePair);
+            }
+        }
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
-        return xml.asXML();
+        String xmlString = xml.asXML();
+        xmlString =  xmlString.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+        return xmlString;
     }
 
     private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
         Element paramsElem = XMLBuilder.create("params");
         if (params != null) {
             for (NameValuePair param : params) {
-                paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                if (param.getValue() != null) {
+                    String value = param.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", value);
+                }
             }
         }
 
@@ -177,7 +194,14 @@ public class JobStarter {
         Element paramsElem = XMLBuilder.create("environment");
         if (envVars != null) {
             for (NameValuePair envVar : envVars) {
-                paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", envVar.getValue());
+                if (envVar.getValue() != null) {
+                    String value = envVar.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    try {
+                        paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", value);
+                    } catch (Exception e) {
+
+                    }
+                }
             }
         }
         return paramsElem;
