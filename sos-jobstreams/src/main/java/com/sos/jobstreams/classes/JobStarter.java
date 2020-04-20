@@ -165,6 +165,8 @@ public class JobStarter {
                 nameValuePair.setName(param.getKey());
                 if (param.getValue() == null) {
                     nameValuePair.setValue("");
+                }else {
+                    nameValuePair.setValue(param.getValue());
                 }
                 params.add(nameValuePair);
             }
