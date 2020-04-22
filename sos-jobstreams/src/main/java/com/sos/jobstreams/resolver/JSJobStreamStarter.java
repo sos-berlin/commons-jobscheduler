@@ -38,6 +38,7 @@ public class JSJobStreamStarter {
     private List<DBItemJobStreamStarterJob> listOfJobs;
     private JobStreamScheduler jobStreamScheduler;
     private String jobStreamName;
+    private Long lastStart;
 
     public Map<String, String> getListOfParameters() {
         return listOfParameters;
@@ -45,6 +46,7 @@ public class JSJobStreamStarter {
 
     public JSJobStreamStarter() {
         super();
+        lastStart = new Date().getTime();
         listOfParameters = new HashMap<String, String>();
     }
 
@@ -63,10 +65,7 @@ public class JSJobStreamStarter {
         this.listOfParameters = listOfParameters;
     }
 
-    public void setItemJobStreamStarter(DBItemJobStreamStarter itemJobStreamStarter) throws JsonParseException, JsonMappingException,
-            JsonProcessingException, IOException, Exception {
-        LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
-        this.itemJobStreamStarter = itemJobStreamStarter;
+    public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
         if (this.getRunTime() != null) {
             Date from = new Date();
@@ -75,15 +74,22 @@ public class JSJobStreamStarter {
             String max = MAX_DATE;
             Date maxDate = formatter.parse(max);
             Calendar c = Calendar.getInstance();
-            
+
             do {
                 jobStreamScheduler.schedule(from, to, this.getRunTime(), true);
                 c.setTime(to);
                 c.add(Calendar.MONTH, 1);
                 from = to;
-                to = c.getTime(); 
-            } while (jobStreamScheduler.getListOfStartTimes().isEmpty() || to.after(maxDate));
+                to = c.getTime();
+            } while (jobStreamScheduler.getListOfStartTimes().isEmpty() && to.before(maxDate));
         }
+    }
+
+    public void setItemJobStreamStarter(DBItemJobStreamStarter itemJobStreamStarter) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, Exception {
+        LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
+        this.itemJobStreamStarter = itemJobStreamStarter;
+        schedule();
     }
 
     public void setListOfParameters(List<DBItemJobStreamParameter> listOfJobStreamParameters) {
@@ -98,10 +104,9 @@ public class JSJobStreamStarter {
 
     public Date getNextStartFromList() {
         if (jobStreamScheduler.getListOfStartTimes() != null) {
-            Date now = new Date();
             for (Long start : jobStreamScheduler.getListOfStartTimes()) {
-                if (start > now.getTime()) {
-                     return new Date(start);
+                if (start > lastStart) {
+                    return new Date(start);
                 }
             }
         }
@@ -181,6 +186,10 @@ public class JSJobStreamStarter {
             result = result + dbItemJobStreamStarterJob.getJob() + ":";
         }
         return result;
+    }
+
+    public void setLastStart() {
+       lastStart = this.getNextStart().getTime();
     }
 
 }

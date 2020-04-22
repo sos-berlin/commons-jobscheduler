@@ -99,6 +99,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(e.toString()), e);
         }
+                
         return schedulerParameters;
     }
 
@@ -230,6 +231,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
+
         if (isNotNull(schedulerParameters)) {
             fillParameterSubstitutor();
             if (string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
@@ -238,12 +240,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
 
-            if (string2Modify.matches("(.*)%(.+)%(.*)")) {
+            if (string2Modify.contains("%")) {
                 parameterSubstitutor.setOpenTag("%");
                 parameterSubstitutor.setCloseTag("%");
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
-
         }
         return resultString;
     }

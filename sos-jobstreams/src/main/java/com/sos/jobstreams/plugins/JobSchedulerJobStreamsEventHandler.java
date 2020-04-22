@@ -66,7 +66,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private String session;
     JSConditionResolver conditionResolver;
     private String periodBegin;
- 
+
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, StartTime
     }
@@ -106,7 +106,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         nextJobStartTimer = new Timer();
         Long delay = -1L;
-        // Damit in der DB UTC landet.
 
         do {
             nextStarter = this.conditionResolver.getNextStarttime();
@@ -177,7 +176,31 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             try {
                 LOGGER.debug("Start of jobs ==>" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+                nextStarter.setLastStart();
+
                 startJobs(nextStarter);
+                if (nextStarter.getNextStartFromList() == null) {
+                    nextStarter.schedule();
+                    Long next = nextStarter.getNextStartFromList().getTime();
+                    Long now = new Date().getTime();
+                    Long delay = next - now;
+
+                    if (delay > 0) {
+                        LOGGER.debug("Recalculated next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+
+                        if (sosHibernateSession != null) {
+
+                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                            sosHibernateSession.beginTransaction();
+                            DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
+                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                            sosHibernateSession.commit();
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
+                                    .getItemJobStreamStarter().getId()));
+                        }
+                    }
+                }
                 resetNextJobStartTimer(sosHibernateSession);
 
             } catch (Exception e) {
@@ -189,7 +212,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     sosHibernateSession.close();
                 }
             }
-
         }
     }
 
@@ -268,7 +290,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 getSettings().setTimezone(timeZoneFromInstances(sosHibernateSession));
             }
             Constants.settings = getSettings();
-            
+
             Constants.baseUrl = this.getBaseUrl();
 
             conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
@@ -278,9 +300,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("onActivate reset timers");
             this.resetGlobalEventsPollTimer();
             this.resetNextJobStartTimer(sosHibernateSession);
- 
+
             LOGGER.debug("onActivate initEventHandler");
-            
+
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
                     EventType.OrderFinished };
             start(observedEventTypes);
@@ -357,15 +379,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private String timeZoneFromInstances(SOSHibernateSession sosHibernateSesssion) throws DBInvalidDataException, DBConnectionRefusedException {
         InventoryInstancesDBLayer inventoryInstancesDBLayer = new InventoryInstancesDBLayer(sosHibernateSesssion);
-        
+
         List<DBItemInventoryInstance> l = inventoryInstancesDBLayer.getInventoryInstancesBySchedulerId(getSettings().getSchedulerId());
         if (l.size() > 0) {
             return l.get(0).getTimeZone();
-        }else {
+        } else {
             return "Europe/Berlin";
         }
     }
-    
+
     private void resolveInConditions() throws Exception {
         DurationCalculator duration = null;
         if (isDebugEnabled) {
