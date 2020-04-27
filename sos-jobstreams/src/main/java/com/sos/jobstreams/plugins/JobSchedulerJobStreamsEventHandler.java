@@ -165,6 +165,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public class JobStartTask extends TimerTask {
 
+        private static final String ACTIVE = "active";
+
         public void run() {
 
             SOSHibernateSession sosHibernateSession = null;
@@ -178,7 +180,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.debug("Start of jobs ==>" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
                 nextStarter.setLastStart();
 
-                startJobs(nextStarter);
+                if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
+                    startJobs(nextStarter);
+                }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
                     Long next = nextStarter.getNextStartFromList().getTime();
