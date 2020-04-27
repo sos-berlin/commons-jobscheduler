@@ -240,10 +240,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
 
-            if (string2Modify.contains("%")) {
+            if (resultString.contains("%")) {
                 parameterSubstitutor.setOpenTag("%");
                 parameterSubstitutor.setCloseTag("%");
-                resultString = parameterSubstitutor.replace(string2Modify);
+                resultString = parameterSubstitutor.replace(resultString);
             }
         }
         return resultString;
