@@ -27,9 +27,11 @@ import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
+import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
@@ -559,42 +561,52 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
-                            JSEvent event = new JSEvent();
-                            event.setCreated(new Date());
-                            event.setEvent(customEvent.getEvent());
-                            event.setJobStream(customEvent.getJobStream());
-                            event.setSchedulerId(super.getSettings().getSchedulerId());
-                            event.setGlobalEvent(customEvent.isGlobalEvent());
-                            if (customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession(periodBegin));
+                            DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+                            filterJobStreamHistory.setContextId(customEvent.getSession());
+                            List<DBItemJobStreamHistory> l = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+                            if (l.size() <= 0) {
+                                LOGGER.warn("Could not add Event " + customEvent.getEvent() + " as session " + customEvent.getSession()
+                                        + " has not been found");
                             } else {
-                                event.setSession(customEvent.getSession());
-                            }
+                                JSEvent event = new JSEvent();
+                                event.setCreated(new Date());
+                                event.setEvent(customEvent.getEvent());
+                                event.setJobStream(customEvent.getJobStream());
+                                event.setSchedulerId(super.getSettings().getSchedulerId());
+                                event.setGlobalEvent(customEvent.isGlobalEvent());
+                                event.setJobStreamHistoryId(l.get(0).getId());
+                                if (customEvent.isGlobalEvent()) {
+                                    event.setSession(Constants.getSession(periodBegin));
+                                } else {
+                                    event.setSession(customEvent.getSession());
+                                }
 
-                            try {
-                                event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
-                            } catch (NumberFormatException e) {
-                                LOGGER.warn("could not add event " + event.getEvent() + ": NumberFormatException with -> " + event
-                                        .getOutConditionId());
-                            }
+                                try {
+                                    event.setOutConditionId(Long.valueOf(customEvent.getOutConditionId()));
+                                } catch (NumberFormatException e) {
+                                    LOGGER.warn("could not add event " + event.getEvent() + ": NumberFormatException with -> " + event
+                                            .getOutConditionId());
+                                }
 
-                            conditionResolver.addEvent(event);
-                            if (!customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession(periodBegin));
                                 conditionResolver.addEvent(event);
-                            }
+                                if (!customEvent.isGlobalEvent()) {
+                                    event.setSession(Constants.getSession(periodBegin));
+                                    conditionResolver.addEvent(event);
+                                }
 
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
-                            addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
-                            if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
-                                this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
-                                conditionResolver.reInitConsumedInConditions();
+                                publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), customEvent.getEvent());
+                                addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
+                                if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
+                                    this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
+                                    conditionResolver.reInitConsumedInConditions();
+                                }
                             }
 
                             break;
                         case "RemoveEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
-                            event = new JSEvent();
+                            JSEvent event = new JSEvent();
                             event.setCreated(new Date());
                             event.setEvent(customEvent.getEvent());
                             event.setJobStream(customEvent.getJobStream());

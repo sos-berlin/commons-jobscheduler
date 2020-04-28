@@ -40,7 +40,7 @@ public class JSEvents {
 
     public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
         for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
-            if (itemEvent != null && itemEvent.getDbItemEvent() != null) {
+            if (itemEvent != null && itemEvent.getDbItemEvent() != null && itemEvent.getDbItemOutCondition() != null) {
                 JSEvent jsEvent = new JSEvent();
                 jsEvent.setItemEvent(itemEvent.getDbItemEvent());
                 jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());

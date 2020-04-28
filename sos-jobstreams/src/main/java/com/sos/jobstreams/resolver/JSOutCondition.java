@@ -21,7 +21,6 @@ import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 
 import sos.util.SOSString;
 
- 
 public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSOutCondition.class);
@@ -69,8 +68,8 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
         return listOfOutConditionEvents;
     }
 
-    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, String context, DBItemJobStreamHistory historyEntry, JSEvents jsEvents, JSEvents jsNewEvents,
-            JSEvents jsRemoveEvents) throws SOSHibernateException {
+    public boolean storeOutConditionEvents(SOSHibernateSession sosHibernateSession, String session, DBItemJobStreamHistory historyEntry,
+            JSEvents jsEvents, JSEvents jsNewEvents, JSEvents jsRemoveEvents) throws SOSHibernateException {
         boolean dbChange = false;
         sosHibernateSession.setAutoCommit(false);
         for (JSOutConditionEvent outConditionEvent : this.getListOfOutConditionEvent()) {
@@ -83,35 +82,36 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             itemEvent.setJobStream(this.jobStream);
             itemEvent.setGlobalEvent(outConditionEvent.isGlobal());
             if (historyEntry != null) {
-            itemEvent.setJobStreamHistoryId(historyEntry.getId());
-            }else {
-                LOGGER.warn("unknown historyId for " + context);
+                itemEvent.setJobStreamHistoryId(historyEntry.getId());
+            } else {
+                LOGGER.warn("unknown historyId for " + session);
                 itemEvent.setJobStreamHistoryId(0L);
             }
 
-            itemEvent.setSession(context);
+            itemEvent.setSession(session);
             JSEvent event = new JSEvent();
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
-            LOGGER.trace("---> Add event: " + SOSString.toString(event));
 
             if (outConditionEvent.isCreateCommand()) {
+                LOGGER.trace("---> Add event: " + SOSString.toString(event));
+                itemEvent.setSession(session);
                 jsEvents.addEvent(event);
                 jsNewEvents.addEvent(event);
                 dbChange = !event.store(sosHibernateSession);
             } else {
                 if (outConditionEvent.isDeleteCommand()) {
                     JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
-                    EventDate eventDate = new EventDate();
                     event.setEvent(jsCondition.getEventName());
-                    event.setSession(eventDate.getEventDate(jsCondition.getConditionDate()));
+                    event.setSession(session);
                     if (jsCondition.getConditionJobStream() != "") {
                         event.setJobStream(jsCondition.getConditionJobStream());
                     }
+                    LOGGER.trace("---> Delete event: " + SOSString.toString(event));
                     jsEvents.removeEvent(event);
                     jsRemoveEvents.addEvent(event);
                     dbChange = !event.deleteEvent(sosHibernateSession);
-                }
+                 }
             }
         }
         return dbChange;
