@@ -18,6 +18,7 @@ public class JobStreamsPlugin extends LoopEventHandlerPlugin {
         setIdentifier("jobstreams");
 
         eventHandler = new JobSchedulerJobStreamsEventHandler(xmlCommandExecutor, eventBus);
+        eventHandler.setPeriodBegin(getJobSchedulerVariable("sos.jobstream_period_begin"));
         eventHandler.setIdentifier(getIdentifier());
     }
 
