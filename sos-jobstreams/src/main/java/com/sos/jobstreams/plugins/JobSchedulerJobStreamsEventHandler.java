@@ -67,7 +67,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private int waitInterval = 2;
     private String session;
     JSConditionResolver conditionResolver;
-    private String periodBegin;
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, StartTime
@@ -283,7 +282,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         super.onActivate(notifier);
         String method = "onActivate";
-        session = Constants.getSession(periodBegin);
+        session = Constants.getSession();
         SOSHibernateSession sosHibernateSession = null;
 
         try {
@@ -354,8 +353,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
 
-        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent.getJobPath(), Constants
-                .getSession(periodBegin));
+        boolean dbChange = conditionResolver.resolveOutConditions(taskEndEvent, getSettings().getSchedulerId(), taskEndEvent.getJobPath());
         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
         conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
 
@@ -472,9 +470,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 conditionResolver.setReportingSession(sosHibernateSession);
             }
 
-            if (!Constants.getSession(periodBegin).equals(this.session)) {
+            if (!Constants.getSession().equals(this.session)) {
                 try {
-                    this.session = Constants.getSession(periodBegin);
+                    this.session = Constants.getSession();
                     LOGGER.debug("Change session to: " + this.session);
                     conditionResolver.reInit();
 
@@ -577,7 +575,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 event.setGlobalEvent(customEvent.isGlobalEvent());
                                 event.setJobStreamHistoryId(l.get(0).getId());
                                 if (customEvent.isGlobalEvent()) {
-                                    event.setSession(Constants.getSession(periodBegin));
+                                    event.setSession(Constants.getSession());
                                 } else {
                                     event.setSession(customEvent.getSession());
                                 }
@@ -591,7 +589,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 conditionResolver.addEvent(event);
                                 if (!customEvent.isGlobalEvent()) {
-                                    event.setSession(Constants.getSession(periodBegin));
+                                    event.setSession(Constants.getSession());
                                     conditionResolver.addEvent(event);
                                 }
 
@@ -612,7 +610,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setJobStream(customEvent.getJobStream());
 
                             if (customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession(periodBegin));
+                                event.setSession(Constants.getSession());
                             } else {
                                 event.setSession(customEvent.getSession());
                             }
@@ -622,7 +620,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             conditionResolver.removeEvent(event);
                             if (!customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession(periodBegin));
+                                event.setSession(Constants.getSession());
                                 conditionResolver.removeEvent(event);
                             }
 
@@ -700,7 +698,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public void setPeriodBegin(String periodBegin) {
         LOGGER.debug("Period starts at: " + periodBegin);
-        this.periodBegin = periodBegin;
+        Constants.periodBegin = periodBegin;
     }
 
 }

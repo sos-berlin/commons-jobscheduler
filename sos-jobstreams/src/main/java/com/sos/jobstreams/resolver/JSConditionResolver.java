@@ -23,6 +23,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
@@ -654,10 +655,11 @@ public class JSConditionResolver {
 
     }
 
-    public boolean resolveOutConditions(TaskEndEvent taskEndEvent, String jobSchedulerId, String job, String defaultSession)
+    public boolean resolveOutConditions(TaskEndEvent taskEndEvent, String jobSchedulerId, String job)
             throws SOSHibernateException {
 
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
+        String defaultSession = Constants.getSession();
         boolean dbChange = false;
         UUID contextId = this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
         if (contextId == null) {
