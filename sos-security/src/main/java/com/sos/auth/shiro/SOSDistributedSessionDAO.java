@@ -22,12 +22,13 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSDistributedSessionDAO.class);
     private HashMap<String, String> serializedSessions;
 
-    private void putSerializedSession(String sessionId, String sessionString) {
-        if (serializedSessions == null) {
-            serializedSessions = new HashMap<String, String>();
-        }
-        serializedSessions.put(sessionId, sessionString);
-    }
+	private String getSessionId(Session session) {
+		if (session == null || session.getId() == null) {
+			return "";
+		} else {
+			session.setAttribute("dao", "true");
+			return session.getId().toString();
+		}
 
     private String getSessionId(Session session) {
         if (session == null || session.getId() == null) {
