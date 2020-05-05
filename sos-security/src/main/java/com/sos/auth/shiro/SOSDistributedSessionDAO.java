@@ -22,21 +22,20 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSDistributedSessionDAO.class);
     private HashMap<String, String> serializedSessions;
 
-	private String getSessionId(Session session) {
-		if (session == null || session.getId() == null) {
-			return "";
-		} else {
-			session.setAttribute("dao", "true");
-			return session.getId().toString();
-		}
+    private void putSerializedSession(String sessionId, String sessionString) {
+        if (serializedSessions == null) {
+            serializedSessions = new HashMap<String, String>();
+        }
+        serializedSessions.put(sessionId, sessionString);
+    }
 
     private String getSessionId(Session session) {
         if (session == null || session.getId() == null) {
             return "";
         } else {
+            session.setAttribute("dao", "true");
             return session.getId().toString();
         }
-
     }
 
     private void copySessionToDb(Serializable sessionId, String session) {
@@ -189,6 +188,8 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
             LOGGER.debug("SOSDistributedSessionDAO: session is empty");
             return null;
         }
-        return (Session) SOSSerializerUtil.fromString(session);
+        Session actSession = (Session) SOSSerializerUtil.fromString(session);
+        String s =  actSession.getAttribute("dao").toString();
+        return actSession;
     }
 }
