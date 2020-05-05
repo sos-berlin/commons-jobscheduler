@@ -33,7 +33,6 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
         if (session == null || session.getId() == null) {
             return "";
         } else {
-            session.setAttribute("dao", "true");
             return session.getId().toString();
         }
     }
@@ -124,6 +123,8 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
     @Override
     protected Serializable doCreate(Session session) {
         LOGGER.debug("SOSDistributedSessionDAO: doCreate Session ->" + getSessionId(session));
+        session.setAttribute("dao", "true");
+
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
         String sessionString = SOSSerializerUtil.object2toString(session);
@@ -188,8 +189,6 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
             LOGGER.debug("SOSDistributedSessionDAO: session is empty");
             return null;
         }
-        Session actSession = (Session) SOSSerializerUtil.fromString(session);
-        String s =  actSession.getAttribute("dao").toString();
-        return actSession;
+        return (Session) SOSSerializerUtil.fromString(session);
     }
 }
