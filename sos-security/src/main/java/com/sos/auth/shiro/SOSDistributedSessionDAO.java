@@ -32,6 +32,7 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 		if (session == null || session.getId() == null) {
 			return "";
 		} else {
+			session.setAttribute("dao", "true");
 			return session.getId().toString();
 		}
 
