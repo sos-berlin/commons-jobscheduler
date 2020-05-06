@@ -19,9 +19,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.mgt.SecurityManager;
+
 import org.apache.shiro.session.ExpiredSessionException;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,7 +270,18 @@ public class SOSServicePermissionShiro {
         try {
 
             if (currentUser == null || currentUser.getCurrentSubject() == null) {
-                comment = "Session time out";
+                try {
+                    Globals.sosShiroProperties = new JocCockpitProperties();
+                    Globals.setProperties();
+                    IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
+                    SecurityManager securityManager = factory.getInstance();
+                    SecurityUtils.setSecurityManager(securityManager);
+                    SessionKey s = new DefaultSessionKey(accessToken);
+                    Session session = SecurityUtils.getSecurityManager().getSession(s);
+                    session.stop();
+                } catch (Exception e) {
+                    throw new SessionNotExistException("Session doesn't exist");
+                }
                 throw new SessionNotExistException("Session doesn't exist");
             }
 
@@ -277,26 +295,21 @@ public class SOSServicePermissionShiro {
             comment = "Session time out: " + u.getMessage();
         }
 
-        if (currentUser != null && currentUser.getCurrentSubject() != null) {
-            JocAuditLog jocAuditLog = new JocAuditLog(user, "./logout");
-            SecurityAudit s = new SecurityAudit(comment);
-            jocAuditLog.logAuditMessage(s);
-            // jocAuditLog.storeAuditLogEntry(s);
-            try {
-
+        JocAuditLog jocAuditLog = new JocAuditLog(user, "./logout");
+        SecurityAudit s = new SecurityAudit(comment);
+        jocAuditLog.logAuditMessage(s);
+        try {
+            if (currentUser != null && currentUser.getCurrentSubject() != null) {
                 Globals.forceClosingHttpClients(currentUser, accessToken);
                 sosShiroSession.getTimeout();
                 sosShiroSession.stop();
-
-            } catch (Exception e) {
             }
-        } else {
-            LOGGER.warn(String.format("Unknown User --> Method: %s, access_token: %s", "logout", accessToken));
+
+        } catch (Exception e) {
         }
 
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(EMPTY_STRING);
         if (currentUser != null) {
-            sosShiroCurrentUserAnswer.setUser(UNKNOWN_USER);
             sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
         }
         sosShiroCurrentUserAnswer.setIsAuthenticated(false);
