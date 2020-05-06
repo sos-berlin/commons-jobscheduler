@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.jurr.jsch.bugfix111.JSCH111BugFix;
 import org.slf4j.Logger;
@@ -74,6 +75,7 @@ public class SOSSFTP extends SOSCommonProvider {
 
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private final static int DEFAULT_CONNECTION_TIMEOUT = 30_000; // 0,5 minutes
+    private static final Pattern HAS_WINDOWS_OPENSSH_DRIVER_LETTER_SPECIFIER = Pattern.compile("^/[a-zA-Z]:");
 
     private JSch secureChannel = null;
     private Session sshSession = null;
@@ -312,6 +314,9 @@ public class SOSSFTP extends SOSCommonProvider {
         entry.setFilesize(attrs.getSize());
         // entry.setLastModified(attrs.getMTime());
         entry.setParentPath(parentPath);
+        if (parentPath != null && hasWindowsOpenSSHDriverLetterSpecifier(parentPath)) {
+            entry.setFullPath("/" + entry.getFullPath());
+        }
         return entry;
     }
 
@@ -551,7 +556,7 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     @Override
-    public OutputStream getOutputStream(final String fileName, boolean append, boolean resume) {
+    public OutputStream getOutputStream(String fileName, boolean append, boolean resume) {
         try {
             int transferMode = ChannelSftp.OVERWRITE;
             if (append) {
@@ -1142,6 +1147,15 @@ public class SOSSFTP extends SOSCommonProvider {
             }
         }
         return result;
+    }
+
+    public static boolean hasWindowsOpenSSHDriverLetterSpecifier(String path) {
+        return HAS_WINDOWS_OPENSSH_DRIVER_LETTER_SPECIFIER.matcher(path).find();
+    }
+
+    @Override
+    public boolean isSFTP() {
+        return true;
     }
 
     public boolean isSimulateShell() {

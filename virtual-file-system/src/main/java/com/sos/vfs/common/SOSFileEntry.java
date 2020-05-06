@@ -13,6 +13,7 @@ public class SOSFileEntry {
 
     private EntryType type;
     private String parentPath;
+    private String fullPath;
     private String filename;
     private long filesize;
     private boolean directory;
@@ -67,18 +68,25 @@ public class SOSFileEntry {
         }
     }
 
+    public void setFullPath(String val) {
+        fullPath = val;
+    }
+
     public String getFullPath() {
-        if (type.equals(EntryType.FILESYSTEM)) {
-            // TODO use nio Path
-            return SOSCommonProvider.normalizePath(new File(parentPath, filename).getPath());
-        } else {
-            if (parentPath == null) {
-                return filename;
+        if (fullPath == null) {
+            if (type.equals(EntryType.FILESYSTEM)) {
+                // TODO use nio Path
+                fullPath = SOSCommonProvider.normalizePath(new File(parentPath, filename).getPath());
             } else {
-                String parent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
-                return parent + filename;
+                if (parentPath == null) {
+                    fullPath = filename;
+                } else {
+                    String parent = parentPath.endsWith("/") ? parentPath : parentPath + "/";
+                    fullPath = parent + filename;
+                }
             }
         }
+        return fullPath;
     }
 
     public boolean isDirUp() {

@@ -289,6 +289,11 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
         return null;
     }
 
+    @Override
+    public boolean isSFTP() {
+        return false;
+    }
+
     public SOSBaseOptions getBaseOptions() {
         return baseOptions;
     }

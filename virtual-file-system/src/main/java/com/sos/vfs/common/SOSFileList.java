@@ -245,10 +245,11 @@ public class SOSFileList extends SOSVFSMessageCodes {
         }
     }
 
-    public void logFileList() {
+    public void logGetListOperation() {
         if (fileListEntries != null && fileListEntries.size() > 0) {
             StringBuilder sb = new StringBuilder();
             for (SOSFileListEntry entry : fileListEntries) {
+                entry.setStatus(TransferStatus.transfer_skipped);
                 sb.append("\n");
                 sb.append(entry.getFileName4ResultList());
             }
