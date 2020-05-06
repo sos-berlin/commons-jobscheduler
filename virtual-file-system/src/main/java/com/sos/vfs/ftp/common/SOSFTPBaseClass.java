@@ -875,6 +875,11 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         return response.substring(4).trim();
     }
 
+    @Override
+    public boolean isSFTP() {
+        return false;
+    }
+
     public SOSOptionProxyProtocol getProxyProtocol() {
         return proxyProtocol;
     }

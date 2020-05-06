@@ -68,4 +68,6 @@ public interface ISOSProvider {
 
     public void executeCommand(String cmd, SOSEnv env) throws Exception;
 
+    public boolean isSFTP();
+
 }

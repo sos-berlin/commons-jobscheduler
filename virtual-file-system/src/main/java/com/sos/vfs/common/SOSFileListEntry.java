@@ -27,6 +27,7 @@ import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.options.SOSTransfer;
+import com.sos.vfs.sftp.SOSSFTP;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -180,7 +181,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     synchronized (this) {
                         if (parent.getBaseOptions().cumulateFiles.isTrue() && parent.getBaseOptions().cumulativeFileSeparator.isNotEmpty()) {
                             String fs = parent.getBaseOptions().cumulativeFileSeparator.getValue();
-                            fs = this.replaceVariables(fs) + System.getProperty("line.separator");
+                            fs = this.replaceVariables(fs, null) + System.getProperty("line.separator");
                             byte[] bytes = fs.getBytes();
                             cumulativeFileSeperatorLength = bytes.length;
                             Buffer compressedBytes = compress(bytes);
@@ -473,7 +474,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         executeCommands(commandOptionName, fileTransfer, optionCommands, optionCommandDelimiter, null);
     }
 
-    private void executeCommands(final String commandOptionName, final ISOSProvider fileTransfer, final SOSOptionString optionCommands,
+    private void executeCommands(final String commandOptionName, final ISOSProvider provider, final SOSOptionString optionCommands,
             final SOSOptionString optionCommandDelimiter, SOSEnv env) {
         String commands = optionCommands.getValue().trim();
         String fileName = "";
@@ -487,7 +488,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             }
         }
         if (commands.length() > 0) {
-            commands = replaceVariables(commands);
+            commands = replaceVariables(commands, provider);
             String delimiter = null;
             if (optionCommandDelimiter != null) {
                 delimiter = optionCommandDelimiter.getValue();
@@ -498,7 +499,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             if (delimiter.isEmpty()) {
                 try {
                     LOGGER.info(String.format("[%s][%s][%s]%s", transferNumber, commandOptionName, fileName, commands));
-                    fileTransfer.executeCommand(commands, env);
+                    provider.executeCommand(commands, env);
                 } catch (JobSchedulerException e) {
                     throw new JobSchedulerException(String.format("[%s][%s][%s][%s]", transferNumber, commandOptionName, fileName, commands), e);
                 } catch (Exception e) {
@@ -514,7 +515,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     if (command.length() > 0) {
                         try {
                             LOGGER.info(String.format("[%s][%s][%s]%s", transferNumber, commandOptionName, fileName, command));
-                            fileTransfer.executeCommand(command, env);
+                            provider.executeCommand(command, env);
                         } catch (JobSchedulerException e) {
                             throw new JobSchedulerException(String.format("[%s][%s][%s][%s]", transferNumber, commandOptionName, fileName, command),
                                     e);
@@ -674,10 +675,6 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return result;
     }
 
-    private String getFileNameWithoutPath(final String name) {
-        return new File(adjustFileSeparator(name)).getName();
-    }
-
     @Override
     public Long getFileSize() {
         return sourceFileSize;
@@ -711,11 +708,21 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return EMPTY_STRING;
     }
 
-    private String getPathWithoutFileName(final String fileName) {
+    private String getFileNameWithoutPath(final String name) {
+        return new File(adjustFileSeparator(name)).getName();
+    }
+
+    private String getPathWithoutFileName(final ISOSProvider provider, final String fileName) {
         File file = new File(adjustFileSeparator(fileName));
         String parent = file.getParent();
         if (parent == null) {
             parent = "./";
+        } else {
+            if (provider.isSFTP()) {
+                if (SOSSFTP.hasWindowsOpenSSHDriverLetterSpecifier(fileName)) {// e.g. /C:/tmp/file.txt
+                    parent = "/" + parent; // new File above removes the leading /
+                }
+            }
         }
         return adjustFileSeparator(parent);
     }
@@ -764,9 +771,10 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         } else {
             targetFileName = getFileNameWithoutPath(targetFileName);
             targetTransferFileName = targetFileName;
-            if (parent.getBaseOptions().replacing.isNotEmpty()) {
+            if (parent.getBaseOptions().getReplacing().isNotEmpty()) {
                 try {
-                    targetFileName = parent.getBaseOptions().replacing.doReplace(targetFileName, parent.getBaseOptions().replacement.getValue());
+                    targetFileName = parent.getBaseOptions().getReplacing().doReplace(targetFileName, parent.getBaseOptions().getReplacement()
+                            .getValue());
                 } catch (Exception e) {
                     throw new JobSchedulerException(SOSVfs_E_0150.get() + " " + e.toString(), e);
                 }
@@ -777,7 +785,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
         boolean recursive = parent.getBaseOptions().recursive.value() && !parent.getBaseOptions().oneOrMoreSingleFilesSpecified();
         if (recursive) {
-            String sourceDir = getPathWithoutFileName(sourceFile.getName());
+            String sourceDir = getPathWithoutFileName(parent.getSourceProvider(), sourceFile.getName());
             String sourceDirOrig = parent.getBaseOptions().sourceDir.getValue();
 
             if (!fileNamesAreEqual(sourceDir, sourceDirOrig, true) && sourceDir.length() > sourceDirOrig.length()) {
@@ -954,9 +962,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     private String makeFileNameReplacing(final String fileName) {
         String name = adjustFileSeparator(fileName);
-        String replacement = parent.getBaseOptions().replacement.getValue();
+        String replacement = parent.getBaseOptions().getReplacement().getValue();
         try {
-            name = parent.getBaseOptions().replacing.doReplace(name, replacement);
+            name = parent.getBaseOptions().getReplacing().doReplace(name, replacement);
         } catch (Exception e) {
             LOGGER.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
             throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
@@ -1069,46 +1077,52 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    private String replaceVariables(final String value) {
+    private String replaceVariables(final String value, final ISOSProvider provider) {
         if (isTraceEnabled) {
             LOGGER.trace(String.format("[%s][replaceVariables]%s", transferNumber, value));
         }
-        EntryPaths targetFile = new EntryPaths(parent.getBaseOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(parent
-                .getBaseOptions().targetDir.getValue(), targetFileName)));
-        EntryPaths targetTransferFile = new EntryPaths(parent.getBaseOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(parent
-                .getBaseOptions().targetDir.getValue(), targetTransferFileName)));
 
-        EntryPaths sourceFile = new EntryPaths(parent.getBaseOptions().sourceDir.getValue(), resolveDotsInPath(sourceFileName));
-        EntryPaths sourceFileRenamed = new EntryPaths(parent.getBaseOptions().sourceDir.getValue(), sourceFileNameRenamed);
+        if (provider != null) {
+            EntryPaths targetFile = new EntryPaths(provider, parent.getBaseOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(parent
+                    .getBaseOptions().targetDir.getValue(), targetFileName)));
+            EntryPaths targetTransferFile = new EntryPaths(provider, parent.getBaseOptions().targetDir.getValue(), resolveDotsInPath(makeFullPathName(
+                    parent.getBaseOptions().targetDir.getValue(), targetTransferFileName)));
 
-        Properties vars = parent.getBaseOptions().getTextProperties();
-        vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
-        vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
+            EntryPaths sourceFile = new EntryPaths(provider, parent.getBaseOptions().sourceDir.getValue(), resolveDotsInPath(sourceFileName));
+            EntryPaths sourceFileRenamed = new EntryPaths(provider, parent.getBaseOptions().sourceDir.getValue(), sourceFileNameRenamed);
 
-        vars.put("TargetFileFullName", targetFile.getFullName());
-        vars.put("TargetFileRelativeName", targetFile.getRelativeName());
-        vars.put("TargetFileBaseName", targetFile.getBaseName());
-        vars.put("TargetFileParentFullName", targetFile.getParentDirFullName());
-        vars.put("TargetFileParentBaseName", targetFile.getParentDirBaseName());
+            Properties vars = new Properties(); // parent.getBaseOptions().getTextProperties();
+            vars.put("TargetDirFullName", targetFile.getBaseDirFullName());
+            vars.put("SourceDirFullName", sourceFile.getBaseDirFullName());
 
-        vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
-        vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
-        vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
-        vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentDirFullName());
-        vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentDirBaseName());
+            vars.put("TargetFileFullName", targetFile.getFullName());
+            vars.put("TargetFileRelativeName", targetFile.getRelativeName());
+            vars.put("TargetFileBaseName", targetFile.getBaseName());
+            vars.put("TargetFileParentFullName", targetFile.getParentDirFullName());
+            vars.put("TargetFileParentBaseName", targetFile.getParentDirBaseName());
 
-        vars.put("SourceFileFullName", sourceFile.getFullName());
-        vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
-        vars.put("SourceFileBaseName", sourceFile.getBaseName());
-        vars.put("SourceFileParentFullName", sourceFile.getParentDirFullName());
-        vars.put("SourceFileParentBaseName", sourceFile.getParentDirBaseName());
+            vars.put("TargetTransferFileFullName", targetTransferFile.getFullName());
+            vars.put("TargetTransferFileRelativeName", targetTransferFile.getRelativeName());
+            vars.put("TargetTransferFileBaseName", targetTransferFile.getBaseName());
+            vars.put("TargetTransferFileParentFullName", targetTransferFile.getParentDirFullName());
+            vars.put("TargetTransferFileParentBaseName", targetTransferFile.getParentDirBaseName());
 
-        vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
-        vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
-        vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
-        vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentDirFullName());
-        vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentDirBaseName());
+            vars.put("SourceFileFullName", sourceFile.getFullName());
+            vars.put("SourceFileRelativeName", sourceFile.getRelativeName());
+            vars.put("SourceFileBaseName", sourceFile.getBaseName());
+            vars.put("SourceFileParentFullName", sourceFile.getParentDirFullName());
+            vars.put("SourceFileParentBaseName", sourceFile.getParentDirBaseName());
 
+            vars.put("SourceFileRenamedFullName", sourceFileRenamed.getFullName());
+            vars.put("SourceFileRenamedRelativeName", sourceFileRenamed.getRelativeName());
+            vars.put("SourceFileRenamedBaseName", sourceFileRenamed.getBaseName());
+            vars.put("SourceFileRenamedParentFullName", sourceFileRenamed.getParentDirFullName());
+            vars.put("SourceFileRenamedParentBaseName", sourceFileRenamed.getParentDirBaseName());
+            if (isTraceEnabled) {
+                LOGGER.trace(vars.toString());
+            }
+            parent.getBaseOptions().getTextProperties().putAll(vars);
+        }
         return parent.getBaseOptions().replaceVars(value);
     }
 
@@ -1157,7 +1171,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             }
 
             sourceTransferFileName = getFileNameWithoutPath(sourceTransferFileName);
-            String fileHandlerSourceFileName = makeFullPathName(getPathWithoutFileName(sourceFileName), sourceTransferFileName);
+            String fileHandlerSourceFileName = makeFullPathName(getPathWithoutFileName(parent.getSourceProvider(), sourceFileName),
+                    sourceTransferFileName);
             sourceTransferFile = parent.getSourceProvider().getFile(fileHandlerSourceFileName);
             if (transferStatus.equals(TransferStatus.ignoredDueToZerobyteConstraint)) {
                 String msg = String.format("[%s]%s", transferNumber, SOSVfs_D_0110.params(sourceFileName));
@@ -1183,7 +1198,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                         targetFile.setModificationDateTime(sourceFileModificationDateTime);
                     }
                 }
-                if ((parent.getBaseOptions().isAtomicTransfer() || parent.getBaseOptions().isReplaceReplacingInEffect()) && parent
+                if ((parent.getBaseOptions().isAtomicTransfer() || parent.getBaseOptions().getReplacing().isNotEmpty()) && parent
                         .getBaseOptions().transactional.isFalse()) {
                     renameTargetFile(targetFile);
                 }
@@ -1470,37 +1485,73 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         private String parentDirFullName = "";
         private String parentDirBaseName = "";
 
-        private EntryPaths(final String baseDirPath, final String filePath) {
+        private EntryPaths(final ISOSProvider provider, final String baseDirPath, final String filePath) {
             if (filePath != null) {
                 try {
-                    Path baseDir = SOSString.isEmpty(baseDirPath) ? null : Paths.get(baseDirPath);
-                    Path file = Paths.get(filePath);
-                    Path parentDir = file.getParent();
-
-                    if (parentDir != null) {
-                        parentDirFullName = parentDir.toString().replace('\\', '/');
-                        Path pdfn = parentDir.getFileName();
-                        if (pdfn != null) {
-                            parentDirBaseName = pdfn.toString();
-                        }
-                        if (baseDir == null) {
-                            baseDir = parentDir;
-                        }
-                    }
-
-                    fullName = file.toString().replace('\\', '/');
-                    baseName = file.getFileName().toString();
-
-                    if (baseDir == null) {
-                        relativeName = baseName;
+                    if (provider.isSFTP() && SOSSFTP.hasWindowsOpenSSHDriverLetterSpecifier(filePath)) {
+                        setForOpenSSHWindows(baseDirPath, filePath);
                     } else {
-                        baseDirFullName = baseDir.normalize().toString().replace('\\', '/');
-                        relativeName = baseDir.relativize(file).normalize().toString().replace('\\', '/');
+                        setFromPath(baseDirPath, filePath);
                     }
 
                 } catch (Exception e) {
                     LOGGER.warn(String.format("[%s]error on resolve path for baseDirPath=%s, filePath=%s", transferNumber, baseDirPath, filePath), e);
                 }
+            }
+        }
+
+        private void setFromPath(final String baseDirPath, final String filePath) throws Exception {
+            Path baseDir = SOSString.isEmpty(baseDirPath) ? null : Paths.get(baseDirPath);
+            Path file = Paths.get(filePath);
+            Path parentDir = file.getParent();
+
+            if (parentDir != null) {
+                parentDirFullName = parentDir.toString().replace('\\', '/');
+                Path pdfn = parentDir.getFileName();
+                if (pdfn != null) {
+                    parentDirBaseName = pdfn.toString();
+                }
+                if (baseDir == null) {
+                    baseDir = parentDir;
+                }
+            }
+
+            fullName = file.toString().replace('\\', '/');
+            baseName = file.getFileName().toString();
+
+            if (baseDir == null) {
+                relativeName = baseName;
+            } else {
+                baseDirFullName = baseDir.normalize().toString().replace('\\', '/');
+                relativeName = baseDir.relativize(file).normalize().toString().replace('\\', '/');
+            }
+        }
+
+        private void setForOpenSSHWindows(final String baseDirPath, final String filePath) throws Exception {
+            File baseDir = SOSString.isEmpty(baseDirPath) ? null : new File(baseDirPath);
+            File file = new File(filePath);
+            File parentDir = file.getParentFile();
+
+            if (parentDir != null) {
+                parentDirFullName = "/" + parentDir.toString().replace('\\', '/');
+                String pdfn = parentDir.getName();
+                if (pdfn != null) {
+                    parentDirBaseName = pdfn;
+                }
+                if (baseDir == null) {
+                    baseDir = parentDir;
+                }
+            }
+
+            fullName = "/" + file.toString().replace('\\', '/');
+            baseName = file.getName().toString();
+
+            if (baseDir == null) {
+                relativeName = baseName;
+            } else {
+                baseDirFullName = "/" + baseDir.getCanonicalPath().replace('\\', '/');
+                relativeName = baseName;
+                // relativeName = baseDir.relativize(file).normalize().toString().replace('\\', '/');
             }
         }
 

@@ -17,6 +17,8 @@ import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionRegExp;
+import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
@@ -669,8 +671,28 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return transfer;
     }
 
-    public boolean isReplaceReplacingInEffect() {
-        return this.replacing.isNotEmpty();
+    public SOSOptionRegExp getReplacing() {
+        SOSOptionRegExp option = super.replacing;
+        try {
+            if (getTarget().replacing.isDirty()) {
+                option = getTarget().replacing;
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return option;
+    }
+
+    public SOSOptionString getReplacement() {
+        SOSOptionString option = super.replacement;
+        try {
+            if (getTarget().replacement.isDirty()) {
+                option = getTarget().replacement;
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return option;
     }
 
     public SOSProviderOptions getSource() throws Exception {
