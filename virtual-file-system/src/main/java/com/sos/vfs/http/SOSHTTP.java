@@ -143,6 +143,14 @@ public class SOSHTTP extends SOSCommonProvider {
         return false;
     }
 
+    @Override
+    public boolean directoryExists(final String path) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", path));
+        }
+        return isDirectory(path);
+    }
+
     private void doLogin(final String user, final String password) throws Exception {
         LOGGER.debug(SOSVfs_D_132.params(user));
         if (!SOSString.isEmpty(user)) {

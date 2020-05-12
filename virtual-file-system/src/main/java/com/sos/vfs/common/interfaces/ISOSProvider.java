@@ -52,6 +52,8 @@ public interface ISOSProvider {
 
     public boolean fileExists(final String path);
 
+    public boolean directoryExists(final String path);
+
     public long getFileSize(String path);
 
     public String getModificationDateTime(String path);

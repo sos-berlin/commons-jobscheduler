@@ -416,6 +416,14 @@ public class SOSWebDAV extends SOSCommonProvider {
         }
     }
 
+    @Override
+    public boolean directoryExists(final String filename) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", filename));
+        }
+        return isDirectory(filename);
+    }
+
     private WebdavResource getResource(final String path) throws Exception {
         return getResource(path, true);
     }

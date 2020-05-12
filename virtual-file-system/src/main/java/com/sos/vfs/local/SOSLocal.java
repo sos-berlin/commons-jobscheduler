@@ -182,6 +182,20 @@ public class SOSLocal extends SOSCommonProvider {
     }
 
     @Override
+    public boolean directoryExists(final String fileName) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", fileName));
+        }
+        File f = new File(fileName);
+        return f.isDirectory() && f.exists();
+    }
+
+    @Override
+    public boolean fileExists(final String fileName) {
+        return new File(fileName).exists();
+    }
+
+    @Override
     public void mkdir(final String pathname) throws IOException {
         File dir = new File(pathname);
         if (!dir.exists()) {

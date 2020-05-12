@@ -42,6 +42,11 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
     }
 
     @Override
+    public boolean directoryExists() throws Exception {
+        return super.exists();
+    }
+    
+    @Override
     public boolean delete(boolean checkIsDirectory) {
         super.delete();
         return true;

@@ -171,6 +171,14 @@ public class SOSSMB extends SOSCommonProvider {
     }
 
     @Override
+    public boolean directoryExists(String filename) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", filename));
+        }
+        return isDirectory(filename);
+    }
+
+    @Override
     public long size(final String path) throws Exception {
         long size = -1;
         SmbFile smbFile = null;
