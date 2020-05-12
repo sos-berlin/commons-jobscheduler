@@ -2,6 +2,7 @@ package com.sos.auth.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
