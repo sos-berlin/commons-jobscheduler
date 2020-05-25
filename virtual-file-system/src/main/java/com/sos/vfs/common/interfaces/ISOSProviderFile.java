@@ -16,6 +16,8 @@ public interface ISOSProviderFile {
 
     public boolean fileExists() throws Exception;
 
+    public boolean directoryExists() throws Exception;
+
     public String getName();
 
     public long getFileSize();

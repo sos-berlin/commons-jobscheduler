@@ -248,6 +248,14 @@ public class SOSSFTP extends SOSCommonProvider {
     }
 
     @Override
+    public boolean directoryExists(final String filename) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", filename));
+        }
+        return isDirectory(filename);
+    }
+
+    @Override
     public boolean isDirectory(final String filename) {
         boolean result = false;
         SftpATTRS attributes = getAttributes(filename);

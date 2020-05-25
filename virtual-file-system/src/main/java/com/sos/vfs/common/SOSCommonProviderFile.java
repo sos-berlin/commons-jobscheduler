@@ -35,6 +35,13 @@ public class SOSCommonProviderFile extends SOSCommonFile {
     }
 
     @Override
+    public boolean directoryExists() {
+        boolean result = getProvider().directoryExists(fileName);
+        LOGGER.debug(String.format("[%s]%s", fileName, result));
+        return result;
+    }
+
+    @Override
     public boolean delete(boolean checkIsDirectory) {
         try {
             getProvider().delete(fileName, checkIsDirectory);

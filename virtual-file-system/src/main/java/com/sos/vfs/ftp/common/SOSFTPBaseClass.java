@@ -528,6 +528,14 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     @Override
+    public boolean directoryExists(final String fileName) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", fileName));
+        }
+        return isDirectory(fileName);
+    }
+
+    @Override
     public boolean fileExists(String fileName) {
         boolean result = false;
         if (getFileSize(fileName) >= 0) {

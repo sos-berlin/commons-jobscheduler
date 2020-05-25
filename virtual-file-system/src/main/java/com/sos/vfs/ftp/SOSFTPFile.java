@@ -46,6 +46,15 @@ public class SOSFTPFile extends SOSCommonFile {
     }
 
     @Override
+    public boolean directoryExists() {
+        boolean result = getProvider().directoryExists(fileName);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(String.format("[%s]fileExists=%s", fileName, result));
+        }
+        return result;
+    }
+
+    @Override
     public boolean delete(boolean chekIsDirectory) {
         try {
             getProvider().delete(fileName, chekIsDirectory);
