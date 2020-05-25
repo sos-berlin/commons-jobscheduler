@@ -284,6 +284,12 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     }
 
     @Override
+    public boolean directoryExists(final String filename) {
+        LOGGER.info("not implemented yet");
+        return false;
+    }
+
+    @Override
     public String getModificationDateTime(final String fileName) {
         LOGGER.info("not implemented yet");
         return null;
