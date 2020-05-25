@@ -115,10 +115,18 @@ public class SOSShell extends SOSVFSMessageCodes implements Runnable {
         stdErr = bytStdErr.toString(CHARACTER_ENCODING);
         String cmd = pb.command().get(pb.command().size() - 1);
         if (!SOSString.isEmpty(stdOut)) {
-            LOGGER.info(String.format("[%s][stdout]%s", cmd, stdOut.trim()));
+            if (showCommand) {
+                LOGGER.info(String.format("[%s][stdout]%s", cmd, stdOut.trim()));
+            } else {
+                LOGGER.info(String.format("[%s][stdout]%s", "***", stdOut.trim()));
+            }
         }
         if (!SOSString.isEmpty(stdErr)) {
-            LOGGER.info(String.format("[%s][stderr]%s", cmd, stdErr.trim()));
+            if (showCommand) {
+                LOGGER.info(String.format("[%s][stderr]%s", cmd, stdErr.trim()));
+            } else {
+                LOGGER.info(String.format("[%s][stderr]%s", "***", stdErr.trim()));
+            }
         }
         return exitValue;
     }
