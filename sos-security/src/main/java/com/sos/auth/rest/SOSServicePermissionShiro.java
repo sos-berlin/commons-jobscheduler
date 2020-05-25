@@ -2,6 +2,7 @@ package com.sos.auth.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +24,13 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
-
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionCommandsMasters;
@@ -39,18 +41,20 @@ import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.classes.audit.SecurityAudit;
+import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocAuthenticationException;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import sos.util.SOSSerializerUtil;
 
@@ -60,12 +64,12 @@ public class SOSServicePermissionShiro {
     private static final String ACCESS_TOKEN = "access_token";
     private static final String X_ACCESS_TOKEN = "X-Access-Token";
     private static final String UTC = "UTC";
-    private static final String UNKNOWN_USER = "*Unknown User*";
     private static final String EMPTY_STRING = "";
     private static final String USER_IS_NULL = "user is null";
     private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization header with basic based64part expected";
     private static final String ACCESS_TOKEN_EXPECTED = "Access token header expected";
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSPermissionsCreator.class);
+	private static final String SHIRO_SESSION = "SHIRO_SESSION";
 
     private SOSShiroCurrentUser currentUser;
     private SOSlogin sosLogin;
@@ -243,15 +247,37 @@ public class SOSServicePermissionShiro {
         return login(request, basicAuthorization, user, pwd);
     }
 
-    /*
-     * @POST
-     * @Path("/login")
-     * @Consumes(MediaType.APPLICATION_JSON)
-     * @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON }) public JOCDefaultResponse loginPost( @HeaderParam("Authorization") String
-     * basicAuthorization, @QueryParam("user") String user,
-     * @QueryParam("pwd") String pwd) throws JocException, SOSHibernateException { return login(basicAuthorization, user, pwd); }
-     */
+    
+    private void removeTimeOutSessions() throws SOSHibernateException, JocConfigurationException, DBOpenSessionException {
+        SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Logout");
 
+        try {
+            sosHibernateSession.beginTransaction();
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+            jocConfigurationDBLayer.getFilter().setAccount(".");
+            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+
+            IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
+            SecurityManager securityManager = factory.getInstance();
+            SecurityUtils.setSecurityManager(securityManager);
+
+            for (JocConfigurationDbItem jocConfigurationDbItem : listOfConfigurtions) {
+                SessionKey s = new DefaultSessionKey(jocConfigurationDbItem.getName());
+                try {
+                    SecurityUtils.getSecurityManager().getSession(s);
+                } catch (ExpiredSessionException e) {
+                    LOGGER.debug("Session " + jocConfigurationDbItem.getName() + " removed");
+                }
+            }
+            sosHibernateSession.commit();
+
+        } finally {
+            sosHibernateSession.rollback();
+            sosHibernateSession.close();
+        }
+    }
+    
     private JOCDefaultResponse logout(String accessToken) {
 
         if (accessToken == null || accessToken.isEmpty()) {
@@ -319,6 +345,12 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
             Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+        }
+        
+        try {
+            this.removeTimeOutSessions();
+        } catch (SOSHibernateException | JocConfigurationException | DBOpenSessionException e) {
+            LOGGER.warn("Could not remove old session " + e.getMessage());
         }
 
         return JOCDefaultResponse.responseStatus200(sosShiroCurrentUserAnswer);
