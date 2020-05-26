@@ -184,7 +184,9 @@ public class SOSHTTP extends SOSCommonProvider {
                 HostConfiguration hc = new HostConfiguration();
                 if (host.toLowerCase().startsWith("https://") || host.toLowerCase().startsWith("http://")) {
                     URL url = new URL(host);
-                    port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+                    if (url.getPort() != -1) {
+                        port = url.getPort();
+                    }
                     host = url.getHost();
                     String _rootUrl = url.getProtocol() + "://" + host + ":" + port + url.getPath();
                     if (!url.getPath().endsWith("/")) {
