@@ -49,6 +49,7 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.classes.audit.SecurityAudit;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.DBOpenSessionException;
 import com.sos.joc.exceptions.JocAuthenticationException;
 import com.sos.joc.exceptions.JocConfigurationException;
@@ -254,9 +255,11 @@ public class SOSServicePermissionShiro {
         try {
             sosHibernateSession.beginTransaction();
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+
+            filter.setAccount(".");
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
 
             IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
             SecurityManager securityManager = factory.getInstance();

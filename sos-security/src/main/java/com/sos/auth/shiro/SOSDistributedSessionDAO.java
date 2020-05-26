@@ -8,6 +8,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.JocException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +49,12 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
             JocConfigurationDbItem jocConfigurationDbItem;
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+
+            filter.setAccount(".");
+            filter.setName(sessionId.toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
             if (listOfConfigurtions.size() > 0) {
                 jocConfigurationDbItem = listOfConfigurtions.get(0);
             } else {
@@ -97,10 +100,11 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
 
             JocConfigurationDbItem jocConfigurationDbItem;
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+            filter.setAccount(".");
+            filter.setName(sessionId.toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
             Globals.commit(sosHibernateSession);
             sosHibernateSession.close();
 
@@ -155,10 +159,12 @@ public class SOSDistributedSessionDAO extends CachingSessionDAO {
             sosHibernateSession.setAutoCommit(false);
             Globals.beginTransaction(sosHibernateSession);
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-            jocConfigurationDBLayer.getFilter().setAccount(".");
-            jocConfigurationDBLayer.getFilter().setName(session.getId().toString());
-            jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-            jocConfigurationDBLayer.delete();
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+
+            filter.setAccount(".");
+            filter.setName(session.getId().toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            jocConfigurationDBLayer.delete(filter);
             putSerializedSession(session.getId().toString(), null);
             Globals.commit(sosHibernateSession);
             sosHibernateSession.close();
