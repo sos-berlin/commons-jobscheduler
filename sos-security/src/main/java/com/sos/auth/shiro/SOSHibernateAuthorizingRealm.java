@@ -16,21 +16,17 @@ import org.apache.shiro.subject.PrincipalCollection;
 
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 
 public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizingRealm.class);
-    private String hibernateConfigurationFile;
     private ISOSAuthorizing authorizing;
     private UsernamePasswordToken authToken;
 
-    public void setHibernateConfigurationFile(String filename) {
-        this.hibernateConfigurationFile = filename;
-    }
-
     public boolean supports(AuthenticationToken token) {
         SOSHibernateAuthorizing authorizing = new SOSHibernateAuthorizing();
-        authorizing.setConfigurationFileName(hibernateConfigurationFile);
         setAuthorizing(authorizing);
         return true;
     }
@@ -64,11 +60,18 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
         authToken = (UsernamePasswordToken) authcToken;
         SOSUserDBLayer sosUserDBLayer;
+        SOSHibernateSession sosHibernateSession = null;
+
         try {
-            sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SimpleAuthorizationInfo");
+            sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
         } catch (Exception e1) {
             e1.printStackTrace();
             return null;
+        }finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
         sosUserDBLayer.getFilter().setUserName(authToken.getUsername());
         List<SOSUserDBItem> sosUserList = null;

@@ -11,16 +11,15 @@ import com.sos.auth.shiro.db.SOSUser2RoleDBItem;
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
 import com.sos.auth.shiro.db.SOSUserPermissionDBItem;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 
 public class SOSHibernateAuthorizing implements ISOSAuthorizing {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizing.class);
     private SimpleAuthorizationInfo authorizationInfo = null;
-    private String configurationFileName = null;
-
-    public void setConfigurationFileName(String filename) {
-        this.configurationFileName = filename;
-    }
+ 
+ 
 
     @Override
     public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection)  {
@@ -32,11 +31,18 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         }
         String userName = (String) principalCollection.getPrimaryPrincipal();
         SOSUserDBLayer sosUserDBLayer;
+        SOSHibernateSession sosHibernateSession = null;
+
         try {
-            sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SimpleAuthorizationInfo");
+            sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
         } catch (Exception e1) {
              e1.printStackTrace();
              return null;
+        }finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
         sosUserDBLayer.getFilter().setUserName(userName);
         List<SOSUserDBItem> sosUserList = null;
@@ -65,13 +71,18 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         }
         String userName = (String) principalCollection.getPrimaryPrincipal();
         SOSUserDBLayer sosUserDBLayer;
+        SOSHibernateSession sosHibernateSession = null;
         try {
-            sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SimpleAuthorizationInfo");
+            sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
         } catch (Exception e1) {
             e1.printStackTrace();
             return null;
-        }
-        sosUserDBLayer.getFilter().setUserName(userName);
+        }finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
+        }       sosUserDBLayer.getFilter().setUserName(userName);
         List<SOSUserDBItem> sosUserList = null;
         try {
             sosUserList = sosUserDBLayer.getSOSUserList(0);
