@@ -336,28 +336,17 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     @Override
     public void commandLineArgs(final String[] args) {
         super.commandLineArgs(args);
-        this.setAllOptions(super.getSettings());
-        boolean found = false;
-        for (int i = 0; i < args.length; i++) {
-            String strParam = args[i];
-            if (strParam.toLowerCase().startsWith("-settings")) {
-                args[i] = "-ignored=ignored";
-                found = true;
-            }
-        }
-        if (found) {
-            super.commandLineArgs(args);
-        }
-    }
-
-    @Override
-    public void commandLineArgs(final String args) {
-        try {
-            commandLineArgs(args.split(" "));
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
-            throw new JobSchedulerException(SOSVFSMessageCodes.SOSVfs_E_153.params("command lines args"), e);
-        }
+        // boolean found = false;
+        // for (int i = 0; i < args.length; i++) {
+        // String strParam = args[i];
+        // if (strParam.toLowerCase().startsWith("-settings")) {
+        // args[i] = "-ignored=ignored";
+        // found = true;
+        // }
+        // }
+        // if (found) {
+        // super.commandLineArgs(args);
+        // }
     }
 
     public void setOptions(HashMap<String, String> map) {
