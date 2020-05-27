@@ -450,8 +450,8 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionBoolean jumpStrictHostkeyChecking = new SOSOptionBoolean(this, CLASS_NAME + ".jump_strict_hostkey_checking",
             "Check the hostkey against known hosts for SSH", "false", "false", false);
 
-    @JSOptionDefinition(name = "jump_platform", description = "This parameter specifies the platform on the jump host", key = "jump_dir", type = "SOSOptionPlatform", mandatory = false)
-    public SOSOptionPlatform jumpPlatform = new SOSOptionPlatform(this, CLASS_NAME + ".jump_platform",
+    @JSOptionDefinition(name = "jump_platform", description = "This parameter specifies the platform on the jump host", key = "jump_platform", type = "SOSOptionPlatform", mandatory = false)
+    public SOSOptionPlatform jump_platform = new SOSOptionPlatform(this, CLASS_NAME + ".jump_platform",
             "This parameter specifies the platform on the jump host", SOSOptionPlatform.enuValidPlatforms.unix.name(),
             SOSOptionPlatform.enuValidPlatforms.unix.name(), false);
 
