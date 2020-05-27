@@ -34,7 +34,6 @@
 		</profile>
 	</profiles>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>com.sos-berlin.joc</groupId>
@@ -47,16 +46,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+        
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.sos-berlin.jobscheduler.engine</groupId>
 			<artifactId>engine-kernel</artifactId>
+            <version>${sos.engine.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
