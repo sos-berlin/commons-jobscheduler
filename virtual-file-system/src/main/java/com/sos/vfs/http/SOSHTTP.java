@@ -470,6 +470,11 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     @Override
+    public void mkdir(final String pathname) throws IOException {
+        // LOGGER.info("not implemented yet");
+    }
+
+    @Override
     public long size(final String path) throws Exception {
         if (fileSizes.containsKey(path)) {
             return fileSizes.get(path);

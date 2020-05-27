@@ -333,22 +333,6 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         }
     }
 
-    @Override
-    public void commandLineArgs(final String[] args) {
-        super.commandLineArgs(args);
-        // boolean found = false;
-        // for (int i = 0; i < args.length; i++) {
-        // String strParam = args[i];
-        // if (strParam.toLowerCase().startsWith("-settings")) {
-        // args[i] = "-ignored=ignored";
-        // found = true;
-        // }
-        // }
-        // if (found) {
-        // super.commandLineArgs(args);
-        // }
-    }
-
     public void setOptions(HashMap<String, String> map) {
         super.setAllOptions(map);
         setChildClasses(map);
