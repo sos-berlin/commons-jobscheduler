@@ -384,10 +384,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public boolean spooler_process_before() throws Exception {
         setLogger();
-        spoolerProcess = new SpoolerProcess(spooler_job);
-        if (spooler_task != null) {
-            spoolerProcess.setOrder(spooler_task.order());
-        }
         return true;
     }
 
