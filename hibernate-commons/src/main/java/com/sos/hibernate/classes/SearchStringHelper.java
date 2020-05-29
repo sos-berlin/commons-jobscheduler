@@ -1,7 +1,7 @@
 package com.sos.hibernate.classes;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class SearchStringHelper {
 
@@ -23,14 +23,14 @@ public class SearchStringHelper {
 	}
 
 	public static String getSearchPathValue(String s) {
-		if (s.startsWith("/") || s.startsWith("%")) {
+		if (s.startsWith("/") || s.startsWith("./") || s.startsWith("%")) {
 			return s;
 		} else {
 			return "%" + s;
 		}
 	}
 
-	public static String getStringSetSql(Set<String> values, String fieldName) {
+	public static String getStringSetSql(Collection<String> values, String fieldName) {
 		StringBuilder sql = new StringBuilder();
 
 		for (String s : values) {
@@ -41,7 +41,7 @@ public class SearchStringHelper {
 		return " (" + sql.toString() + ") ";
 	}
 
-	public static String getIntegerSetSql(Set<Integer> values, String fieldName) {
+	public static String getIntegerSetSql(Collection<Integer> values, String fieldName) {
 		StringBuilder sql = new StringBuilder();
 
 		for (Integer i : values) {
@@ -53,7 +53,7 @@ public class SearchStringHelper {
 		return " (" + sql.toString() + ") ";
 	}
 
-	public static String getSetPathSql(Set<String> values, String fieldName) {
+	public static String getSetPathSql(Collection<String> values, String fieldName) {
 		StringBuilder sql = new StringBuilder();
 
 		for (String s : values) {
@@ -65,7 +65,7 @@ public class SearchStringHelper {
 		return " (" + sql.toString() + ") ";
 	}
 
-	public static String getStringListSql(List<String> values, String fieldName) {
+	public static String getStringListSql(Collection<String> values, String fieldName) {
 		StringBuilder sql = new StringBuilder();
 
 		for (String s : values) {
@@ -76,16 +76,18 @@ public class SearchStringHelper {
 		return " (" + sql.toString() + ") ";
 	}
 
-	public static String getStringListPathSql(List<String> values, String fieldName) {
-		StringBuilder sql = new StringBuilder();
-
-		for (String s : values) {
-			s = getSearchPathValue(s);
-			sql.append(fieldName + getSearchOperator(s) + "'" + s + "'").append(" or ");
-		}
-		sql.append("1=0");
-
-		return " (" + sql.toString() + ") ";
+    public static String getStringListPathSql(Collection<String> values, String fieldName) {
+        return values.stream().map(s -> getSearchPathValue(s)).map(s -> fieldName + getSearchOperator(s) + "'" + s + "'").collect(Collectors.joining(
+                " or ", " (", ") "));
+//		StringBuilder sql = new StringBuilder();
+//
+//		for (String s : values) {
+//			s = getSearchPathValue(s);
+//			sql.append(fieldName + getSearchOperator(s) + "'" + s + "'").append(" or ");
+//		}
+//		sql.append("1=0");
+//
+//		return " (" + sql.toString() + ") ";
 	}
 
 	public static boolean isDBWildcardSearch(String regex) {
