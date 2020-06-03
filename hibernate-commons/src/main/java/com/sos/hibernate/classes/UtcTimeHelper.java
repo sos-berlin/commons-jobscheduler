@@ -52,7 +52,7 @@ public class UtcTimeHelper {
         }
     }
 
-    public Date getNowUtc() {
+    public static Date getNowUtc() {
         return convertTimeZonesToDate(DateTimeZone.getDefault().getID(), DateTimeZone.UTC.getID(), new DateTime());
     }
 

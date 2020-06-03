@@ -12,12 +12,14 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.eventhandler.EventMeta.EventType;
@@ -110,12 +112,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         do {
             nextStarter = this.conditionResolver.getNextStarttime();
-
+ 
             if (nextStarter != null) {
-                Long next = nextStarter.getNextStartFromList().getTime();
-                Long now = new Date().getTime();
+                DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
+                Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
+                //Long now = new Date().getTime();
+                Long now = UtcTimeHelper.getNowUtc().getTime();
                 delay = next - now;
-
                 if (delay > 0) {
                     LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
                     try {
@@ -274,7 +277,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     @Override
     public void onActivate(Notifier notifier) {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+       // TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
