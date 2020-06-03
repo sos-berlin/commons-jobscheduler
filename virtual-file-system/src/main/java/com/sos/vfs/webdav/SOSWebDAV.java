@@ -39,6 +39,7 @@ public class SOSWebDAV extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSWebDAV.class);
     private HttpURL rootUrl = null;
+    private String path = null;
     private WebdavResource davClient = null;
     // private String currentDirectory = "";
 
@@ -349,6 +350,9 @@ public class SOSWebDAV extends SOSCommonProvider {
     @Override
     public ISOSProviderFile getFile(String fileName) {
         fileName = adjustFileSeparator(fileName);
+        if (!isAbsolute(fileName)) {
+            fileName = (path + fileName).replaceAll("//+", "/");
+        }
         ISOSProviderFile file = new SOSWebDAVFile(fileName);
         file.setProvider(this);
         return file;
@@ -423,6 +427,10 @@ public class SOSWebDAV extends SOSCommonProvider {
         }
         return isDirectory(filename);
     }
+    
+    private boolean isAbsolute(String fileName) {
+        return fileName.startsWith(path);
+    }
 
     private WebdavResource getResource(final String path) throws Exception {
         return getResource(path, true);
@@ -470,7 +478,7 @@ public class SOSWebDAV extends SOSCommonProvider {
     private HttpURL setRootHttpURL(final String puser, final String ppassword, final String phost, final int pport) throws Exception {
         rootUrl = null;
         HttpURL httpUrl = null;
-        String path = "/";
+        path = "/";
         if (getProviderOptions().authMethod.isURL()) {
             URL url = new URL(phost);
             String phostRootUrl = url.getProtocol() + "://" + url.getAuthority();
@@ -487,6 +495,7 @@ public class SOSWebDAV extends SOSCommonProvider {
             } else {
                 httpUrl = new HttpURL(normalizedHost);
             }
+            path = httpUrl.getPath();
             if ("https".equalsIgnoreCase(httpUrl.getScheme())) {
                 rootUrl = new HttpsURL(phostRootUrl);
                 StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
@@ -527,8 +536,8 @@ public class SOSWebDAV extends SOSCommonProvider {
             } else {
                 url = new HttpURL(rootUrl.getEscapedURI() + path);
             }
+            url.setUserinfo(userName, password);
         }
-        url.setUserinfo(userName, password);
         return url;
     }
 

@@ -151,7 +151,7 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     }
 
     public static String normalizePath(String path) {
-        return path.replaceAll("\\\\", "/");
+        return path.replace('\\', '/');
     }
 
     @Override
