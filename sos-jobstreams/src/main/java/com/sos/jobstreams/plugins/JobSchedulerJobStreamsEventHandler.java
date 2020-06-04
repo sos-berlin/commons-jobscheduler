@@ -116,10 +116,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
  
             if (nextStarter != null) {
                 DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
-                //Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
                 Long next = nextDateTime.getMillis();
                 Long now = new Date().getTime();
-                //Long now = UtcTimeHelper.getNowUtc().getTime();
                 delay = next - now;
                 if (delay > 0) {
                     LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
@@ -129,9 +127,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
-                            dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                            //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            //calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
+                            //dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                            dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
@@ -210,10 +209,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
-                            dbItemJobStreamStarter.setNextStart(calendar.getTime());
-                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                            //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            //calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
+                            //dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                            dbItemJobStreamStarter.setNextStart(new Date(next));                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
                                     .getItemJobStreamStarter().getId()));
@@ -288,7 +287,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     @Override
     public void onActivate(Notifier notifier) {
-       // TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         LOGGER.debug("onActivate Plugin");
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
