@@ -669,7 +669,7 @@ public class JSConditionResolver {
         boolean dbChange = false;
         UUID contextId = this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
         if (contextId == null) {
-            LOGGER.warn(String.format("ContextId for task %s could not be found. Outconditions will not be resolved", taskEndEvent.getTaskIdLong()));
+            LOGGER.debug(String.format("ContextId for task %s could not be found. Outconditions will not be resolved", taskEndEvent.getTaskIdLong()));
         } else {
             this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
 
