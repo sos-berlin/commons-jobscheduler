@@ -11,15 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
@@ -241,7 +244,7 @@ public class JSConditionResolver {
             jsJobStreams = new JSJobStreams();
             jsJobStreams.setListOfJobStreams(listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
 
-            sosHibernateSession.beginTransaction();
+            /*   sosHibernateSession.beginTransaction();
 
             LOGGER.debug("timeZone:" + TimeZone.getDefault());
             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession); 
@@ -250,14 +253,17 @@ public class JSConditionResolver {
                 Date nextStart = entry.getValue().getNextStartFromList();
                 if (nextStart != null) {
                     LOGGER.debug("next Start:" + new Date(nextStart.getTime()));
+                    DateTime nextDateTime = new DateTime(nextStart.getTime());
                     DBItemJobStreamStarter dbItemJobStreamStarter = entry.getValue().getItemJobStreamStarter();
-
-                    dbItemJobStreamStarter.setNextStart(new Date(nextStart.getTime()));
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
+                    dbItemJobStreamStarter.setNextStart(calendar.getTime());
                     dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                 }
             }
+            
  
-            sosHibernateSession.commit();
+            sosHibernateSession.commit();*/
         }
 
         if (listOfHistoryIds == null) {
@@ -708,8 +714,11 @@ public class JSConditionResolver {
     }
 
     public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
+        LOGGER.debug("setJobIsRunningInconditionsForJob: " + contextId);
         if (contextId != null) {
             JSJobConditionKey jobConditionKey = new JSJobConditionKey();
+            LOGGER.debug("job:" + job);
+            LOGGER.debug("jobSchedulerId:" + jobSchedulerId);
             jobConditionKey.setJob(job);
             jobConditionKey.setJobSchedulerId(jobSchedulerId);
             JSInConditions jobInConditions = jsJobInConditions.getListOfJobInConditions().get(jobConditionKey);

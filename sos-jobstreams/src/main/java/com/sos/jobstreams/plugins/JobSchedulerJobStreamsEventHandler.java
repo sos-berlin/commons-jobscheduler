@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -115,9 +116,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
  
             if (nextStarter != null) {
                 DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
-                Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
-                //Long now = new Date().getTime();
-                Long now = UtcTimeHelper.getNowUtc().getTime();
+                //Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
+                Long next = nextDateTime.getMillis();
+                Long now = new Date().getTime();
+                //Long now = UtcTimeHelper.getNowUtc().getTime();
                 delay = next - now;
                 if (delay > 0) {
                     LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
@@ -127,7 +129,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
+                            dbItemJobStreamStarter.setNextStart(calendar.getTime());
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
@@ -189,8 +193,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
-                    Long next = nextStarter.getNextStartFromList().getTime();
+                    DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
+
+                    //Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
                     Long now = new Date().getTime();
+                    Long next =  nextDateTime.getMillis();
+
+                    //Long now = new Date().getTime();
                     Long delay = next - now;
 
                     if (delay > 0) {
@@ -201,7 +210,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
+                            dbItemJobStreamStarter.setNextStart(calendar.getTime());
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
