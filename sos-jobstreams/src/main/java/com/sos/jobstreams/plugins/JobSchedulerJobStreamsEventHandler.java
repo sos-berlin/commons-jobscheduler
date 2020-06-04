@@ -522,7 +522,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     case "TaskClosed":
                         taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-                        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
+                        //conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
                         break;
 
                     case "VariablesCustomEvent":
