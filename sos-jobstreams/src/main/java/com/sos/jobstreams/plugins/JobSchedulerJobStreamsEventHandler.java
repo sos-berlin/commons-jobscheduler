@@ -16,11 +16,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.eventhandler.EventMeta.EventType;
@@ -113,7 +111,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         do {
             nextStarter = this.conditionResolver.getNextStarttime();
- 
+
             if (nextStarter != null) {
                 DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
                 Long next = nextDateTime.getMillis();
@@ -127,9 +125,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            //calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
-                            //dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                            // Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            // calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC",
+                            // nextDateTime).getTime());
+                            // dbItemJobStreamStarter.setNextStart(calendar.getTime());
                             dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
@@ -178,7 +177,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             SOSHibernateSession sosHibernateSession = null;
             try {
-                sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
+                sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:JobStartTask.run");
             } catch (SOSHibernateOpenSessionException e) {
                 LOGGER.error("Could not initiate session", e);
             }
@@ -194,11 +193,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     nextStarter.schedule();
                     DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
 
-                    //Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
+                    // Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
                     Long now = new Date().getTime();
-                    Long next =  nextDateTime.getMillis();
+                    Long next = nextDateTime.getMillis();
 
-                    //Long now = new Date().getTime();
+                    // Long now = new Date().getTime();
                     Long delay = next - now;
 
                     if (delay > 0) {
@@ -209,10 +208,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            //calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
-                            //dbItemJobStreamStarter.setNextStart(calendar.getTime());
-                            dbItemJobStreamStarter.setNextStart(new Date(next));                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                            // Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            // calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC",
+                            // nextDateTime).getTime());
+                            // dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
                             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
                                     .getItemJobStreamStarter().getId()));
@@ -236,8 +237,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private void startJobs(JSJobStreamStarter jobStreamStarter) throws Exception {
         List<JobStarterOptions> listOfStartedJobs = jobStreamStarter.startJobs(getXmlCommandExecutor());
         UUID uuid = UUID.randomUUID();
-        SOSHibernateSession session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
-        session.beginTransaction();
+        SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
+        sosHibernateSession.beginTransaction();
         try {
 
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
@@ -257,19 +258,20 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
             LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
                     .getJobStream()));
-            jobStream.getJsHistory().addHistoryEntry(historyEntry, session);
+            jobStream.getJsHistory().addHistoryEntry(historyEntry, sosHibernateSession);
 
             for (JobStarterOptions startedJob : listOfStartedJobs) {
-                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, super.getSettings().getSchedulerId(), startedJob, session);
+                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, super.getSettings().getSchedulerId(), startedJob,
+                        sosHibernateSession);
             }
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
-            session.commit();
+            sosHibernateSession.commit();
             conditionResolver.getListOfHistoryIds().put(uuid, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            session.rollback();
+            sosHibernateSession.rollback();
         } finally {
-            session.close();
+            sosHibernateSession.close();
         }
     }
 
@@ -323,9 +325,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
                     EventType.OrderFinished };
-            start(observedEventTypes);
-
             LOGGER.debug("Session: " + this.session);
+            start(observedEventTypes);
 
         } catch (Exception e) {
             conditionResolver = null;
@@ -412,15 +413,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             duration = new DurationCalculator();
         }
 
-        SOSHibernateSession session = null;
+        SOSHibernateSession sosHibernateSession = null;
         try {
-            session = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
 
             boolean skippedTask = false;
             do {
                 skippedTask = false;
 
-                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(session, super.getSettings()
+                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(sosHibernateSession, super.getSettings()
                         .getSchedulerId());
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
@@ -434,7 +435,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     taskEndEvent.setTaskId("");
                                     LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
                                     inConditionCommand.setExecuted(true);
-                                    performTaskEnd(session, taskEndEvent);
+                                    performTaskEnd(sosHibernateSession, taskEndEvent);
                                     skippedTask = true;
                                 }
                             }
@@ -449,8 +450,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
         } finally {
-            if (session != null) {
-                session.close();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
             }
         }
     }
@@ -469,6 +470,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
 
             if (conditionResolver == null) {
+                sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
                 conditionResolver = new JSConditionResolver(sosHibernateSession, this.getXmlCommandExecutor(), this.getSettings());
                 try {
                     conditionResolver.init();
@@ -520,9 +522,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         resolveInConditions = true;
                         break;
                     case "TaskClosed":
-                        taskEndEvent = new TaskEndEvent((JsonObject) entry);
-                        UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-                        //conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
+                        //taskEndEvent = new TaskEndEvent((JsonObject) entry);
+                        //UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+                        // conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
                         break;
 
                     case "VariablesCustomEvent":
@@ -692,12 +694,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private void closeReportingFactory() {
         if (reportingFactory != null) {
+            LOGGER.debug("closing reporting factory");
             reportingFactory.close();
             reportingFactory = null;
         }
     }
 
     private void createReportingFactory(Path configFile) throws Exception {
+        LOGGER.debug("open reporting factory");
         reportingFactory = new SOSHibernateFactory(configFile);
         reportingFactory.setIdentifier(getIdentifier());
         reportingFactory.setAutoCommit(false);
