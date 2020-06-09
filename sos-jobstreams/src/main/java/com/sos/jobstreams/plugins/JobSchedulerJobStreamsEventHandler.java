@@ -143,7 +143,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                     nextJobStartTimer.schedule(new JobStartTask(), delay);
                 } else {
-                    LOGGER.info("negative delay");
+                    LOGGER.debug("negative delay");
                 }
             }
         } while (delay < 0 && nextStarter != null);
