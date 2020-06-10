@@ -627,6 +627,8 @@ public class JSConditionResolver {
                         if (!historyValidated2True) {
                             if (!jsHistoryEntry.checkReady(this)) {
                                 try {
+                                    LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
+                                    jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
                                     DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(session);
                                     DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
                                             .getId());
@@ -634,8 +636,8 @@ public class JSConditionResolver {
                                         session.beginTransaction();
                                         dbItemJobStreamHistory.setRunning(false);
                                         dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
-                                        jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
                                         session.commit();
+                                        jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
                                         this.listOfParameters.remove(contextId);
                                     }
                                 } catch (Exception e) {
