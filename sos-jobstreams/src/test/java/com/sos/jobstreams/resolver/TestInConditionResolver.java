@@ -61,8 +61,8 @@ public class TestInConditionResolver {
         EventHandlerSettings settings = new EventHandlerSettings();
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
         settings.setSchedulerId("scheduler_joc_cockpit");
-        JSConditionResolver conditionResolver = new JSConditionResolver(session,null,settings);
-        conditionResolver.init();
+        JSConditionResolver conditionResolver = new JSConditionResolver(null,settings);
+        conditionResolver.init(session);
         conditionResolver.resolveInConditions(session, settings.getSchedulerId());
       //  conditionResolver.resolveOutConditions();
     }
@@ -73,7 +73,7 @@ public class TestInConditionResolver {
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
-        JSConditionResolver conditionResolver = new JSConditionResolver(session,null,settings);
+        JSConditionResolver conditionResolver = new JSConditionResolver(null,settings);
         conditionResolver.initEvents(session);
     }
 

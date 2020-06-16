@@ -61,8 +61,8 @@ public class TestEvents {
         settings.setSchedulerId("scheduler_joc_cockpit");
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
 
-        JSConditionResolver expressionResolver = new JSConditionResolver(session,null,settings );
-        expressionResolver.init();
+        JSConditionResolver expressionResolver = new JSConditionResolver(null,settings );
+        expressionResolver.init(session);
         expressionResolver.resolveInConditions(session,settings.getSchedulerId());
     }
 
