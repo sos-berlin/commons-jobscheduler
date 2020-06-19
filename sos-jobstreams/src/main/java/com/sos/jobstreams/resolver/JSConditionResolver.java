@@ -560,8 +560,8 @@ public class JSConditionResolver {
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 boolean historyValidated2True = false;
                 if (jobStream.getValue() != null) {
-                    //for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
-                    for (Iterator<JSHistoryEntry> iterator =  jobStream.getValue().getListOfJobStreamHistory().iterator();iterator.hasNext();) {
+                    // for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    for (Iterator<JSHistoryEntry> iterator = jobStream.getValue().getListOfJobStreamHistory().iterator(); iterator.hasNext();) {
                         JSHistoryEntry jsHistoryEntry = iterator.next();
                         LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                 .getJobStream(), jsHistoryEntry.getContextId()));
@@ -599,6 +599,7 @@ public class JSConditionResolver {
                                                         this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(),
                                                                 contextId);
                                                     }
+                                                    inCondition.setEvaluatedContext(contextId);
                                                     listOfValidatedInconditions.add(inCondition);
                                                 } else {
                                                     if (isTraceEnabled) {
@@ -660,20 +661,23 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
         String defaultSession = Constants.getSession();
         boolean dbChange = false;
-        UUID contextId = this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-        if (contextId != null) {
-            this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
 
-            LOGGER.debug("resolve outconditions using context:" + contextId.toString());
-            JSJobConditionKey jobConditionKey = new JSJobConditionKey();
-            this.newJsEvents = new JSEvents();
-            this.removeJsEvents = new JSEvents();
-            jobConditionKey.setJob(job);
-            jobConditionKey.setJobSchedulerId(jobSchedulerId);
-            JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
-            if (jobOutConditions != null && jobOutConditions.getListOfOutConditions().size() == 0) {
-                LOGGER.debug("No out conditions defined. Nothing to do");
-            } else {
+        JSJobConditionKey jobConditionKey = new JSJobConditionKey();
+        this.newJsEvents = new JSEvents();
+        this.removeJsEvents = new JSEvents();
+        jobConditionKey.setJob(job);
+        jobConditionKey.setJobSchedulerId(jobSchedulerId);
+        JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
+        if (jobOutConditions != null && jobOutConditions.getListOfOutConditions().size() == 0) {
+            LOGGER.debug("No out conditions defined. Nothing to do");
+        } else {
+            UUID contextId = this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+            if (contextId == null) {
+                contextId = taskEndEvent.getEvaluatedContextId();
+                LOGGER.debug("using contextId from in condition");
+            }
+            if (contextId != null) {
+                LOGGER.debug("resolve outconditions using context:" + contextId.toString());
 
                 if (jobOutConditions != null) {
                     for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
@@ -695,12 +699,12 @@ public class JSConditionResolver {
                 } else {
                     LOGGER.debug("No out conditions for job " + job + " found. Nothing to do");
                 }
+                if (this.listOfHistoryIds.get(contextId) != null && !this.listOfHistoryIds.get(contextId).getRunning()) {
+                    this.listOfHistoryIds.remove(contextId);
+                }
             }
         }
 
-        if (this.listOfHistoryIds.get(contextId) != null && !this.listOfHistoryIds.get(contextId).getRunning()) {
-            this.listOfHistoryIds.remove(contextId);
-        }
         return dbChange;
     }
 
