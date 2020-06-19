@@ -42,6 +42,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
     private boolean haveCalendars;
+    private UUID evaluatedContextId;
 
     public JSInCondition() {
         super();
@@ -231,6 +232,16 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public void removeConsumed(UUID contextId) {
         consumedForContext.remove(contextId);
+    }
+
+    
+    public UUID getEvaluatedContextId() {
+        return evaluatedContextId;
+    }
+
+    
+    public void setEvaluatedContextId(UUID evaluatedContextId) {
+        this.evaluatedContextId = evaluatedContextId;
     }
 
 }

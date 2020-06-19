@@ -443,6 +443,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     taskEndEvent.setJobPath(jsInCondition.getJob());
                                     taskEndEvent.setReturnCode(0);
                                     taskEndEvent.setTaskId("");
+                                    taskEndEvent.setEvaluatedContextId(jsInCondition.getEvaluatedContextId());
                                     LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
                                     inConditionCommand.setExecuted(true);
                                     performTaskEnd(sosHibernateSession, taskEndEvent);
