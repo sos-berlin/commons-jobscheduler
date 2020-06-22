@@ -563,7 +563,7 @@ public class JSConditionResolver {
                     // for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                     for (Iterator<JSHistoryEntry> iterator = jobStream.getValue().getListOfJobStreamHistory().iterator(); iterator.hasNext();) {
                         JSHistoryEntry jsHistoryEntry = iterator.next();
-                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                        LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         jsHistoryEntry.getContextId();
                         UUID contextId = jsHistoryEntry.getContextId();
@@ -709,8 +709,8 @@ public class JSConditionResolver {
     }
 
     public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
-        LOGGER.debug("setJobIsRunningInconditionsForJob: " + contextId);
         if (contextId != null) {
+            LOGGER.debug("setJobIsRunningInconditionsForJob: " + contextId);
             JSJobConditionKey jobConditionKey = new JSJobConditionKey();
             LOGGER.debug("job:" + job);
             LOGGER.debug("jobSchedulerId:" + jobSchedulerId);
