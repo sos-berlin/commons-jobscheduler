@@ -590,7 +590,7 @@ public class JSConditionResolver {
                                                         this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(),
                                                                 contextId);
                                                     }
-                                                    inCondition.setEvaluatedContextId(contextId)
+                                                    inCondition.setEvaluatedContextId(contextId);
                                                     listOfValidatedInconditions.add(inCondition);
                                                 } else {
                                                     if (isTraceEnabled) {
