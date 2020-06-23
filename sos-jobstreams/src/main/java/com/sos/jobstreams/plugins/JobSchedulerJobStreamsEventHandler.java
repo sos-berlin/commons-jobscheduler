@@ -48,6 +48,7 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
+import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -206,7 +207,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     // Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
                     Long now = new Date().getTime();
                     Long next = nextDateTime.getMillis();
-
+ 
                     // Long now = new Date().getTime();
                     Long delay = next - now;
 
@@ -435,9 +436,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         .getSchedulerId());
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+                        LOGGER.debug("checking whether to execute out conditions for skipped jobs");
+                        LOGGER.debug("isSkipOutCondition:" + jsInCondition.isSkipOutCondition());
                         publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
                         if (!jsInCondition.isSkipOutCondition()) {
                             for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                                LOGGER.debug("isExecuted:" + inConditionCommand.getCommand() + "-->" + inConditionCommand.isExecuted());
                                 if (!inConditionCommand.isExecuted()) {
                                     TaskEndEvent taskEndEvent = new TaskEndEvent();
                                     taskEndEvent.setJobPath(jsInCondition.getJob());
