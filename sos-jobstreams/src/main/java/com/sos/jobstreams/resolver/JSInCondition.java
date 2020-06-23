@@ -1,23 +1,30 @@
 package com.sos.jobstreams.resolver;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
+import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
@@ -30,15 +37,13 @@ import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 import sos.util.SOSString;
 
- 
-
 public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
     private Set<UUID> consumedForContext;
-    private Map<UUID,Boolean> listOfRunningJobs;
+    private Map<UUID, Boolean> listOfRunningJobs;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
     private boolean haveCalendars;
@@ -47,7 +52,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public JSInCondition() {
         super();
         haveCalendars = false;
-        listOfRunningJobs = new HashMap<UUID,Boolean>();
+        listOfRunningJobs = new HashMap<UUID, Boolean>();
         this.consumedForContext = new HashSet<UUID>();
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
@@ -116,34 +121,44 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        LocalDate today = LocalDate.now();
+        LOGGER.debug("Setting next period for job: " + this.getJob() + " expression: " + this.getExpression());
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
 
         for (LocalDate d : this.listOfDates) {
 
-            if (d.isBefore(last) && (d.isAfter(today) || d.getDayOfYear() == today.getDayOfYear())) {
+            if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
                 last = d;
                 next = d;
             }
         }
-
         this.itemInCondition.setNextPeriod(null);
-        if (next != null && next.isAfter(today)) {// Empty if today.
-            this.itemInCondition.setNextPeriod(Date.from(last.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        }
-        try {
-            sosHibernateSession.beginTransaction();
-            sosHibernateSession.update(this.itemInCondition);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-        }
+        if (next != null) {// Empty if today.
+            if (next.isAfter(today)) {
 
+                Instant nextPeriod = last.atStartOfDay(ZoneId.of(Constants.settings.getTimezone())).toInstant();
+                Date d = new Date(nextPeriod.toEpochMilli());
+                LOGGER.debug("Setting next period:" + nextPeriod.toString());
+                this.itemInCondition.setNextPeriod(d);
+            } else {
+                LOGGER.debug(next.toString() + " is not after " + today.toString());
+            }
+
+            try {
+                sosHibernateSession.beginTransaction();
+                sosHibernateSession.update(this.itemInCondition);
+                sosHibernateSession.commit();
+            } catch (Exception e) {
+                sosHibernateSession.rollback();
+            }
+        }
     }
 
+
     public boolean isConsumed(UUID contextId) {
-        LOGGER.debug("check consumed " + this.getExpression() + " is consumed for context " + contextId + " ---> " + consumedForContext.contains(contextId));
+        LOGGER.debug("check consumed " + this.getExpression() + " is consumed for context " + contextId + " ---> " + consumedForContext.contains(
+                contextId));
         return consumedForContext.contains(contextId);
     }
 
@@ -181,8 +196,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     }
 
-    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, UUID contextId,
-            Map<String, String> listOfParameters, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
+    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, UUID contextId, Map<String, String> listOfParameters,
+            SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
@@ -192,7 +207,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this,listOfParameters);
+            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);
         }
         return startJobReturn;
     }
@@ -223,7 +238,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public void setJobIsRunning(UUID contextId, boolean jobIsRunning) {
-        this.listOfRunningJobs.put(contextId,jobIsRunning);
+        this.listOfRunningJobs.put(contextId, jobIsRunning);
     }
 
     public Date getNextPeriod() {
@@ -234,12 +249,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         consumedForContext.remove(contextId);
     }
 
-    
     public UUID getEvaluatedContextId() {
         return evaluatedContextId;
     }
 
-    
     public void setEvaluatedContextId(UUID evaluatedContextId) {
         this.evaluatedContextId = evaluatedContextId;
     }
