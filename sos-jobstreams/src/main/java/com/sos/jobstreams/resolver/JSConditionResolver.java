@@ -67,6 +67,8 @@ import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import sos.util.SOSString;
+
 public class JSConditionResolver {
 
     private static final String JOB = "job";
@@ -554,6 +556,7 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver::resolveInConditions");
 
         List<JSInCondition> listOfValidatedInconditions = null;
+        listOfValidatedInconditions = new ArrayList<JSInCondition>();
 
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             LOGGER.debug("Resolving jobstream " + jobStream.getValue().getJobStream());
@@ -567,7 +570,6 @@ public class JSConditionResolver {
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         jsHistoryEntry.getContextId();
                         UUID contextId = jsHistoryEntry.getContextId();
-                        listOfValidatedInconditions = new ArrayList<JSInCondition>();
                         if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
                             LOGGER.debug("No in conditions defined. Nothing to do");
                         } else {
@@ -599,7 +601,8 @@ public class JSConditionResolver {
                                                         this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(),
                                                                 contextId);
                                                     }
-                                                    inCondition.setEvaluatedContext(contextId);
+                                                    inCondition.setEvaluatedContextId(contextId);
+                                                    LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
                                                     listOfValidatedInconditions.add(inCondition);
                                                 } else {
                                                     if (isTraceEnabled) {

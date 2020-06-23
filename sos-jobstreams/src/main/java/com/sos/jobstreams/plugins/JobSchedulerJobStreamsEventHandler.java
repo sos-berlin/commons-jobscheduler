@@ -425,15 +425,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         .getSchedulerId());
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
+                        LOGGER.debug("checking whether to execute out conditions for skipped jobs");
+                        LOGGER.debug("isSkipOutCondition:" + jsInCondition.isSkipOutCondition());
                         publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.InconditionValidated.name(), jsInCondition.getJob());
                         if (!jsInCondition.isSkipOutCondition()) {
                             for (JSInConditionCommand inConditionCommand : jsInCondition.getListOfInConditionCommand()) {
+                                LOGGER.debug("isExecuted:" + inConditionCommand.getCommand() + "-->" + inConditionCommand.isExecuted());
                                 if (!inConditionCommand.isExecuted()) {
                                     TaskEndEvent taskEndEvent = new TaskEndEvent();
                                     taskEndEvent.setJobPath(jsInCondition.getJob());
                                     taskEndEvent.setReturnCode(0);
                                     taskEndEvent.setTaskId("");
-                                    taskEndEvent.setEvaluatedContextId(jsInCondition.getEvaluatedContext());
+                                    taskEndEvent.setEvaluatedContextId(jsInCondition.getEvaluatedContextId());
                                     LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
                                     inConditionCommand.setExecuted(true);
                                     performTaskEnd(sosHibernateSession, taskEndEvent);
@@ -444,7 +447,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
             } while (skippedTask);
-            if (isDebugEnabled & duration != null) {
+          if (isDebugEnabled & duration != null) {
                 duration.end("Resolving all InConditions: ");
             }
 
