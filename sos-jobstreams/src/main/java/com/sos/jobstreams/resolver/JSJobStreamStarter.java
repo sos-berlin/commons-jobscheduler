@@ -38,6 +38,7 @@ public class JSJobStreamStarter {
     private List<DBItemJobStreamStarterJob> listOfJobs;
     private JobStreamScheduler jobStreamScheduler;
     private String jobStreamName;
+    private String endJob;
     private Long lastStart;
 
     public Map<String, String> getListOfParameters() {
@@ -189,7 +190,11 @@ public class JSJobStreamStarter {
     }
 
     public void setLastStart() {
-       lastStart = this.getNextStart().getTime();
+        lastStart = this.getNextStart().getTime();
+    }
+
+    public String getEndJob() {
+        return normalizePath(itemJobStreamStarter.getEndOfJobStream());
     }
 
 }

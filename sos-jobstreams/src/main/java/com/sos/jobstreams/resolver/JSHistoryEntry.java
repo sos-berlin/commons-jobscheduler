@@ -13,13 +13,12 @@ import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 
 import sos.util.SOSString;
 
- 
 public class JSHistoryEntry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSHistoryEntry.class);
 
     private DBItemJobStreamHistory itemJobStreamHistory;
- 
+
     public JSHistoryEntry() {
         super();
         itemJobStreamHistory = new DBItemJobStreamHistory();
@@ -57,6 +56,33 @@ public class JSHistoryEntry {
         return itemJobStreamHistory;
     }
 
+    private boolean endOfStream(JSJobStream jsJobStream, JSInConditions jsInConditions) {
+        // Checking all starters whether there is an end job
+        LOGGER.debug("Check for end job in job stream: " + jsJobStream.getJobStream());
+        boolean endReached = false;
+        for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
+            if (!"".equals(jsJobStreamStarter.getEndJob())) {
+                LOGGER.debug("end job found for starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " Job: " + jsJobStreamStarter.getEndJob());
+                for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                    boolean isConsumed = jsInCondition.isConsumed(this.getContextId());
+                    LOGGER.debug("jsInCondition expression:" + jsInCondition.getExpression());
+                    LOGGER.debug("jsInCondition is consumed :" + isConsumed);
+                    LOGGER.debug("jsInCondition is job :" + jsInCondition.getNormalizedJob());
+                    if (isConsumed && jsInCondition.getNormalizedJob().equals(jsJobStreamStarter
+                            .getItemJobStreamStarter().getEndOfJobStream())) {
+                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsInCondition
+                                .getNormalizedJob() + " for the instance " + this.getContextId());
+                        endReached = true;
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        return endReached;
+    }
+
     public boolean checkRunning(JSConditionResolver jsConditionResolver) {
         // get all Inconditions for this jobStream
         // running is true if there is at least one local not global event in the not consumed conditions that is created by a local out condition
@@ -71,52 +97,57 @@ public class JSHistoryEntry {
 
         LOGGER.debug("- JobStream: " + jsJobStream.getJobStream());
         LOGGER.debug("- Context: " + this.getContextId());
-        LOGGER.debug("- local OutCondition Events: ");
-
-        JSOutConditions jsOutConditions = jsConditionResolver.getJsJobStreamOutConditions().getListOfJobOutConditions().get(jsJobStreamConditionKey);
-        Set<String> localEvents = new HashSet<String>();
-        if (jsOutConditions != null && jsOutConditions.getListOfOutConditions() != null) {
-            for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
-                for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
-                    if (!jsOutConditionEvent.isGlobal()) {
-                        localEvents.add(jsOutConditionEvent.getEvent());
-                        LOGGER.debug("- Event: " + jsOutConditionEvent.getEvent());
-
-                    }
-                }
-
-            }
-        }
-
         LOGGER.debug("- InCondition Events: ");
 
         JSInConditions jsInConditions = jsConditionResolver.getJsJobStreamInConditions().getListOfJobStreamInConditions().get(
                 jsJobStreamConditionKey);
         if (jsInConditions != null) {
-            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
-                LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
-                LOGGER.debug(SOSString.toString(jsInCondition));
-                if (!jsInCondition.isConsumed(this.getContextId())) {
-                    List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
-                    LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
-                    for (JSCondition jsCondition : listOfConditions) {
-                        if (jsCondition.getConditionJobStream() == null || jsCondition.getConditionJobStream().isEmpty()) {
-                            LOGGER.debug("- InCondition event : " + jsCondition.getEventName());
-                            if (jsCondition.typeIsLocalEvent() && localEvents.contains(jsCondition.getEventName())) {
-                                LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " is still running the context " + this.getContextId());
-                                running = true;
-                                break;
+
+            running = !this.endOfStream(jsJobStream, jsInConditions);
+            if (running) {
+
+                LOGGER.debug("- local OutCondition Events: ");
+
+                JSOutConditions jsOutConditions = jsConditionResolver.getJsJobStreamOutConditions().getListOfJobOutConditions().get(
+                        jsJobStreamConditionKey);
+                Set<String> localEvents = new HashSet<String>();
+                if (jsOutConditions != null && jsOutConditions.getListOfOutConditions() != null) {
+                    for (JSOutCondition jsOutCondition : jsOutConditions.getListOfOutConditions().values()) {
+                        for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                            if (!jsOutConditionEvent.isGlobal()) {
+                                localEvents.add(jsOutConditionEvent.getEvent());
+                                LOGGER.debug("- Event: " + jsOutConditionEvent.getEvent());
+
                             }
                         }
+
                     }
-                    if (running) {
-                        break;
+                }
+
+                for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                    LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
+                    LOGGER.debug(SOSString.toString(jsInCondition));
+                    if (!jsInCondition.isConsumed(this.getContextId())) {
+                        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
+                        LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
+                        for (JSCondition jsCondition : listOfConditions) {
+                            if (jsCondition.getConditionJobStream() == null || jsCondition.getConditionJobStream().isEmpty()) {
+                                LOGGER.debug("- InCondition event : " + jsCondition.getEventName());
+                                if (jsCondition.typeIsLocalEvent() && localEvents.contains(jsCondition.getEventName())) {
+                                    LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " is still running the context " + this
+                                            .getContextId());
+                                    running = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (running) {
+                            break;
+                        }
                     }
                 }
             }
         }
-
-        itemJobStreamHistory.setRunning(running);
         return running;
     }
 

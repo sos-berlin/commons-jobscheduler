@@ -552,6 +552,7 @@ public class JSConditionResolver {
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 boolean historyValidated2True = false;
                 if (jobStream.getValue() != null) {
+                    List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
                     for (Iterator<JSHistoryEntry> iterator = jobStream.getValue().getListOfJobStreamHistory().iterator(); iterator.hasNext();) {
                         JSHistoryEntry jsHistoryEntry = iterator.next();
                         LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
@@ -630,7 +631,7 @@ public class JSConditionResolver {
                                         dbItemJobStreamHistory.setRunning(false);
                                         dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
                                         sosHibernateSession.commit();
-                                        jobStream.getValue().getListOfJobStreamHistory().remove(jsHistoryEntry);
+                                        toRemove.add(jsHistoryEntry);
                                         this.listOfParameters.remove(contextId);
                                     }
                                 } catch (Exception e) {
@@ -640,6 +641,7 @@ public class JSConditionResolver {
                             }
                         }
                     }
+                    jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
                 }
 
             }

@@ -151,7 +151,6 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
     }
 
-
     public boolean isConsumed(UUID contextId) {
         LOGGER.debug("check consumed " + this.getExpression() + " is consumed for context " + contextId + " ---> " + consumedForContext.contains(
                 contextId));
@@ -197,15 +196,13 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
-//        if (this.isMarkExpression()) {
-          String isMark="";
-          if (!this.isMarkExpression()) {
-              isMark = " and will be executed again";
-          }
-          LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
+        String isMark = "";
+        if (!this.isMarkExpression()) {
+            isMark = " and will be executed again";
+        }
+        LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
 
-            this.markAsConsumed(sosHibernateSession, contextId);
-//      }
+        this.markAsConsumed(sosHibernateSession, contextId);
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);
