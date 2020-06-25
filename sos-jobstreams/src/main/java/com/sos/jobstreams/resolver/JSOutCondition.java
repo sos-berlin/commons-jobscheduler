@@ -3,20 +3,17 @@ package com.sos.jobstreams.resolver;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
-import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 
 import sos.util.SOSString;

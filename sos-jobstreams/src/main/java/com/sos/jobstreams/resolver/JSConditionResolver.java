@@ -582,7 +582,7 @@ public class JSConditionResolver {
                                             logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
                                                     + " Expression: " + inCondition.getExpression();
                                         }
-                                        if (!inCondition.isConsumed(contextId)) {
+                                        if (!(inCondition.isConsumed(contextId) && inCondition.isMarkExpression())) {
                                             if (!inCondition.jobIsRunning(contextId)) {
 
                                                 if (isTraceEnabled) {

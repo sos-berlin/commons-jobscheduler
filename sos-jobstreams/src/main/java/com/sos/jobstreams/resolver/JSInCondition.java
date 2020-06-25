@@ -200,10 +200,13 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 		LOGGER.trace("execute commands ------>");
 		StartJobReturn startJobReturn = new StartJobReturn();
 		startJobReturn.setStartedJob("");
-		if (this.isMarkExpression()) {
-			LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
-			this.markAsConsumed(sosHibernateSession, contextId);
+		String isMark = "";
+		if (!this.isMarkExpression()) {
+			isMark = " and will be executed again";
 		}
+		LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
+
+		this.markAsConsumed(sosHibernateSession, contextId);
 
 		for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
 			startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);
