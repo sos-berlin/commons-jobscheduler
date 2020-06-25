@@ -6,22 +6,18 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.jobstreams.Constants;
@@ -201,10 +197,15 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
-        if (this.isMarkExpression()) {
-            LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
+//        if (this.isMarkExpression()) {
+          String isMark="";
+          if (!this.isMarkExpression()) {
+              isMark = " and will be executed again";
+          }
+          LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
+
             this.markAsConsumed(sosHibernateSession, contextId);
-        }
+//      }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);

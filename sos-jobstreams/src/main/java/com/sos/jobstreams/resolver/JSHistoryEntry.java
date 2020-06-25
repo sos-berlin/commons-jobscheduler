@@ -57,7 +57,7 @@ public class JSHistoryEntry {
         return itemJobStreamHistory;
     }
 
-    public boolean checkReady(JSConditionResolver jsConditionResolver) {
+    public boolean checkRunning(JSConditionResolver jsConditionResolver) {
         // get all Inconditions for this jobStream
         // running is true if there is at least one local not global event in the not consumed conditions that is created by a local out condition
 
