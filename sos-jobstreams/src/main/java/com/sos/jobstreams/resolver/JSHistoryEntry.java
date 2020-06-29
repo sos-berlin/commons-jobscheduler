@@ -103,8 +103,8 @@ public class JSHistoryEntry {
                 jsJobStreamConditionKey);
         if (jsInConditions != null) {
 
-            running = !this.endOfStream(jsJobStream, jsInConditions);
-            if (running) {
+            boolean endedByJob = this.endOfStream(jsJobStream, jsInConditions);
+            if (!endedByJob) {
 
                 LOGGER.debug("- local OutCondition Events: ");
 

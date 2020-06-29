@@ -553,8 +553,7 @@ public class JSConditionResolver {
                 boolean historyValidated2True = false;
                 if (jobStream.getValue() != null) {
                     List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
-                    for (Iterator<JSHistoryEntry> iterator = jobStream.getValue().getListOfJobStreamHistory().iterator(); iterator.hasNext();) {
-                        JSHistoryEntry jsHistoryEntry = iterator.next();
+                    for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                         LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         jsHistoryEntry.getContextId();
