@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
@@ -234,19 +232,8 @@ public class JSConditionResolver {
             DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
             jsJobStreams = new JSJobStreams();
-            jsJobStreams.setListOfJobStreams(listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
-
-            /*
-             * sosHibernateSession.beginTransaction(); LOGGER.debug("timeZone:" + TimeZone.getDefault()); DBLayerJobStreamStarters dbLayerJobStreamStarters =
-             * new DBLayerJobStreamStarters(sosHibernateSession); for (Map.Entry<Long, JSJobStreamStarter> entry : listOfJobStreamStarter.entrySet()) { Date
-             * nextStart = entry.getValue().getNextStartFromList(); if (nextStart != null) { LOGGER.debug("next Start:" + new Date(nextStart.getTime()));
-             * DateTime nextDateTime = new DateTime(nextStart.getTime()); DBItemJobStreamStarter dbItemJobStreamStarter =
-             * entry.getValue().getItemJobStreamStarter(); Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-             * calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime());
-             * dbItemJobStreamStarter.setNextStart(calendar.getTime()); dbLayerJobStreamStarters.update(dbItemJobStreamStarter); } }
-             * sosHibernateSession.commit();
-             */
-        }
+            jsJobStreams.setListOfJobStreams(settings, listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
+         }
 
         if (listOfHistoryIds == null) {
             listOfHistoryIds = new HashMap<UUID, DBItemJobStreamHistory>();

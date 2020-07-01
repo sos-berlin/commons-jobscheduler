@@ -126,10 +126,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            // Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            // calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC",
-                            // nextDateTime).getTime());
-                            // dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                           
                             dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
@@ -207,7 +204,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     // Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
                     Long now = new Date().getTime();
                     Long next = nextDateTime.getMillis();
- 
+
                     // Long now = new Date().getTime();
                     Long delay = next - now;
 
@@ -219,10 +216,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                            // Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            // calendar.setTimeInMillis(UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC",
-                            // nextDateTime).getTime());
-                            // dbItemJobStreamStarter.setNextStart(calendar.getTime());
+                           
                             dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
@@ -246,8 +240,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     private void startJobs(JSJobStreamStarter jobStreamStarter) throws Exception {
-        List<JobStarterOptions> listOfStartedJobs = jobStreamStarter.startJobs(getXmlCommandExecutor());
+        List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(getXmlCommandExecutor());
+
         UUID uuid = UUID.randomUUID();
+
         SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:resolveInCondtions");
         sosHibernateSession.beginTransaction();
         try {
@@ -270,13 +266,26 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
                     .getJobStream()));
             jobStream.getJsHistory().addHistoryEntry(historyEntry, sosHibernateSession);
+            sosHibernateSession.commit();
 
-            for (JobStarterOptions startedJob : listOfStartedJobs) {
-                conditionResolver.getJobStreamContexts().addTaskToContext(uuid, super.getSettings().getSchedulerId(), startedJob,
-                        sosHibernateSession);
+            for (JobStarterOptions handledJob : listOfHandledJobs) {
+                if (handledJob.isSkipped()) {
+                    TaskEndEvent taskEndEvent = new TaskEndEvent();
+                    taskEndEvent.setJobPath(handledJob.getJob());
+                    taskEndEvent.setReturnCode(0);
+                    taskEndEvent.setTaskId("");
+                    taskEndEvent.setEvaluatedContextId(uuid);
+                    LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", handledJob.getJob()));
+                    performTaskEnd(sosHibernateSession, taskEndEvent);
+
+                } else {
+                    sosHibernateSession.beginTransaction();
+                    conditionResolver.getJobStreamContexts().addTaskToContext(uuid, super.getSettings().getSchedulerId(), handledJob,
+                            sosHibernateSession);
+                    sosHibernateSession.commit();
+                }
             }
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
-            sosHibernateSession.commit();
             conditionResolver.getListOfHistoryIds().put(uuid, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -382,7 +391,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         boolean dbChange = conditionResolver.resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
                 .getJobPath());
         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-        conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
+        if (contextId != null) {
+            conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
+        }
 
         for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
             publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
@@ -556,6 +567,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     .getJobStreamStarterId());
                             if (jsJobStreamStarter != null) {
                                 startJobs(jsJobStreamStarter);
+                                resolveInConditions = true;
+
                             } else {
                                 LOGGER.warn("Could not find JobStream starter with id: " + customEvent.getJobStreamStarterId());
                             }

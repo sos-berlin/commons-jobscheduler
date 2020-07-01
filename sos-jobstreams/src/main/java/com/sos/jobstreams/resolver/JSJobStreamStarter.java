@@ -35,10 +35,9 @@ public class JSJobStreamStarter {
     private Map<String, String> listOfParameters;
     private DBItemJobStreamStarter itemJobStreamStarter;
     private Date nextStart;
-    private List<DBItemJobStreamStarterJob> listOfJobs;
+    private List<JSStarterJob> listOfJobs;
     private JobStreamScheduler jobStreamScheduler;
     private String jobStreamName;
-    private String endJob;
     private Long lastStart;
 
     public Map<String, String> getListOfParameters() {
@@ -136,36 +135,42 @@ public class JSJobStreamStarter {
 
     public List<JobStarterOptions> startJobs(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws Exception {
         JobStarter jobStarter = new JobStarter();
-        List<JobStarterOptions> listOfStartedJobs = new ArrayList<JobStarterOptions>();
-        for (DBItemJobStreamStarterJob dbItemJobStreamStarterJob : listOfJobs) {
+        List<JobStarterOptions> listOfHandledJobs = new ArrayList<JobStarterOptions>();
+        for (JSStarterJob jsStarterJob : listOfJobs) {
             JobStarterOptions jobStartOptions = new JobStarterOptions();
-            jobStartOptions.setJob(dbItemJobStreamStarterJob.getJob());
+            jobStartOptions.setJob(jsStarterJob.getDbItemJobStreamStarterJob().getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
             jobStartOptions.setListOfParameters(listOfParameters);
-            jobStartOptions.setNormalizedJob(normalizePath(dbItemJobStreamStarterJob.getJob()));
+            jobStartOptions.setSkipped(false);
+            jobStartOptions.setNormalizedJob(normalizePath(jsStarterJob.getDbItemJobStreamStarterJob().getJob()));
             String at = "";
-            if (dbItemJobStreamStarterJob.getDelay() != null) {
-                at = "now+" + String.valueOf(dbItemJobStreamStarterJob.getDelay());
+            if (jsStarterJob.getDbItemJobStreamStarterJob().getDelay() != null) {
+                at = "now+" + String.valueOf(jsStarterJob.getDbItemJobStreamStarterJob().getDelay());
             }
 
-            String jobXml = jobStarter.buildJobStartXml(jobStartOptions, at);
-            String answer = "";
+            boolean startToday = jsStarterJob.isStartToday();
+            if (startToday) {
+                String jobXml = jobStarter.buildJobStartXml(jobStartOptions, at);
+                String answer = "";
 
-            LOGGER.trace("JSInConditionCommand:startJob XML for job start is: " + jobXml);
-            if (schedulerXmlCommandExecutor != null) {
-                answer = schedulerXmlCommandExecutor.executeXml(jobXml);
-                LOGGER.trace(answer);
+                LOGGER.trace("JSInConditionCommand:startJob XML for job start is: " + jobXml);
+                if (schedulerXmlCommandExecutor != null) {
+                    answer = schedulerXmlCommandExecutor.executeXml(jobXml);
+                    LOGGER.trace(answer);
+                } else {
+                    answer = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><spooler> <answer time=\"2020-03-18T14:23:09.033Z\"> <ok> <task enqueued=\"2020-03-18T14:23:09.045Z\" force_start=\"no\" id=\"298620\" job=\"/myJob4711\" log_file=\"D:/documents/sos-berlin.com/scheduler_joc_cockpit/logs/scheduler-2020-03-18-134738.scheduler_joc_cockpit.log\" name=\"\" start_at=\"2020-03-18T14:23:09.040Z\" state=\"none\" steps=\"0\" task=\"298620\"> <log level=\"info\"/>  </task> </ok> </answer></spooler>";
+                    LOGGER.debug("Start job will be ignored as running in debug  mode.: " + jobStartOptions.getJob());
+                }
+                SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
+                Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
+                jobStartOptions.setTaskId(taskId);
             } else {
-                answer = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><spooler> <answer time=\"2020-03-18T14:23:09.033Z\"> <ok> <task enqueued=\"2020-03-18T14:23:09.045Z\" force_start=\"no\" id=\"298620\" job=\"/myJob4711\" log_file=\"D:/documents/sos-berlin.com/scheduler_joc_cockpit/logs/scheduler-2020-03-18-134738.scheduler_joc_cockpit.log\" name=\"\" start_at=\"2020-03-18T14:23:09.040Z\" state=\"none\" steps=\"0\" task=\"298620\"> <log level=\"info\"/>  </task> </ok> </answer></spooler>";
-                LOGGER.debug("Start job will be ignored as running in debug  mode.: " + jobStartOptions.getJob());
+                jobStartOptions.setSkipped(true);
             }
-            SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
-            Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
-            jobStartOptions.setTaskId(taskId);
-            listOfStartedJobs.add(jobStartOptions);
+            listOfHandledJobs.add(jobStartOptions);
         }
 
-        return listOfStartedJobs;
+        return listOfHandledJobs;
 
     }
 
@@ -173,18 +178,18 @@ public class JSJobStreamStarter {
         this.jobStreamName = jobStream;
     }
 
-    public List<DBItemJobStreamStarterJob> getListOfJobs() {
+    public List<JSStarterJob> getListOfJobs() {
         return listOfJobs;
     }
 
-    public void setListOfJobs(List<DBItemJobStreamStarterJob> listOfJobs) {
+    public void setListOfJobs(List<JSStarterJob> listOfJobs) {
         this.listOfJobs = listOfJobs;
     }
 
     public String getAllJobNames() {
         String result = ":";
-        for (DBItemJobStreamStarterJob dbItemJobStreamStarterJob : listOfJobs) {
-            result = result + dbItemJobStreamStarterJob.getJob() + ":";
+        for (JSStarterJob jsStarterJob : listOfJobs) {
+            result = result + jsStarterJob.getDbItemJobStreamStarterJob().getJob() + ":";
         }
         return result;
     }

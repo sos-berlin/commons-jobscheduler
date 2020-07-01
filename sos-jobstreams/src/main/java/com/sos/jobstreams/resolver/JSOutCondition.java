@@ -84,7 +84,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             if (historyEntry != null) {
                 itemEvent.setJobStreamHistoryId(historyEntry.getId());
             } else {
-                LOGGER.warn("unknown historyId for " + session);
+                LOGGER.debug("unknown historyId for " + session + " Maybe a simulated out condition");
                 itemEvent.setJobStreamHistoryId(0L);
             }
 

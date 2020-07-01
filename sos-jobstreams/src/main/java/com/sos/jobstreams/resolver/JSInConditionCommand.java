@@ -1,10 +1,12 @@
 package com.sos.jobstreams.resolver;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.jobstreams.classes.JobStarter;
 import com.sos.jobstreams.classes.JobStarterOptions;
@@ -46,6 +48,7 @@ public class JSInConditionCommand {
     public String getCommandParam() {
         return itemInConditionCommand.getCommandParam();
     }
+
 
     private StartJobReturn startJob(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, JSInCondition inCondition, Map<String, String> listOfParameters) throws NumberFormatException, Exception  {
 

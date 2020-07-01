@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
@@ -42,7 +43,7 @@ public class JSJobStreams {
         return this.listOfJobStreams.get(jobStreamKey);
     }
 
-    public void setListOfJobStreams(List<DBItemJobStream> listOfJobStreams, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
+    public void setListOfJobStreams(EventHandlerSettings settings, List<DBItemJobStream> listOfJobStreams, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
             JsonMappingException, JsonProcessingException, IOException, Exception {
         
         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
@@ -54,7 +55,7 @@ public class JSJobStreams {
             FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
             filterJobStreamStarters.setJobStreamId(itemJobStream.getId());
             List<DBItemJobStreamStarter> listOfJobStreamStarters = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0);
-            jsStreamStream.setJobStreamStarters(listOfJobStreamStarters,listOfJobStreamStarterGlobal, sosHibernateSession);
+            jsStreamStream.setJobStreamStarters(settings,listOfJobStreamStarters,listOfJobStreamStarterGlobal, sosHibernateSession);
             
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
             filterJobStreamHistory.setJobStreamId(itemJobStream.getId());

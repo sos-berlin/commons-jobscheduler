@@ -1,10 +1,13 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +16,20 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamParameters;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamsStarterJobs;
+import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jitl.jobstreams.db.FilterJobStreamParameters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarterJobs;
+import com.sos.jobstreams.classes.JobStreamCalendar;
+
+import sos.util.SOSString;
 
 public class JSJobStream {
 
@@ -74,9 +83,31 @@ public class JSJobStream {
         listOfJobStreamStarter.add(jobStreamStarter);
     }
 
+    private String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+    }
+    
+    public Set<LocalDate> getListOfDates(SOSHibernateSession sosHibernateSession, DBItemJobStreamStarterJob dbItemJobStreamStarterJob, EventHandlerSettings settings) {
+        Set<LocalDate> listOfDates = new HashSet<LocalDate>();
+        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
+        filterCalendarUsage.setPath(normalizePath(dbItemJobStreamStarterJob.getJob()));
+        filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
  
+        JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
+ 
+        try {
+            listOfDates = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
+        } catch (Exception e) {
+            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+        }
+        return listOfDates;
 
-    public void setJobStreamStarters(List<DBItemJobStreamStarter> listOfJobStreamStarters, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession)
+    }
+
+    public void setJobStreamStarters(EventHandlerSettings settings, List<DBItemJobStreamStarter> listOfJobStreamStarters, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession)
             throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
         for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfJobStreamStarters) {
@@ -87,7 +118,18 @@ public class JSJobStream {
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
             filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
-            jobStreamStarter.setListOfJobs(dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0));
+            List<DBItemJobStreamStarterJob> listOfStarterJobs = dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0);
+            List<JSStarterJob> listOfJSStarterJobs = new ArrayList<JSStarterJob>();
+            for (DBItemJobStreamStarterJob dbItemJobStreamStarterJob :listOfStarterJobs) {
+
+                JSStarterJob jsStarterJob = new JSStarterJob();
+                jsStarterJob.setDbItemJobStreamStarterJob(dbItemJobStreamStarterJob);
+                Set<LocalDate> listOfDates = this.getListOfDates(sosHibernateSession, dbItemJobStreamStarterJob, settings );
+                jsStarterJob.setListOfDates(listOfDates);
+                listOfJSStarterJobs.add(jsStarterJob);
+            }
+            
+            jobStreamStarter.setListOfJobs(listOfJSStarterJobs);
 
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();
             filterJobStreamParameters.setJobStreamStarterId(jobStreamStarter.getItemJobStreamStarter().getId());

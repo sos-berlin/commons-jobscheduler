@@ -7,6 +7,7 @@ public class JobStarterOptions {
     private String jobStream;
     private String job;
     private Long taskId;
+    private boolean skipped;
     private Map<String,String>listOfParameters;
     
     public String getNormalizedJob() {
@@ -51,5 +52,15 @@ public class JobStarterOptions {
     
     public void setListOfParameters(Map<String, String> listOfParameters) {
         this.listOfParameters = listOfParameters;
+    }
+
+    
+    public boolean isSkipped() {
+        return skipped;
+    }
+
+    
+    public void setSkipped(boolean skipped) {
+        this.skipped = skipped;
     }
 }
