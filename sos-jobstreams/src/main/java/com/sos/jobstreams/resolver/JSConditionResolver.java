@@ -233,7 +233,7 @@ public class JSConditionResolver {
             List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
             jsJobStreams = new JSJobStreams();
             jsJobStreams.setListOfJobStreams(settings, listOfJobStreams, listOfJobStreamStarter, sosHibernateSession);
-         }
+        }
 
         if (listOfHistoryIds == null) {
             listOfHistoryIds = new HashMap<UUID, DBItemJobStreamHistory>();
@@ -541,95 +541,105 @@ public class JSConditionResolver {
                 if (jobStream.getValue() != null) {
                     List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
                     for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
-                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
-                                .getJobStream(), jsHistoryEntry.getContextId()));
-                        jsHistoryEntry.getContextId();
-                        UUID contextId = jsHistoryEntry.getContextId();
-                        if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
-                            LOGGER.debug("No in conditions defined. Nothing to do");
-                        } else {
-                            sosHibernateSession.beginTransaction();
-                            try {
-                                for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                                    for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                                        String logPrompt = "";
-                                        if (isTraceEnabled) {
-                                            logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
-                                                    + " Expression: " + inCondition.getExpression();
-                                        }
-                                        if (!(inCondition.isConsumed(contextId) && inCondition.isMarkExpression())) {
-                                            if (!inCondition.jobIsRunning(contextId)) {
+                        if (jsHistoryEntry.isRunning()) {
+                            LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                                    .getJobStream(), jsHistoryEntry.getContextId()));
+                            jsHistoryEntry.getContextId();
+                            UUID contextId = jsHistoryEntry.getContextId();
+                            if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
+                                LOGGER.debug("No in conditions defined. Nothing to do");
+                            } else {
+                                sosHibernateSession.beginTransaction();
+                                try {
+                                    for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                                        for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                                            String logPrompt = "";
+                                            if (isTraceEnabled) {
+                                                logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
+                                                        + " Expression: " + inCondition.getExpression();
+                                            }
+                                            if (!(inCondition.isConsumed(contextId) && inCondition.isMarkExpression())) {
+                                                if (!inCondition.jobIsRunning(contextId)) {
 
-                                                if (isTraceEnabled) {
-                                                    LOGGER.trace("---InCondition is: " + inCondition.toStr());
-                                                }
-                                                if (validate(sosHibernateSession, null, contextId, inCondition)) {
-                                                    historyValidated2True = true;
-                                                    StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
-                                                            listOfParameters.get(contextId), schedulerXmlCommandExecutor);
-                                                    if (!startJobReturn.getStartedJob().isEmpty()) {
-                                                        JobStarterOptions jobStarterOptions = new JobStarterOptions();
-                                                        jobStarterOptions.setJob(startJobReturn.getStartedJob());
-                                                        jobStarterOptions.setJobStream(inCondition.getJobStream());
-                                                        jobStarterOptions.setTaskId(startJobReturn.getTaskId());
-                                                        jobStreamContexts.addTaskToContext(contextId, jobSchedulerId, jobStarterOptions,
-                                                                sosHibernateSession);
-                                                        this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(),
-                                                                contextId);
+                                                    if (isTraceEnabled) {
+                                                        LOGGER.trace("---InCondition is: " + inCondition.toStr());
                                                     }
-                                                    inCondition.setEvaluatedContextId(contextId);
-                                                    LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
-                                                    listOfValidatedInconditions.add(inCondition);
+                                                    
+                                                    JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory().getJobStream());
+                                                    JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
+                                                    boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
+                                                    if (!endedByJob) {
+                                                        if (validate(sosHibernateSession, null, contextId, inCondition)) {
+                                                            historyValidated2True = true;
+                                                            StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
+                                                                    listOfParameters.get(contextId), schedulerXmlCommandExecutor);
+                                                            if (!startJobReturn.getStartedJob().isEmpty()) {
+                                                                JobStarterOptions jobStarterOptions = new JobStarterOptions();
+                                                                jobStarterOptions.setJob(startJobReturn.getStartedJob());
+                                                                jobStarterOptions.setJobStream(inCondition.getJobStream());
+                                                                jobStarterOptions.setTaskId(startJobReturn.getTaskId());
+                                                                jobStreamContexts.addTaskToContext(contextId, jobSchedulerId, jobStarterOptions,
+                                                                        sosHibernateSession);
+                                                                this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn
+                                                                        .getStartedJob(), contextId);
+                                                            }
+                                                            inCondition.setEvaluatedContextId(contextId);
+                                                            LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
+                                                            listOfValidatedInconditions.add(inCondition);
+                                                        } else {
+                                                            if (isTraceEnabled) {
+                                                                LOGGER.trace(logPrompt + " evaluated to --> false");
+                                                            }
+                                                        }
+                                                    }
                                                 } else {
                                                     if (isTraceEnabled) {
-                                                        LOGGER.trace(logPrompt + " evaluated to --> false");
+                                                        LOGGER.trace(logPrompt + " not executed --> job is running");
                                                     }
                                                 }
                                             } else {
                                                 if (isTraceEnabled) {
-                                                    LOGGER.trace(logPrompt + " not executed --> job is running");
+                                                    LOGGER.trace(logPrompt + " not executed --> already consumed");
                                                 }
-                                            }
-                                        } else {
-                                            if (isTraceEnabled) {
-                                                LOGGER.trace(logPrompt + " not executed --> already consumed");
                                             }
                                         }
                                     }
-                                }
-                                sosHibernateSession.commit();
-                            } catch (Exception e) {
-                                LOGGER.error(e.getMessage(), e);
-                                sosHibernateSession.rollback();
-                            }
-                        }
-
-                        if (!historyValidated2True) {
-                            if (!jsHistoryEntry.checkRunning(this)) {
-                                try {
-                                    LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
-                                    jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
-                                    DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-                                    DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
-                                            .getId());
-                                    if (dbItemJobStreamHistory != null) {
-                                        sosHibernateSession.beginTransaction();
-                                        dbItemJobStreamHistory.setRunning(false);
-                                        dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
-                                        sosHibernateSession.commit();
-                                        toRemove.add(jsHistoryEntry);
-                                        this.listOfParameters.remove(contextId);
-                                    }
+                                    sosHibernateSession.commit();
                                 } catch (Exception e) {
                                     LOGGER.error(e.getMessage(), e);
                                     sosHibernateSession.rollback();
                                 }
                             }
-                        }
-                    }
-                    jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
-                }
 
+                            if (!historyValidated2True) {
+                                if (!jsHistoryEntry.checkRunning(this)) {
+                                    try {
+                                        LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
+                                        jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
+                                        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                                        DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(
+                                                jsHistoryEntry.getId());
+                                        if (dbItemJobStreamHistory != null) {
+                                            sosHibernateSession.beginTransaction();
+                                            dbItemJobStreamHistory.setRunning(false);
+                                            dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
+                                            sosHibernateSession.commit();
+                                            toRemove.add(jsHistoryEntry);
+                                            this.listOfParameters.remove(contextId);
+                                        }
+                                    } catch (Exception e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                        sosHibernateSession.rollback();
+                                    }
+                                }
+                            }
+                        }
+                        LOGGER.debug("history size: " + jobStream.getValue().getListOfJobStreamHistory().size());
+                        LOGGER.debug("history to remove size: " + toRemove.size());
+                        jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
+                        LOGGER.debug("history size after remove: " + jobStream.getValue().getListOfJobStreamHistory().size());
+                    }
+                }
             }
         }
         return listOfValidatedInconditions;

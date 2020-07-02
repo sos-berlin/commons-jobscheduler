@@ -19,12 +19,12 @@ import com.sos.jobstreams.classes.JobStarterOptions;
 public class JobStreamContexts {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamContexts.class);
-    private Map<UUID, List<Long>> listOfContexts;
+    private Map<UUID, List<JobStarterOptions>> listOfContexts;
     private Map<Long, UUID> listOfTaskIds;
-
+ 
     public JobStreamContexts() {
         super();
-        listOfContexts = new HashMap<UUID, List<Long>>();
+        listOfContexts = new HashMap<UUID, List<JobStarterOptions>>();
         listOfTaskIds = new HashMap<Long, UUID>();
     }
 
@@ -32,7 +32,7 @@ public class JobStreamContexts {
         LOGGER.debug(String.format("adding task %s to context %s", startedJob.getTaskId(), contextId.toString()));
         if (listOfContexts.get(contextId) == null) {
             LOGGER.debug("init list of tasks for context " + contextId.toString());
-            List<Long> l = new ArrayList<Long>();
+            List<JobStarterOptions> l = new ArrayList<JobStarterOptions>();
             listOfContexts.put(contextId, l);
         }
         DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
@@ -46,7 +46,7 @@ public class JobStreamContexts {
         LOGGER.debug("store contextid:" + contextId);
         dbLayerJobStreamsTaskContext.store(dbItemJobStreamTaskContext);
         LOGGER.debug("adding contextid:" + contextId);
-        listOfContexts.get(contextId).add(startedJob.getTaskId());
+        listOfContexts.get(contextId).add(startedJob);
         LOGGER.debug("adding taskid " + startedJob.getTaskId());
         listOfTaskIds.put(startedJob.getTaskId(), contextId);
     }
@@ -55,7 +55,7 @@ public class JobStreamContexts {
         return listOfTaskIds.get(taskId);
     }
 
-    public Map<UUID, List<Long>> getListOfContexts() {
+    public Map<UUID, List<JobStarterOptions>> getListOfContexts() {
         return listOfContexts;
     }
 
@@ -64,10 +64,15 @@ public class JobStreamContexts {
             UUID contextId = UUID.fromString(dbItemJobStreamTaskContext.getJobStreamHistoryId());
             if (listOfContexts.get(contextId) == null) {
                 LOGGER.debug("init list of tasks for context " + contextId.toString());
-                List<Long> l = new ArrayList<Long>();
+                List<JobStarterOptions> l = new ArrayList<JobStarterOptions>();
                 listOfContexts.put(contextId, l);
             }
-            listOfContexts.get(contextId).add(dbItemJobStreamTaskContext.getTaskId());
+            
+            JobStarterOptions jobStarterOptions = new JobStarterOptions();
+            jobStarterOptions.setJob(dbItemJobStreamTaskContext.getJob());
+            jobStarterOptions.setJobStream(dbItemJobStreamTaskContext.getJobStream());
+            jobStarterOptions.setTaskId(dbItemJobStreamTaskContext.getTaskId());
+            listOfContexts.get(contextId).add(jobStarterOptions);
             listOfTaskIds.put(dbItemJobStreamTaskContext.getTaskId(), contextId);
         }
     }

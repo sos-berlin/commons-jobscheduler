@@ -3,6 +3,7 @@ package com.sos.jobstreams.resolver;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
+import com.sos.jobstreams.classes.JobStarterOptions;
 
 import sos.util.SOSString;
 
@@ -56,14 +58,26 @@ public class JSHistoryEntry {
         return itemJobStreamHistory;
     }
 
-    private boolean endOfStream(JSJobStream jsJobStream, JSInConditions jsInConditions) {
+    public boolean endOfStream(JSJobStream jsJobStream, JobStreamContexts jobStreamContexts) {
         // Checking all starters whether there is an end job
         LOGGER.debug("Check for end job in job stream: " + jsJobStream.getJobStream());
         boolean endReached = false;
         for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
             if (!"".equals(jsJobStreamStarter.getEndJob())) {
                 LOGGER.debug("end job found for starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " Job: " + jsJobStreamStarter.getEndJob());
-                for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+              
+                Map <UUID, List<JobStarterOptions>> mapOfContexts = jobStreamContexts.getListOfContexts();
+                List<JobStarterOptions> listOfJobStarterOptions = mapOfContexts.get(this.getContextId()); 
+                for (JobStarterOptions jobStarterOptions:listOfJobStarterOptions) {
+                    LOGGER.debug("check job: " + jobStarterOptions.getJob());
+                    if (jobStarterOptions.getJob().equals(jsJobStreamStarter.getEndJob())) {
+                        endReached = true;
+                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsJobStreamStarter.getEndJob() + " for the instance " + this.getContextId());
+                        break;
+                    }
+                }
+              
+                /*for (JobStreamContext jobStreamContext : jsInConditions.getListOfInConditions().values()) {
                     boolean isConsumed = jsInCondition.isConsumed(this.getContextId());
                     LOGGER.debug("jsInCondition expression:" + jsInCondition.getExpression());
                     LOGGER.debug("jsInCondition is consumed :" + isConsumed);
@@ -75,9 +89,8 @@ public class JSHistoryEntry {
                         endReached = true;
                         break;
                     }
-                }
+                }*/
             }
-
         }
 
         return endReached;
@@ -101,9 +114,10 @@ public class JSHistoryEntry {
 
         JSInConditions jsInConditions = jsConditionResolver.getJsJobStreamInConditions().getListOfJobStreamInConditions().get(
                 jsJobStreamConditionKey);
+        JobStreamContexts jobStreamContexts = jsConditionResolver.getJobStreamContexts();
         if (jsInConditions != null) {
 
-            boolean endedByJob = this.endOfStream(jsJobStream, jsInConditions);
+            boolean endedByJob = this.endOfStream(jsJobStream, jobStreamContexts);
             if (!endedByJob) {
 
                 LOGGER.debug("- local OutCondition Events: ");
