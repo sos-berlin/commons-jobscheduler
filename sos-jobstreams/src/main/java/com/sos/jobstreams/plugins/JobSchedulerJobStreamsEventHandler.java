@@ -26,6 +26,8 @@ import com.sos.jitl.eventhandler.handler.LoopEventHandler;
 import com.sos.jitl.eventhandler.plugin.notifier.Notifier;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
+import com.sos.jitl.jobstreams.db.DBItemInCondition;
+import com.sos.jitl.jobstreams.db.DBItemInConditionCommand;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
 import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
@@ -41,6 +43,7 @@ import com.sos.jobstreams.classes.JobSchedulerEvent;
 import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.QueuedEvents;
+import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSHistoryEntry;
@@ -126,7 +129,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                           
+
                             dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
@@ -216,7 +219,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                             sosHibernateSession.beginTransaction();
                             DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-                           
+
                             dbItemJobStreamStarter.setNextStart(new Date(next));
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             sosHibernateSession.commit();
@@ -443,8 +446,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             do {
                 skippedTask = false;
 
-                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(sosHibernateSession, super.getSettings()
-                        .getSchedulerId());
+                List<JSInCondition> listOfValidatedInconditions = conditionResolver.resolveInConditions(sosHibernateSession);
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                         LOGGER.debug("checking whether to execute out conditions for skipped jobs");
@@ -574,6 +576,24 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             }
                             this.resetGlobalEventsPollTimer();
 
+                            break;
+                        case "StartJob":
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            JSInConditionCommand jsInConditionCommand = new JSInConditionCommand();
+                            jsInConditionCommand.setCommand("startjob");
+                            jsInConditionCommand.setCommandParam("now");
+                            
+                            String session = customEvent.getSession();
+                            UUID contextId = UUID.fromString(session);
+                            JSInCondition inCondition = new JSInCondition();
+                            DBItemInCondition itemInCondition = new DBItemInCondition();
+                            itemInCondition.setJob(customEvent.getJob());
+                            itemInCondition.setJobStream(customEvent.getJobStream());
+                            inCondition.setItemInCondition(itemInCondition);
+                            JobStarterOptions jobStarterOptions = new JobStarterOptions();
+                            jobStarterOptions.setJob(inCondition.getNormalizedJob());
+                            StartJobReturn startJobReturn = jsInConditionCommand.startJob(this.getXmlCommandExecutor(),inCondition,conditionResolver.getListOfParameters().get(contextId));                                                      
+                            conditionResolver.handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
                             break;
                         case "CalendarUsageUpdated":
                         case "CalendarDeleted":

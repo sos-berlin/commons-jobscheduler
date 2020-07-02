@@ -255,4 +255,9 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         this.evaluatedContextId = evaluatedContextId;
     }
 
+    
+    public DBItemInCondition getItemInCondition() {
+        return itemInCondition;
+    }
+
 }

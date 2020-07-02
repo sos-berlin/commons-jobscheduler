@@ -63,7 +63,7 @@ public class TestInConditionResolver {
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver conditionResolver = new JSConditionResolver(null,settings);
         conditionResolver.init(session);
-        conditionResolver.resolveInConditions(session, settings.getSchedulerId());
+        conditionResolver.resolveInConditions(session);
       //  conditionResolver.resolveOutConditions();
     }
 

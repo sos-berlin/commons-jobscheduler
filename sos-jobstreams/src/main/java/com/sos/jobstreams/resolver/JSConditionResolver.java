@@ -527,8 +527,19 @@ public class JSConditionResolver {
         return evaluatedExpression;
     }
 
-    public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession, String jobSchedulerId) throws NumberFormatException,
-            Exception {
+    public void handleStartedJob(UUID contextId, SOSHibernateSession sosHibernateSession, StartJobReturn startJobReturn, JSInCondition inCondition)
+            throws SOSHibernateException {
+        if (!startJobReturn.getStartedJob().isEmpty()) {
+            JobStarterOptions jobStarterOptions = new JobStarterOptions();
+            jobStarterOptions.setJob(startJobReturn.getStartedJob());
+            jobStarterOptions.setJobStream(inCondition.getJobStream());
+            jobStarterOptions.setTaskId(startJobReturn.getTaskId());
+            jobStreamContexts.addTaskToContext(contextId, settings.getSchedulerId(), jobStarterOptions, sosHibernateSession);
+            this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(), contextId);
+        }
+    }
+
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession) throws NumberFormatException, Exception {
 
         LOGGER.debug("JSConditionResolver::resolveInConditions");
 
@@ -564,8 +575,9 @@ public class JSConditionResolver {
                                                     if (isTraceEnabled) {
                                                         LOGGER.trace("---InCondition is: " + inCondition.toStr());
                                                     }
-                                                    
-                                                    JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory().getJobStream());
+
+                                                    JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry
+                                                            .getItemJobStreamHistory().getJobStream());
                                                     JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
                                                     boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
                                                     if (!endedByJob) {
@@ -573,16 +585,7 @@ public class JSConditionResolver {
                                                             historyValidated2True = true;
                                                             StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
                                                                     listOfParameters.get(contextId), schedulerXmlCommandExecutor);
-                                                            if (!startJobReturn.getStartedJob().isEmpty()) {
-                                                                JobStarterOptions jobStarterOptions = new JobStarterOptions();
-                                                                jobStarterOptions.setJob(startJobReturn.getStartedJob());
-                                                                jobStarterOptions.setJobStream(inCondition.getJobStream());
-                                                                jobStarterOptions.setTaskId(startJobReturn.getTaskId());
-                                                                jobStreamContexts.addTaskToContext(contextId, jobSchedulerId, jobStarterOptions,
-                                                                        sosHibernateSession);
-                                                                this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn
-                                                                        .getStartedJob(), contextId);
-                                                            }
+                                                            handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
                                                             inCondition.setEvaluatedContextId(contextId);
                                                             LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
                                                             listOfValidatedInconditions.add(inCondition);
@@ -884,4 +887,15 @@ public class JSConditionResolver {
         return listOfHistoryIds;
     }
 
+    
+    public Map<UUID, Map<String, String>> getListOfParameters() {
+        return listOfParameters;
+    }
+
+    
+    public void setListOfParameters(Map<UUID, Map<String, String>> listOfParameters) {
+        this.listOfParameters = listOfParameters;
+    }
+
+   
 }
