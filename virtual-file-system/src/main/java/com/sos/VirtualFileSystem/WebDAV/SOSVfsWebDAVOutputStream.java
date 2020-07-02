@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
 
 public class SOSVfsWebDAVOutputStream extends ByteArrayOutputStream {
@@ -12,8 +11,6 @@ public class SOSVfsWebDAVOutputStream extends ByteArrayOutputStream {
     @SuppressWarnings("unused")
     private final String conClassName = "SOSVfsWebDAV";
 
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(SOSVfsWebDAVOutputStream.class);
     private final WebdavResource resource;
 
     /** \brief SOSVfsWebDAVOutputStream

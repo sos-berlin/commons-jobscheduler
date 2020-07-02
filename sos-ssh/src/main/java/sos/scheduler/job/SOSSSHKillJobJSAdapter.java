@@ -2,14 +2,14 @@ package sos.scheduler.job;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.spooler.Variable_set;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
 
@@ -17,8 +17,8 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
     private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
     private static final String PARAM_SSH_JOB_TIMEOUT_KILL_AFTER = "ssh_job_timeout_kill_after";
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHKillJobJSAdapter.class);
-    private Variable_set allParams;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillJobJSAdapter.class);
+    private HashMap<String, String> allParams;
 
     @Override
     public boolean spooler_process() throws Exception {
@@ -27,7 +27,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             successfull = doProcessing();
         } catch (Exception e) {
-            LOGGER.fatal(stackTrace2String(e));
+            LOGGER.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         if (successfull) {
@@ -40,22 +40,22 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     private boolean doProcessing() throws Exception {
         SOSSSHJob2 sshJob;
         allParams = getGlobalSchedulerParameters();
-        allParams.merge(getParameters());
+        allParams.putAll(getParameters());
         boolean taskIsActive = true;
         boolean timeoutAfterKillIsSet = false;
-        if (allParams.value(PARAM_SSH_JOB_TASK_ID) != null && !allParams.value(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
-            taskIsActive = isTaskActive(allParams.value(PARAM_SSH_JOB_TASK_ID));
+        if (allParams.get(PARAM_SSH_JOB_TASK_ID) != null && !allParams.get(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
+            taskIsActive = isTaskActive(allParams.get(PARAM_SSH_JOB_TASK_ID));
         } else {
             taskIsActive = false;
         }
-        if (allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()) {
+        if (allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()) {
             timeoutAfterKillIsSet = true;
         }
         LOGGER.info("Task is still active: " + taskIsActive);
         sshJob = executeCheckPids();
         if (((SOSSSHCheckRemotePidJob) sshJob).getPids() != null) {
             spooler_log.debug9(((SOSSSHCheckRemotePidJob) sshJob).getPids());
-            spooler_task.order().params().set_var(PARAM_PIDS_TO_KILL, ((SOSSSHCheckRemotePidJob) sshJob).getPids());
+            getOrderParams().set_var(PARAM_PIDS_TO_KILL, ((SOSSSHCheckRemotePidJob) sshJob).getPids());
         }
         String runningPids = spooler_task.order().params().value(PARAM_PIDS_TO_KILL);
         if (taskIsActive && runningPids != null && !runningPids.isEmpty()) {
@@ -66,8 +66,8 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
         } else if (taskIsActive && (runningPids == null || runningPids.isEmpty())) {
             // if task is still running but remote pid is not available anymore (finished) --> kill task
             LOGGER.info("Task is still active, try to end task!");
-            String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\""
-                    + allParams.value(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
+            String killTaskXml = new String("<kill_task job=\"" + allParams.get(PARAM_SSH_JOB_NAME) + "\" id=\""
+                    + allParams.get(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
             String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
             LOGGER.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
             return true;
@@ -83,7 +83,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             // and a timeout_kill_after is set --> terminate remote pid
             // if timeout_kill_after is set, try terminate first and kill after
             // timeout
-            allParams.set_value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
+            allParams.put(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
             sshJob = executeTerminatePids();
             return true;
         } else if (!taskIsActive && (runningPids == null || runningPids.isEmpty())) {

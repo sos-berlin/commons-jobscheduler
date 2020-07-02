@@ -1,7 +1,9 @@
 package com.sos.VirtualFileSystem.SSH;
 
 import java.io.InputStream;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.spooler.Variable_set;
 
@@ -37,7 +39,7 @@ public class SOSSSH2BaseImpl extends SOSVfsBaseClass {
 
     private final String conClassName = "SOSSSH2BaseImpl";
 
-    protected final Logger logger = Logger.getLogger(SOSSSH2BaseImpl.class);
+    protected final Logger logger = LoggerFactory.getLogger(SOSSSH2BaseImpl.class);
     protected Msg objMsg = new Msg(new BundleBaseName(this.getClass().getAnnotation(I18NResourceBundle.class).baseName()));
     boolean isAuthenticated = false;
     boolean isConnected = false;

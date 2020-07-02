@@ -12,6 +12,7 @@ import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
@@ -74,6 +75,19 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     public void setRaiseExceptionOnError(final SOSOptionBoolean raiseExceptionOnError) {
         this.raiseExceptionOnError = raiseExceptionOnError;
+    }
+    
+    @JSOptionDefinition(name = "use_keyagent", description = "Using a keyagent to get the privat key file", key = "use_keyagent",
+            type = "SOSOptionBoolean", mandatory = true)
+    public SOSOptionBoolean useKeyAgent = new SOSOptionBoolean(this, CLASSNAME + ".use_keyagent", 
+            "Using a keyagent to get the privat key file", "true", "true", true);
+
+    public SOSOptionBoolean isUseKeyAgent() {
+        return useKeyAgent;
+    }
+
+    public void setUseKeyAgent(final SOSOptionBoolean useKeyAgent) {
+        this.useKeyAgent = useKeyAgent;
     }
 
     @JSOptionDefinition(name = "auth_file", description = "auth_file", key = "auth_file", type = "SOSOptionString", mandatory = false)
@@ -157,6 +171,11 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
             type = "SOSOptionString", mandatory = false)
     public SOSOptionPassword password = new SOSOptionPassword(this, CLASSNAME + ".password", 
             "This parameter specifies the user account password for au", null, null, false);
+
+    @JSOptionDefinition(name = "passphrase", description = "This parameter specifies the user account passphrase for au", key = "passphrase", 
+            type = "SOSOptionPassword", mandatory = false)
+    public SOSOptionPassword passphrase = new SOSOptionPassword(this, CLASSNAME + ".passphrase", 
+            "This parameter specifies the user account passphrase for au", null, null, false);
 
     @JSOptionDefinition(name = "port", description = "This parameter specifies the port number of the SSH serve", key = "port", 
             type = "SOSOptionString", mandatory = true)
@@ -529,6 +548,16 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
+    public SOSOptionPassword getPassphrase() {
+        return passphrase;
+    }
+
+    @Override
+    public void setPassphrase(final SOSOptionPassword val) {
+        this.passphrase = val;
+    }
+    
+    @Override
     public SOSOptionPortNumber getPort() {
         return port;
     }
@@ -710,5 +739,31 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public void setProxyHost(SOSOptionProxyProtocol val) {
         proxyProtocol = val;
     }
+    
+    @JSOptionDefinition(name = "temp_dir", description = "Entry point or remote temp directory of the ssh session",
+            key = "temp_dir", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName tempDirectory = new SOSOptionFolderName(this, CLASSNAME + ".temp_dir",
+            "Entry point or remote temp directory of the ssh session", ".", ".", false);
+
+    public SOSOptionFolderName getTempDirectory() {
+        return tempDirectory;
+    }
+
+    public void setTempDirectory(SOSOptionFolderName val) {
+        tempDirectory = val;
+    }
+    
+    @JSOptionDefinition(name = "auto_detect_os", description = "automatic OS detection is used to specify remote commands by implication",
+            key = "auto_detect_os", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean autoDetectOS = new SOSOptionBoolean(this, CLASSNAME + ".auto_detect_os", 
+            "automatic OS detection is used to specify remote commands by implication", "true", "true", false);
+
+    public SOSOptionBoolean getAutoDetectOS() {
+        return autoDetectOS;
+    }
+
+    public void setAutoDetectOS(final SOSOptionBoolean autoDetectOS) {
+        this.autoDetectOS = autoDetectOS;
+    }    
 
 }

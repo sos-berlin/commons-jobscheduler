@@ -26,11 +26,13 @@ public class SOSOptionInFileName extends JSOptionInFileName {
             this.getJSFile();
             if (objFile != null) {
                 String lstrFileName = objFile.getPath();
-                if (!objFile.exists()) {
-                    throw new RuntimeException(String.format("%1$s: file '%2$s' does not exists", conMethodName, lstrFileName));
-                }
-                if (!objFile.canRead()) {
-                    throw new RuntimeException(String.format("%1$s: file '%2$s' is not readable", conMethodName, lstrFileName));
+                if (!lstrFileName.startsWith("cs:")) {
+                    if (!objFile.exists()) {
+                        throw new RuntimeException(String.format("%1$s: file '%2$s' does not exists", conMethodName, lstrFileName));
+                    }
+                    if (!objFile.canRead()) {
+                        throw new RuntimeException(String.format("%1$s: file '%2$s' is not readable", conMethodName, lstrFileName));
+                    }
                 }
             }
         }

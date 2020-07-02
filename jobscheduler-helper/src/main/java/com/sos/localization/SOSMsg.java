@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -14,7 +14,7 @@ import com.sos.JSHelper.io.Files.JSTextFile;
 /** @author JS */
 public class SOSMsg {
 
-    protected static final Logger logger = Logger.getLogger(SOSMsg.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SOSMsg.class);
     protected String strLastMsgKey = "";
     protected String strControlName = "";
     protected String strControlParent = "";
@@ -87,10 +87,10 @@ public class SOSMsg {
             logger.error(pstrLogMsg);
             break;
         case fatal:
-            logger.fatal(pstrLogMsg);
+            logger.error(pstrLogMsg);
             throw new JobSchedulerException(pstrLogMsg);
         case warning:
-            if (logger.isEnabledFor(Level.WARN)) {
+            if (logger.isWarnEnabled()) {
                 logger.warn(pstrLogMsg);
             }
             break;

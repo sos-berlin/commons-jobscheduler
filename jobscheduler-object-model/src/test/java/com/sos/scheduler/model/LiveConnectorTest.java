@@ -2,10 +2,11 @@ package com.sos.scheduler.model;
 
 import com.sos.scheduler.model.objects.JSObjOrder;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  * </div> */
 public class LiveConnectorTest extends TestBase {
 
-    private final static Logger logger = Logger.getLogger(LiveConnectorTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(LiveConnectorTest.class);
     private static SchedulerObjectFactory factory = null;
 
     private static final String liveFolder = "/testdata/connector/";
@@ -57,7 +58,7 @@ public class LiveConnectorTest extends TestBase {
         SchedulerHotFolderFileList fileList = hotFolder.loadRecursive();
         List<JSObjOrder> orders = fileList.getOrderList();
         for (JSObjOrder order : orders) {
-            logger.debug(order.getHotFolderSrc());
+            LOGGER.debug(order.getHotFolderSrc().toString());
         }
     }
 
@@ -65,7 +66,7 @@ public class LiveConnectorTest extends TestBase {
     @Ignore("Test set to Ignore for later examination, fails in Jenkins build")
     public final void testFTP() throws MalformedURLException {
         final String liveFolderName = "ftp://Administrator@8of9.sos:21" + liveFolder;
-        logger.debug("liveFolderName=" + liveFolderName);
+        LOGGER.debug("liveFolderName=" + liveFolderName);
         LiveConnector connector = new LiveConnector(new URL(liveFolderName));
         SchedulerHotFolder hotFolder = factory.createSchedulerHotFolder(connector.getHotFolderHandle());
         SchedulerHotFolderFileList fileList = hotFolder.loadRecursive();

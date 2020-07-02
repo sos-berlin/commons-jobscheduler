@@ -11,7 +11,8 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListenerClass;
@@ -19,7 +20,7 @@ import com.sos.localization.Messages;
 
 public class JSToolBox extends JSListenerClass {
 
-    private static final Logger LOGGER = Logger.getLogger(JSToolBox.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSToolBox.class);
     private static final String ENVVAR_SOS_LOCALE = "SOS_LOCALE";
     protected final String EMPTY_STRING = "";
     BufferedWriter objOut = null;
@@ -69,6 +70,7 @@ public class JSToolBox extends JSListenerClass {
 
     protected String makeFullPathName(final String pstrPathname, final String pstrFileName) {
         String strT = pstrFileName;
+        if(pstrFileName == null) return "";
         String normalizedFilename = pstrFileName.replace('\\', '/');
         String normalizedPathname = pstrPathname.replace('\\', '/');
         if (!normalizedFilename.startsWith(normalizedPathname)) {

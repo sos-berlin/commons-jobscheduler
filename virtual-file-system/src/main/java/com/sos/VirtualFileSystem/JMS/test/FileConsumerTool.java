@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -40,11 +41,12 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQBytesMessage;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileConsumerTool extends Thread implements MessageListener, ExceptionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(FileConsumerTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileConsumerTool.class);
     private ActiveMQConnection connection;
     private boolean running;
     private Session session;
@@ -70,7 +72,7 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
     private String strTargetFileNameSave = "";
 
     public static void main(final String[] args) {
-        ArrayList<FileConsumerTool> threads = new ArrayList();
+        List<FileConsumerTool> threads = new ArrayList<FileConsumerTool>();
         FileConsumerTool consumerTool = new FileConsumerTool();
         String[] unknown = CommandLineSupport.setOptions(consumerTool, args);
         if (unknown.length > 0) {

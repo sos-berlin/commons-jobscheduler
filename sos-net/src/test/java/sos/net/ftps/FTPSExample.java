@@ -13,12 +13,13 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public final class FTPSExample {
 
-    private static final Logger LOGGER = Logger.getLogger(FTPSExample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FTPSExample.class);
     public static final String USAGE = "Usage: ftp [-s] [-b] <hostname> <username> <password> <remote file> <local file>\n"
             + "\nDefault behavior is to download a file and use ASCII transfer mode.\n" + "\t-s store file on server (upload)\n"
             + "\t-b use binary transfer mode\n";

@@ -5,11 +5,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
@@ -37,7 +38,7 @@ public class SchedulerHotFolderTest {
 
     private static final String LIVE_FOLDER_LOCATION = "/8of9_buildjars_4210/config/live/";
     private static final String LIVE_LOCAL_FOLDER_LOCATION = "Z:" + LIVE_FOLDER_LOCATION;
-    private static final Logger LOGGER = Logger.getLogger(SchedulerHotFolderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerHotFolderTest.class);
     private static SchedulerObjectFactory objFactory = null;
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
@@ -60,7 +61,7 @@ public class SchedulerHotFolderTest {
             objVFS = VFSFactory.getHandler("local");
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -75,7 +76,7 @@ public class SchedulerHotFolderTest {
             objVFS.authenticate(objOptions);
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -283,6 +284,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadJobChainByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "BuildJars.job_chain.xml";
@@ -295,6 +297,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadJobByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "junitModel/testOrderJob.job.xml";
@@ -307,6 +310,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public final void loadLockByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "junitModel/testlock.lock.xml";
@@ -359,6 +363,7 @@ public class SchedulerHotFolderTest {
     }
 
     @Test
+    @Ignore
     public void testDateRange() {
         for (int i = 20; i < 60; i++) {
             LOGGER.info(addDays(new Date(), i) + " --- " + i);
@@ -391,7 +396,7 @@ public class SchedulerHotFolderTest {
             c1.setTimeInMillis(new Date().getTime());
             c1.set(intYear, intMonth, intLastFridayInMOnth, 23, 30, 30);
             LOGGER.debug("lastfriday = " + c1.getTime());
-            LOGGER.debug(c1.getTimeInMillis());
+            LOGGER.debug("" + c1.getTimeInMillis());
             if (objHolidays.isAHoliday(c1)) {
                 LOGGER.info(c1.getTime() + " is a Holiday");
                 Calendar c2 = (Calendar) c1.clone();
@@ -420,10 +425,11 @@ public class SchedulerHotFolderTest {
         String strTestFilePath = LIVE_LOCAL_FOLDER_LOCATION + "junitModel/testJobChain,testOrder.order.xml";
         File strTestFile = new File(strTestFilePath);
         Object obj = objFactory.unMarshall(strTestFile);
-        LOGGER.info(obj.getClass());
+        LOGGER.info("" + obj.getClass());
     }
 
     @Test
+    @Ignore
     public final void loadOrderByFtpVfs() {
         prepareFtpVfs();
         String strTestFilePath = LIVE_FOLDER_LOCATION + "BuildJars,1.order.xml";

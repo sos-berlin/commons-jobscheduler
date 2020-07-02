@@ -2,7 +2,6 @@ package com.sos.dialog.components;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;

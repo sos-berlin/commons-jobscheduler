@@ -19,7 +19,7 @@ public class ClassListTest {
         classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
         classList.addClassIfExist("com.sos.hibernate.classes.DbItem");
         assertEquals(EXPECTED_CLASSES.size(), classList.getClasses().size());
-        for (Class c : classList.getClasses()) {
+        for (Class<?> c : classList.getClasses()) {
             assertTrue(EXPECTED_CLASSES.contains(c.getName()));
         }
     }

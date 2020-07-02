@@ -1,7 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
-
 /** \class JSOrderId
  * 
  * \brief JSOrderId -
@@ -29,10 +27,6 @@ import org.apache.log4j.Logger;
 public class JSOrderId extends SOSOptionElement {
 
     private static final long serialVersionUID = -4801697306092176103L;
-    @SuppressWarnings("unused")
-    private final String conClassName = "JSOrderId";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSOrderId.class);
 
     /** \brief JSOrderId
      *

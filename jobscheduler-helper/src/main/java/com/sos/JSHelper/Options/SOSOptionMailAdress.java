@@ -1,7 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
-
 /** \class SOSOptionMailAdress
  * 
  * \brief SOSOptionMailAdress -
@@ -25,16 +23,7 @@ import org.apache.log4j.Logger;
 /** @author KB */
 public class SOSOptionMailAdress extends SOSOptionString {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -3108431782466472299L;
-    @SuppressWarnings("unused")
-    private final String conClassName = "SOSOptionMailAdress";
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings({ "unused", "hiding" })
-    private static final Logger logger = Logger.getLogger(SOSOptionMailAdress.class);
 
     /** \brief SOSOptionMailAdress
      *

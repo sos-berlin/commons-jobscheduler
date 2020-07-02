@@ -7,11 +7,12 @@ import static com.sos.dialog.swtdesigner.SWTResourceManager.getCursor;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -22,8 +23,7 @@ public class SOSCursor implements AutoCloseable {
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSCursor.class);
 
     private final Stack<Cursor> objCursorStack = new Stack<>();
     private Shell shell = null;
@@ -51,7 +51,7 @@ public class SOSCursor implements AutoCloseable {
         if (shell.isDisposed() == false) {
             objCursorStack.push(shell.getCursor());
             shell.setCursor(getCursor(pintCursor));
-            logger.trace("set cursor to " + pintCursor);
+            LOGGER.trace("set cursor to " + pintCursor);
         }
 
     }
@@ -62,7 +62,7 @@ public class SOSCursor implements AutoCloseable {
         try {
             if (shell.isDisposed() == false) {
                 shell.setCursor(objCursorStack.pop());
-                logger.trace("close SOSCursor. reestablish the cursor");
+                LOGGER.trace("close SOSCursor. reestablish the cursor");
             }
         } catch (Exception e) {
             throw new JobSchedulerException(e);

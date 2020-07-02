@@ -10,10 +10,10 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +23,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.Util;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -48,8 +49,11 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 import sos.util.SOSString;
@@ -73,7 +77,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     protected SOSFtpServerReply objFTPReply = null;
     protected SOSOptionTransferMode objTransferMode = null;
     private static final String CLASS_NAME = "SOSVfsFtpBaseClass";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpBaseClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpBaseClass.class);
     private ISOSAuthenticationOptions objAO = null;
     private SOSOptionProxyProtocol proxyProtocol = null;
     private String proxyHost = null;
@@ -437,8 +441,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             LOGGER.debug(SOSVfs_D_127.params(strT));
             x = cd(strT);
             logReply();
+        } catch (SocketException e) {
+            raiseException(e, getHostID(SOSVfs_E_0105.params("doCD")));
         } catch (IOException e) {
-            //
+            LOGGER.debug(e.toString(), e);
         }
         return x;
     }
@@ -503,7 +509,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public void executeCommand(final String strCmd, final Map<String, String> env) throws Exception {
+    public void executeCommand(final String strCmd, SOSVfsEnv env) throws Exception {
         String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
         sendCommand(command);
         LOGGER.info(SOSVfs_D_151.params(strCmd, getReplyString()));
@@ -669,8 +675,15 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return getFilenames(pathname, false);
     }
 
-    private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) {
-        return getFilenames(pstrPathName, flgRecurseSubFolders, true);
+    private Vector<String> getFilenames(final String pathName, final boolean recurseSubFolders) {
+        Vector<String> listOfFilenames = getFilenames(pathName, recurseSubFolders, true);
+
+        for (String currentFileName : listOfFilenames) {
+            SOSFileEntry sosFileEntry = new SOSFileEntry();
+            sosFileEntry.setFilename(currentFileName);
+            sosFileEntries.add(sosFileEntry);
+        }
+        return getFilenames(pathName, recurseSubFolders, true);
     }
 
     private Vector<String> getFilenames(final String path, final boolean withRecurseSubFolders, final boolean checkReplyCode) {
@@ -961,7 +974,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 }
             } else {
                 LOGGER.info(SOSVfs_D_132.params(strUserName));
-                throw new JobSchedulerException(SOSVfs_E_134.params("Login"));
+                throw new JobSchedulerException(SOSVfs_E_134.params("Login") + " code:" + objFTPReply.getCode() + " Message: " + objFTPReply
+                        .getMessages()[0]);
             }
         } catch (JobSchedulerException e) {
             throw e;
@@ -1408,6 +1422,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

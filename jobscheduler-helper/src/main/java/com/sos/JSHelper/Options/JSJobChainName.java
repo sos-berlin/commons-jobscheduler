@@ -1,7 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
-
 /** \class JSJobChainName
  * 
  * \brief JSJobChainName -
@@ -31,7 +29,6 @@ public class JSJobChainName extends SOSOptionString {
     private static final long serialVersionUID = -2882063205764903596L;
     @SuppressWarnings("unused")
     private final String conClassName = "JSJobChainName";
-    private static final Logger logger = Logger.getLogger(JSJobChainName.class);
 
     /** \brief JSJobChainName
      *

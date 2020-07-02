@@ -1,22 +1,17 @@
 package com.sos.hibernate.layer;
 
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 
 /** @author Uwe Risse */
-public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
+public abstract class SOSHibernateIntervalDBLayer<T> extends SOSHibernateDBLayer {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalDBLayer.class);
     public abstract SOSHibernateIntervalFilter getFilter();
-    public abstract void onAfterDeleting(DbItem h) throws SOSHibernateException ;
-    public abstract List<DbItem> getListOfItemsToDelete() throws SOSHibernateException;
+    public abstract void onAfterDeleting(T h) throws SOSHibernateException ;
+    public abstract List<T> getListOfItemsToDelete() throws SOSHibernateException;
     public abstract long deleteInterval() throws SOSHibernateException;
 
     public SOSHibernateIntervalDBLayer() {
@@ -44,17 +39,17 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                 this.getFilter().setLimit(limit);
                 this.getFilter().setIntervalFrom(null);
                 this.getFilter().setIntervalTo(to.getTime());
-                List<DbItem> listOfDBItems = this.getListOfItemsToDelete();
-                Iterator<DbItem> dbitemEntries = listOfDBItems.iterator();
+                List<T> listOfDBItems = this.getListOfItemsToDelete();
                 int i = 0;
-                while (dbitemEntries.hasNext()) {
-                    DbItem h = (DbItem) dbitemEntries.next();
-                    sosHibernateSession.delete(h);
-                    this.onAfterDeleting(h);
-                    deleted = deleted + 1;
-                    i = i + 1;
-                    if (i == limit) {
-                        i = 0;
+                if (listOfDBItems != null) {
+                    for (T h : listOfDBItems) {
+                        sosHibernateSession.delete(h);
+                        this.onAfterDeleting(h);
+                        deleted = deleted + 1;
+                        i = i + 1;
+                        if (i == limit) {
+                            i = 0;
+                        }
                     }
                 }
                 this.getSession().commit();

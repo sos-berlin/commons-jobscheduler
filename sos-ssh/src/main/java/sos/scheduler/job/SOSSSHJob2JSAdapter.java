@@ -4,11 +4,13 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
@@ -36,7 +38,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_CODE = "exit_code";
     private static final String EXIT_SIGNAL = "exit_signal";
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2JSAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2JSAdapter.class);
     private boolean useTrilead = true;
     private String pidFileName;
     private String envVarNamePrefix;
@@ -47,7 +49,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            LOGGER.fatal(stackTrace2String(e));
+            LOGGER.error(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -57,13 +59,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         if (this.isOrderJob()) {
             spooler_task.order().params().set_var(EXIT_SIGNAL, "");
             spooler_task.order().params().set_var(EXIT_CODE, "");
-            spooler_task.order().params().set_var(STD_ERR_OUTPUT, "");
-            spooler_task.order().params().set_var(STD_OUT_OUTPUT, "");
         }
         spooler_task.params().set_var(EXIT_SIGNAL, "");
         spooler_task.params().set_var(EXIT_CODE, "");
-        spooler_task.params().set_var(STD_ERR_OUTPUT, "");
-        spooler_task.params().set_var(STD_OUT_OUTPUT, "");
         SOSSSHJob2 objR;
         String useJSch = spooler.var(PARAM_JITL_SSH_USE_JSCH_IMPL);
         envVarNamePrefix = spooler.var(PARAM_SCHEDULER_VARIABLE_NAME_PREFIX);
@@ -110,10 +108,11 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
-            for (String key : ((SOSSSHJobJSch) objR).getReturnValues().keySet()) {
-                spooler_task.order().params().set_var(key, ((SOSSSHJobJSch) objR).getReturnValues().get(key));
+            for (Entry<String, String> entry : ((SOSSSHJobJSch) objR).getReturnValues().entrySet()) {
+                spooler_task.order().params().set_var(entry.getKey(), entry.getValue());
             }
         }
+        objR.disconnect();
     }
 
     private void createOrderForWatchdog() {

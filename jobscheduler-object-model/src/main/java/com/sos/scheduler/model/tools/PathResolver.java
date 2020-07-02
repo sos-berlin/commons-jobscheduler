@@ -2,12 +2,15 @@ package com.sos.scheduler.model.tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class PathResolver {
 
-    private final static Logger LOGGER = Logger.getLogger(PathResolver.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(PathResolver.class);
 
     private PathResolver() {
     }

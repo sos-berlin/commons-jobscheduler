@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>1.14.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
@@ -66,10 +66,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -99,10 +95,15 @@
 			<artifactId>jzlib</artifactId>
         </dependency>
 
-        <dependency>
+        <!-- dependency>
             <groupId>jcifs</groupId>
             <artifactId>jcifs</artifactId>
-        </dependency>
+        </dependency-->
+        
+        <dependency>
+			<groupId>eu.agno3.jcifs</groupId>
+			<artifactId>jcifs-ng</artifactId>
+		</dependency>
 
         <!-- This is a replacement dependency for the jar file /SOS_LIB/commons-ssl.jar  		   -->
         <!-- which does not exist in any open accessible maven repository. 						   -->
@@ -126,12 +127,36 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
 
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.jurr.jsch</groupId>
+			<artifactId>jsch-111-bugfix</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.jsch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.sshagent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch.agentproxy.connector-factory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
         </dependency>
 
     </dependencies>

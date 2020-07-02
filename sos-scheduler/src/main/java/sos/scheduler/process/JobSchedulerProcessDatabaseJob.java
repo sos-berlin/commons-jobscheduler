@@ -1,8 +1,7 @@
 package sos.scheduler.process;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.Map;
 
 import sos.connection.SOSConnection;
 import sos.spooler.Order;
@@ -86,16 +85,16 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                     this.executeStatements(this.getConnection(), this.getCommand());
                     if (this.getConnection().getResultSet() != null) {
                         String warning = "";
-                        HashMap result = null;
+                        Map<String, String> result = null;
                         while (!(result = this.getConnection().get()).isEmpty()) {
                             warning = "execution terminated with warning:";
-                            Iterator resultIterator = result.keySet().iterator();
+                            Iterator<String> resultIterator = result.keySet().iterator();
                             while (resultIterator.hasNext()) {
-                                String key = (String) resultIterator.next();
+                                String key = resultIterator.next();
                                 if (key == null || key.isEmpty()) {
                                     continue;
                                 }
-                                warning += " " + key + "=" + (String) result.get(key).toString();
+                                warning += " " + key + "=" + result.get(key);
                             }
                         }
                         if (warning != null && !warning.isEmpty()) {
@@ -128,28 +127,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
     }
 
     protected void executeStatements(SOSConnection connection, String command) throws Exception {
-        Exception exception = null;
-        try {
-            connection.executeStatements(command);
-        } catch (Exception e) {
-            exception = e;
-        }
-        try {
-            Vector output = connection.getOutput();
-            if (!output.isEmpty()) {
-                spooler_log.info("output from database server:");
-                Iterator it = output.iterator();
-                while (it.hasNext()) {
-                    String line = (String) it.next();
-                    spooler_log.info("  " + line);
-                }
-            } else {
-                spooler_log.debug9("no output from database server.");
-            }
-        } catch (Exception e) {}
-        if (exception != null) {
-            throw new Exception(exception);
-        }
+        connection.executeStatements(command);
     }
 
     public String getCommand() {

@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author KB */
 public class SOSVfsTcpIpServer {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsTcpIpServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsTcpIpServer.class);
 
     public SOSVfsTcpIpServer() {
     }
@@ -48,7 +50,7 @@ class Connection extends Thread {
     DataInputStream input;
     DataOutputStream output;
     Socket clientSocket;
-    private static final Logger LOGGER = Logger.getLogger(Connection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
 
     public Connection(final Socket aClientSocket) {
         try {

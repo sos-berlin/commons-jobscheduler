@@ -6,7 +6,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -14,7 +15,7 @@ import com.sos.scheduler.model.answers.Calendar;
 
 public class JSCmdShowCalendar extends ShowCalendar {
 
-    private static final Logger LOGGER = Logger.getLogger(JSCmdShowCalendar.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSCmdShowCalendar.class);
     private DatatypeFactory objDatatypeFactory = null;
 
     public JSCmdShowCalendar(SchedulerObjectFactory schedulerObjectFactory) {

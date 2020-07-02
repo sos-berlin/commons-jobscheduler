@@ -3,16 +3,16 @@ package com.sos.JSHelper.Options;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
-/** @author KB */
 public class SOSOptionPasswordTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionPasswordTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionPasswordTest.class);
     private SOSOptionPassword objOption = null;
 
     @Before
@@ -32,7 +32,13 @@ public class SOSOptionPasswordTest {
     }
 
     private String createTestFile() {
-        String strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
+        File f = new File("C:/Windows/system.ini");
+        String strFileName;
+        if (f.exists()){
+            strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
+        } else {
+            strFileName = System.getProperty("java.io.tmpdir") + "test.sh";
+        }
         JSFile objFile = new JSFile(strFileName);
         objFile.deleteOnExit();
         try {

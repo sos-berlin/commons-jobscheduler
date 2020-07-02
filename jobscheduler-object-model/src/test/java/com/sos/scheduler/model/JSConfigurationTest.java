@@ -1,9 +1,10 @@
 package com.sos.scheduler.model;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -15,7 +16,7 @@ import com.sos.scheduler.model.objects.Spooler;
 /** @author oh */
 public class JSConfigurationTest {
 
-    private static final Logger LOGGER = Logger.getLogger(JSConfigurationTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSConfigurationTest.class);
     private static SchedulerObjectFactory objFactory = null;
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
@@ -24,7 +25,7 @@ public class JSConfigurationTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         LOGGER.debug("test start");
-        objFactory = new SchedulerObjectFactory("8of9.sos", 4210);
+        objFactory = new SchedulerObjectFactory("galadriel.sos", 4412);
         objFactory.initMarshaller(Spooler.class);
     }
 
@@ -33,13 +34,13 @@ public class JSConfigurationTest {
             objVFS = VFSFactory.getHandler("local");
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     private final void prepareFtpVfs() {
         objOptions = new SOSFTPOptions();
-        objOptions.host.setValue("8of9.sos");
+        objOptions.host.setValue("galadriel.sos");
         objOptions.user.setValue("sos");
         objOptions.password.setValue("sos");
         try {
@@ -48,24 +49,24 @@ public class JSConfigurationTest {
             objVFS.authenticate(objOptions);
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     @Test
-    @Ignore("Test set to Ignore for later examination")
     public final void loadSchedulerXMLLocal() {
         prepareLocalVfs();
-        String strTestHotFolder = "Z:/8of9_buildjars_4210/config/scheduler.xml";
+        String strTestHotFolder = "src/test/resources/scheduler.xml";
         ISOSVirtualFile pobjVirtualFile = objFileSystemHandler.getFileHandle(strTestHotFolder);
         JSConfiguration objJSConf = objFactory.createJSConfiguration(pobjVirtualFile);
         LOGGER.info(objJSConf.toXMLString());
     }
 
     @Test
+    @Ignore("Test set to Ignore for later examination")
     public final void loadSchedulerXMLFTP() {
         prepareFtpVfs();
-        String strTestHotFolder = "/8of9_buildjars_4210/config/scheduler.xml";
+        String strTestHotFolder = "src/test/resources/scheduler.xml";
         ISOSVirtualFile pobjVirtualFile = objFileSystemHandler.getFileHandle(strTestHotFolder);
         JSConfiguration objJSConf = objFactory.createJSConfiguration(pobjVirtualFile);
         LOGGER.info(objJSConf.toXMLString());

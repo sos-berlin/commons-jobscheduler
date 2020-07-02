@@ -139,6 +139,12 @@ public class JobChainDiagramCreator {
         LOGGER.debug("createGraphVizImageFile.job chain.title:" + jobchain.getTitle());
         int fileOrderSourceCnt = 0;
 
+        jobChainDiagrammData.getListOfFileOrderSinks().getList();
+        jobChainDiagrammData.getListOfJobChainNodes().getList();
+        if (jobChainDiagrammData.getListOfJobChainNodes().size() == 0){
+            return null;
+        }
+
         jobChainDiagrammData.getListOfFileOrderSources().getList();
 
         while (jobChainDiagrammData.getListOfFileOrderSources().hasNext()) {
@@ -157,8 +163,6 @@ public class JobChainDiagramCreator {
             singleNodeProperties.setLabel(strH);
         }
 
-        jobChainDiagrammData.getListOfFileOrderSinks().getList();
-        jobChainDiagrammData.getListOfJobChainNodes().getList();
 
         String firstState = jobChainDiagrammData.getListOfJobChainNodes().getFirstNode();
         if (firstState == null || firstState.isEmpty()) {
@@ -300,6 +304,8 @@ public class JobChainDiagramCreator {
         DataSourceOrders listOfOrders = new DataSourceOrders(liveFolder, schedulerObjectFactory, listOfFileOrderSinks.getJobChain());
         jobChainDiagrammData.setListOfOrders(listOfOrders);
 
+       
+        
         outputFile = createGraphVizImageFile(liveFolder, showErrorNodes);
         return outputFile;
     }

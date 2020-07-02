@@ -9,11 +9,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class SchedulerSocket extends Socket {
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerSocket.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerSocket.class);
     private BufferedReader in = null;
     private PrintWriter out = null;
     private SchedulerObjectFactoryOptions objOptions = null;

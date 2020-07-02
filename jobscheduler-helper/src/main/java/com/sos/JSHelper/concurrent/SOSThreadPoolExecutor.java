@@ -5,11 +5,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class SOSThreadPoolExecutor {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSThreadPoolExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSThreadPoolExecutor.class);
     // Parallel running Threads(Executor) on System
     public int corePoolSize = 5;
     // Maximum Threads allowed in Pool
@@ -28,9 +30,8 @@ public class SOSThreadPoolExecutor {
         corePoolSize = pintCorePoolSize;
     }
 
-    public Future<Runnable> runTask(final Runnable task) {
-        Future<Runnable> objFut = (Future<Runnable>) objThreadPool.submit(task);
-        return objFut;
+    public Future<?> runTask(final Runnable task) {
+        return objThreadPool.submit(task);
     }
 
     public void shutDown() {
@@ -42,7 +43,7 @@ public class SOSThreadPoolExecutor {
         int cpus = Runtime.getRuntime().availableProcessors();
         LOGGER.debug("max avl cpus = " + cpus);
         for (int i = 0; i < 19; i++) {
-            Future objF = mtpe.runTask(new WorkerRunnable(i));
+            mtpe.runTask(new WorkerRunnable(i));
         }
         mtpe.shutDown();
         LOGGER.debug("Finished! ");
@@ -62,7 +63,7 @@ public class SOSThreadPoolExecutor {
                 try {
                     long intNo = Thread.currentThread().getId();
                     LOGGER.debug("Task " + jobNr + ", calculated " + i + ", Thread ID = " + intNo);
-                    Thread.currentThread().sleep(100);
+                    Thread.sleep(100);
                 } catch (InterruptedException ie) {
                     LOGGER.error(ie.getMessage(), ie);
                 }

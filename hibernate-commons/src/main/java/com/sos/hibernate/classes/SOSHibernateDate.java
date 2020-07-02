@@ -4,12 +4,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author Uwe Risse */
 public class SOSHibernateDate {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSHibernateDate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateDate.class);
     private String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
     private Date date;
     private String isoDate;

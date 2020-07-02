@@ -6,16 +6,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
-/** @author KB */
+import sos.util.SOSString;
+
 public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     private static final String CHARACTER_ENCODING = "Cp1252";
-    private static final Logger LOGGER = Logger.getLogger(CmdShell.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmdShell.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private String strStdOut = "";
     private String strStdErr = "";
     private int intCC = 0;
@@ -35,6 +39,13 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     public boolean isWindows() {
         return osn != null && osn.contains("Windows");
+    }
+
+    public String replaceCommand4Windows(final String cmd) {
+        String command = cmd;
+        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
+        command = command.replaceAll("(?<! )/", "\\\\");
+        return command;
     }
 
     public int getCC() {
@@ -73,6 +84,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
     }
 
     private int executeCommand(final String[] pstrCommand, final boolean showCommand) throws Exception {
+        return executeCommand(pstrCommand, showCommand, null);
+    }
+
+    private int executeCommand(final String[] pstrCommand, final boolean showCommand, SOSVfsEnv env) throws Exception {
         ByteArrayOutputStream bytStdOut = new ByteArrayOutputStream();
         ByteArrayOutputStream bytStdErr = new ByteArrayOutputStream();
         PrintStream psStdOut = new PrintStream(bytStdOut, true, CHARACTER_ENCODING);
@@ -84,6 +99,20 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
             LOGGER.debug(SOSVfs_D_0151.params(pstrCommand));
         }
         objShell = new ProcessBuilder(pstrCommand);
+        if (env != null) {
+            if (env.getGlobalEnvs() != null) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[set global envs]%s", env.getGlobalEnvs()));
+                }
+                objShell.environment().putAll(env.getGlobalEnvs());
+            }
+            if (env.getLocalEnvs() != null) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[set local envs]%s", env.getLocalEnvs()));
+                }
+                objShell.environment().putAll(env.getLocalEnvs());
+            }
+        }
         final Process objCommand = objShell.start();
         createOutputPipe(objCommand.getInputStream(), psStdOut);
         createOutputPipe(objCommand.getErrorStream(), psStdErr);
@@ -91,8 +120,13 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
         intCC = objCommand.waitFor();
         strStdOut = bytStdOut.toString(CHARACTER_ENCODING);
         strStdErr = bytStdErr.toString(CHARACTER_ENCODING);
-        LOGGER.info(strStdOut);
-        LOGGER.info(strStdErr);
+        String cmd = objShell.command().get(objShell.command().size() - 1);
+        if (!SOSString.isEmpty(strStdOut)) {
+            LOGGER.info(String.format("[%s][stdout]%s", cmd, strStdOut.trim()));
+        }
+        if (!SOSString.isEmpty(strStdErr)) {
+            LOGGER.info(String.format("[%s][stderr]%s", cmd, strStdErr.trim()));
+        }
         return intCC;
     }
 
@@ -102,6 +136,10 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
 
     public int executeCommand(final String pstrcommand) throws Exception {
         return executeCommand(createCommand(pstrcommand), true);
+    }
+
+    public int executeCommand(final String pstrcommand, SOSVfsEnv env) throws Exception {
+        return executeCommand(createCommand(pstrcommand), true, env);
     }
 
     public int executeCommand(final ISOSCmdShellOptions pobjOptions) throws Exception {
@@ -123,13 +161,12 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
                     strStartShellCommandParameter = objShellOptions.getStartShellCommandParameter().getValue();
                     command[intCmdIndex++] = strStartShellCommandParameter;
                 }
-                command[intCmdIndex++] =
-                        objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
-                                + objShellOptions.getShellCommandParameter().getValue();
+                command[intCmdIndex++] = objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
+                        + objShellOptions.getShellCommandParameter().getValue();
             } else {
                 command[intCmdIndex++] = objShellOptions.getShellCommand().getValue();
-                command[intCmdIndex++] =
-                        objShellOptions.getCommandLineOptions().getValue() + " " + objShellOptions.getShellCommandParameter().getValue();
+                command[intCmdIndex++] = objShellOptions.getCommandLineOptions().getValue() + " " + objShellOptions.getShellCommandParameter()
+                        .getValue();
             }
         } else {
             strComSpec = System.getenv(pstrComSpec);
@@ -138,9 +175,8 @@ public class CmdShell extends SOSVfsMessageCodes implements Runnable {
             }
             command[intCmdIndex++] = strComSpec;
             command[intCmdIndex++] = strStartShellCommandParameter;
-            command[intCmdIndex++] =
-                    objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
-                            + objShellOptions.getShellCommandParameter().getValue();
+            command[intCmdIndex++] = objShellOptions.getShellCommand().getValue() + " " + objShellOptions.getCommandLineOptions().getValue() + " "
+                    + objShellOptions.getShellCommandParameter().getValue();
         }
         LOGGER.debug(SOSVfs_D_230.params(strComSpec));
         return command;

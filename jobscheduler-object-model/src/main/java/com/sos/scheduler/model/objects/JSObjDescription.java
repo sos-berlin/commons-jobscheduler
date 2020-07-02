@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Job.Description;
@@ -31,8 +29,6 @@ import com.sos.scheduler.model.objects.Job.Description;
 public class JSObjDescription extends Description {
 
     private final String conClassName = "JSObjectDescription";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjDescription.class);
 
     public JSObjDescription(final SchedulerObjectFactory schedulerObjectFactory) {
         objFactory = schedulerObjectFactory;

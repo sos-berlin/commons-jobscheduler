@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjWebServices
@@ -34,8 +32,6 @@ public class JSObjWebServices extends WebServices {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjWebServices";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjWebServices.class);
 
     public JSObjWebServices(SchedulerObjectFactory schedulerObjectFactory) {
         super();

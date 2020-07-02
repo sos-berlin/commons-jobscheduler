@@ -7,7 +7,8 @@ import java.security.KeyStore;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.util.TrustManagerUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
@@ -21,7 +22,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpS.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpS.class);
     private FTPSClient client = null;
 
     public SOSVfsFtpS() {

@@ -2,10 +2,11 @@ package com.sos.VirtualFileSystem.SFTP;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
@@ -21,7 +22,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSVfsSFtpTest extends JSToolBox {
 
-    protected static final Logger LOGGER = Logger.getLogger(SOSVfsFtpTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtpTest.class);
     protected static final String LOCAL_BASE_PATH = "R:\\nobackup\\junittests\\testdata\\SFTP\\";
     protected static final String REMOTE_BASE_PATH = "/home/kb/";
     protected SOSFTPOptions objOptions = null;
@@ -42,15 +43,15 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
     @Test
     public void testConnect() throws Exception {
-        objOptions.host.setValue("wilma.sos");
+        objOptions.host.setValue("192.11.0.116");
         objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
         setDynamicClassNameSource(objSource);
-        objSource.host.setValue("wilma.sos");
+        objSource.host.setValue("192.11.0.116");
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
-        objSource.user.setValue("kb");
+        objSource.user.setValue("test");
         objSource.protocol.setValue("sftp");
-        objSource.sshAuthMethod.isPassword(true);
+        objSource.sshAuthMethod.isPassword(false);
         objOptions.operation.setValue("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -119,11 +120,11 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
     @Test
     public void testConnectOpenSSH() throws Exception {
-        objOptions.host.setValue("wilma.sos");
+        objOptions.host.setValue("192.11.0.116");
         objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
         setDynamicClassNameSource(objSource);
-        objSource.host.setValue("wilma.sos");
+        objSource.host.setValue("192.11.0.116");
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         objSource.protocol.setValue("sftp");
         objSource.sshAuthMethod.isPassword(false);

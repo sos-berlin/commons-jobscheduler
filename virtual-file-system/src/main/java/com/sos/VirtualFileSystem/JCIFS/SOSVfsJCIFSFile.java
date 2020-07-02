@@ -1,20 +1,21 @@
 package com.sos.VirtualFileSystem.JCIFS;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @author KB */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFSFile.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsJCIFSFile.class);
+
     public SOSVfsJCIFSFile(final String pstrFileName) {
         super(pstrFileName);
     }
@@ -36,7 +37,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
-            InputStream is = this.getFileInputStream();
+            InputStream is = getFileInputStream();
             if (is == null) {
                 throw new Exception(SOSVfs_E_177.get());
             }
@@ -50,13 +51,22 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
-            OutputStream os = this.getFileOutputStream();
+            OutputStream os = getFileOutputStream();
             if (os == null) {
                 throw new Exception(SOSVfs_E_147.get());
             }
             os.write(bteBuffer, intOffset, intLength);
         } catch (Exception e) {
             raiseException(e, SOSVfs_E_173.params("write", fileName));
+        }
+    }
+
+    @Override
+    public void write(final byte[] buffer) {
+        try {
+            getFileOutputStream().write(buffer);
+        } catch (IOException e) {
+            raiseException(e, SOSVfs_E_134.params("write()"));
         }
     }
 
@@ -76,7 +86,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
         return objOutputStream;
     }
-    
+
     @Override
     public long setModificationDateTime(final long timeStamp) {
         try {

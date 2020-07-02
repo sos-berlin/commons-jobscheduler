@@ -2,7 +2,8 @@ package sos.scheduler.launcher;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import sos.scheduler.command.SOSSchedulerCommand;
@@ -14,7 +15,7 @@ import sos.xml.SOSXMLXPath;
 /** @author Mürüvet Öksüz */
 public class JobSchedulerLoadTestLauncher {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerLoadTestLauncher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerLoadTestLauncher.class);
     private String schedulerLauncherHost = "localhost";
     private int schedulerLauncherPort = 4444;
     private String schedulerLauncherProtocol = "tcp";

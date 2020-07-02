@@ -1,13 +1,15 @@
 package com.sos.dialog.menu;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.components.SOSCursor;
 import com.sos.dialog.message.DialogMsg;
 
 public class MenueActionSave extends MenueActionBase {
 
-    private static final Logger LOGGER = Logger.getLogger(MenueActionSave.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MenueActionSave.class);
 
     public MenueActionSave() {
         this("");

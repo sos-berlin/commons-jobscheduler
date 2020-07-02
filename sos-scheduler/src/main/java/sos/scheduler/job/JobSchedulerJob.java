@@ -10,7 +10,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
@@ -18,6 +19,7 @@ import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
 import sos.spooler.Spooler;
+import sos.spooler.Task;
 import sos.spooler.Variable_set;
 import sos.util.SOSArguments;
 import sos.util.SOSSchedulerLogger;
@@ -28,17 +30,17 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 /** @author Andreas Liebert */
 public class JobSchedulerJob extends Job_impl {
 
-	public static final String HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER = "hibernate.cfg.xml";
-	public static final String HIBERNATE_DEFAULT_FILE_NAME_REPORTING = "reporting.hibernate.cfg.xml";
+    public static final String HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER = "hibernate.cfg.xml";
+    public static final String HIBERNATE_DEFAULT_FILE_NAME_REPORTING = "reporting.hibernate.cfg.xml";
 
-	public static final String SCHEDULER_PARAM_PROXY_URL = "sos.proxy_url";
-	public static final String SCHEDULER_PARAM_HIBERNATE_SCHEDULER = "sos.hibernate_configuration_scheduler";
-	public static final String SCHEDULER_PARAM_HIBERNATE_REPORTING = "sos.hibernate_configuration_reporting";
-	public static final String SCHEDULER_PARAM_USE_NOTIFICATION = "sos.use_notification";
-	
+    public static final String SCHEDULER_PARAM_PROXY_URL = "sos.proxy_url";
+    public static final String SCHEDULER_PARAM_HIBERNATE_SCHEDULER = "sos.hibernate_configuration_scheduler";
+    public static final String SCHEDULER_PARAM_HIBERNATE_REPORTING = "sos.hibernate_configuration_reporting";
+    public static final String SCHEDULER_PARAM_USE_NOTIFICATION = "sos.use_notification";
+
     protected String application = new String("");
     protected SOSSchedulerLogger sosLogger = null;
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJob.class);
     private SOSConnection sosConnection = null;
     private SOSConnectionSettings connectionSettings = null;
     private SOSSettings jobSettings = null;
@@ -62,12 +64,12 @@ public class JobSchedulerJob extends Job_impl {
                     throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
                 }
                 if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").isEmpty()) {
-                    throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: "
-                            + spooler.ini_path());
+                    throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler
+                            .ini_path());
                 }
                 if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
-                    throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: "
-                            + spooler.ini_path());
+                    throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler
+                            .ini_path());
                 }
                 if (this.getLogger() != null) {
                     sosLogger.debug6("connecting to database...");
@@ -251,41 +253,51 @@ public class JobSchedulerJob extends Job_impl {
         return SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
                 arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
     }
- 
-    public Path getHibernateConfigurationScheduler(){
+
+    public Path getHibernateConfigurationScheduler() {
         return getHibernateConfigurationScheduler(spooler);
     }
-    
-    public static Path getHibernateConfigurationScheduler(Spooler spooler){
-    	Variable_set vs = spooler.variables();
-		if(vs != null){
-			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
-			if(!SOSString.isEmpty(var)){
-				return Paths.get(var);
-			}
-		}
-		return Paths.get(spooler.directory() + "/config").resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
+
+    public static Path getHibernateConfigurationScheduler(Spooler spooler) {
+        Variable_set vs = spooler.variables();
+        if (vs != null) {
+            String var = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
+            if (!SOSString.isEmpty(var)) {
+                return Paths.get(var);
+            }
+        }
+        return Paths.get(spooler.directory() + "/config").resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
     }
-    
-    public Path getHibernateConfigurationReporting(){
-        return getHibernateConfigurationReporting(spooler);
+
+    public Path getHibernateConfigurationReporting() {
+        return getHibernateConfigurationReporting(spooler, spooler_task);
     }
-    
-    public static Path getHibernateConfigurationReporting(Spooler spooler){
-    	Variable_set vs = spooler.variables();
-		if(vs != null){
-			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
-			if(!SOSString.isEmpty(var)){
-				return Paths.get(var);
-			}
-		}
-		Path configFile = Paths.get(spooler.directory() + "/config").resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
-		if(Files.exists(configFile)){
-			return configFile;
-		}
-		return getHibernateConfigurationScheduler(spooler);
+
+    public static Path getHibernateConfigurationReporting(Spooler spooler, Task task) {
+        Path configDir = null;
+        boolean isAgent = !SOSString.isEmpty(task.agent_url());
+        if (isAgent) {
+            configDir = Paths.get(System.getenv("SCHEDULER_DATA")).resolve("config");
+        } else {
+            Variable_set vs = spooler.variables();
+            if (vs != null) {
+                String var = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
+                if (!SOSString.isEmpty(var)) {
+                    return Paths.get(var);
+                }
+            }
+            configDir = Paths.get(spooler.directory() + "/config");
+        }
+        Path configFile = configDir.resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
+        if (Files.exists(configFile)) {
+            return configFile;
+        }
+        if (isAgent) {
+            throw new JobSchedulerException("no hibernate configuration file found on agent file system!");
+        }
+        return getHibernateConfigurationScheduler(spooler);
     }
-    
+
     private boolean getSettings() {
         try {
 

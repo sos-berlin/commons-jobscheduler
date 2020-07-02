@@ -2,8 +2,9 @@ package com.sos.scheduler.model.xmldoc;
 
 import com.sos.JSHelper.io.Files.JSXMLFile;
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
 public class DescriptionTest {
 
     private static final String TEST_FILENAME = "junit/com/sos/scheduler/model/xmldoc/JobSchedulerCanWrite.xml";
-    private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXmlDoc.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestLoadSchedulerXmlDoc.class);
     private File documentationFile = null;
     static JAXBContext context = null;
     static Unmarshaller unmarshaller = null;

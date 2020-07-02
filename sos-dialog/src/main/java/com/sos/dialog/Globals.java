@@ -1,6 +1,5 @@
 package com.sos.dialog;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -12,12 +11,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.classes.SOSMsgControl;
 
 public class Globals {
 
-    private final static Logger LOGGER = Logger.getLogger(Globals.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     public static int gTextBoxStyle = SWT.None;
     public static int gButtonStyle = SWT.BORDER;
     public static FontRegistry stFontRegistry = new FontRegistry();

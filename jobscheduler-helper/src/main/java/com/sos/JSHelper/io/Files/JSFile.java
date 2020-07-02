@@ -28,7 +28,8 @@ import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSGZip;
 
@@ -56,7 +57,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     protected String strCharSet4InputFile = null;
     protected BufferedWriter bufWriter = null;
     protected boolean flgIsAppendMode = false;
-    private static final Logger LOGGER = Logger.getLogger(JSFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSFile.class);
     private static final String ConDefaultExtension4BackupFile = ".bak";
     private static final long serialVersionUID = -1430552107244301112L;
     private final char[] charArray = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -757,7 +758,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     public void signalAbort(final String strS) {
         String strT = " ###ProgramAbort### ";
         strT = strT + strS + strS;
-        LOGGER.fatal(strT);
+        LOGGER.error(strT);
         throw new JobSchedulerException(strT);
     }
 

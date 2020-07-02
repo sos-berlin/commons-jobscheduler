@@ -15,7 +15,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPHTTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
@@ -31,13 +32,14 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
     private static final String CLASS_NAME = "SOSVfsFtp";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtp.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsFtp.class);
     private FTPClient objFTPClient = null;
     private boolean simulateShell = false;
 
@@ -254,6 +256,11 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public void executeCommand(final String cmd) throws Exception {
+        executeCommand(cmd, null);
+    }
+
+    @Override
+    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
         String command = cmd.trim();
         try {
             objFTPClient.sendCommand(command);

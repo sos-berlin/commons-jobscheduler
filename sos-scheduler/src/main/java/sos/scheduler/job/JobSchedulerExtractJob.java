@@ -170,11 +170,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                         throw new Exception(
                                 "for an input directory specified by the parameter [input_file] an output directory must be specified by the parameter [output_file]");
                     }
-                    Vector filelist = SOSFile.getFilelist(inputFile.getAbsolutePath(), this.getInputFileSpec(), 0);
-                    Iterator iterator = filelist.iterator();
+                    Vector<File> filelist = SOSFile.getFilelist(inputFile.getAbsolutePath(), this.getInputFileSpec(), 0);
                     int count = 0;
-                    while (iterator.hasNext()) {
-                        File extractFile = (File) iterator.next();
+                    for (File extractFile : filelist) {
                         outputFile =
                                 new File(this.getOutputFilePath() + "/" + extractFile.getName().substring(0, extractFile.getName().lastIndexOf("."))
                                         + this.getOutputFilenameExtension());

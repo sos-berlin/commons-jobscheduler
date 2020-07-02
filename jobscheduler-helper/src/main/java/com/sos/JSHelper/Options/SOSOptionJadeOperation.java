@@ -10,7 +10,7 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 
     public static enum enuJadeOperations {
         send, receive, copy, move, delete, undefined, rename, zip, getlist, sendusingdmz, receiveusingdmz, copytointernet, copyfrominternet, remove;
-        
+
         public String getText() {
             return this.name();
         }
@@ -109,4 +109,8 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
         return enuT == enuJadeOperations.getlist;
     }
 
+    public boolean isOperationRemove() {
+        enuJadeOperations enuT = this.value();
+        return enuT == enuJadeOperations.delete;
+    }
 }

@@ -2,7 +2,8 @@ package com.sos.scheduler.model;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
@@ -19,7 +20,7 @@ import com.sos.scheduler.model.objects.JSObjSchedule;
 /** @author oh */
 public class SchedulerHotFolder extends JSObjBase {
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerHotFolder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerHotFolder.class);
     private boolean isLoaded = false;
     private SchedulerHotFolderFileList objHotFolderFileList = new SchedulerHotFolderFileList();
 

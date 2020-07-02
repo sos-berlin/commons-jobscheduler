@@ -2,7 +2,8 @@ package com.sos.JSHelper.Archiver;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
@@ -15,7 +16,7 @@ public class JSArchiverOptions extends JSOptionsClass {
 
     private static final long serialVersionUID = 1L;
     private static final String CLASSNAME = "JSArchiverOptions";
-    private static final Logger LOGGER = Logger.getLogger(JSArchiverOptions.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSArchiverOptions.class);
     private static final String ARCHIVE_FOLDER_NAME_SETTINGS_KEY = CLASSNAME + ".ArchiveFolderName";
     private static final String FILE_NAME_SETTINGS_KEY = CLASSNAME + ".FileName";
     private static final String COMPRESS_ARCHIVED_FILE_SETTINGS_KEY = CLASSNAME + ".CompressArchivedFile";

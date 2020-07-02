@@ -38,7 +38,7 @@ import java.util.Locale;
  * <code>Throwable</code> with your localized message, it is specified before
  * those parameters. Again, this is consistent both in this class and the
  * localized exception classes (see
- * {@link Log4jLogMsg#fatal(org.apache.log4j.Logger, Throwable, Msg.BundleBaseName, Locale, String, Object[])}
+ * {@link Log4jLogMsg#fatal(org.apache.logging.log4j.Logger, Throwable, Msg.BundleBaseName, Locale, String, Object[])}
  * and
  * {@link LocalizedException#LocalizedException(Throwable, Msg.BundleBaseName, Locale, String, Object[])}
  * as examples).
@@ -77,7 +77,7 @@ public class Log4jLogMsg {
      *
      * @see Msg#createMsg(com.sos.i18n.Msg.BundleBaseName, Locale, String,
      *      Object[]) */
-    public static Msg fatal(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         log.fatal((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -104,7 +104,7 @@ public class Log4jLogMsg {
      *
      * @see Msg#createMsg(com.sos.i18n.Msg.BundleBaseName, Locale, String,
      *      Object[]) */
-    public static Msg fatal(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         logFatalWithThrowable(log, key, msg, throwable);
         return msg;
@@ -121,7 +121,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         log.fatal((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -144,7 +144,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         logFatalWithThrowable(log, key, msg, throwable);
         return msg;
@@ -161,7 +161,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         log.fatal((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -184,7 +184,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         logFatalWithThrowable(log, key, msg, throwable);
         return msg;
@@ -200,7 +200,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         log.fatal((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -222,7 +222,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg fatal(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg fatal(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         logFatalWithThrowable(log, key, msg, throwable);
         return msg;
@@ -240,7 +240,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         log.error((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -264,7 +264,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         logErrorWithThrowable(log, key, msg, throwable);
         return msg;
@@ -281,7 +281,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         log.error((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -304,7 +304,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         logErrorWithThrowable(log, key, msg, throwable);
         return msg;
@@ -321,7 +321,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         log.error((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -344,7 +344,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         logErrorWithThrowable(log, key, msg, throwable);
         return msg;
@@ -360,7 +360,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         log.error((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -382,7 +382,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg error(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg error(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         logErrorWithThrowable(log, key, msg, throwable);
         return msg;
@@ -400,7 +400,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         log.warn((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -424,7 +424,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, locale, key, varargs);
         logWarnWithThrowable(log, key, msg, throwable);
         return msg;
@@ -441,7 +441,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         log.warn((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -464,7 +464,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         Msg msg = Msg.createMsg(locale, key, varargs);
         logWarnWithThrowable(log, key, msg, throwable);
         return msg;
@@ -481,7 +481,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         log.warn((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -504,7 +504,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         Msg msg = Msg.createMsg(basename, key, varargs);
         logWarnWithThrowable(log, key, msg, throwable);
         return msg;
@@ -520,7 +520,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         log.warn((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
         return msg;
@@ -542,7 +542,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg warn(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg warn(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         Msg msg = Msg.createMsg(key, varargs);
         logWarnWithThrowable(log, key, msg, throwable);
         return msg;
@@ -560,7 +560,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             log.info((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -588,7 +588,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             logInfoWithThrowable(log, key, msg, throwable);
@@ -609,7 +609,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             log.info((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -636,7 +636,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             logInfoWithThrowable(log, key, msg, throwable);
@@ -657,7 +657,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             log.info((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -684,7 +684,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             logInfoWithThrowable(log, key, msg, throwable);
@@ -704,7 +704,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             log.info((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -730,7 +730,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg info(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg info(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         if (log.isInfoEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             logInfoWithThrowable(log, key, msg, throwable);
@@ -752,7 +752,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             log.debug((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -780,7 +780,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             logDebugWithThrowable(log, key, msg, throwable);
@@ -801,7 +801,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             log.debug((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -828,7 +828,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             logDebugWithThrowable(log, key, msg, throwable);
@@ -849,7 +849,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             log.debug((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -876,7 +876,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             logDebugWithThrowable(log, key, msg, throwable);
@@ -896,7 +896,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             log.debug((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -922,7 +922,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg debug(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg debug(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         if (log.isDebugEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             logDebugWithThrowable(log, key, msg, throwable);
@@ -944,7 +944,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             log.trace((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -972,7 +972,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, Locale locale, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(basename, locale, key, varargs);
             logTraceWithThrowable(log, key, msg, throwable);
@@ -993,7 +993,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, Locale locale, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, Locale locale, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             log.trace((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -1020,7 +1020,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, Throwable throwable, Locale locale, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(locale, key, varargs);
             logTraceWithThrowable(log, key, msg, throwable);
@@ -1041,7 +1041,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, BundleBaseName basename, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             log.trace((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -1068,7 +1068,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, Throwable throwable, BundleBaseName basename, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(basename, key, varargs);
             logTraceWithThrowable(log, key, msg, throwable);
@@ -1088,7 +1088,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             log.trace((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg);
@@ -1114,7 +1114,7 @@ public class Log4jLogMsg {
      *
      * @return if the message was logged, a non-<code>null</code> Msg object is
      *         returned */
-    public static Msg trace(org.apache.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
+    public static Msg trace(org.apache.logging.log4j.Logger log, Throwable throwable, String key, Object... varargs) {
         if (log.isTraceEnabled()) {
             Msg msg = Msg.createMsg(key, varargs);
             logTraceWithThrowable(log, key, msg, throwable);
@@ -1134,7 +1134,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logFatalWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logFatalWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         log.fatal(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
     }
 
@@ -1147,7 +1147,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logErrorWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logErrorWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         if (Logger.getDumpStackTraces()) {
             log.error(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
         } else {
@@ -1164,7 +1164,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logWarnWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logWarnWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         if (Logger.getDumpStackTraces()) {
             log.warn(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
         } else {
@@ -1181,7 +1181,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logInfoWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logInfoWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         if (Logger.getDumpStackTraces()) {
             log.info(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
         } else {
@@ -1198,7 +1198,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logDebugWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logDebugWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         if (Logger.getDumpStackTraces()) {
             log.debug(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
         } else {
@@ -1215,7 +1215,7 @@ public class Log4jLogMsg {
      * @param key the resource key that is associated with the message
      * @param msg the message to log
      * @param throwable the throwable associated with the message */
-    private static void logTraceWithThrowable(org.apache.log4j.Logger log, String key, Msg msg, Throwable throwable) {
+    private static void logTraceWithThrowable(org.apache.logging.log4j.Logger log, String key, Msg msg, Throwable throwable) {
         if (Logger.getDumpStackTraces()) {
             log.trace(((Logger.getDumpLogKeys()) ? ('{' + key + '}' + msg) : msg), throwable);
         } else {

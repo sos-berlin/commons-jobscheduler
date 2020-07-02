@@ -2,7 +2,8 @@ package sos.net.ssh;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
@@ -28,7 +29,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     protected StringBuffer strbStdoutOutput;
     protected StringBuffer strbStderrOutput;
     protected Vector<String> tempFilesToDelete = new Vector<String>();
-    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHJob2.class);
     private static final String STD_ERR_OUTPUT = "std_err_output";
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_SIGNAL = "exit_signal";
@@ -37,18 +38,14 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public boolean flgIsWindowsShell = false;
     public boolean keepConnected = false;
 
-    @I18NMessages(value = {
-            @I18NMessage("neither Commands nor Script(file) specified. Abort."),
-            @I18NMessage(value = "neither Commands nor Script(file) specified. Abort.", locale = "en_UK",
-                    explanation = "neither Commands nor Script(file) specified. Abort."),
-            @I18NMessage(value = "Es wurde weder ein Kommando noch eine Kommandodatei angegeben. Abbruch.", locale = "de",
-                    explanation = "neither Commands nor Script(file) specified. Abort.") }, msgnum = "SOS-SSH-E-100", msgurl = "msgurl")
+    @I18NMessages(value = { @I18NMessage("neither Commands nor Script(file) specified. Abort."),
+            @I18NMessage(value = "neither Commands nor Script(file) specified. Abort.", locale = "en_UK", explanation = "neither Commands nor Script(file) specified. Abort."),
+            @I18NMessage(value = "Es wurde weder ein Kommando noch eine Kommandodatei angegeben. Abbruch.", locale = "de", explanation = "neither Commands nor Script(file) specified. Abort.") }, msgnum = "SOS-SSH-E-100", msgurl = "msgurl")
     public static final String SOS_SSH_E_100 = "SOS-SSH-E-100";
 
     @I18NMessages(value = { @I18NMessage("executing remote command: '%1$s'."),
             @I18NMessage(value = "executing remote command: '%1$s'.", locale = "en_UK", explanation = "executing remote command: '%1$s'."),
-            @I18NMessage(value = "starte am remote-server das Kommando: '%1$s'.", locale = "de", explanation = "executing remote command: '%1$s'.") },
-            msgnum = "SOS-SSH-D-110", msgurl = "msgurl")
+            @I18NMessage(value = "starte am remote-server das Kommando: '%1$s'.", locale = "de", explanation = "executing remote command: '%1$s'.") }, msgnum = "SOS-SSH-D-110", msgurl = "msgurl")
     protected static final String SOS_SSH_D_110 = "SOS-SSH-D-110";
 
     public String[] getCommands2Execute() {
@@ -133,6 +130,11 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     LOGGER.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + intExitCode);
                     objJSJobUtilities.setJSParam("exit_code_ignored", "true");
                 } else {
+                    if (objOptions.raiseExceptionOnError.value()) {
+                        if (isNotEmpty(strbStdoutOutput)) {
+                            LOGGER.info(strbStdoutOutput.toString());
+                        }
+                    }
                     String strM = "SOS-SSH-E-150: remote command terminated with exit code: " + intExitCode;
                     objJSJobUtilities.setCC(intExitCode);
                     if (objOptions.raiseExceptionOnError.isTrue()) {
@@ -162,7 +164,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (isNotEmpty(strbStderrOutput)) {
             LOGGER.info("stderr = " + strbStderrOutput.toString());
 
-            objJSJobUtilities.setJSParam(STD_ERR_OUTPUT, strbStderrOutput);
             if (objOptions.ignoreStderr.value()) {
                 LOGGER.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
             } else {
@@ -191,7 +192,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             LOGGER.error(this.stackTrace2String(e));
             throw new JobSchedulerException(e.getMessage(), e);
         }
-        objJSJobUtilities.setJSParam(STD_OUT_OUTPUT, strbStdoutOutput);
     }
 
     public StringBuffer getStdOut() throws Exception {

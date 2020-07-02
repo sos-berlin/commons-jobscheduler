@@ -27,16 +27,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurationChangingPlugin {
 
-    private static final Logger LOGGER = Logger.getLogger(GlobalMonitorPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalMonitorPlugin.class);
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorJobOptions;
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorMonitorOptions;
     private HashMap<String, String> parameters;

@@ -16,10 +16,9 @@ import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.ssl.TrustMaterial;
-import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
-
-import sos.util.SOSString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -27,16 +26,19 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.util.SOSString;
 
 /** @ressources webdavclient4j-core-0.92.jar
  * @author Robert Ehrlich */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAV.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAV.class);
     private HttpURL rootUrl = null;
     private WebdavResource davClient = null;
     private String currentDirectory = "";
@@ -729,6 +731,12 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

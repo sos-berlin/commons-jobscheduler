@@ -6,14 +6,15 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /** @author KB */
 public class SOSOptionHostName extends SOSOptionElement {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionHostName.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionHostName.class);
     private static final long serialVersionUID = 4006670598088800990L;
     public static final String conLocalHostName = "localhost";
     public SOSOptionPortNumber objPortNumber = null;

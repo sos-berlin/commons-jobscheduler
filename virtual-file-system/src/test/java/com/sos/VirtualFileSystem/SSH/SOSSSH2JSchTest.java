@@ -18,6 +18,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionUserName;
@@ -85,6 +86,30 @@ public class SOSSSH2JSchTest {
         @Override
         public void setAuthFile(SOSOptionInFileName authFile) {
             optionAuthFileName = authFile;
+        }
+
+        @Override
+        public SOSOptionPassword getPassphrase() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setPassphrase(SOSOptionPassword passphrase) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void setUseKeyAgent(SOSOptionBoolean keyAgent) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public SOSOptionBoolean isUseKeyAgent() {
+            // TODO Auto-generated method stub
+            return null;
         }
     };
 

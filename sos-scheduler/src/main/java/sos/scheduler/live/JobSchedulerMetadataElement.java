@@ -1,8 +1,8 @@
 package sos.scheduler.live;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class JobSchedulerMetadataElement {
@@ -12,12 +12,12 @@ public class JobSchedulerMetadataElement {
     public String element_path = "";
     public String element_name = "";
     public String table_name = "";
-    public HashMap attributes;
+    public Map<String, String> attributes;
     public String attribute = "";
     public int nesting = 0;
-    public ArrayList elements = null;
+    public List<String> elements = null;
 
-    public JobSchedulerMetadataElement(HashMap rec) {
+    public JobSchedulerMetadataElement(Map<String, String> rec) {
         super();
         pkid = getValue(rec, "pk_id");
         parent_id = getValue(rec, "parent_id");
@@ -30,7 +30,7 @@ public class JobSchedulerMetadataElement {
         table_name = getValue(rec, "table_name");
         element_path = getValue(rec, "element_path");
         StringTokenizer t = new StringTokenizer(element_path, "/");
-        elements = new ArrayList();
+        elements = new ArrayList<String>();
         while (t.hasMoreTokens()) {
             String token = t.nextToken().trim();
             elements.add(token);
@@ -39,9 +39,8 @@ public class JobSchedulerMetadataElement {
 
     public String fieldnames() {
         String erg = "";
-        Iterator i = attributes.keySet().iterator();
-        while (i.hasNext()) {
-            erg += "\"" + i.next().toString().toUpperCase() + "\",";
+        for (String key : attributes.keySet()) {
+            erg += "\"" + key.toUpperCase() + "\",";
         }
         if ("script".equals(element_name.toLowerCase())) {
             erg += "\"CDATA\",";
@@ -54,9 +53,8 @@ public class JobSchedulerMetadataElement {
 
     public String fieldvalues() {
         String erg = "";
-        Iterator i = attributes.values().iterator();
-        while (i.hasNext()) {
-            erg += "'" + i.next().toString() + "',";
+        for (String val : attributes.values()) {
+            erg += "'" + val + "',";
         }
         if ("script".equals(element_name.toLowerCase())) {
             erg += "'',";
@@ -67,13 +65,13 @@ public class JobSchedulerMetadataElement {
         return erg;
     }
 
-    private String getValue(HashMap h, String k) {
+    private String getValue(Map<String, String> h, String k) {
         String erg = "";
         try {
             if (h.containsKey(k) && h.get(k) == null) {
                 erg = "";
             } else {
-                erg = h.get(k).toString();
+                erg = h.get(k);
             }
             return erg;
         } catch (Exception e) {

@@ -9,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -20,7 +21,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private static final long serialVersionUID = 8393808803161272343L;
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionRegExp.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionRegExp.class);
     private static final HashMap<String, String> defaultProposals = new HashMap<>();
     private Pattern objCurrentPattern = null;
     private int intRegExpFlags = Pattern.CASE_INSENSITIVE;
@@ -259,7 +260,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     public void addValue(final String pstrValue4Matching) {
         if (lstMatchValues == null) {
-            lstMatchValues = new Vector();
+            lstMatchValues = new Vector<String>();
         }
         lstMatchValues.add(pstrValue4Matching);
     }

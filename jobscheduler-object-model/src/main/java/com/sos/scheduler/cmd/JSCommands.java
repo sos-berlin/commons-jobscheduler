@@ -3,9 +3,12 @@ package com.sos.scheduler.cmd;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.commands.JSCmdCommands;
 import com.sos.scheduler.model.objects.JSObjBase;
-import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +16,7 @@ import java.util.List;
  * JobScheduler instance. */
 public class JSCommands extends JSCommand {
 
-    private static Logger logger = Logger.getLogger(JSCommands.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSCommands.class);
 
     private final List<String> listOfCommands = new ArrayList<String>();
     private final JSCmdCommands cmdContainer;
@@ -44,11 +47,11 @@ public class JSCommands extends JSCommand {
             xmlCmd.append(cmd.trim());
         }
         xmlCmd.append("</commands>");
-        logger.info(xmlCmd.toString());
+        LOGGER.info(xmlCmd.toString());
         @SuppressWarnings("unchecked")
         JAXBElement<JSObjBase> obj = (JAXBElement<JSObjBase>) cmdContainer.unMarshal(xmlCmd.toString());
         cmdContainer.setObjectFieldsFrom(obj.getValue());
-        logger.info(cmdContainer.toXMLString());
+        LOGGER.info(cmdContainer.toXMLString());
 
         try {
             super.run();

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<soscommandsecuritywebserviceanswer>
-    <Message>str1234</Message>
-    <JobSchedulerAnswer>str1234</JobSchedulerAnswer>
-    <User>str1234</User>
-    <SessionId>str1234</SessionId>
-    <Resource>str1234</Resource>
-    <IsEnabled>true</IsEnabled>
-</soscommandsecuritywebserviceanswer>

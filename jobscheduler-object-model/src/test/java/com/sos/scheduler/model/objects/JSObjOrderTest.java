@@ -3,15 +3,17 @@ package com.sos.scheduler.model.objects;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class JSObjOrderTest {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjOrderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjOrderTest.class);
     private static SchedulerObjectFactory factory = null;
     private String xml;
 
@@ -33,7 +35,7 @@ public class JSObjOrderTest {
         order.getOrderFromXMLString(xml);
         JSObjRunTime r = order.getJSObjRunTime();
         List<DateTime> d = r.getDtSingleStarts(IntervalConstants.NEXT_WEEK.getInterval());
-        LOGGER.debug(d.size());
+        LOGGER.debug("" + d.size());
         assertEquals(xml, order.toXMLString());
     }
 

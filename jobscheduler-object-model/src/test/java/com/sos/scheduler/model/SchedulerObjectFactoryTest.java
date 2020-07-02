@@ -21,8 +21,9 @@ import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.Job.Description;
 import com.sos.scheduler.model.objects.Spooler;
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import static org.junit.Assert.fail;
 /** @author KB */
 public class SchedulerObjectFactoryTest extends JSToolBox {
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactoryTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerObjectFactoryTest.class);
     private static SchedulerObjectFactory objSchedulerObjectFactory = null;
 
     public SchedulerObjectFactoryTest() {
@@ -58,7 +59,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     @Before
     public void setUp() throws Exception {
         LOGGER.debug("test start");
-        objSchedulerObjectFactory = new SchedulerObjectFactory("8of9.sos", 4210);
+        objSchedulerObjectFactory = new SchedulerObjectFactory("galadriel.sos", 4412);
         objSchedulerObjectFactory.initMarshaller(Spooler.class);
     }
 
@@ -96,6 +97,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateSubsystemShow() {
         JSCmdSubsystemShow objSubsystemShow = objSchedulerObjectFactory.createSubsystemShow();
         objSubsystemShow.setWhat(JSCmdSubsystemShow.enu4What.STATISTICS);
@@ -111,6 +113,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateModifyJob() {
         String jobName = "/junitModel/testStandaloneJob";
         JSCmdModifyJob objModifyJob = objSchedulerObjectFactory.createModifyJob();
@@ -136,6 +139,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateJobChainModify() {
         String jobChainName = "/junitModel/testJobChain";
         JSCmdJobChainModify objModifyJobChain = objSchedulerObjectFactory.createJobChainModify();
@@ -203,6 +207,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateAddJobs() {
         // java job
         JSObjJob objJavaJob = objSchedulerObjectFactory.createJob();
@@ -242,6 +247,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateAddJobsShort() {
         // java job
         JSObjJob objJavaJob = objSchedulerObjectFactory.createStandAloneJob("checkIfWritable");
@@ -278,6 +284,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateStartJob() {
         JSCmdStartJob objStartJob = objSchedulerObjectFactory.createStartJob();
         objStartJob.setForce("yes");
@@ -534,6 +541,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     }
 
     @Test
+    @Ignore
     public final void testCreateShowHistory() {
         JSCmdShowHistory objCmdShowHistory = objSchedulerObjectFactory.createShowHistory();
         objCmdShowHistory.setJob("/junitModel/testStandaloneJob");

@@ -5,7 +5,6 @@ package com.sos.dialog.classes;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
@@ -15,6 +14,8 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.dialog.Globals;
 
@@ -25,8 +26,7 @@ public class SOSSashForm extends SashForm {
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id: SOSSashForm.java 23811 2014-04-15 15:45:10Z kb $";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSashForm.class);
     private final Vector<Control> objControlList = new Vector<Control>();
 
     private final WindowsSaver objPersistenceStore;
@@ -50,7 +50,7 @@ public class SOSSashForm extends SashForm {
 
             @Override
             public void controlResized(final ControlEvent e) {
-                logger.trace("sashForm resized");
+                LOGGER.trace("sashForm resized");
             }
         });
         addDisposeListener(new DisposeListener() {

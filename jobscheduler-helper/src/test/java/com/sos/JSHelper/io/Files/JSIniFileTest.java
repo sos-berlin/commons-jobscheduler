@@ -20,8 +20,9 @@ package com.sos.JSHelper.io.Files;
  *
  * Created on 26.08.2011 21:31:13 */
 
-import org.apache.log4j.Logger;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -32,8 +33,8 @@ import static org.junit.Assert.assertTrue;
 /** @author KB */
 public class JSIniFileTest {
 
-    private static final String conIniFileName = "R:/backup/sos/java/development/SOSDataExchange/examples/jade_settings.ini";
-    private static final Logger LOGGER = Logger.getLogger(JSIniFileTest.class);
+    private static final String conIniFileName = "src/test/resources/jade_settings.ini";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSIniFileTest.class);
     private JSIniFile objF = null;
 
     @Before
@@ -88,12 +89,7 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
     }
 
-    @Test
-    public final void testProfileName() {
-        String strName = objF.strFileName;
-        assertTrue("name is identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
-    }
-
+ 
     @Test
     public final void testToString() {
         LOGGER.debug(objF.toString());

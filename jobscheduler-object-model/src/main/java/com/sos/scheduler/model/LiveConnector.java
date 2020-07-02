@@ -4,7 +4,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -15,7 +17,7 @@ import com.sos.scheduler.model.tools.PathResolver;
 
 public class LiveConnector {
 
-    private static final Logger LOGGER = Logger.getLogger(LiveConnector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LiveConnector.class);
     private final String liveFolder;
     private final ISOSVfsFileTransfer fileSystemHandler;
     private final ISOSVirtualFile hotFolderHandle;

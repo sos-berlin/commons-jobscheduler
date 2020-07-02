@@ -1,17 +1,16 @@
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 
 public class SOSSearchAndReplaceFilterTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSSearchAndReplaceFilterTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSearchAndReplaceFilterTest.class);
     private SOSSearchAndReplaceFilter objF = null;
     private SOSFilterOptions objFO = null;
     byte[] bteBuffer = null;
@@ -20,8 +19,6 @@ public class SOSSearchAndReplaceFilterTest {
     public void setUp() throws Exception {
         objF = new SOSSearchAndReplaceFilter();
         objFO = objF.getOptions();
-        BasicConfigurator.configure();
-        LOGGER.setLevel(Level.DEBUG);
     }
 
     @Test

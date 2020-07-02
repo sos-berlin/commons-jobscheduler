@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjRegisterRemoteScheduler
@@ -34,8 +32,6 @@ public class JSObjRegisterRemoteScheduler extends RegisterRemoteScheduler {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjRegisterRemoteScheduler";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjRegisterRemoteScheduler.class);
 
     public JSObjRegisterRemoteScheduler(SchedulerObjectFactory schedulerObjectFactory) {
         super();

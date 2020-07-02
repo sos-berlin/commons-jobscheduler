@@ -1,13 +1,15 @@
 package com.sos.scheduler.cmd;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
-import org.apache.log4j.Logger;
 
 /** @uthor ss at 17.09.13 19:52 */
 public class JSRemoveOrder extends JSCommand {
 
-    private final Logger logger = Logger.getLogger(JSRemoveOrder.class);
+    private final Logger logger = LoggerFactory.getLogger(JSRemoveOrder.class);
 
     @SuppressWarnings("unused")
     private final JSCmdRemoveOrder cmdRemoveOrder;

@@ -1,13 +1,15 @@
 package com.sos.JSHelper.Listener;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class JSListenerClass implements JSListener {
 
     protected JSListener JSListener = null;
-    private static final Logger LOGGER = Logger.getLogger(JSListenerClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSListenerClass.class);
     public static final Integer DEBUG_LEVEL1 = new Integer(1);
     public static final Integer DEBUG_LEVEL2 = new Integer(2);
     public static final Integer DEBUG_LEVEL3 = new Integer(3);

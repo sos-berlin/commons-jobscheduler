@@ -1,6 +1,8 @@
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
@@ -9,11 +11,11 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSFileContentFilter;
 /** @author KB */
 public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> implements ISOSFileContentFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSNullFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSNullFilter.class);
     protected byte[] bteBuffer = null;
 
     public SOSNullFilter() {
-        super();
+        super(new SOSFilterOptions());
     }
 
     public SOSNullFilter(final SOSFilterOptions pobjOptions) {

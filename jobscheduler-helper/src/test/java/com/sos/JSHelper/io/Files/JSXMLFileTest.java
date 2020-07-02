@@ -14,11 +14,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -39,7 +39,7 @@ public class JSXMLFileTest extends JSToolBox {
     private static final String XSLT_PARM_SOURCE_TYPE = "sourcetype";
     private static final String XSLT_PARM_CLASSNAME = "ClassName";
     private static final String XSLT_PARM_WORKER_CLASSNAME = "WorkerClassName";
-    private static final Logger LOGGER = Logger.getLogger(JSXMLFileTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSXMLFileTest.class);
     private HashMap<String, String> pobjHshMap = null;
     String strBaseFolder = "R:/backup/sos/";
     String strBaseDirName = strBaseFolder + "java/development/com.sos.scheduler/src/sos/scheduler/jobdoc";
@@ -47,7 +47,7 @@ public class JSXMLFileTest extends JSToolBox {
     String strXMLFileName = "";
 
     public JSXMLFileTest() {
-        BasicConfigurator.configure();
+//        BasicConfigurator.configure();
     }
 
     @Before

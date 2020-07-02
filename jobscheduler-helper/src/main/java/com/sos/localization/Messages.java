@@ -9,13 +9,15 @@ import java.util.ResourceBundle;
 import java.util.UnknownFormatConversionException;
 import java.util.regex.Matcher;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** @author KB */
 public class Messages implements Serializable {
 
     private static final long serialVersionUID = -1276188512965716159L;
-    private static final Logger LOGGER = Logger.getLogger(Messages.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
     private static final String ENCODING_KEY = "properties.file.encoding";
     private String BUNDLE_NAME = "com.sos.localization.messages";
     private ResourceBundle objResource_Bundle = null;
@@ -235,14 +237,12 @@ public class Messages implements Serializable {
             }
             return strM;
         } catch (MissingFormatArgumentException e) {
-            strM =
-                    String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
-                            e.getFormatSpecifier());
+            strM = String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e
+                    .getFormatSpecifier());
             return strM;
         } catch (UnknownFormatConversionException e) {
-            strM =
-                    String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
-                            e.getConversion());
+            strM = String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e
+                    .getConversion());
             return strM;
         } catch (MissingResourceException e) {
             strM = String.format("%1$s (%2$s): %3$s", pstrKey, objCurrentLocale.getDisplayName(), strM);
@@ -256,10 +256,10 @@ public class Messages implements Serializable {
     public String getMsg(final String pstrKey, final Locale pobjLocale) {
         String strM = "";
         try {
-            if (objCurrentLocale.equals(pobjLocale)) {
-                objResource_Bundle = null;
+            if (!objCurrentLocale.equals(pobjLocale)) {
+                objCurrentLocale = pobjLocale;
+                objResource_Bundle = getBundle();
             }
-            objCurrentLocale = pobjLocale;
             strM = addKey(pstrKey, getString(pstrKey, objResource_Bundle));
         } catch (MissingResourceException e) {
             strM = '!' + pstrKey + '!';

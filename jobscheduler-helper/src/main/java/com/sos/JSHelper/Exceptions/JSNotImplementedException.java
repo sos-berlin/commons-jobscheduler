@@ -1,6 +1,5 @@
 package com.sos.JSHelper.Exceptions;
 
-import org.apache.log4j.Logger;
 
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -31,12 +30,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class JSNotImplementedException extends JobSchedulerException {
 
     private static final long serialVersionUID = 8821743868485352721L;
-    @SuppressWarnings("unused")
-    private final String conClassName = "JSNotImplementedException";
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSNotImplementedException.class);
 
     public JSNotImplementedException() {
         super("Function not implemented.");

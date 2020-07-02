@@ -6,12 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSFileTest {
 
-    private static final Logger LOGGER = Logger.getLogger(JSFileTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSFileTest.class);
     private static final String CLASSNAME = "JSFileTest";
     private static final String REC = "Eine Zeile zum Test ...";
     private static final String FOLDERNAME = "R:/nobackup/junittests/testdata/JSFileTest/";
@@ -271,7 +273,7 @@ public class JSFileTest {
 
     @Test
     public void testExistsAndCanWrite() {
-        JSTextFile objFile = new JSTextFile("./abcd.properties");
+        JSTextFile objFile = new JSTextFile("src/test/resources/log4j.properties");
         if (!objFile.exists() && objFile.getParentFile().canWrite()) {
             assertTrue("geht nicht", false);
         }

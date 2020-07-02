@@ -70,8 +70,8 @@ public class SOSMail {
     protected String language = "de";
     protected String dateFormat = "dd.MM.yyyy";
     protected String datetimeFormat = "dd.MM.yyyy HH:mm";
-    protected HashMap <String,String>dateFormats = new HashMap<String,String>();
-    protected HashMap <String,String>datetimeFormats = new HashMap<String,String>();
+    protected HashMap<String, String> dateFormats = new HashMap<String, String>();
+    protected HashMap<String, String> datetimeFormats = new HashMap<String, String>();
     protected String attachmentCharset = "iso-8859-1";
     protected String charset = "iso-8859-1";
     protected String alternativeCharset = "iso-8859-1";
@@ -81,10 +81,10 @@ public class SOSMail {
     protected String alternativeEncoding = "7bit";
     protected String attachmentEncoding = "Base64";
     protected String attachmentContentType = "application/octet-stream";
-    protected LinkedList <String> toList = new LinkedList<String>();
-    protected LinkedList <String>ccList = new LinkedList<String>();
-    protected LinkedList <String>bccList = new LinkedList<String>();
-    protected TreeMap <String,SOSMailAttachment>attachmentList = new TreeMap<String,SOSMailAttachment>();
+    protected LinkedList<String> toList = new LinkedList<String>();
+    protected LinkedList<String> ccList = new LinkedList<String>();
+    protected LinkedList<String> bccList = new LinkedList<String>();
+    protected TreeMap<String, SOSMailAttachment> attachmentList = new TreeMap<String, SOSMailAttachment>();
     protected Properties templates = new Properties();
     protected SOSSettings sosSettings = null;
     protected String tableSettings = "SETTINGS";
@@ -106,6 +106,7 @@ public class SOSMail {
     private boolean changed = false;
     private final String queuePattern = "yyyy-MM-dd.HHmmss.S";
     private String queuePraefix = "sos.";
+    private String queueFailedPraefix = "failed.";
     private String lastGeneratedFileName = "";
     private String loadedMessageId = "";
     private boolean messageReady = false;
@@ -241,17 +242,10 @@ public class SOSMail {
         clearAttachments();
     }
 
-
     public void setProperties(Properties smtpProperties) {
-        Properties props = System.getProperties();
-        for (Map.Entry<Object, Object> e : smtpProperties.entrySet()) {
-            String key = (String) e.getKey();
-            String value = (String) e.getValue();
-            props.put(key, value);
-          }
+        System.getProperties().putAll(smtpProperties);
     }
 
-    
     public void initMessage() throws Exception {
         createMessage(createSession());
         initPriority();
@@ -260,7 +254,7 @@ public class SOSMail {
     public Session createSession() throws Exception {
         Properties props = System.getProperties();
         props.put("mail.host", host);
-        props.put("mail.port", port);
+        props.put("mail.smtp.port", port);
         props.put("mail.smtp.timeout", String.valueOf(timeout));
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.class", "com.sun.mail.SMTPTransport");
@@ -377,21 +371,21 @@ public class SOSMail {
         return true;
     }
 
-    public String substituteSubject(final String template, final HashMap replacements) throws Exception {
+    public String substituteSubject(final String template, final Map<String, String> replacements) throws Exception {
         if (!templates.containsKey(template + "_subject")) {
             throw new Exception("substituteSubject(): template does not exist: " + template + "_subject");
         }
         return substitute(templates.get(template + "_subject").toString(), replacements, false);
     }
 
-    public String substituteBody(final String template, final HashMap replacements, final boolean nl2br) throws Exception {
+    public String substituteBody(final String template, final Map<String, String> replacements, final boolean nl2br) throws Exception {
         if (!templates.containsKey(template + "_body")) {
             throw new Exception("substituteBody(): template does not exist: " + template + "_body");
         }
         return substitute(templates.get(template + "_body").toString(), replacements, nl2br);
     }
 
-    public String substituteBody(final String template, final HashMap replacements) throws Exception {
+    public String substituteBody(final String template, final Map<String, String> replacements) throws Exception {
         if (!templates.containsKey(template + "_body")) {
             throw new Exception("substituteBody(): template does not exist: " + template + "_body");
         }
@@ -399,7 +393,7 @@ public class SOSMail {
     }
 
     @Deprecated
-    private String substitute(String content, final HashMap<String, String> replacements, final boolean nl2br) throws Exception {
+    private String substitute(String content, final Map<String, String> replacements, final boolean nl2br) throws Exception {
         String key = null;
         String value = null;
         if ("de".equalsIgnoreCase(this.getLanguage())) {
@@ -424,12 +418,10 @@ public class SOSMail {
                     value = replacements.get(key);
                     if (value != null) {
                         try {
-                            content =
-                                    content.replaceAll("&\\#\\(" + key + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()),
-                                            this.getDateFormat()));
-                            content =
-                                    content.replaceAll("&\\#\\#\\(" + key + "\\)", SOSDate.getDateTimeAsString(
-                                            SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
+                            content = content.replaceAll("&\\#\\(" + key + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this
+                                    .getDateFormat()));
+                            content = content.replaceAll("&\\#\\#\\(" + key + "\\)", SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()),
+                                    this.getDatetimeFormat()));
                         } catch (Exception ex) {
                             // ignore this error: replacement is not convertible
                             // to date
@@ -705,7 +697,7 @@ public class SOSMail {
             lastError = "AuthenticationFailedException while connecting to " + host + ":" + port + " " + user + "/******** -->" + ee.getMessage();
             if (queueMailOnError) {
                 try {
-                    dumpMessageToFile(true);
+                    dumpFailedMessageToFile(true);
                 } catch (Exception e) {
                     LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                 }
@@ -715,12 +707,12 @@ public class SOSMail {
             }
         } catch (javax.mail.MessagingException e) {
             if (queueMailOnError) {
-                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host")
-                        || e.getMessage().startsWith("Unknown SMTP host") || e.getMessage().startsWith("Read timed out")
-                        || e.getMessage().startsWith("Exception reading response")) {
+                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith(
+                        "Unknown SMTP host") || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith(
+                                "Exception reading response")) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
-                        dumpMessageToFile(true);
+                        dumpFailedMessageToFile(true);
                     } catch (Exception ee) {
                         LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
@@ -737,7 +729,7 @@ public class SOSMail {
                 if (!queueDir.isEmpty()) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
-                        dumpMessageToFile(true);
+                        dumpFailedMessageToFile(true);
                     } catch (Exception ee) {
                         LOGGER.warn(SOSClassUtil.getMethodName() + ":" + e.getMessage());
                     }
@@ -873,7 +865,7 @@ public class SOSMail {
 
     public String dumpHeaders() throws IOException, MessagingException {
         String s = "";
-        for (Enumeration e = message.getAllHeaders(); e.hasMoreElements();) {
+        for (Enumeration<?> e = message.getAllHeaders(); e.hasMoreElements();) {
             Header header = (Header) e.nextElement();
             s += "\n" + header.getName() + ": " + header.getValue();
         }
@@ -905,17 +897,18 @@ public class SOSMail {
         return dumpMessageAsString(false);
     }
 
-    private void dumpMessageToFile(final boolean withAttachment) throws Exception {
+
+    private void dumpFailedMessageToFile(final boolean withAttachment) throws Exception {
         Date d = new Date();
         StringBuffer bb = new StringBuffer();
         SimpleDateFormat s = new SimpleDateFormat(queuePattern);
         FieldPosition fp = new FieldPosition(0);
         StringBuffer b = s.format(d, bb, fp);
-        lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
+        lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + "sos." + b + ".email";
         File f = new File(lastGeneratedFileName);
         while (f.exists()) {
             b = s.format(d, bb, fp);
-            lastGeneratedFileName = queueDir + "/" + queuePraefix + b + ".email~";
+            lastGeneratedFileName = queueDir + "/" + queueFailedPraefix + "sos." + b + ".email";
             f = new File(lastGeneratedFileName);
         }
         dumpMessageToFile(f, withAttachment);
@@ -1470,7 +1463,7 @@ public class SOSMail {
             if (!toList.isEmpty()) {
                 sb = new StringBuilder();
                 for (ListIterator<String> e = toList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
@@ -1480,7 +1473,7 @@ public class SOSMail {
             if (!ccList.isEmpty()) {
                 sb = new StringBuilder();
                 for (ListIterator<String> e = ccList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
@@ -1489,8 +1482,8 @@ public class SOSMail {
             }
             if (!bccList.isEmpty()) {
                 sb = new StringBuilder();
-                for (ListIterator e = bccList.listIterator(); e.hasNext();) {
-                    sb.append(getQuotedName(e.next().toString()));
+                for (ListIterator<String> e = bccList.listIterator(); e.hasNext();) {
+                    sb.append(getQuotedName(e.next()));
                     if (e.hasNext()) {
                         sb.append(",");
                     }
@@ -1513,7 +1506,8 @@ public class SOSMail {
                 for (Iterator<SOSMailAttachment> i = attachmentList.values().iterator(); i.hasNext();) {
                     SOSMailAttachment sosMailAttachment = i.next();
                     sendLine(out, "\r\n--" + boundary);
-                    sendLine(out, "Content-Type: " + sosMailAttachment.getContentType() + "; name=\"" + new File(sosMailAttachment.getFilename()) + "\"");                    
+                    sendLine(out, "Content-Type: " + sosMailAttachment.getContentType() + "; name=\"" + new File(sosMailAttachment.getFilename())
+                            + "\"");
                     sendLine(out, "Content-Disposition: attachment; filename=\"" + sosMailAttachment.getFilename() + "\"");
                     sendLine(out, "Content-Transfer-Encoding: " + attachmentEncoding + "\r\n");
                     SOSMimeBase64.encode(sosMailAttachment.getFilename(), out);
@@ -1556,11 +1550,36 @@ public class SOSMail {
         sosMail.clearRecipients();
     }
 
+    public File getNewQueueDirectoryFile() {
+        Date d = new Date();
+        StringBuffer bb = new StringBuffer();
+        SimpleDateFormat s = new SimpleDateFormat(queuePattern);
+        FieldPosition fp = new FieldPosition(0);
+        StringBuffer b = s.format(d, bb, fp);
+        String fn = queueDir + "/" + queuePraefix + b + ".email";
+        File f = new File(fn);
+        while (f.exists()) {
+            b = s.format(d, bb, fp);
+            fn = queueDir + "/" + queuePraefix + b + ".email";
+            f = new File(lastGeneratedFileName);
+        }
+        return f;
+    }
+
     public void sendMail(final ISOSSmtpMailOptions options) throws Exception {
+        sendMail(options, false, false);
+    }
+
+    public void sendMail(final ISOSSmtpMailOptions options, boolean queueOnly) throws Exception {
+        sendMail(options, queueOnly, false);
+    }
+
+    public void sendMail(final ISOSSmtpMailOptions options, boolean queueOnly, boolean withAttachment) throws Exception {
         final String delims = ",|;";
         try {
             SOSMail sosMail = this;
             sosMail.init();
+
             sosMail.setHost(options.getHost().getValue());
             sosMail.setPort(options.getPort().getValue());
             sosMail.setQueueDir(options.getQueueDirectory().getValue());
@@ -1596,16 +1615,28 @@ public class SOSMail {
             }
             sosMail.setSubject(options.getSubject().getValue());
             sosMail.setBody(options.getBody().getValue());
-            LOGGER.debug("sending mail: \n" + sosMail.dumpMessageAsString());
-            
-            if (!sosMail.send() ) {
-                LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
-                        + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
+
+            if (queueOnly) {
+                File f = getNewQueueDirectoryFile();
+                LOGGER.debug(String.format("[%s]queue mail: \n %s", f.getCanonicalPath(), sosMail.dumpMessageAsString()));
+
+                dumpMessageToFile(f, withAttachment);
+            } else {
+                LOGGER.debug("sending mail: \n" + sosMail.dumpMessageAsString());
+                if (!sosMail.send()) {
+                    LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail
+                            .getQueueDir() + "]:" + sosMail.getLastError());
+                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new Exception("error occurred sending mail: " + e.getMessage());
+            throw new Exception("error occurred sendMail: " + e.getMessage());
         }
+    }
+
+    
+    public void setQueueFailedPraefix(String queueFailedPraefix) {
+        this.queueFailedPraefix = queueFailedPraefix;
     }
 
 }

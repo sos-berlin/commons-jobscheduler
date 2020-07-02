@@ -24,23 +24,21 @@ public class TestJobConfigurationFileChanger {
     @Test
     public void testJobChange() throws Exception, JAXBException {
         ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
-        configurationModifierFileSelectorOptions.setConfigurationDirectory(
-                "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("scr/test/resources/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
         configurationModifierFileSelectorOptions.setFileExclusions("");
         configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^.*$");
         ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(
                 configurationModifierFileSelectorOptions);
-        configurationModifierFileSelectorOptions.setConfigurationDirectory(
-                "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("scr/test/resources/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
         configurationModifierFileSelectorOptions.setFileExclusions("");
         configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^.*$");
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
         configurationModifierFileSelector.fillSelectedFileList();
-        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/parallel_job_instances/Job_1");
+        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/myJob");
         assertEquals("testGetMonitorList", true, jobIsToBeHandled);
         if (jobIsToBeHandled) {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

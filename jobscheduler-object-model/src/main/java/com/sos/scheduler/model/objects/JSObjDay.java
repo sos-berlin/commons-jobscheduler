@@ -2,11 +2,12 @@ package com.sos.scheduler.model.objects;
 
 import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.scheduler.model.ISOSJsObjStartTimes;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -17,7 +18,7 @@ import com.sos.scheduler.model.tools.RunTimeElements;
 /** @author ss */
 public class JSObjDay extends Weekdays.Day implements ISOSJsObjStartTimes {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjDay.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjDay.class);
 
     public JSObjDay(SchedulerObjectFactory schedulerObjectFactory) {
         super();

@@ -2,7 +2,8 @@ package com.sos.VirtualFileSystem.WebDAV;
 
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
@@ -12,7 +13,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAVFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsWebDAVFile.class);
     private String strFileName = null;
 
     public SOSVfsWebDAVFile(final String pstrFileName) {

@@ -17,7 +17,7 @@ package com.sos.VirtualFileSystem.JMS.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -29,11 +29,12 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
 import org.apache.activemq.util.IndentPrinter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProducerTool extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(ProducerTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerTool.class);
     private Destination destination;
     private int messageCount = 10;
     private long sleepTime;
@@ -51,7 +52,7 @@ public class ProducerTool extends Thread {
     private static Object lockResults = new Object();
 
     public static void main(String[] args) {
-        ArrayList<ProducerTool> threads = new ArrayList();
+        List<ProducerTool> threads = new ArrayList<ProducerTool>();
         ProducerTool producerTool = new ProducerTool();
         String[] unknown = CommandLineSupport.setOptions(producerTool, args);
         if (unknown.length > 0) {
@@ -66,10 +67,8 @@ public class ProducerTool extends Thread {
             threads.add(producerTool);
         }
         while (true) {
-            Iterator<ProducerTool> itr = threads.iterator();
             int running = 0;
-            while (itr.hasNext()) {
-                ProducerTool thread = itr.next();
+            for (ProducerTool thread : threads) {
                 if (thread.isAlive()) {
                     running++;
                 }
@@ -199,11 +198,11 @@ public class ProducerTool extends Thread {
         this.timeToLive = timeToLive;
     }
 
-    public void setParallelThreads(int parallelThreads) {
-        if (parallelThreads < 1) {
-            parallelThreads = 1;
+    public void setParallelThreads(int _parallelThreads) {
+        if (_parallelThreads < 1) {
+            _parallelThreads = 1;
         }
-        this.parallelThreads = parallelThreads;
+        parallelThreads = _parallelThreads;
     }
 
     public void setTopic(boolean topic) {

@@ -2,7 +2,8 @@ package sos.scheduler.launcher;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.spooler.Job_impl;
 import sos.spooler.Variable_set;
@@ -12,7 +13,7 @@ import sos.util.SOSString;
 /** @author Mürüvet Öksüz */
 public class JobSchedulerLoadTestLauncherJob extends Job_impl {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerLoadTestLauncherJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerLoadTestLauncherJob.class);
     private SOSString sosString = null;
 
     public boolean spooler_init() {

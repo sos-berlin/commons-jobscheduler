@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 
 /** @author KB */
 public class SOSVfsConnectionPool {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsConnectionPool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsConnectionPool.class);
     List<ISOSVFSHandler> list = Collections.synchronizedList(new ArrayList<ISOSVFSHandler>());
 
     public SOSVfsConnectionPool() {

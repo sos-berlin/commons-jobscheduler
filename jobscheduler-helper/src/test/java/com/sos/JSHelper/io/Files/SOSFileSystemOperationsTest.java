@@ -3,19 +3,21 @@ package com.sos.JSHelper.io.Files;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.io.SOSFileSystemOperations;
+import com.sos.JSHelper.io.SOSFileSystemOperationsImpl;
 
 /** @author KB */
 public class SOSFileSystemOperationsTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSFileSystemOperationsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileSystemOperationsTest.class);
     private String strReplaceWhat = "";
     private String strReplaceWith = "";
     private String strStringToWorkOn = "";
@@ -62,14 +64,14 @@ public class SOSFileSystemOperationsTest {
 
     private void doTest(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
             final String strExpectedResult) throws Exception {
-        SOSFileSystemOperations objFSO = new SOSFileSystemOperations();
+        SOSFileSystemOperations objFSO = new SOSFileSystemOperationsImpl();
         String strResult = objFSO.getReplacementFilename(strWork, strReplaceWhat, strReplaceWith);
         assertEquals(strText, strExpectedResult, strResult);
     }
 
     @Test
     public void resultListTest() throws Exception {
-        String file = "c:/temp";
+        String file = "src/test/resources";
         String fileSpec = "^.*\\.kb$";
         for (int j = 0; j < 10; j++) {
             JSFile objTestFile = new JSFile(file + "/test" + j + ".kb");
@@ -84,12 +86,12 @@ public class SOSFileSystemOperationsTest {
         int skipLastFiles = 0;
         String minFileSize = "-1";
         String maxFileSize = "-1";
-        SOSFileSystemOperations objFSO = new SOSFileSystemOperations();
+        SOSFileSystemOperations objFSO = new SOSFileSystemOperationsImpl();
         boolean flgOperationWasSuccessful = objFSO.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, maxFileAge, minFileSize,
-                maxFileSize, skipFirstFiles, skipLastFiles, null);
+                maxFileSize, skipFirstFiles, skipLastFiles);
         LOGGER.info("flgOperationWasSuccessful: " + flgOperationWasSuccessful);
         if (flgOperationWasSuccessful) {
-            Vector<File> lstR = objFSO.lstResultList;
+            List<File> lstR = objFSO.lstResultList;
             int intNoOfHits = lstR.size();
             LOGGER.info("intNoOfHits = " + intNoOfHits);
             for (File file2 : lstR) {

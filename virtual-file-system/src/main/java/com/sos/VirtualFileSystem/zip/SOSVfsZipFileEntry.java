@@ -7,7 +7,8 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDateTime;
@@ -23,7 +24,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     private static final long serialVersionUID = -6693187904489763940L;
     private static final String CLASSNAME = "SOSVfsZipFileEntry";
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsZipFileEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsZipFileEntry.class);
     private ZipEntry objZipEntry = null;
 
     public SOSVfsZipFileEntry(final String pstrFileName) {

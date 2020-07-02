@@ -4,15 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author KB */
 public class SOSOptionHostNameTest {
 
     private static final String CLASSNAME = "SOSOptionHostNameTest";
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionHostNameTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionHostNameTest.class);
     public SOSOptionHostName objHostName = new SOSOptionHostName(null, CLASSNAME + ".variablename", "OptionDescription", "4444", "4444", true);
 
     public SOSOptionHostNameTest() {

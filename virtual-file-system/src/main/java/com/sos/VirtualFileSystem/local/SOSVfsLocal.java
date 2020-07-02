@@ -5,12 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
-import sos.util.SOSFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -31,15 +29,19 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSCommandResult;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
+import com.sos.VirtualFileSystem.common.SOSVfsEnv;
 import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.util.SOSFile;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSVfsLocal.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSVfsLocal.class);
     private final InputStream objInputStream = null;
     private final OutputStream objOutputStream = null;
     private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
@@ -195,15 +197,15 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void executeCommand(final String cmd, Map<String, String> env) throws Exception {
+    public void executeCommand(final String cmd, SOSVfsEnv env) throws Exception {
         if (objCmdShell == null) {
             objCmdShell = new CmdShell();
         }
         String command = cmd.trim();
         if (objCmdShell.isWindows()) {
-            command = replaceCommand4Windows(command);
+            command = objCmdShell.replaceCommand4Windows(command);
         }
-        int exitCode = objCmdShell.executeCommand(command);
+        int exitCode = objCmdShell.executeCommand(command, env);
         if (exitCode != 0) {
             boolean raiseException = true;
             if (connection2OptionsAlternate != null) {
@@ -216,12 +218,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
         }
     }
-
-    public String replaceCommand4Windows(final String cmd) {
-        String command = cmd;
-        command = command.replaceAll("/(?=[^ ]*/)", "\\\\");
-        command = command.replaceAll("(?<! )/", "\\\\");
-        return command;
+    
+    public CmdShell getCmdShell(){
+        if (objCmdShell == null) {
+            objCmdShell = new CmdShell();
+        }
+        return objCmdShell;
     }
 
     @Override
@@ -643,6 +645,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    @Override
+    public SOSCommandResult executePrivateCommand(String cmd) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

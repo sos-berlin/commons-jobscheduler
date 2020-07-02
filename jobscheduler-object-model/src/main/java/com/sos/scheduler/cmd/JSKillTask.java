@@ -2,13 +2,15 @@ package com.sos.scheduler.cmd;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdKillTask;
-import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSKillTask extends JSCommand {
 
-    private final Logger logger = Logger.getLogger(JSKillTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSKillTask.class);
 
     @SuppressWarnings("unused")
     private final JSCmdKillTask cmdKillTask;
@@ -29,7 +31,7 @@ public class JSKillTask extends JSCommand {
         cmd.setJob(jobName);
         cmd.setImmediately((immediately) ? "yes" : "no");
         setCommand(cmd);
-        logger.info("Try to kill task " + jobName + " with taskID " + taskId + ((immediately) ? " immediately" : ""));
+        LOGGER.info("Try to kill task " + jobName + " with taskID " + taskId + ((immediately) ? " immediately" : ""));
         return cmd;
     }
 

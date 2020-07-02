@@ -1,6 +1,7 @@
 package com.sos.JSHelper.Options;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** \class SOSOptionJobChainNode
  * 
@@ -28,7 +29,7 @@ public class SOSOptionJobChainNode extends SOSOptionString {
     @SuppressWarnings("unused")
     private final String conClassName = "SOSOptionJobChainNode";
     private static final String conSVNVersion = "$Id$";
-    private static final Logger logger = Logger.getLogger(SOSOptionJobChainNode.class);
+    private static final Logger logger = LoggerFactory.getLogger(SOSOptionJobChainNode.class);
 
     public SOSOptionJobChainNode(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
             boolean pPflgIsMandatory) {

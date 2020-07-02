@@ -1,8 +1,9 @@
 package com.sos.VirtualFileSystem.Filter;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SOSDos2UnixFilterTest extends SOSNullFilterBase<SOSDos2UnixFilter> {
 
@@ -10,7 +11,7 @@ public class SOSDos2UnixFilterTest extends SOSNullFilterBase<SOSDos2UnixFilter> 
     private final String conClassName = this.getClass().getSimpleName();
     @SuppressWarnings("unused")
     private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSDos2UnixFilterTest.class);
 
     public SOSDos2UnixFilterTest() {
         super(new SOSDos2UnixFilter());
@@ -24,7 +25,7 @@ public class SOSDos2UnixFilterTest extends SOSNullFilterBase<SOSDos2UnixFilter> 
 
         bteBuffer = objF.read();
         String strX = new String(bteBuffer);
-        logger.debug(strX);
+        LOGGER.debug(strX);
         Assert.assertEquals(strT2, strX);
     }
 

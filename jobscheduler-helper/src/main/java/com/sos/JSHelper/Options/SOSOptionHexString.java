@@ -2,7 +2,8 @@ package com.sos.JSHelper.Options;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -10,7 +11,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class SOSOptionHexString extends SOSOptionFileString {
 
     private static final long serialVersionUID = 5459978964312384049L;
-    private static final Logger LOGGER = Logger.getLogger(SOSOptionHexString.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionHexString.class);
 
     public SOSOptionHexString(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
             final String pPstrDefaultValue, final boolean pPflgIsMandatory) {

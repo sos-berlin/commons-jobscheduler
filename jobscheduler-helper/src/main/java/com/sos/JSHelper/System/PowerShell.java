@@ -11,12 +11,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** source code from http://kra.lc/blog/2014/02/powershell-java-bridge/ */
 public class PowerShell {
 
-    private static final Logger LOGGER = Logger.getLogger(PowerShell.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PowerShell.class);
     private static final int GARBAGE_INTERVAL = 60 * 1000;
     private static File powershell = null;
     private final Process process;

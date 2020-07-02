@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -15,7 +16,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class JSIniFile extends JSTextFile {
 
     private static final long serialVersionUID = -1960627326921434568L;
-    private static final Logger LOGGER = Logger.getLogger(JSIniFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSIniFile.class);
     private final Map<String, SOSProfileSection> mapSections = new HashMap<String, SOSProfileSection>();
     private String strSectionName = null;
     private boolean flgIgnoreDuplicateSections = true;

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
@@ -13,6 +12,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -21,7 +22,7 @@ import com.sos.scheduler.model.objects.Weekdays.Day;
 
 public class JSObjWeekdaysTest extends TestBase {
 
-    private static final Logger LOGGER = Logger.getLogger(JSObjWeekdaysTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSObjWeekdaysTest.class);
     private static final DateTimeFormatter FMT_DATE_TIME = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm:ss");
     private static final Interval NEXT_WEEK = IntervalConstants.NEXT_WEEK.getInterval();

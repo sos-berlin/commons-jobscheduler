@@ -2,7 +2,6 @@ package com.sos.JSHelper.io.Files;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +15,6 @@ public class JSCsvFileTest extends JSListenerClass {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         fleTestdataDirectory = new JSFile("R:/backup/sos/java/junittests/testdata/JSCsvFileTest/");
-        BasicConfigurator.configure();
     }
 
     @Test

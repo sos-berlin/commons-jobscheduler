@@ -5,13 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.FormatPatternException;
 
 public class JSDataElementDate extends JSDataElement {
 
-    private static final Logger LOGGER = Logger.getLogger(JSDataElementDate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSDataElementDate.class);
     private JSDateFormat objFormat = null;
 
     public JSDataElementDate() {
