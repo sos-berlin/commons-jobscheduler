@@ -548,14 +548,12 @@ public class JSConditionResolver {
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             LOGGER.debug("Resolving jobstream " + jobStream.getValue().getJobStream());
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
-                boolean historyValidated2True = false;
                 if (jobStream.getValue() != null) {
                     List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
                     for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                         if (jsHistoryEntry.isRunning()) {
                             LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                     .getJobStream(), jsHistoryEntry.getContextId()));
-                            jsHistoryEntry.getContextId();
                             UUID contextId = jsHistoryEntry.getContextId();
                             if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
                                 LOGGER.debug("No in conditions defined. Nothing to do");
@@ -582,7 +580,6 @@ public class JSConditionResolver {
                                                     boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
                                                     if (!endedByJob) {
                                                         if (validate(sosHibernateSession, null, contextId, inCondition)) {
-                                                            historyValidated2True = true;
                                                             StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
                                                                     listOfParameters.get(contextId), schedulerXmlCommandExecutor);
                                                             handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
@@ -613,40 +610,48 @@ public class JSConditionResolver {
                                     sosHibernateSession.rollback();
                                 }
                             }
-
-                            if (!historyValidated2True) {
-                                if (!jsHistoryEntry.checkRunning(this)) {
-                                    try {
-                                        LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
-                                        jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
-                                        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-                                        DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(
-                                                jsHistoryEntry.getId());
-                                        if (dbItemJobStreamHistory != null) {
-                                            sosHibernateSession.beginTransaction();
-                                            dbItemJobStreamHistory.setRunning(false);
-                                            dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
-                                            sosHibernateSession.commit();
-                                            toRemove.add(jsHistoryEntry);
-                                            this.listOfParameters.remove(contextId);
-                                        }
-                                    } catch (Exception e) {
-                                        LOGGER.error(e.getMessage(), e);
-                                        sosHibernateSession.rollback();
-                                    }
-                                }
-                            }
                         }
-                        LOGGER.debug("history size: " + jobStream.getValue().getListOfJobStreamHistory().size());
-                        LOGGER.debug("history to remove size: " + toRemove.size());
-                        jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
-                        LOGGER.debug("history size after remove: " + jobStream.getValue().getListOfJobStreamHistory().size());
                     }
                 }
             }
         }
         return listOfValidatedInconditions;
 
+    }
+
+    public void checkRunning(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
+        for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
+            if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
+                List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    if (jsHistoryEntry.getContextId().toString().equals(contextId.toString()) && jsHistoryEntry.isRunning()) {
+                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                                .getJobStream(), jsHistoryEntry.getContextId()));
+                        if (!jsHistoryEntry.checkRunning(this)) {
+                            try {
+                                LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
+                                jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
+                                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                                DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
+                                        .getId());
+                                if (dbItemJobStreamHistory != null) {
+                                    sosHibernateSession.beginTransaction();
+                                    dbItemJobStreamHistory.setRunning(false);
+                                    dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
+                                    sosHibernateSession.commit();
+                                    toRemove.add(jsHistoryEntry);
+                                    this.listOfParameters.remove(contextId);
+                                }
+                                jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                                sosHibernateSession.rollback();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public boolean resolveOutConditions(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent, String jobSchedulerId, String job)
@@ -671,6 +676,7 @@ public class JSConditionResolver {
                 LOGGER.debug("using contextId from in condition");
             }
             if (contextId != null) {
+                checkRunning(sosHibernateSession, contextId);
                 LOGGER.debug("resolve outconditions using context:" + contextId.toString());
                 if (jobOutConditions != null) {
                     for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
@@ -887,15 +893,12 @@ public class JSConditionResolver {
         return listOfHistoryIds;
     }
 
-    
     public Map<UUID, Map<String, String>> getListOfParameters() {
         return listOfParameters;
     }
 
-    
     public void setListOfParameters(Map<UUID, Map<String, String>> listOfParameters) {
         this.listOfParameters = listOfParameters;
     }
 
-   
 }
