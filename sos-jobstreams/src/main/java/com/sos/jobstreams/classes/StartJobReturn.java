@@ -4,6 +4,7 @@ public class StartJobReturn {
 
     private String startedJob;
     private Long taskId;
+    private boolean markedAsConsumed=false;
 
     public String getStartedJob() {
         return startedJob;
@@ -19,6 +20,16 @@ public class StartJobReturn {
 
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
+    }
+
+    
+    public boolean isMarkedAsConsumed() {
+        return markedAsConsumed;
+    }
+
+    
+    public void setMarkedAsConsumed(boolean markedAsConsumed) {
+        this.markedAsConsumed = markedAsConsumed;
     }
 
 }

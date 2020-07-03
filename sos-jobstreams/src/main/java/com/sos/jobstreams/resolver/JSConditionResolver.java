@@ -549,7 +549,6 @@ public class JSConditionResolver {
             LOGGER.debug("Resolving jobstream " + jobStream.getValue().getJobStream());
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 if (jobStream.getValue() != null) {
-                    List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
                     for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                         if (jsHistoryEntry.isRunning()) {
                             LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
