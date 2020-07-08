@@ -1,6 +1,7 @@
 package com.sos.jobstreams.plugins;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.HashMap;
@@ -291,10 +292,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
             Map<String, String> values = new HashMap<String, String>();
-            values.put(CustomEventType.JobStreamStarted.name(), jobStream.getJobStream() + "." + jobStreamStarter.getItemJobStreamStarter().getTitle());
+            values.put(CustomEventType.JobStreamStarted.name(), jobStream.getJobStream() + "." + jobStreamStarter.getItemJobStreamStarter()
+                    .getTitle());
             values.put("contextId", contextId.toString());
             publishCustomEvent(CUSTOM_EVENT_KEY, values);
-            
+
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
             conditionResolver.getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
@@ -562,13 +564,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         values = new HashMap<String, String>();
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
-                       
+                        values.put("path",taskEndEvent.getJobPath());
                         if (conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong()) != null) {
                             values.put("contextId", conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong()).toString());
                         }
 
                         performTaskEnd(sosHibernateSession, taskEndEvent);
-                     
+
                         resolveInConditions = true;
                         publishCustomEvent(CUSTOM_EVENT_KEY, values);
                         break;
@@ -683,6 +685,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 values = new HashMap<String, String>();
                                 values.put(CustomEventType.EventCreated.name(), customEvent.getEvent());
                                 values.put("contextId", customEvent.getSession());
+
+                                if ((conditionResolver.getJobStreamContexts() != null) && (conditionResolver.getJobStreamContexts()
+                                        .getListOfContexts() != null) && (conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID
+                                                .fromString(customEvent.getSession())) != null)) {
+
+                                    String path = Paths.get(conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID.fromString(customEvent
+                                            .getSession())).get(0).getJob()).getParent().getFileName().toString().replace('\\','/');
+                                    values.put("path", path);
+                                }
+
+                                values.put("path", customEvent.getJob());
                                 publishCustomEvent(CUSTOM_EVENT_KEY, values);
                                 addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
 
@@ -721,7 +734,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 conditionResolver.reInitConsumedInConditions(sosHibernateSession);
                             }
 
+                            
                             values = new HashMap<String, String>();
+
+                            if ((conditionResolver.getJobStreamContexts() != null) && (conditionResolver.getJobStreamContexts()
+                                    .getListOfContexts() != null) && (conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID
+                                            .fromString(customEvent.getSession())) != null)) {
+
+                                String path = Paths.get(conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID.fromString(customEvent
+                                        .getSession())).get(0).getJob()).getParent().getFileName().toString().replace('\\','/');
+                                values.put("path", path);
+                            }
+                            
                             values.put(CustomEventType.EventRemoved.name(), customEvent.getEvent());
                             values.put("contextId", customEvent.getSession());
 
