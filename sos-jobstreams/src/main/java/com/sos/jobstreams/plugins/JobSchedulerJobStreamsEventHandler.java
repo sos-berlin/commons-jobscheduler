@@ -529,6 +529,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     throw new RuntimeException(e);
                 }
             }
+            
+            Map<String, String> values;
 
             for (JsonValue entry : events) {
                 if (entry != null) {
@@ -552,7 +554,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
                         performTaskEnd(sosHibernateSession, taskEndEvent);
                         resolveInConditions = true;
-                        Map<String, String> values = new HashMap<String,String>();                  
+                        values = new HashMap<String,String>();                  
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
                         values.put("contextId", conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong()).toString());
                         publishCustomEvent(CUSTOM_EVENT_KEY,values );
@@ -664,8 +666,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     conditionResolver.addEvent(sosHibernateSession, event);
                                 }
 
-                                publishCustomEvent(CUSTOM_EVENT_KEY ,CustomEventType.EventCreated.name(), customEvent.getEvent());
+                                
+                                values = new HashMap<String,String>();                  
+                                values.put(CustomEventType.EventCreated.name(), customEvent.getEvent());
+                                values.put("contextId",customEvent.getSession());
+                                publishCustomEvent(CUSTOM_EVENT_KEY,values);
                                 addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
+                        
                                 if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
                                     this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
                                     conditionResolver.reInitConsumedInConditions(sosHibernateSession);
@@ -700,7 +707,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
                                 conditionResolver.reInitConsumedInConditions(sosHibernateSession);
                             }
-                            publishCustomEvent(CUSTOM_EVENT_KEY,CustomEventType.EventRemoved.name(),customEvent.getEvent());
+
+                            values = new HashMap<String,String>();                  
+                            values.put(CustomEventType.EventRemoved.name(), customEvent.getEvent());
+                            values.put("contextId",customEvent.getSession());
+
+                            publishCustomEvent(CUSTOM_EVENT_KEY,values);
 
                             break;
 

@@ -597,6 +597,13 @@ public class SOSServicePermissionShiro {
         Globals.setProperties();
         SOSHibernateSession sosHibernateSession = null;
 
+        
+        if (basicAuthorization == null) {
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
+            sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+            sosShiroCurrentUserAnswer.setMessage("Login: Could not login as no authorization header is available");
+            throw new JocAuthenticationException(sosShiroCurrentUserAnswer);
+        }
         if (basicAuthorization.isEmpty()) {
             String s = user + ":" + pwd;
             byte[] authEncBytes = org.apache.commons.codec.binary.Base64.encodeBase64(s.getBytes());
