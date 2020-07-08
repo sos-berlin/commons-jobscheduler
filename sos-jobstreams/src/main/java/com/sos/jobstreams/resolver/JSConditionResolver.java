@@ -641,7 +641,6 @@ public class JSConditionResolver {
                                     toRemove.add(jsHistoryEntry);
                                     this.listOfParameters.remove(contextId);
                                 }
-                                jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                                 sosHibernateSession.rollback();
@@ -649,6 +648,7 @@ public class JSConditionResolver {
                         }
                     }
                 }
+                jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
             }
         }
     }
