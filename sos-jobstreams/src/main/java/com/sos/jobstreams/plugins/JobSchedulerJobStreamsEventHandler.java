@@ -691,7 +691,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                                 .fromString(customEvent.getSession())) != null)) {
 
                                     String path = Paths.get(conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID.fromString(customEvent
-                                            .getSession())).get(0).getJob()).getParent().getFileName().toString().replace('\\','/');
+                                            .getSession())).get(0).getJob()).getParent().toString().replace('\\','/');
                                     values.put("path", path);
                                 }
 
@@ -742,7 +742,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                             .fromString(customEvent.getSession())) != null)) {
 
                                 String path = Paths.get(conditionResolver.getJobStreamContexts().getListOfContexts().get(UUID.fromString(customEvent
-                                        .getSession())).get(0).getJob()).getParent().getFileName().toString().replace('\\','/');
+                                        .getSession())).get(0).getJob()).getParent().toString().replace('\\','/');
                                 values.put("path", path);
                             }
                             
