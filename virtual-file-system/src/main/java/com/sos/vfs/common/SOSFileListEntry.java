@@ -103,6 +103,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
         entry = fileEntry;
         sourceFileName = entry.getFullPath();
+        sourceFileSize = entry.getFilesize();
         targetFileName = "";
         bytesTransferred = 0;
     }
@@ -1175,8 +1176,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     sourceTransferFileName);
             sourceTransferFile = parent.getSourceProvider().getFile(fileHandlerSourceFileName);
             if (transferStatus.equals(TransferStatus.ignoredDueToZerobyteConstraint)) {
-                String msg = String.format("[%s]%s", transferNumber, SOSVfs_D_0110.params(sourceFileName));
-                LOGGER.debug(msg);
+                String msg = String.format("[%s][skip][TransferZeroByteFiles=relaxed]Source=%s, Bytes=0", transferNumber, SOSCommonProvider
+                        .normalizePath(sourceFileName));
+                LOGGER.info(msg);
                 JADE_REPORT_LOGGER.info(msg);
             }
 
@@ -1257,7 +1259,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     public void setNotOverwritten(ISOSProviderFile targetFile) {
         transferStatus = TransferStatus.notOverwritten;
         endTime = Instant.now();
-        LOGGER.info(String.format("[%s][notOverwritten]Target=%s", transferNumber, SOSCommonProvider.normalizePath(targetFile.getName())));
+        LOGGER.info(String.format("[%s][skip][DisableOverwriteFiles=true]Target=%s", transferNumber, SOSCommonProvider.normalizePath(targetFile
+                .getName())));
     }
 
     public boolean isNotOverwritten() {

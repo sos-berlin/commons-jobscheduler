@@ -484,8 +484,12 @@ public class SOSFileList extends SOSVFSMessageCodes {
         case no: // transfer only if least one is not a zero byte file
             if (emptyFiles == total) {
                 counterAbortedZeroByteFiles = emptyFiles;
+                int counter = 0;
                 for (SOSFileListEntry entry : getList()) {
+                    counter++;
                     entry.setTransferStatus(TransferStatus.transfer_aborted);
+                    LOGGER.info(String.format("[%s][skip][TransferZeroByteFiles=false]Source=%s, Bytes=%s", counter, SOSCommonProvider.normalizePath(
+                            entry.getSourceFilename()), entry.getFileSize()));
                 }
                 throw new JobSchedulerException(String.format("All %s files have zero byte size, transfer aborted", emptyFiles));
             } else {
@@ -505,8 +509,13 @@ public class SOSFileList extends SOSVFSMessageCodes {
         case strict: // abort transfer if any zero byte file is found
             if (emptyFiles > 0) {
                 counterAbortedZeroByteFiles = emptyFiles;
+                int counter = 0;
                 for (SOSFileListEntry entry : getList()) {
+                    counter++;
                     entry.setTransferStatus(TransferStatus.transfer_aborted);
+                    LOGGER.info(String.format("[%s][skip][TransferZeroByteFiles=strict]Source=%s, Bytes=%s", counter, SOSCommonProvider.normalizePath(
+                            entry.getSourceFilename()), entry.getFileSize()));
+
                 }
                 throw new JobSchedulerException(String.format("%s zero byte size file(s) detected", emptyFiles));
             }
