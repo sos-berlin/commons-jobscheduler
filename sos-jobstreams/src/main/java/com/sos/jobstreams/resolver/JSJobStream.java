@@ -63,6 +63,10 @@ public class JSJobStream {
         return itemJobStream.getJobStream();
     }
 
+    public String getFolder() {
+        return itemJobStream.getFolder();
+    }
+
     public void setSchedulerId(String schedulerId) {
         itemJobStream.setSchedulerId(schedulerId);
     }
@@ -89,15 +93,16 @@ public class JSJobStream {
         }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
-    
-    public Set<LocalDate> getListOfDates(SOSHibernateSession sosHibernateSession, DBItemJobStreamStarterJob dbItemJobStreamStarterJob, EventHandlerSettings settings) {
+
+    public Set<LocalDate> getListOfDates(SOSHibernateSession sosHibernateSession, DBItemJobStreamStarterJob dbItemJobStreamStarterJob,
+            EventHandlerSettings settings) {
         Set<LocalDate> listOfDates = new HashSet<LocalDate>();
         FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
         filterCalendarUsage.setPath(normalizePath(dbItemJobStreamStarterJob.getJob()));
         filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
- 
+
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
- 
+
         try {
             listOfDates = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
         } catch (Exception e) {
@@ -107,8 +112,9 @@ public class JSJobStream {
 
     }
 
-    public void setJobStreamStarters(EventHandlerSettings settings, List<DBItemJobStreamStarter> listOfJobStreamStarters, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession)
-            throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
+    public void setJobStreamStarters(EventHandlerSettings settings, List<DBItemJobStreamStarter> listOfJobStreamStarters,
+            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
+            JsonMappingException, JsonProcessingException, IOException, Exception {
         DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
         for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfJobStreamStarters) {
             JSJobStreamStarter jobStreamStarter = new JSJobStreamStarter();
@@ -118,17 +124,18 @@ public class JSJobStream {
             DBLayerJobStreamsStarterJobs dbLayerJobStreamsStarterJobs = new DBLayerJobStreamsStarterJobs(sosHibernateSession);
             FilterJobStreamStarterJobs filterJobStreamStarterJobs = new FilterJobStreamStarterJobs();
             filterJobStreamStarterJobs.setJobStreamStarter(dbItemJobStreamStarter.getId());
-            List<DBItemJobStreamStarterJob> listOfStarterJobs = dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs, 0);
+            List<DBItemJobStreamStarterJob> listOfStarterJobs = dbLayerJobStreamsStarterJobs.getJobStreamStarterJobsList(filterJobStreamStarterJobs,
+                    0);
             List<JSStarterJob> listOfJSStarterJobs = new ArrayList<JSStarterJob>();
-            for (DBItemJobStreamStarterJob dbItemJobStreamStarterJob :listOfStarterJobs) {
+            for (DBItemJobStreamStarterJob dbItemJobStreamStarterJob : listOfStarterJobs) {
 
                 JSStarterJob jsStarterJob = new JSStarterJob();
                 jsStarterJob.setDbItemJobStreamStarterJob(dbItemJobStreamStarterJob);
-                Set<LocalDate> listOfDates = this.getListOfDates(sosHibernateSession, dbItemJobStreamStarterJob, settings );
+                Set<LocalDate> listOfDates = this.getListOfDates(sosHibernateSession, dbItemJobStreamStarterJob, settings);
                 jsStarterJob.setListOfDates(listOfDates);
                 listOfJSStarterJobs.add(jsStarterJob);
             }
-            
+
             jobStreamStarter.setListOfJobs(listOfJSStarterJobs);
 
             FilterJobStreamParameters filterJobStreamParameters = new FilterJobStreamParameters();
@@ -160,7 +167,6 @@ public class JSJobStream {
         }
     }
 
-    
     public JSHistory getJsHistory() {
         return jsHistory;
     }
