@@ -77,7 +77,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     JSConditionResolver conditionResolver;
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed
+        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive
     }
 
     public static enum CustomEventTypeValue {
@@ -664,6 +664,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             resolveInConditions = true;
                             break;
 
+                        case "IsAlive":
+                            LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(),super.getSettings().getSchedulerId());                            }
+                            break;
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
