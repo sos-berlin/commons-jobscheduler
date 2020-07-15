@@ -666,7 +666,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         case "IsAlive":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(),super.getSettings().getSchedulerId());                            }
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(),super.getSettings().getSchedulerId());                             
                             break;
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
