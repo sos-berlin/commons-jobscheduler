@@ -15,7 +15,6 @@ import com.sos.hibernate.classes.DbItem;
 public class SOSUser2RoleDBItem extends DbItem {
 
     private Long id;
-    private Long roleId;
     private Long userId;
     private SOSUserRoleDBItem sosUserRoleDBItem;
     private SOSUserDBItem sosUserDBItem;
@@ -74,19 +73,10 @@ public class SOSUser2RoleDBItem extends DbItem {
         return userId;
     }
 
-    @Column(name = "[USER_ID]")
-    public void setUserId(Long userId) {
+     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    @Column(name = "[ROLE_ID]")
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    @Column(name = "[ROLE_ID]")
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
+   
 
 }

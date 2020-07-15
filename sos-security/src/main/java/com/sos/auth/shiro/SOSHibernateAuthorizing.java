@@ -18,87 +18,85 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizing.class);
     private SimpleAuthorizationInfo authorizationInfo = null;
- 
- 
 
     @Override
-    public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection)  {
-        if (authorizationInfo_ == null) {
-            SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-            authorizationInfo = simpleAuthorizationInfo;
-        } else {
-            authorizationInfo = authorizationInfo_;
-        }
-        String userName = (String) principalCollection.getPrimaryPrincipal();
-        SOSUserDBLayer sosUserDBLayer;
+    public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
         SOSHibernateSession sosHibernateSession = null;
-
         try {
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SimpleAuthorizationInfo");
+            if (authorizationInfo_ == null) {
+                SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+                authorizationInfo = simpleAuthorizationInfo;
+            } else {
+                authorizationInfo = authorizationInfo_;
+            }
+            String userName = (String) principalCollection.getPrimaryPrincipal();
+            SOSUserDBLayer sosUserDBLayer;
+
+            sosHibernateSession = Globals.sosHibernateFactory.openSession("SOSHibernateAuthorizingRealm");
             sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
+            sosUserDBLayer.getFilter().setUserName(userName);
+            List<SOSUserDBItem> sosUserList = null;
+            try {
+                sosUserList = sosUserDBLayer.getSOSUserList(0);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            for (SOSUserDBItem sosUserDBItem : sosUserList) {
+                for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
+                    if (sosUser2RoleDBItem.getSosUserRoleDBItem() != null) {
+                        authorizationInfo.addRole(sosUser2RoleDBItem.getSosUserRoleDBItem().getSosUserRole());
+                    }
+                }
+            }
         } catch (Exception e1) {
-             e1.printStackTrace();
-             return null;
-        }finally {
+            e1.printStackTrace();
+            return null;
+        } finally {
             if (sosHibernateSession != null) {
                 sosHibernateSession.close();
             }
         }
-        sosUserDBLayer.getFilter().setUserName(userName);
-        List<SOSUserDBItem> sosUserList = null;
-        try {
-            sosUserList = sosUserDBLayer.getSOSUserList(0);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        for (SOSUserDBItem sosUserDBItem : sosUserList) {
-            for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
-                if (sosUser2RoleDBItem.getSosUserRoleDBItem() != null) {
-                    authorizationInfo.addRole(sosUser2RoleDBItem.getSosUserRoleDBItem().getSosUserRole());
-                }
-            }
-        }
+
         return authorizationInfo;
     }
 
     @Override
     public SimpleAuthorizationInfo setPermissions(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
-        if (authorizationInfo == null) {
-            SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-            authorizationInfo = simpleAuthorizationInfo;
-        } else {
-            authorizationInfo = authorizationInfo_;
-        }
-        String userName = (String) principalCollection.getPrimaryPrincipal();
-        SOSUserDBLayer sosUserDBLayer;
         SOSHibernateSession sosHibernateSession = null;
+        SOSUserDBLayer sosUserDBLayer;
         try {
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SimpleAuthorizationInfo");
+            if (authorizationInfo == null) {
+                SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+                authorizationInfo = simpleAuthorizationInfo;
+            } else {
+                authorizationInfo = authorizationInfo_;
+            }
+            String userName = (String) principalCollection.getPrimaryPrincipal();
+            sosHibernateSession = Globals.sosHibernateFactory.openSession("SOSHibernateAuthorizingRealm");
             sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
+
+            sosUserDBLayer.getFilter().setUserName(userName);
+            List<SOSUserDBItem> sosUserList = null;
+            sosUserList = sosUserDBLayer.getSOSUserList(0);
+            for (SOSUserDBItem sosUserDBItem : sosUserList) {
+                // Die direkt zugewiesenen Rechte.
+                for (SOSUserPermissionDBItem sosUserPermissionDBItem : sosUserDBItem.getSOSUserPermissionDBItems()) {
+                    authorizationInfo.addStringPermission(sosUserPermissionDBItem.getSosUserPermission());
+                }
+                // Die über die Rollen zugewiesenen Rechte
+                for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
+                    for (SOSUserPermissionDBItem sosUserPermissionDBItemFromRole : sosUser2RoleDBItem.getSosUserRoleDBItem()
+                            .getSOSUserPermissionDBItems()) {
+                        authorizationInfo.addStringPermission(sosUserPermissionDBItemFromRole.getSosUserPermission());
+                    }
+                }
+            }
         } catch (Exception e1) {
             e1.printStackTrace();
             return null;
-        }finally {
+        } finally {
             if (sosHibernateSession != null) {
                 sosHibernateSession.close();
-            }
-        }       sosUserDBLayer.getFilter().setUserName(userName);
-        List<SOSUserDBItem> sosUserList = null;
-        try {
-            sosUserList = sosUserDBLayer.getSOSUserList(0);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        for (SOSUserDBItem sosUserDBItem : sosUserList) {
-            // Die direkt zugewiesenen Rechte.
-            for (SOSUserPermissionDBItem sosUserPermissionDBItem : sosUserDBItem.getSOSUserPermissionDBItems()) {
-                authorizationInfo.addStringPermission(sosUserPermissionDBItem.getSosUserPermission());
-            }
-            // Die über die Rollen zugewiesenen Rechte
-            for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
-                for (SOSUserPermissionDBItem sosUserPermissionDBItemFromRole : sosUser2RoleDBItem.getSosUserRoleDBItem().getSOSUserPermissionDBItems()) {
-                    authorizationInfo.addStringPermission(sosUserPermissionDBItemFromRole.getSosUserPermission());
-                }
             }
         }
         return authorizationInfo;
