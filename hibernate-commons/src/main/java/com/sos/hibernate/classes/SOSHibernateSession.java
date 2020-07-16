@@ -1222,7 +1222,7 @@ public class SOSHibernateSession implements Serializable {
         try {
             if (getFactory().getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
                 String value = getFactory().getConfiguration().getProperties().getProperty(SOSHibernate.HIBERNATE_SOS_PROPERTY_MSSQL_LOCK_TIMEOUT);
-                if (value != null && value != "-1") {
+                if (value != null && !"-1".equals(value)) {
                     getSQLExecutor().execute("set LOCK_TIMEOUT " + value);
                 }
             }
