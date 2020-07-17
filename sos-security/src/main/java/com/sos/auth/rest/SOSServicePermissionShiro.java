@@ -265,8 +265,10 @@ public class SOSServicePermissionShiro {
                 SessionKey s = new DefaultSessionKey(jocConfigurationDbItem.getName());
                 try {
                     SecurityUtils.getSecurityManager().getSession(s);
-                } catch (ExpiredSessionException e) {
+                    
+                } catch (ExpiredSessionException | UnknownSessionException e) {
                     LOGGER.debug("Session " + jocConfigurationDbItem.getName() + " removed");
+                    sosHibernateSession.delete(jocConfigurationDbItem);
                 }
             }
             sosHibernateSession.commit();
