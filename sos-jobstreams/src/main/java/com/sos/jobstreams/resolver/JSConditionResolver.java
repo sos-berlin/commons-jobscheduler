@@ -373,10 +373,10 @@ public class JSConditionResolver {
 						}
 
 					}
+					sosHibernateSession.commit();
 				}
 			}
 		}
-		sosHibernateSession.commit();
 	}
 
 	public void initCheckHistory() throws SOSHibernateException {
