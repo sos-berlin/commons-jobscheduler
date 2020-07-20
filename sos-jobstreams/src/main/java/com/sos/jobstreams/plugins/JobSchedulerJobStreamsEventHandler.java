@@ -636,7 +636,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     jobStarterOptions.setJob(inCondition.getNormalizedJob());
                                     StartJobReturn startJobReturn = jsInConditionCommand.startJob(this.getXmlCommandExecutor(), inCondition,
                                             conditionResolver.getListOfParameters().get(contextId));
+                                    sosHibernateSession.beginTransaction();
                                     conditionResolver.handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
+                                    sosHibernateSession.commit();
+
                                 } else {
                                     LOGGER.warn("Could not start task. JobStream with id " + jobStreamId + " not found.");
                                 }
