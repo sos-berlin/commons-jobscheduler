@@ -132,7 +132,7 @@ public class JSJobStream {
                 JSStarterJob jsStarterJob = new JSStarterJob();
                 jsStarterJob.setDbItemJobStreamStarterJob(dbItemJobStreamStarterJob);
                 Set<LocalDate> listOfDates = this.getListOfDates(sosHibernateSession, dbItemJobStreamStarterJob, settings);
-                jsStarterJob.setListOfDates(listOfDates);
+                jsStarterJob.setListOfDates(sosHibernateSession,listOfDates);
                 listOfJSStarterJobs.add(jsStarterJob);
             }
 

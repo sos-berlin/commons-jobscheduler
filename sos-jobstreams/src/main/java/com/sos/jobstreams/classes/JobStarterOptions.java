@@ -8,6 +8,7 @@ public class JobStarterOptions {
     private String job;
     private Long taskId;
     private boolean skipped;
+    private boolean skipOutCondition;
     private Map<String,String>listOfParameters;
     
     public String getNormalizedJob() {
@@ -62,5 +63,15 @@ public class JobStarterOptions {
     
     public void setSkipped(boolean skipped) {
         this.skipped = skipped;
+    }
+
+    
+    public boolean isSkipOutCondition() {
+        return skipOutCondition;
+    }
+
+    
+    public void setSkipOutCondition(boolean skipOutCondition) {
+        this.skipOutCondition = skipOutCondition;
     }
 }

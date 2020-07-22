@@ -42,12 +42,10 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private Map<UUID, Boolean> listOfRunningJobs;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
-    private boolean haveCalendars;
     private UUID evaluatedContextId;
 
     public JSInCondition() {
         super();
-        haveCalendars = false;
         listOfRunningJobs = new HashMap<UUID, Boolean>();
         this.consumedForContext = new HashSet<UUID>();
         this.listOfDates = new HashSet<LocalDate>();
@@ -173,10 +171,8 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
         try {
             l = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
-            if (l == null) {
-                haveCalendars = false;
-            } else {
-                haveCalendars = true;
+            if (l != null) {
+
                 this.listOfDates.addAll(l);
             }
 
@@ -211,7 +207,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public boolean isStartToday() {
-        if (!haveCalendars) {
+        if (listOfDates == null || listOfDates.isEmpty()) {
             return true;
         }
         for (LocalDate d : listOfDates) {
@@ -255,7 +251,6 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         this.evaluatedContextId = evaluatedContextId;
     }
 
-    
     public DBItemInCondition getItemInCondition() {
         return itemInCondition;
     }

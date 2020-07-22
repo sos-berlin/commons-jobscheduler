@@ -635,6 +635,7 @@ public class JSConditionResolver {
                                 if (dbItemJobStreamHistory != null) {
                                     sosHibernateSession.beginTransaction();
                                     dbItemJobStreamHistory.setRunning(false);
+                                    dbItemJobStreamHistory.setEnded(new Date());
                                     dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
                                     sosHibernateSession.commit();
                                     toRemove.add(jsHistoryEntry);

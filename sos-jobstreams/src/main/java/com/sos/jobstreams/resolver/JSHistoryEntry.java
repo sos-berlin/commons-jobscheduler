@@ -63,7 +63,7 @@ public class JSHistoryEntry {
         LOGGER.debug("Check for end job in job stream: " + jsJobStream.getJobStream());
         boolean endReached = false;
         for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-            if (!"".equals(jsJobStreamStarter.getEndJob())) {
+            if (!"".equals(jsJobStreamStarter.getEndJob()) && jsJobStreamStarter.getEndJob() != null) {
                 LOGGER.debug("end job found for starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " Job: " + jsJobStreamStarter.getEndJob());
               
                 Map <UUID, List<JobStarterOptions>> mapOfContexts = jobStreamContexts.getListOfContexts();
