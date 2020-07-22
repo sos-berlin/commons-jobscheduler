@@ -74,7 +74,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private JSJobStreamStarter nextStarter;
     private int waitInterval = 2;
     private String session;
+    private boolean synchronizeNextStart;
     JSConditionResolver conditionResolver;
+    private Date lastStart;
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive
@@ -109,13 +111,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void resetNextJobStartTimer(SOSHibernateSession sosHibernateSession) {
+
+        while (synchronizeNextStart) {
+            try {
+                java.lang.Thread.sleep(1000);
+                LOGGER.trace("Waiting for period synchronization...");
+            } catch (InterruptedException e) {
+
+            }
+        }
         if (nextJobStartTimer != null) {
             nextJobStartTimer.cancel();
             nextJobStartTimer.purge();
         }
         nextJobStartTimer = new Timer();
         Long delay = -1L;
-        boolean negativeDelay = false;
 
         do {
             nextStarter = this.conditionResolver.getNextStarttime();
@@ -125,36 +135,35 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 Long next = nextDateTime.getMillis();
                 Long now = new Date().getTime();
                 delay = next - now;
-                if (delay > 0) {
-                    LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
-                    negativeDelay = false;
-
-                    try {
-                        if (sosHibernateSession != null) {
-
-                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
-                            sosHibernateSession.beginTransaction();
-                            DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-
-                            dbItemJobStreamStarter.setNextStart(new Date(next));
-                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
-                            sosHibernateSession.commit();
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
-                                    .getItemJobStreamStarter().getId()));
-
-                        }
-                    } catch (SOSHibernateException e) {
-                        LOGGER.error("Could not update next start time for starter: " + nextStarter.getItemJobStreamStarter().getId() + ":"
-                                + nextStarter.getItemJobStreamStarter().getTitle(), e);
-                    }
-
-                    nextJobStartTimer.schedule(new JobStartTask(), delay);
-                } else {
-                    if (!negativeDelay) {
-                        LOGGER.debug("negative delay");
-                        negativeDelay = true;
-                    }
+                if (delay < 0) {
+                    delay = 0L;
                 }
+                LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+
+                try {
+                    if (sosHibernateSession != null) {
+
+                        DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                        sosHibernateSession.beginTransaction();
+                        DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
+
+                        dbItemJobStreamStarter.setNextStart(new Date(next));
+                        dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                        sosHibernateSession.commit();
+                        LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle() + " to "
+                                + dbItemJobStreamStarter.getNextStart());
+
+                        publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter.getItemJobStreamStarter()
+                                .getId()));
+
+                    }
+                } catch (SOSHibernateException e) {
+                    LOGGER.error("Could not update next start time for starter: " + nextStarter.getItemJobStreamStarter().getId() + ":" + nextStarter
+                            .getItemJobStreamStarter().getTitle(), e);
+                }
+
+                nextJobStartTimer.schedule(new JobStartTask(), delay);
+
             }
         } while (delay < 0 && nextStarter != null);
         if (nextStarter == null) {
@@ -171,7 +180,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 sosHibernateSession = reportingFactory.openStatelessSession();
                 try {
                     if (conditionResolver.haveGlobalEvents()) {
+                        synchronizeNextStart = true;
                         conditionResolver.reInitEvents(sosHibernateSession);
+                        synchronizeNextStart = false;
                     }
                     resolveInConditions(sosHibernateSession);
                 } catch (Exception e) {
@@ -195,6 +206,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         public void run() {
 
+            while (synchronizeNextStart) {
+                try {
+                    java.lang.Thread.sleep(1000);
+                    LOGGER.trace("Waiting for period synchronization...");
+                } catch (InterruptedException e) {
+
+                }
+            }
             SOSHibernateSession sosHibernateSession = null;
             try {
                 sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:JobStartTask.run");
@@ -211,32 +230,33 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
-                    DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
+                }
+                DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
 
-                    // Long next = UtcTimeHelper.convertTimeZonesToDate(UtcTimeHelper.localTimeZoneString(), "UTC", nextDateTime).getTime();
-                    Long now = new Date().getTime();
-                    Long next = nextDateTime.getMillis();
+                Long now = nextStarter.getNextStart().getTime();
+                Long next = nextDateTime.getMillis();
 
-                    // Long now = new Date().getTime();
-                    Long delay = next - now;
+                Long delay = next - now;
 
-                    if (delay > 0) {
-                        LOGGER.debug("Recalculated next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+                if (delay >= 0) {
+                    LOGGER.debug("Recalculated next start:" + nextStarter.getAllJobNames() + " at " + new Date(next));
 
-                        if (sosHibernateSession != null) {
+                    if (sosHibernateSession != null) {
 
-                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
-                            sosHibernateSession.beginTransaction();
-                            DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
+                        DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                        sosHibernateSession.beginTransaction();
+                        DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
 
-                            dbItemJobStreamStarter.setNextStart(new Date(next));
-                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
-                            sosHibernateSession.commit();
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
-                                    .getItemJobStreamStarter().getId()));
-                        }
+                        dbItemJobStreamStarter.setNextStart(new Date(next));
+                        dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                        sosHibernateSession.commit();
+                        LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle() + " to "
+                                + dbItemJobStreamStarter.getNextStart());
+                        publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter.getItemJobStreamStarter()
+                                .getId()));
                     }
                 }
+
                 resetNextJobStartTimer(sosHibernateSession);
 
             } catch (Exception e) {
@@ -281,7 +301,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             sosHibernateSession.commit();
 
             for (JobStarterOptions handledJob : listOfHandledJobs) {
-                if (handledJob.isSkipped()) {
+                if (handledJob.isSkipped() && !handledJob.isSkipOutCondition()) {
                     TaskEndEvent taskEndEvent = new TaskEndEvent();
                     taskEndEvent.setJobPath(handledJob.getJob());
                     taskEndEvent.setReturnCode(0);
@@ -304,6 +324,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             publishCustomEvent(CUSTOM_EVENT_KEY, values);
 
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
+            if (conditionResolver.getListOfHistoryIds() == null) {
+                LOGGER.debug("!list of historyIds is null");
+                synchronizeNextStart = true;
+                conditionResolver.reInit(sosHibernateSession);
+                synchronizeNextStart = false;
+            }
             conditionResolver.getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -333,6 +359,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("WorkingDirectory:" + System.getProperty("user.dir"));
         LOGGER.debug("TimeZone: " + TimeZone.getDefault().getID());
 
+        synchronizeNextStart = false;
+        lastStart = new Date();
         super.onActivate(notifier);
         String method = "onActivate";
         session = Constants.getSession();
@@ -412,19 +440,19 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
         if (contextId != null) {
             conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
-        }
 
-        for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
-            Map<String, String> values = new HashMap<String, String>();
-            values.put(CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
-            values.put("contextId", contextId.toString());
-            publishCustomEvent(CUSTOM_EVENT_KEY, values);
-        }
-        for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
-            Map<String, String> values = new HashMap<String, String>();
-            values.put(CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
-            values.put("contextId", contextId.toString());
-            publishCustomEvent(CUSTOM_EVENT_KEY, values);
+            for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
+                Map<String, String> values = new HashMap<String, String>();
+                values.put(CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                values.put("contextId", contextId.toString());
+                publishCustomEvent(CUSTOM_EVENT_KEY, values);
+            }
+            for (JSEvent jsNewEvent : conditionResolver.getRemoveJsEvents().getListOfEvents().values()) {
+                Map<String, String> values = new HashMap<String, String>();
+                values.put(CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+                values.put("contextId", contextId.toString());
+                publishCustomEvent(CUSTOM_EVENT_KEY, values);
+            }
         }
         if (!conditionResolver.getNewJsEvents().isEmpty() || !conditionResolver.getRemoveJsEvents().isEmpty()) {
             boolean reinint = false;
@@ -439,7 +467,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 reinint = true;
             }
             if (reinint) {
+                synchronizeNextStart = true;
                 conditionResolver.reInitConsumedInConditions(sosHibernateSession);
+                synchronizeNextStart = false;
             }
         }
     }
@@ -536,7 +566,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 try {
                     this.session = Constants.getSession();
                     LOGGER.debug("Change session to: " + this.session);
+                    synchronizeNextStart = true;
                     conditionResolver.reInit(sosHibernateSession);
+                    synchronizeNextStart = false;
 
                 } catch (SOSHibernateException e) {
                     conditionResolver = null;
@@ -593,7 +625,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         case "InitConditionResolver":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            synchronizeNextStart = true;
                             conditionResolver.reInit(sosHibernateSession);
+                            synchronizeNextStart = false;
                             this.resetGlobalEventsPollTimer();
                             resolveInConditions = true;
                             resetNextJobStartTimer(sosHibernateSession);
@@ -652,8 +686,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "CalendarDeleted":
 
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            synchronizeNextStart = true;
                             conditionResolver.reInit(sosHibernateSession);
                             conditionResolver.reinitCalendarUsage(sosHibernateSession);
+                            synchronizeNextStart = false;
 
                             this.resetGlobalEventsPollTimer();
                             resetNextJobStartTimer(sosHibernateSession);
@@ -663,13 +699,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             break;
                         case "StartConditionResolver":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
+                            synchronizeNextStart = true;
                             conditionResolver.reInitEvents(sosHibernateSession);
+                            synchronizeNextStart = false;
                             resolveInConditions = true;
                             break;
 
                         case "IsAlive":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
-                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(),super.getSettings().getSchedulerId());                             
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(), super.getSettings().getSchedulerId());
                             break;
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
@@ -725,7 +763,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 if (!conditionResolver.getNewJsEvents().isEmpty() && !this.addQueuedEvents.isEmpty()) {
                                     this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
+                                    synchronizeNextStart = true;
                                     conditionResolver.reInitConsumedInConditions(sosHibernateSession);
+                                    synchronizeNextStart = false;
                                 }
                             }
 
@@ -755,7 +795,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
                             if (!conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
                                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
+                                synchronizeNextStart = true;
                                 conditionResolver.reInitConsumedInConditions(sosHibernateSession);
+                                synchronizeNextStart = false;
                             }
 
                             values = new HashMap<String, String>();
