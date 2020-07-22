@@ -19,7 +19,6 @@ import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JobStreamScheduler;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarter;
-import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jobstreams.classes.JobStarter;
 import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.joc.Globals;
@@ -46,7 +45,7 @@ public class JSJobStreamStarter {
 
     public JSJobStreamStarter() {
         super();
-        lastStart = new Date().getTime();
+        lastStart = 0L;
         listOfParameters = new HashMap<String, String>();
     }
 
@@ -66,15 +65,19 @@ public class JSJobStreamStarter {
     }
 
     public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
+        LOGGER.debug("schedule for:" + this.getItemJobStreamStarter().getTitle());
         jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
         if (this.getRunTime() != null) {
+            Calendar c = Calendar.getInstance();
             Date from = new Date();
             Date to = new Date();
+            c.setTime(to);
+            c.add(Calendar.DATE, 3);
+            to = c.getTime();
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             String max = MAX_DATE;
             Date maxDate = formatter.parse(max);
-            Calendar c = Calendar.getInstance();
-
+ 
             do {
                 jobStreamScheduler.schedule(from, to, this.getRunTime(), true);
                 c.setTime(to);
@@ -103,10 +106,15 @@ public class JSJobStreamStarter {
     }
 
     public Date getNextStartFromList() {
+        
+        LOGGER.trace(this.jobStreamName + "--> last start:" + new Date(lastStart));
         if (jobStreamScheduler.getListOfStartTimes() != null) {
             for (Long start : jobStreamScheduler.getListOfStartTimes()) {
+                LOGGER.trace("check start:" + new Date(start));
                 if (start > lastStart) {
-                    return new Date(start);
+                    Date nextStart = new Date(start);
+                    LOGGER.trace("---> next start:" + nextStart);
+                    return nextStart;
                 }
             }
         }
@@ -141,7 +149,10 @@ public class JSJobStreamStarter {
             jobStartOptions.setJob(jsStarterJob.getDbItemJobStreamStarterJob().getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
             jobStartOptions.setListOfParameters(listOfParameters);
-            jobStartOptions.setSkipped(false);
+            if (jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition() != null) {
+                jobStartOptions.setSkipOutCondition(jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition());
+            }
+
             jobStartOptions.setNormalizedJob(normalizePath(jsStarterJob.getDbItemJobStreamStarterJob().getJob()));
             String at = "";
             if (jsStarterJob.getDbItemJobStreamStarterJob().getDelay() != null) {
@@ -195,6 +206,7 @@ public class JSJobStreamStarter {
     }
 
     public void setLastStart() {
+        LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + this.getNextStart());
         lastStart = this.getNextStart().getTime();
     }
 

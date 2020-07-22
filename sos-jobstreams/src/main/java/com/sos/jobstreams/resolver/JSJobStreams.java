@@ -23,6 +23,7 @@ import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
 
 public class JSJobStreams {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStreams.class);
     Map<Long, JSJobStream> listOfJobStreams;
     Map<String, JSJobStream> listOfJobStreamNames;
@@ -45,13 +46,15 @@ public class JSJobStreams {
     public JSJobStream getJobStream(Long jobStreamKey) {
         return this.listOfJobStreams.get(jobStreamKey);
     }
+
     public JSJobStream getJobStreamByName(String jobStreamKey) {
         return this.listOfJobStreamNames.get(jobStreamKey);
     }
 
-    public void setListOfJobStreams(EventHandlerSettings settings, List<DBItemJobStream> listOfJobStreams, Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
+    public void setListOfJobStreams(EventHandlerSettings settings, List<DBItemJobStream> listOfJobStreams,
+            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
             JsonMappingException, JsonProcessingException, IOException, Exception {
-        
+
         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
         DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
 
@@ -61,17 +64,16 @@ public class JSJobStreams {
             FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
             filterJobStreamStarters.setJobStreamId(itemJobStream.getId());
             List<DBItemJobStreamStarter> listOfJobStreamStarters = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0);
-            jsStreamStream.setJobStreamStarters(settings,listOfJobStreamStarters,listOfJobStreamStarterGlobal, sosHibernateSession);
-            
+            jsStreamStream.setJobStreamStarters(settings, listOfJobStreamStarters, listOfJobStreamStarterGlobal, sosHibernateSession);
+
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
             filterJobStreamHistory.setJobStreamId(itemJobStream.getId());
             filterJobStreamHistory.setRunning(true);
             List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
             jsStreamStream.setJobStreamHistory(listOfJobStreamHistory, sosHibernateSession);
 
-            
             addJobStream(jsStreamStream);
-         }
+        }
     }
 
     public Map<Long, JSJobStream> getListOfJobStreams() {
@@ -84,17 +86,29 @@ public class JSJobStreams {
 
     public JSJobStreamStarter getNextStarter() {
         Date next = null;
+        LOGGER.debug("Get next starter");
         JSJobStreamStarter nextJsJobStreamStarter = null;
         for (JSJobStream jsJobStream : listOfJobStreams.values()) {
+            LOGGER.trace("starters for: " + jsJobStream.getJobStream());
             for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-                if (next == null || (jsJobStreamStarter.getNextStartFromList() != null) && jsJobStreamStarter.getNextStartFromList().before(next)) {
+                LOGGER.trace("starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle());
+                LOGGER.trace("next start from list: " + jsJobStreamStarter.getNextStartFromList());
+                if (next == null || (jsJobStreamStarter.getNextStartFromList() != null) && (jsJobStreamStarter.getNextStartFromList() == next
+                        || jsJobStreamStarter.getNextStartFromList().before(next))) {
                     next = jsJobStreamStarter.getNextStartFromList();
                     if (next != null) {
+                        LOGGER.trace("next start: " + next);
+                        jsJobStreamStarter.setNextStart(next);
                         nextJsJobStreamStarter = jsJobStreamStarter;
-                        nextJsJobStreamStarter.setNextStart(next);
                     }
                 }
             }
+        }
+        if (nextJsJobStreamStarter != null) {
+            LOGGER.debug("--> Next starter ist: " + nextJsJobStreamStarter.getItemJobStreamStarter().getTitle() + " at " + nextJsJobStreamStarter
+                    .getNextStart());
+        } else {
+            LOGGER.debug("Could not find a next starter");
         }
         return nextJsJobStreamStarter;
     }
