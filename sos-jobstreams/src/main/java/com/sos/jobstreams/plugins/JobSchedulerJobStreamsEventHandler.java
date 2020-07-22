@@ -76,7 +76,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private String session;
     private boolean synchronizeNextStart;
     JSConditionResolver conditionResolver;
-    private Date lastStart;
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive
@@ -360,7 +359,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TimeZone: " + TimeZone.getDefault().getID());
 
         synchronizeNextStart = false;
-        lastStart = new Date();
         super.onActivate(notifier);
         String method = "onActivate";
         session = Constants.getSession();
