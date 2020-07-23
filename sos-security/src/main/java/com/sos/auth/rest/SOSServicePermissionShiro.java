@@ -66,7 +66,7 @@ public class SOSServicePermissionShiro {
     private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization header with basic based64part expected";
     private static final String ACCESS_TOKEN_EXPECTED = "Access token header expected";
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSPermissionsCreator.class);
-	private static final String SHIRO_SESSION = "SHIRO_SESSION";
+    private static final String SHIRO_SESSION = "SHIRO_SESSION";
 
     private SOSShiroCurrentUser currentUser;
     private SOSlogin sosLogin;
@@ -244,7 +244,6 @@ public class SOSServicePermissionShiro {
         return login(request, basicAuthorization, user, pwd);
     }
 
-    
     private void removeTimeOutSessions() throws SOSHibernateException, JocConfigurationException, DBOpenSessionException {
         SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("JOC: Logout");
 
@@ -255,7 +254,7 @@ public class SOSServicePermissionShiro {
 
             filter.setAccount(".");
             filter.setConfigurationType(SHIRO_SESSION);
-            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter, 0);
 
             IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
             SecurityManager securityManager = factory.getInstance();
@@ -265,7 +264,7 @@ public class SOSServicePermissionShiro {
                 SessionKey s = new DefaultSessionKey(jocConfigurationDbItem.getName());
                 try {
                     SecurityUtils.getSecurityManager().getSession(s);
-                    
+
                 } catch (ExpiredSessionException | UnknownSessionException e) {
                     LOGGER.debug("Session " + jocConfigurationDbItem.getName() + " removed");
                     sosHibernateSession.delete(jocConfigurationDbItem);
@@ -278,7 +277,7 @@ public class SOSServicePermissionShiro {
             sosHibernateSession.close();
         }
     }
-    
+
     private JOCDefaultResponse logout(String accessToken) {
 
         if (accessToken == null || accessToken.isEmpty()) {
@@ -347,7 +346,7 @@ public class SOSServicePermissionShiro {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
             Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
         }
-        
+
         try {
             this.removeTimeOutSessions();
         } catch (SOSHibernateException | JocConfigurationException | DBOpenSessionException e) {
@@ -503,7 +502,8 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
-        currentUser.getCurrentSubject().getSession().setAttribute("username_joc_permissions", SOSSerializerUtil.object2toString(sosPermissionJocCockpitMasters));
+        currentUser.getCurrentSubject().getSession().setAttribute("username_joc_permissions", SOSSerializerUtil.object2toString(
+                sosPermissionJocCockpitMasters));
 
         currentUser.initFolders();
 
@@ -516,7 +516,8 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken);
         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
-        currentUser.getCurrentSubject().getSession().setAttribute("username_command_permissions", SOSSerializerUtil.object2toString(sosPermissionCommandsMasters));
+        currentUser.getCurrentSubject().getSession().setAttribute("username_command_permissions", SOSSerializerUtil.object2toString(
+                sosPermissionCommandsMasters));
 
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
@@ -599,7 +600,6 @@ public class SOSServicePermissionShiro {
         Globals.setProperties();
         SOSHibernateSession sosHibernateSession = null;
 
-        
         if (basicAuthorization == null) {
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
             sosShiroCurrentUserAnswer.setIsAuthenticated(false);
