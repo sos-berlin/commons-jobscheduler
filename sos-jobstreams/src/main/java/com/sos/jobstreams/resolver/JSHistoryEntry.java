@@ -141,7 +141,7 @@ public class JSHistoryEntry {
                 for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                     LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
                     LOGGER.debug(SOSString.toString(jsInCondition));
-                    if (!jsInCondition.isConsumed(this.getContextId())) {
+                    if (jsInCondition.isStartToday() && !jsInCondition.isConsumed(this.getContextId())) {
                         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
                         LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
                         for (JSCondition jsCondition : listOfConditions) {
