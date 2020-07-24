@@ -9,7 +9,6 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.InvalidSessionException;
@@ -62,8 +61,8 @@ public class SOSlogin {
 		UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
 		if (currentUser != null) {
 			try {
-				LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
-				currentUser.login(token);
+				LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);		        
+				currentUser.login(token);		        
 			} catch (UnknownAccountException uae) {
 				setMsg("There is no user with username/password combination of " + token.getPrincipal());
 				currentUser = null;
@@ -85,15 +84,14 @@ public class SOSlogin {
 		}
 	}
 
-	public void login(String user, String pwd) {
+	public void login(String user, String pwd) {        
 		if (user == null) {
 			currentUser = null;
 		} else {
 			if (currentUser != null && currentUser.isAuthenticated()) {
 				logout();
-			}
-			this.init();
-
+			}	        
+			this.init();	        
 			createSubject(user, pwd);
 		}
 	}
@@ -107,20 +105,17 @@ public class SOSlogin {
 	private void init() {
 
 		LOGGER.debug("sosLogin.init()");
-		if (factory != null) {
-			SecurityManager securityManager = factory.getInstance();
-			SecurityUtils.setSecurityManager(securityManager);
-		} else {
+		if (factory == null) {
 			LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
 		}
 
 		LOGGER.debug("sosLogin.init(): buildSubject");
-		currentUser = new Subject.Builder().buildSubject();
+		currentUser = new Subject.Builder().buildSubject();        
 
 		try {
-			logout();
+			logout();	        
 		} catch (InvalidSessionException e) {
-			// ignore this.
+			// ignore this.aa
 		} catch (Exception e) {
 			LOGGER.info(String.format("Shiro init: %1$s: %2$s", e.getClass().getSimpleName(), e.getMessage()));
 		}
