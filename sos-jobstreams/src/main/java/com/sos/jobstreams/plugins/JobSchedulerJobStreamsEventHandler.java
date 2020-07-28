@@ -1,5 +1,6 @@
 package com.sos.jobstreams.plugins;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -19,6 +20,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.icu.util.TimeZone;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -37,6 +43,7 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
+import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
@@ -107,6 +114,39 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         if (isDebugEnabled) {
             LOGGER.debug("60s Polling for is activated");
         }
+    }
+
+    private void refreshStarters() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
+        SOSHibernateSession sosHibernateSession = null;
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
+            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+            FilterJobStreamStarters filter = new FilterJobStreamStarters();
+
+            List<DBItemJobStreamStarter> listOfStarter = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
+            sosHibernateSession.beginTransaction();
+            for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfStarter) {
+                Date now = new Date();
+                if (dbItemJobStreamStarter.getRunTime() != null && !"".equals(dbItemJobStreamStarter.getRunTime())) {
+                    if (dbItemJobStreamStarter.getNextStart() == null || dbItemJobStreamStarter.getNextStart().before(now)) {
+                        Date nextStart = dbLayerJobStreamStarters.getNextStartTime(objectMapper, getSettings().getTimezone(), dbItemJobStreamStarter
+                                .getRunTime());
+                        if (nextStart != null) {
+                            dbItemJobStreamStarter.setNextStart(nextStart);
+                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                            LOGGER.debug("Refreshed next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
+                                    + " to " + nextStart);
+                        }
+                    }
+                }
+            }
+        } finally {
+            sosHibernateSession.commit();
+            sosHibernateSession.close();
+        }
+
     }
 
     public void resetNextJobStartTimer(SOSHibernateSession sosHibernateSession) {
@@ -183,6 +223,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         conditionResolver.reInitEvents(sosHibernateSession);
                         synchronizeNextStart = false;
                     }
+                    refreshStarters();
                     resolveInConditions(sosHibernateSession);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -384,7 +425,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("onActivate reset timers");
             this.resetGlobalEventsPollTimer();
             this.resetNextJobStartTimer(sosHibernateSession);
-
+            refreshStarters();
             LOGGER.debug("onActivate initEventHandler");
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,

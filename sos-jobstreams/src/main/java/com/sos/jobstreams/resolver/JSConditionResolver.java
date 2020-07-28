@@ -556,10 +556,10 @@ public class JSConditionResolver {
                             if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
                                 LOGGER.debug("No in conditions defined. Nothing to do");
                             } else {
-                                sosHibernateSession.beginTransaction();
                                 try {
                                     for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
                                         for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                                            sosHibernateSession.beginTransaction();
                                             String logPrompt = "";
                                             if (isTraceEnabled) {
                                                 logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
@@ -580,6 +580,7 @@ public class JSConditionResolver {
                                                         if (validate(sosHibernateSession, null, contextId, inCondition)) {
                                                             StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
                                                                     listOfParameters.get(contextId), schedulerXmlCommandExecutor);
+
                                                             handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
                                                             inCondition.setEvaluatedContextId(contextId);
                                                             LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
@@ -600,9 +601,9 @@ public class JSConditionResolver {
                                                     LOGGER.trace(logPrompt + " not executed --> already consumed");
                                                 }
                                             }
+                                            sosHibernateSession.commit();
                                         }
                                     }
-                                    sosHibernateSession.commit();
                                 } catch (Exception e) {
                                     LOGGER.error(e.getMessage(), e);
                                     sosHibernateSession.rollback();

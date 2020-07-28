@@ -43,7 +43,7 @@ public class JobStreamContexts {
         dbItemJobStreamTaskContext.setJobStream(startedJob.getJobStream());
         dbItemJobStreamTaskContext.setTaskId(startedJob.getTaskId());
         dbItemJobStreamTaskContext.setSchedulerId(schedulerId);
-        LOGGER.debug("store contextid:" + contextId);
+        LOGGER.debug("store contextid:" + contextId + " for job " + startedJob.getJob() + " with taskId " + startedJob.getTaskId());
         dbLayerJobStreamsTaskContext.store(dbItemJobStreamTaskContext);
         LOGGER.debug("adding contextid:" + contextId);
         listOfContexts.get(contextId).add(startedJob);
