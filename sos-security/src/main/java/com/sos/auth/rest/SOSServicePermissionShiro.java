@@ -1,5 +1,6 @@
 package com.sos.auth.rest;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
+import org.ini4j.InvalidFileFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.classes.audit.SecurityAudit;
+import com.sos.joc.classes.security.SOSSecurityConfiguration;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.DBOpenSessionException;
@@ -52,6 +55,7 @@ import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.model.security.SecurityConfiguration;
 
 import sos.util.SOSSerializerUtil;
 
@@ -74,19 +78,25 @@ public class SOSServicePermissionShiro {
     @Context
     UriInfo uriInfo;
 
-    public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException {
+    public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException, InvalidFileFormatException, SOSHibernateException, IOException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 
-        SOSPermissionJocCockpitMasters sosPermissionMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken);
+        SOSSecurityConfiguration sosSecurityConfiguration = new SOSSecurityConfiguration();
+        SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
+
+        SOSPermissionJocCockpitMasters sosPermissionMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken, entity.getMasters());
         return JOCDefaultResponse.responseStatus200(sosPermissionMasters);
     }
 
-    private JOCDefaultResponse getCommandPermissions(String accessToken, String user, String pwd) throws JocException {
+    private JOCDefaultResponse getCommandPermissions(String accessToken, String user, String pwd) throws JocException, InvalidFileFormatException, SOSHibernateException, IOException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
 
-        SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken);
+        SOSSecurityConfiguration sosSecurityConfiguration = new SOSSecurityConfiguration();
+        SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
+
+        SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken, entity.getMasters());
         return JOCDefaultResponse.responseStatus200(sosPermissionCommandsMasters);
     }
 
@@ -95,7 +105,7 @@ public class SOSServicePermissionShiro {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
             @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
-            @QueryParam("user") String user, @QueryParam("pwd") String pwd) throws JocException {
+            @QueryParam("user") String user, @QueryParam("pwd") String pwd) throws JocException, InvalidFileFormatException, SOSHibernateException, IOException {
         String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
         return getJocCockpitMasterPermissions(accessToken, user, pwd);
     }
@@ -144,7 +154,7 @@ public class SOSServicePermissionShiro {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getCommandPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
             @HeaderParam(X_ACCESS_TOKEN) String xAccessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
-            @QueryParam("user") String user, @QueryParam("pwd") String pwd) throws JocException {
+            @QueryParam("user") String user, @QueryParam("pwd") String pwd) throws JocException, InvalidFileFormatException, SOSHibernateException, IOException {
         String accessToken = getAccessToken(accessTokenFromHeader, xAccessTokenFromHeader, accessTokenFromQuery);
         return getCommandPermissions(accessToken, user, pwd);
     }
@@ -499,8 +509,11 @@ public class SOSServicePermissionShiro {
 
         currentUser.setAccessToken(accessToken);
         Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
+        
+        SOSSecurityConfiguration sosSecurityConfiguration = new SOSSecurityConfiguration();
+        SecurityConfiguration entity = sosSecurityConfiguration.readConfiguration();
 
-        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken);
+        SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters = sosPermissionsCreator.createJocCockpitPermissionMasterObjectList(accessToken, entity.getMasters());
         currentUser.setSosPermissionJocCockpitMasters(sosPermissionJocCockpitMasters);
         currentUser.getCurrentSubject().getSession().setAttribute("username_joc_permissions", SOSSerializerUtil.object2toString(
                 sosPermissionJocCockpitMasters));
@@ -514,7 +527,7 @@ public class SOSServicePermissionShiro {
             }
         }
 
-        SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken);
+        SOSPermissionCommandsMasters sosPermissionCommandsMasters = sosPermissionsCreator.createCommandsPermissionMasterObjectList(accessToken, entity.getMasters());
         currentUser.setSosPermissionCommandsMasters(sosPermissionCommandsMasters);
         currentUser.getCurrentSubject().getSession().setAttribute("username_command_permissions", SOSSerializerUtil.object2toString(
                 sosPermissionCommandsMasters));
