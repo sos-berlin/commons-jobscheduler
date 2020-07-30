@@ -87,31 +87,6 @@ public class JSJobStream {
         listOfJobStreamStarter.add(jobStreamStarter);
     }
 
-    private String normalizePath(String path) {
-        if (path == null) {
-            return null;
-        }
-        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
-    }
-
-    public Set<LocalDate> getListOfDates(SOSHibernateSession sosHibernateSession, DBItemJobStreamStarterJob dbItemJobStreamStarterJob,
-            EventHandlerSettings settings) {
-        Set<LocalDate> listOfDates = new HashSet<LocalDate>();
-        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
-        filterCalendarUsage.setPath(normalizePath(dbItemJobStreamStarterJob.getJob()));
-        filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
-
-        JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
-
-        try {
-            listOfDates = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
-        } catch (Exception e) {
-            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
-        }
-        return listOfDates;
-
-    }
-
     public void setJobStreamStarters(EventHandlerSettings settings, List<DBItemJobStreamStarter> listOfJobStreamStarters,
             Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
             JsonMappingException, JsonProcessingException, IOException, Exception {
@@ -131,8 +106,7 @@ public class JSJobStream {
 
                 JSStarterJob jsStarterJob = new JSStarterJob();
                 jsStarterJob.setDbItemJobStreamStarterJob(dbItemJobStreamStarterJob);
-                Set<LocalDate> listOfDates = this.getListOfDates(sosHibernateSession, dbItemJobStreamStarterJob, settings);
-                jsStarterJob.setListOfDates(sosHibernateSession,listOfDates);
+                jsStarterJob.setListOfDates(sosHibernateSession,settings);
                 listOfJSStarterJobs.add(jsStarterJob);
             }
 

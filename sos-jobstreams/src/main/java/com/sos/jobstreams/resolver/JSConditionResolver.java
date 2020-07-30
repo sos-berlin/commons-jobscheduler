@@ -143,7 +143,13 @@ public class JSConditionResolver {
                 jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
             }
         }
-    }
+
+        for (Map.Entry<Long,JSJobStreamStarter > entry : listOfJobStreamStarter.entrySet()) {
+            for (JSStarterJob jsStarterJob:entry.getValue().getListOfJobs()) {
+                jsStarterJob.setListOfDates(sosHibernateSession,this.settings);
+            }
+        }
+     }
 
     public boolean haveGlobalEvents() {
         return this.jsJobInConditions.getHaveGlobalConditions();

@@ -15,8 +15,13 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
+import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
+import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
+import com.sos.jobstreams.classes.JobStreamCalendar;
+
+import sos.util.SOSString;
 
 public class JSStarterJob {
 
@@ -42,16 +47,14 @@ public class JSStarterJob {
         return listOfDates;
     }
 
-    public void setListOfDates(SOSHibernateSession sosHibernateSession, Set<LocalDate> listOfDates) {
+    public void setListOfDates(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) {
 
-        if (listOfDates != null) {
-            this.listOfDates = listOfDates;
+        this.listOfDates = this.getListOfDatesFromCalendar(sosHibernateSession, settings);
 
-            try {
-                this.setNextPeriod(sosHibernateSession);
-            } catch (SOSHibernateException e) {
-                LOGGER.error("Could not set the next period", e);
-            }
+        try {
+            this.setNextPeriod(sosHibernateSession);
+        } catch (SOSHibernateException e) {
+            LOGGER.error("Could not set the next period", e);
         }
 
     }
@@ -75,11 +78,13 @@ public class JSStarterJob {
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
 
-        for (LocalDate d : this.listOfDates) {
+        if (this.listOfDates != null) {
+            for (LocalDate d : this.listOfDates) {
 
-            if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
-                last = d;
-                next = d;
+                if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
+                    last = d;
+                    next = d;
+                }
             }
         }
         this.dbItemJobStreamStarterJob.setNextPeriod(null);
@@ -93,15 +98,39 @@ public class JSStarterJob {
             } else {
                 LOGGER.debug(next.toString() + " is not after " + today.toString());
             }
-
-            try {
-                sosHibernateSession.beginTransaction();
-                sosHibernateSession.update(dbItemJobStreamStarterJob);
-                sosHibernateSession.commit();
-            } catch (Exception e) {
-                sosHibernateSession.rollback();
-            }
         }
+        try {
+            sosHibernateSession.beginTransaction();
+            sosHibernateSession.update(dbItemJobStreamStarterJob);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+        }
+
+    }
+
+    private Set<LocalDate> getListOfDatesFromCalendar(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) {
+        Set<LocalDate> listOfDates = new HashSet<LocalDate>();
+        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
+        filterCalendarUsage.setPath(normalizePath(dbItemJobStreamStarterJob.getJob()));
+        filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
+
+        JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
+
+        try {
+            listOfDates = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
+        } catch (Exception e) {
+            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+        }
+        return listOfDates;
+
+    }
+
+    private String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 
 }
