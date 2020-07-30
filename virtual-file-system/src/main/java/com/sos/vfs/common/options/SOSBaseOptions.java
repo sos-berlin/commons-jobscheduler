@@ -201,7 +201,7 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return mailOptions;
     }
 
-    private void setChildClasses(final HashMap<String, String> settings) {
+    public void setChildClasses(final HashMap<String, String> settings) {
         try {
             if (transfer == null) {
                 transfer = new SOSTransfer(settings);
