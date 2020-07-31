@@ -28,7 +28,6 @@ public class JobStreamCalendar {
         DBLayerCalendarUsages dbLayer = new DBLayerCalendarUsages(sosHibernateSession);
 
         List<DBItemCalendarWithUsages> listOfCalendarUsages = dbLayer.getCalendarUsages(filterCalendarUsage, 0);
-        CalendarResolver calendarResolver = new CalendarResolver();
         for (DBItemCalendarWithUsages item : listOfCalendarUsages) {
             CalendarDatesFilter calendarDatesFilter = new CalendarDatesFilter();
             Calendar calendar = new ObjectMapper().readValue(item.getDBItemInventoryClusterCalendarUsage().getConfiguration(), Calendar.class);
@@ -36,7 +35,7 @@ public class JobStreamCalendar {
             calendarDatesFilter.setCalendar(calendar);
             calendarDatesFilter.setJobschedulerId(filterCalendarUsage.getSchedulerId());
             try {
-                dates = calendarResolver.getCalendarDates(sosHibernateSession, calendarDatesFilter);
+                dates = CalendarResolver.getCalendarDates(sosHibernateSession, calendarDatesFilter);
                 for (String d : dates.getDates()) {
                     listOfDates.add(LocalDate.parse(d, formatter));
                 }
