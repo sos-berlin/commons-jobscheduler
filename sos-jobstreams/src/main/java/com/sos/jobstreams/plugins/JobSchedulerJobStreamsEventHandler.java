@@ -167,41 +167,43 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         Long delay = -1L;
 
         do {
-            nextStarter = this.conditionResolver.getNextStarttime();
+            if (!synchronizeNextStart && this.conditionResolver.getJsJobStreams() != null) {
+                nextStarter = this.conditionResolver.getNextStarttime();
 
-            if (nextStarter != null) {
-                DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
-                Long next = nextDateTime.getMillis();
-                Long now = new Date().getTime();
-                delay = next - now;
-                if (delay < 0) {
-                    delay = 0L;
-                }
-                LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
-
-                try {
-                    if (sosHibernateSession != null) {
-
-                        DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
-                        sosHibernateSession.beginTransaction();
-                        DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
-
-                        dbItemJobStreamStarter.setNextStart(new Date(next));
-                        dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
-                        sosHibernateSession.commit();
-                        LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle() + " to "
-                                + dbItemJobStreamStarter.getNextStart());
-
-                        publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter.getItemJobStreamStarter()
-                                .getId()));
-
+                if (nextStarter != null) {
+                    DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
+                    Long next = nextDateTime.getMillis();
+                    Long now = new Date().getTime();
+                    delay = next - now;
+                    if (delay < 0) {
+                        delay = 0L;
                     }
-                } catch (SOSHibernateException e) {
-                    LOGGER.error("Could not update next start time for starter: " + nextStarter.getItemJobStreamStarter().getId() + ":" + nextStarter
-                            .getItemJobStreamStarter().getTitle(), e);
-                }
+                    LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
 
-                nextJobStartTimer.schedule(new JobStartTask(), delay);
+                    try {
+                        if (sosHibernateSession != null) {
+
+                            DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
+                            sosHibernateSession.beginTransaction();
+                            DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
+
+                            dbItemJobStreamStarter.setNextStart(new Date(next));
+                            dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
+                            sosHibernateSession.commit();
+                            LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
+                                    + " to " + dbItemJobStreamStarter.getNextStart());
+
+                            publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
+                                    .getItemJobStreamStarter().getId()));
+
+                        }
+                    } catch (SOSHibernateException e) {
+                        LOGGER.error("Could not update next start time for starter: " + nextStarter.getItemJobStreamStarter().getId() + ":"
+                                + nextStarter.getItemJobStreamStarter().getTitle(), e);
+                    }
+
+                    nextJobStartTimer.schedule(new JobStartTask(), delay);
+                }
 
             }
         } while (delay < 0 && nextStarter != null);
@@ -373,7 +375,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             conditionResolver.getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
         } finally {
             sosHibernateSession.close();
         }
