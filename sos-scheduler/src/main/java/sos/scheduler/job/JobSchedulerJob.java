@@ -117,6 +117,9 @@ public class JobSchedulerJob extends Job_impl {
                 configuration.getRootLogger().setLevel(Level.INFO);
             } else if (schedulerLogLevel == -9) {
                 configuration.getRootLogger().setLevel(Level.TRACE);
+                configuration.getLoggerConfig("com.mchange").setLevel(Level.DEBUG);
+                configuration.getLoggerConfig("org.hibernate").setLevel(Level.DEBUG);
+                configuration.getLoggerConfig("org.hibernate.type.descriptor.sql").setLevel(Level.TRACE);
             } else if (schedulerLogLevel < 0) {
                 configuration.getRootLogger().setLevel(Level.DEBUG);
             }
