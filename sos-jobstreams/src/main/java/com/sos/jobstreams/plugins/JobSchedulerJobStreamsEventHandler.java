@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -691,7 +692,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             JSInConditionCommand jsInConditionCommand = new JSInConditionCommand();
                             jsInConditionCommand.setCommand("startjob");
-                            jsInConditionCommand.setCommandParam("now");
+                            jsInConditionCommand.setCommandParam(customEvent.getAt() + ", force=yes");
+                            
                             String session = customEvent.getSession();
                             UUID contextId = UUID.fromString(session);
                             LOGGER.debug("Start task for job " + customEvent.getJob() + " instance:" + session);
@@ -708,6 +710,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     inCondition.setItemInCondition(itemInCondition);
                                     JobStarterOptions jobStarterOptions = new JobStarterOptions();
                                     jobStarterOptions.setJob(inCondition.getNormalizedJob());
+                                    for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
+                                        conditionResolver.getListOfParameters().get(contextId).put(param.getKey(), param.getValue());
+                                    }
                                     StartJobReturn startJobReturn = jsInConditionCommand.startJob(this.getXmlCommandExecutor(), inCondition,
                                             conditionResolver.getListOfParameters().get(contextId));
                                     sosHibernateSession.beginTransaction();

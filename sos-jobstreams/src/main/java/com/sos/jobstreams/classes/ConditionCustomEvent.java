@@ -1,6 +1,12 @@
 package com.sos.jobstreams.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.json.JsonObject;
+import javax.json.JsonValue;
+
+import com.sos.joc.model.common.NameValuePair;
 
 public class ConditionCustomEvent {
     // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
@@ -17,20 +23,30 @@ public class ConditionCustomEvent {
     private String key;
     private Integer eventId;
     private String state;
+    private String at;
+    private Map<String,String>parameters;
 
     public ConditionCustomEvent(JsonObject entry) {
         super();
+        this.parameters = new HashMap<String,String>();
         this.type = entry.getString("TYPE");
         this.key = entry.getString("key");
-
         JsonObject variables = entry.getJsonObject("variables");
         if (variables != null) {
+            
+            for (String name : variables.keySet()) {
+                JsonValue value = variables.get(name);
+                if (name.startsWith("#") && name.length() > 1) {
+                    parameters.put(name.substring(1),value.toString()); 
+                }
+            }
             this.event = variables.getString("event", "");
             this.session = variables.getString("session", "");
             this.source = variables.getString("source", "");
             this.jobStream = variables.getString("jobStream", "");
             this.state = variables.getString("state", "");
             this.job = variables.getString("job", "");
+            this.at = variables.getString("at", "now");
             this.globalEvent = "true".equals(variables.getString("globalEvent", "false"));
             this.outConditionId = variables.getString("outConditionId", "");
             try {
@@ -90,5 +106,16 @@ public class ConditionCustomEvent {
     public Long getJobStreamStarterId() {
         return JobStreamStarterId;
     }
+
+    
+    public String getAt() {
+        return at;
+    }
+
+    
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+ 
 
 }
