@@ -92,6 +92,7 @@ public class JobStarter {
             jobchainNodeConfiguration.substituteTaskParamters();
 
             for (NameValuePair entry : parameters) {
+                LOGGER.debug("substitute: " + entry.getName() + "=" + entry.getValue());
                 String paramName = entry.getName();
                 String paramValue = jobchainNodeConfiguration.getListOfTaskParameters().get(paramName);
 
@@ -155,7 +156,8 @@ public class JobStarter {
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
 
         List<NameValuePair> envVars = getDefaultEnvVars(jobStartOptions);
-        List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
+        List<NameValuePair>params = jobV.getParams();
+        
         if (jobStartOptions.getListOfParameters() != null) {
             if (params == null) {
                 params = new ArrayList<NameValuePair>();
@@ -170,7 +172,11 @@ public class JobStarter {
                 }
                 params.add(nameValuePair);
             }
-        }
+        } 
+        
+        params = substituteParameters(jobV.getParams(), envVars);
+        
+ 
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
         String xmlString = xml.asXML();
