@@ -787,7 +787,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         boolean recursive = parent.getBaseOptions().recursive.value() && !parent.getBaseOptions().oneOrMoreSingleFilesSpecified();
         if (recursive) {
             String sourceDir = getPathWithoutFileName(parent.getSourceProvider(), sourceFile.getName());
-            String sourceDirOrig = parent.getBaseOptions().sourceDir.getValue();
+            String sourceDirOrig = parent.getSourceProvider().getFile(parent.getBaseOptions().sourceDir.getValue()).getName();
 
             if (!fileNamesAreEqual(sourceDir, sourceDirOrig, true) && sourceDir.length() > sourceDirOrig.length()) {
                 String subFolder = sourceDir.substring(sourceDirOrig.length());

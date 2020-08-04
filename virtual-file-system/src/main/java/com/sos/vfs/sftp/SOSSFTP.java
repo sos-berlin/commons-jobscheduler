@@ -90,7 +90,6 @@ public class SOSSFTP extends SOSCommonProvider {
     private SOSSFTPShellInfo shellInfo = null;
     private boolean simulateShell = false;
 
-    private int proxyPort = 0;
     private int sessionConnectTimeout = 0;
     private int channelConnectTimeout = 0; // default 20sek
     private final String lineSeparator = System.getProperty("line.separator");
@@ -917,9 +916,10 @@ public class SOSSFTP extends SOSCommonProvider {
         String proxyHost = getProviderOptions().proxyHost.getValue();
         String proxyUser = getProviderOptions().proxyUser.getValue();
         String proxyPassword = getProviderOptions().proxyPassword.getValue();
+        int proxyPort = getProviderOptions().proxyPort.value();
 
         if (!SOSString.isEmpty(proxyHost)) {
-            LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%s, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
+            LOGGER.info(String.format("using proxy: protocol=%s, host=%s, port=%d, user=%s, pass=?", proxyProtocol.getValue(), proxyHost, proxyPort,
                     proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);

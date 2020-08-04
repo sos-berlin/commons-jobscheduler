@@ -105,9 +105,10 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             }
             provider = getProvider(providerOptions.getProtocol());
             try {
-                handleOptions(providerOptions);
+                handleProviderOptions(providerOptions);
                 provider.setBaseOptions(options);
                 provider.connect(providerOptions);
+                handleOptions(provider, providerOptions);
             } catch (Exception e) {
                 SOSProviderOptions alternative = providerOptions.getAlternative();
                 if (alternative.optionsHaveMinRequirements()) {
@@ -121,8 +122,9 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
                     provider = getProvider(alternative.protocol.getValue());
-                    handleOptions(alternative);
+                    handleProviderOptions(alternative);
                     provider.connect(alternative);
+                    handleOptions(provider, alternative);
                     providerOptions.alternateOptionsUsed.value(true);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()), e);
@@ -146,8 +148,9 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         return provider;
     }
 
-    private void handleOptions(SOSProviderOptions providerOptions) throws Exception {
+    private void handleOptions(ISOSProvider provider, SOSProviderOptions providerOptions) throws Exception {
         if (providerOptions.directory.isDirty()) {
+            providerOptions.directory.setValue(provider.getFile(providerOptions.directory.getValue()).getName());
             if (providerOptions.isSource()) {
                 options.sourceDir = providerOptions.directory;
                 options.localDir = providerOptions.directory;
@@ -156,6 +159,9 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                 options.remoteDir = providerOptions.directory;
             }
         }
+    }
+    
+    private void handleProviderOptions(SOSProviderOptions providerOptions) throws Exception {
         if (providerOptions.transferMode.isDirty() && providerOptions.transferMode.isNotEmpty()) {
             // client.transferMode(providerOptions.transferMode);
         } else {
