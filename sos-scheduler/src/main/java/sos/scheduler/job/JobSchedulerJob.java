@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -103,28 +104,33 @@ public class JobSchedulerJob extends Job_impl {
             LOG_D_0020.toLog();
 
             LOGGER = LogManager.getRootLogger();
-            LoggerContext logContext = (LoggerContext) LogManager.getContext(false);
-            Configuration configuration = logContext.getConfiguration();
 
             if (schedulerLogLevel == null) {
                 schedulerLogLevel = spooler_log.level();
             }
             if (schedulerLogLevel > 1) {
-                configuration.getRootLogger().setLevel(Level.ERROR);
+                Configurator.setRootLevel(Level.ERROR);
             } else if (schedulerLogLevel == 1) {
-                configuration.getRootLogger().setLevel(Level.WARN);
+                Configurator.setRootLevel(Level.WARN);
             } else if (schedulerLogLevel == 0) {
-                configuration.getRootLogger().setLevel(Level.INFO);
+                Configurator.setRootLevel(Level.INFO);
             } else if (schedulerLogLevel == -9) {
-                configuration.getRootLogger().setLevel(Level.TRACE);
-                configuration.getLoggerConfig("com.mchange").setLevel(Level.DEBUG);
-                configuration.getLoggerConfig("org.hibernate").setLevel(Level.DEBUG);
-                configuration.getLoggerConfig("org.hibernate.type.descriptor.sql").setLevel(Level.TRACE);
+                Configurator.setRootLevel(Level.TRACE);
+                Configurator.setLevel("com.mchange", Level.INFO);
+                Configurator.setLevel("org.hibernate", Level.INFO);
+                Configurator.setLevel("org.hibernate.persister.entity.AbstractEntityPersister", Level.DEBUG);
+                Configurator.setLevel("org.hibernate.type.descriptor.sql", Level.TRACE);
+                Configurator.setLevel("org.hibernate.SQL", Level.DEBUG);
+                Configurator.setLevel("org.hibernate.loader.entity.plan.EntityLoader", Level.DEBUG);
             } else if (schedulerLogLevel < 0) {
-                configuration.getRootLogger().setLevel(Level.DEBUG);
+                Configurator.setRootLevel(Level.DEBUG);
+                Configurator.setLevel("com.mchange", Level.INFO);
+                Configurator.setLevel("org.hibernate", Level.INFO);
+                Configurator.setLevel("org.hibernate.persister.entity.AbstractEntityPersister", Level.DEBUG);
+                Configurator.setLevel("org.hibernate.SQL", Level.DEBUG);
+                Configurator.setLevel("org.hibernate.loader.entity.plan.EntityLoader", Level.DEBUG);
             }
             loggerConfigured = true;
-            logContext.updateLoggers();
         }
     }
 
