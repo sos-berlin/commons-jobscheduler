@@ -505,7 +505,7 @@ public class JSConditionResolver {
                     jsEventKey.setJobStream(jsCondition.getConditionJobStream());
                 }
 
-                if (jsEventKey.getJobStream() != null && !condition.getJobStream().equals(jsEventKey.getJobStream())) {
+                if (jsEventKey.getJobStream() != null) {
                     String session = eventDate.getEventDate(date);
                     LOGGER.debug("Jobstream context: setting session to: " + session);
                     jsEventKey.setSession(session);
