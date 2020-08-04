@@ -35,9 +35,9 @@ public class SOSOptionPasswordTest {
         File f = new File("C:/Windows/system.ini");
         String strFileName;
         if (f.exists()){
-            strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
+            strFileName = System.getProperty("java.io.tmpdir") + "/test.cmd";
         } else {
-            strFileName = System.getProperty("java.io.tmpdir") + "test.sh";
+            strFileName = System.getProperty("java.io.tmpdir") + "/test.sh";
         }
         JSFile objFile = new JSFile(strFileName);
         objFile.deleteOnExit();
