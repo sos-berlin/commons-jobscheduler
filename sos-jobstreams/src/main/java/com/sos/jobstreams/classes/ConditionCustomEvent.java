@@ -35,9 +35,9 @@ public class ConditionCustomEvent {
         if (variables != null) {
             
             for (String name : variables.keySet()) {
-                JsonValue value = variables.get(name);
+                String value = variables.getString(name);
                 if (name.startsWith("#") && name.length() > 1) {
-                    parameters.put(name.substring(1),value.toString()); 
+                    parameters.put(name.substring(1),value); 
                 }
             }
             this.event = variables.getString("event", "");

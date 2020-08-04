@@ -710,6 +710,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     inCondition.setItemInCondition(itemInCondition);
                                     JobStarterOptions jobStarterOptions = new JobStarterOptions();
                                     jobStarterOptions.setJob(inCondition.getNormalizedJob());
+                           
+                                    if (conditionResolver.getListOfParameters().get(contextId) == null){
+                                        conditionResolver.addParameters(contextId, new HashMap<String,String>());  
+                                    }
+                                    
+                                    
                                     for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
                                         conditionResolver.getListOfParameters().get(contextId).put(param.getKey(), param.getValue());
                                     }
