@@ -170,11 +170,15 @@ public class JobStarter {
                 }else {
                     nameValuePair.setValue(param.getValue());
                 }
+                LOGGER.debug(nameValuePair.getName() + "=" + nameValuePair.getValue());
+
                 params.add(nameValuePair);
             }
-        } 
+        }else {
+            LOGGER.debug("no parameters in the starter");
+        }
         
-        params = substituteParameters(jobV.getParams(), envVars);
+        params = substituteParameters(params, envVars);
         
  
         xml.add(getParams(params));
