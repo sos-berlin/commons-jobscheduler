@@ -838,20 +838,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             event.setEvent(customEvent.getEvent());
                             event.setJobStream(customEvent.getJobStream());
 
-                            if (customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession());
-                            } else {
-                                event.setSession(customEvent.getSession());
-                            }
-
+                            event.setSession(customEvent.getSession());
                             event.setSchedulerId(super.getSettings().getSchedulerId());
                             event.setGlobalEvent(customEvent.isGlobalEvent());
 
                             conditionResolver.removeEvent(sosHibernateSession, event);
-                            if (!customEvent.isGlobalEvent()) {
-                                event.setSession(Constants.getSession());
-                                conditionResolver.removeEvent(sosHibernateSession, event);
-                            }
+
+                            event.setSession(Constants.getSession());
+                            conditionResolver.removeEvent(sosHibernateSession, event);
 
                             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
                             if (!conditionResolver.getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {

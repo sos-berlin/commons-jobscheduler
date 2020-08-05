@@ -505,10 +505,14 @@ public class JSConditionResolver {
                     jsEventKey.setJobStream(jsCondition.getConditionJobStream());
                 }
 
-                if (jsEventKey.getJobStream() != null && !"".equals(jsCondition.getConditionJobStream())) {
+                if (jsCondition.typeIsGlobalEvent() || (jsEventKey.getJobStream() != null && !"".equals(jsCondition.getConditionJobStream()))) {
                     String session = eventDate.getEventDate(date);
                     LOGGER.debug("Jobstream context: setting session to: " + session);
                     jsEventKey.setSession(session);
+                }
+                
+                if (jsCondition.typeIsGlobalEvent()) {
+                    jsEventKey.setJobStream("");  
                 }
 
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
@@ -692,6 +696,7 @@ public class JSConditionResolver {
                         if (validate(sosHibernateSession, taskEndEvent.getReturnCode(), contextId, outCondition)) {
                             LOGGER.trace("create/remove events ------>");
                             DBItemJobStreamHistory historyEntry = listOfHistoryIds.get(contextId);
+                            
                             dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
                                     newJsEvents, removeJsEvents);
                             outCondition.storeOutConditionEvents(sosHibernateSession, defaultSession, historyEntry, jsEvents, newJsEvents,
