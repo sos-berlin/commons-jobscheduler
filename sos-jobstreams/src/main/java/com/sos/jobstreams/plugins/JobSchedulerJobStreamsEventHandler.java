@@ -620,6 +620,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
 
             Map<String, String> values;
+            
+            DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+
 
             for (JsonValue entry : events) {
                 if (entry != null) {
@@ -697,7 +701,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             String session = customEvent.getSession();
                             UUID contextId = UUID.fromString(session);
                             LOGGER.debug("Start task for job " + customEvent.getJob() + " instance:" + session);
-                            DBItemJobStreamHistory dbItemJobStreamHistory = conditionResolver.getListOfHistoryIds().get(contextId);
+                            DBItemJobStreamHistory dbItemJobStreamHistory = null;
+                            filterJobStreamHistory = new FilterJobStreamHistory();
+                            filterJobStreamHistory.setSchedulerId(super.getSettings().getSchedulerId());
+                            filterJobStreamHistory.setContextId(session);
+                            dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                            List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+                            if (listOfJobStreamHistory.size() > 0){
+                                dbItemJobStreamHistory = listOfJobStreamHistory.get(0); 
+                            }
                             if (dbItemJobStreamHistory != null) {
                                 Long jobStreamId = dbItemJobStreamHistory.getJobStream();
                                 JSJobStream jsJobStream = conditionResolver.getJsJobStreams().getJobStream(jobStreamId);
@@ -763,8 +775,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
-                            DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
-                            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
                             filterJobStreamHistory.setContextId(customEvent.getSession());
                             List<DBItemJobStreamHistory> l = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
                             if (l.size() <= 0) {
