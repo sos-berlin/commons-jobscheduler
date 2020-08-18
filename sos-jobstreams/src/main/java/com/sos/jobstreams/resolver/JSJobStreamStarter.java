@@ -149,9 +149,7 @@ public class JSJobStreamStarter {
             jobStartOptions.setJob(jsStarterJob.getDbItemJobStreamStarterJob().getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
             jobStartOptions.setListOfParameters(listOfParameters);
-            if (jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition() != null) {
-                jobStartOptions.setSkipOutCondition(jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition());
-            }
+            jobStartOptions.setSkipOutCondition(jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition());
 
             jobStartOptions.setNormalizedJob(normalizePath(jsStarterJob.getDbItemJobStreamStarterJob().getJob()));
             String at = "";

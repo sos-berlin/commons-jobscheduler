@@ -81,7 +81,7 @@ public class SOSServicePermissionShiro {
     @Context
     UriInfo uriInfo;
 
-    public JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException,
+    private JOCDefaultResponse getJocCockpitMasterPermissions(String accessToken, String user, String pwd) throws JocException,
             InvalidFileFormatException, SOSHibernateException, IOException {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);

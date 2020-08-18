@@ -270,6 +270,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                 if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
                     startJobs(nextStarter);
+                }else {
+                    LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() +  "." + nextStarter.getItemJobStreamStarter().getTitle() + " is not active. Not started");
                 }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
