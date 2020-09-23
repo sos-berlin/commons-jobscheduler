@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -18,6 +23,26 @@ public class UtcTimeHelper {
 
     public static String localTimeZoneString() {
         return TimeZone.getDefault().getID();
+    }
+
+    public static String convertTimeZoneToTimeZone(String dateFormat, String fromTimeZone, String toTimeZone, String fromDateTime) {
+        LOGGER.debug("dateFormat:" + dateFormat);
+        LOGGER.debug("fromTimeZone:" + fromTimeZone);
+        LOGGER.debug("toTimeZone:" + toTimeZone);
+        LOGGER.debug("fromDateTime:" + fromDateTime);
+
+        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern(dateFormat);
+
+        if (dateFormat.length() > 8) {
+            LocalDateTime dateTime = LocalDateTime.parse(fromDateTime, dateTimeFormatter);
+            ZonedDateTime toDateTime = ZonedDateTime.now(ZoneId.of(fromTimeZone)).with(dateTime).withZoneSameInstant(ZoneId.of(toTimeZone));
+            return toDateTime.format(dateTimeFormatter);
+        } else {
+            LocalTime dateTime = LocalTime.parse(fromDateTime, dateTimeFormatter);
+            ZonedDateTime toDateTime = ZonedDateTime.now(ZoneId.of(fromTimeZone)).with(dateTime).withZoneSameInstant(ZoneId.of(toTimeZone));
+            return toDateTime.format(dateTimeFormatter);
+        }
+
     }
 
     public static String convertTimeZonesToString(String dateFormat, String fromTimeZone, String toTimeZone, DateTime fromDateTime) {
