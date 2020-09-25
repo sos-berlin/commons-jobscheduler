@@ -25,6 +25,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.model.joe.schedule.RunTime;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import sos.util.SOSClassUtil;
 import sos.xml.SOSXMLXPath;
 
 public class JSJobStreamStarter {
@@ -46,6 +47,8 @@ public class JSJobStreamStarter {
     public JSJobStreamStarter() {
         super();
         lastStart = 0L;
+        SOSClassUtil.printStackTrace(true);
+
         listOfParameters = new HashMap<String, String>();
     }
 
@@ -204,12 +207,17 @@ public class JSJobStreamStarter {
         }
         return result;
     }
-
-    public void setLastStart() {
+ 
+    public void setLastStart(long lastStart) {
         LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + this.getNextStart());
-        lastStart = this.getNextStart().getTime();
+        this.lastStart = lastStart;
     }
 
+
+    public Long getLastStart() {
+       return  lastStart;
+    }
+    
     public String getEndJob() {
         return normalizePath(itemJobStreamStarter.getEndOfJobStream());
     }
