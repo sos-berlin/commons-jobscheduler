@@ -202,12 +202,16 @@ public class JSJobStreamStarter {
         }
         return result;
     }
-
-    public void setLastStart() {
+    
+    public void setLastStart(long lastStart) {
         LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + this.getNextStart());
-        lastStart = this.getNextStart().getTime();
+        this.lastStart = lastStart;
     }
-
+   
+    public Long getLastStart() {
+        return  lastStart;
+     }
+     
     public String getEndJob() {
         return normalizePath(itemJobStreamStarter.getEndOfJobStream());
     }

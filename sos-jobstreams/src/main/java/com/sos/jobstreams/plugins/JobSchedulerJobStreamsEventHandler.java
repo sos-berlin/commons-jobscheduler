@@ -54,7 +54,6 @@ import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.StartJobReturn;
-import com.sos.jobstreams.classes.StartedItem;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSHistoryEntry;
@@ -84,7 +83,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private int waitInterval = 2;
     private String session;
     private boolean synchronizeNextStart;
-    private Map<StartedItem, Boolean> listOfStartedItems;
     JSConditionResolver conditionResolver;
 
     public static enum CustomEventType {
@@ -174,7 +172,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 nextStarter = this.conditionResolver.getNextStarttime();
 
                 if (nextStarter != null) {
-                    StartedItem startedItem = new StartedItem();
                     DateTime nextDateTime = new DateTime(nextStarter.getNextStartFromList());
                     Long next = nextDateTime.getMillis();
                     Long now = new Date().getTime();
@@ -183,9 +180,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         delay = 0L;
                     }
                     LOGGER.debug("Next start:" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
-                    startedItem.setStarterId(nextStarter.getItemJobStreamStarter().getId());
-                    startedItem.setStartTime(nextStarter.getNextStart().getTime());
-                    listOfStartedItems.put(startedItem, false);
 
                     try {
                         if (sosHibernateSession != null) {
@@ -272,22 +266,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             try {
                 LOGGER.debug("Start of jobs ==>" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
-                nextStarter.setLastStart();
-                StartedItem startedItem = new StartedItem();
-                startedItem.setStartTime(nextStarter.getNextStart().getTime());
-                startedItem.setStarterId(nextStarter.getItemJobStreamStarter().getId());
-                boolean started = listOfStartedItems.get(startedItem);
+                nextStarter.setLastStart(nextStarter.getNextStart().getTime());
 
-                if (!started) {
-                    if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
-                        startJobs(nextStarter);
-                    } else {
-                        LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter()
-                                .getTitle() + " is not active. Not started");
-                    }
+                if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
+                    startJobs(nextStarter);
                 } else {
                     LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter().getTitle()
-                            + " has been already started. Not started");
+                            + " is not active. Not started");
                 }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
@@ -389,6 +374,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.debug("!list of historyIds is null");
                 synchronizeNextStart = true;
                 conditionResolver.reInit(sosHibernateSession);
+                conditionResolver.getJsJobStreams().reInitLastStart(nextStarter);
                 synchronizeNextStart = false;
             }
             conditionResolver.getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
@@ -424,8 +410,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         String method = "onActivate";
         session = Constants.getSession();
         SOSHibernateSession sosHibernateSession = null;
-
-        listOfStartedItems = new HashMap<StartedItem, Boolean>();
 
         try {
             LOGGER.debug("onActivate createReportingFactory");
@@ -625,12 +609,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             if (!Constants.getSession().equals(this.session)) {
                 try {
-                    listOfStartedItems = new HashMap<StartedItem, Boolean>();
-
-                    this.session = Constants.getSession();
+                     this.session = Constants.getSession();
                     LOGGER.debug("Change session to: " + this.session);
                     synchronizeNextStart = true;
                     conditionResolver.reInit(sosHibernateSession);
+                    conditionResolver.getJsJobStreams().reInitLastStart(nextStarter);
                     synchronizeNextStart = false;
 
                 } catch (SOSHibernateException e) {
@@ -693,6 +676,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey());
                             synchronizeNextStart = true;
                             conditionResolver.reInit(sosHibernateSession);
+                            conditionResolver.getJsJobStreams().reInitLastStart(nextStarter);
                             synchronizeNextStart = false;
                             this.resetGlobalEventsPollTimer();
                             resolveInConditions = true;
@@ -773,6 +757,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             synchronizeNextStart = true;
                             conditionResolver.reInit(sosHibernateSession);
                             conditionResolver.reinitCalendarUsage(sosHibernateSession);
+                            conditionResolver.getJsJobStreams().reInitLastStart(nextStarter);
                             synchronizeNextStart = false;
 
                             this.resetGlobalEventsPollTimer();

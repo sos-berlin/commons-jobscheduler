@@ -113,4 +113,31 @@ public class JSJobStreams {
         return nextJsJobStreamStarter;
     }
 
+    public void showLastStarts(String id) {
+        LOGGER.debug(id + ": Show all lastStart");
+        for (JSJobStream jsJobStream : listOfJobStreams.values()) {
+            for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
+                LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " last start: " + new Date(
+                        jsJobStreamStarter.getLastStart()));
+            }
+        }
+    }
+
+    public JSJobStreamStarter reInitLastStart(JSJobStreamStarter nextStarter) {
+        if (nextStarter != null) {
+            for (JSJobStream jsJobStream : listOfJobStreams.values()) {
+                for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
+                    if (jsJobStreamStarter.getItemJobStreamStarter().getId() == nextStarter.getItemJobStreamStarter().getId()) {
+                        LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getTitle()
+                                + " last start: reinit " + new Date(jsJobStreamStarter.getLastStart()) + " --> " + new Date(nextStarter
+                                        .getLastStart()));
+                        jsJobStreamStarter.setLastStart(nextStarter.getLastStart());
+                        return jsJobStreamStarter;
+                    }
+                }
+
+            }
+        }
+        return nextStarter;
+    }
 }
