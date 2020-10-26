@@ -8,12 +8,15 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.HtmlLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Logging.SOSHtmlLayout;
+
+import sos.util.SOSString;
 
 public class SOSOptionLogFileName extends SOSOptionOutFileName {
 
@@ -42,14 +45,21 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                 if (app != null) {
                     FileAppender.Builder<?> faBuilder = null;
                     RollingFileAppender.Builder<?> rfaBuilder = null;
-
+                    RollingRandomAccessFileAppender.Builder<?> rrfaBuilder = null;
+                    String configuredFilePattern = null;
                     if (app instanceof FileAppender) {
                         faBuilder = createBuilder((FileAppender) app);
                     } else if (app instanceof RollingFileAppender) {
-                        rfaBuilder = createBuilder((RollingFileAppender) app);
+                        RollingFileAppender source = (RollingFileAppender) app;
+                        configuredFilePattern = source.getFilePattern();
+                        rfaBuilder = createBuilder(source);
+                    } else if (app instanceof RollingRandomAccessFileAppender) {
+                        RollingRandomAccessFileAppender source = (RollingRandomAccessFileAppender) app;
+                        configuredFilePattern = source.getFilePattern();
+                        rrfaBuilder = createBuilder(source);
                     }
-                    if (faBuilder == null && rfaBuilder == null) {
-                        LOGGER.debug(String.format("[%s][skip]no File or RollingFile appender found", app.getName()));
+                    if (faBuilder == null && rfaBuilder == null && rrfaBuilder == null) {
+                        LOGGER.debug(String.format("[%s][skip]no File, RollingFile or RollingRandomAccessFile  appender found", app.getName()));
                         continue;
                     }
                     String fileName = getValue();
@@ -71,10 +81,9 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                         update = true;
                     } else if (rfaBuilder != null) {
                         rfaBuilder.withFileName(fileName);
-                        try {
-                            rfaBuilder.withFilePattern(fileName.concat(".%d{yyyy-MM}-%i.gz"));
-                        } catch (Throwable e) {
-
+                        String newFilePattern = getNewFilePattern(fileName, configuredFilePattern);
+                        if (!SOSString.isEmpty(newFilePattern)) {
+                            rfaBuilder.withFilePattern(newFilePattern);
                         }
 
                         RollingFileAppender a = rfaBuilder.build();
@@ -82,7 +91,21 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                         config.addAppender(a, Level.INFO, a.getFilter());
                         config.setLevel(Level.INFO);
 
-                        LOGGER.debug(String.format("[RollingFile][%s]%s", a.getName(), fileName));
+                        LOGGER.debug(String.format("[RollingFile][%s][%s][%s]", a.getName(), fileName, a.getFilePattern()));
+                        update = true;
+                    } else if (rrfaBuilder != null) {
+                        rrfaBuilder.withFileName(fileName);
+                        String newFilePattern = getNewFilePattern(fileName, configuredFilePattern);
+                        if (!SOSString.isEmpty(newFilePattern)) {
+                            rrfaBuilder.withFilePattern(newFilePattern);
+                        }
+
+                        RollingRandomAccessFileAppender a = rrfaBuilder.build();
+                        a.start();
+                        config.addAppender(a, Level.INFO, a.getFilter());
+                        config.setLevel(Level.INFO);
+
+                        LOGGER.debug(String.format("[RollingRandomAccessFile][%s][%s][%s]", a.getName(), fileName, a.getFilePattern()));
                         update = true;
                     }
                 }
@@ -93,6 +116,32 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
         }
+    }
+
+    private String getNewFilePattern(String fileName, String configuredFilePattern) {
+        if (!SOSString.isEmpty(configuredFilePattern)) {
+            String[] arr = configuredFilePattern.replaceAll("\\\\", "/").split("/");
+            String oldFileNameWithPattern = arr[arr.length - 1];
+
+            // e.g.: filePattern="${env:TEMP}/YADE-%d{yyyy-MM-dd}.log"
+            // oldFileNameWithPattern=YADE-%d{yyyy-MM-dd}.log
+            int pidx = oldFileNameWithPattern.indexOf("%");
+            if (pidx > -1) {
+                return fileName.concat(".").concat(oldFileNameWithPattern.substring(pidx));
+            }
+
+            // e.g.: filePattern="${env:TEMP}/YADE.log"
+            // oldFileNameWithPattern=YADE.log
+            pidx = oldFileNameWithPattern.lastIndexOf(".");
+            if (pidx > -1) {
+                return fileName.concat(oldFileNameWithPattern.substring(pidx));
+            }
+
+            // e.g.: filePattern="${env:TEMP}/YADE"
+            // oldFileNameWithPattern=YADE
+            return fileName;
+        }
+        return null;
     }
 
     private FileAppender.Builder<?> createBuilder(FileAppender source) {
@@ -122,8 +171,26 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
             b.withPolicy(source.getTriggeringPolicy());
             b.withStrategy(source.getManager().getRolloverStrategy());
             b.withAppend(source.getManager().isAppend());
-            b.withCreateOnDemand(false);
-            b.withLocking(false);
+            b.withCreateOnDemand(source.getManager().isCreateOnDemand());
+            b.withLocking(source.getManager().isLocking());
+            b.withAdvertise(false);
+            return b;
+        } catch (Throwable e) {
+            LOGGER.error(e.toString(), e);
+        }
+        return null;
+    }
+
+    private RollingRandomAccessFileAppender.Builder<?> createBuilder(RollingRandomAccessFileAppender source) {
+        try {
+            RollingRandomAccessFileAppender.Builder<?> b = RollingRandomAccessFileAppender.newBuilder();
+            b.setName(source.getName());
+            b.setFilter(source.getFilter());
+            b.setLayout(source.getLayout());
+            b.withFilePattern(source.getFilePattern());
+            b.withPolicy(source.getManager().getTriggeringPolicy());
+            b.withStrategy(source.getManager().getRolloverStrategy());
+            b.withAppend(source.getManager().isAppend());
             b.withAdvertise(false);
             return b;
         } catch (Throwable e) {
