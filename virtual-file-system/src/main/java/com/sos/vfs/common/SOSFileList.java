@@ -26,7 +26,7 @@ import sos.util.SOSString;
 public class SOSFileList extends SOSVFSMessageCodes {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileList.class);
-    private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.getLoggerName());
+    private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.REPORT_LOGGER_NAME);
 
     private ISOSProvider sourceProvider = null;
     private ISOSProvider targetProvider = null;

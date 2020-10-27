@@ -42,7 +42,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileListEntry.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
-    private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.getLoggerName());
+    private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.REPORT_LOGGER_NAME);
 
     private static String ENV_VAR_FILE_TRANSFER_STATUS = "YADE_FILE_TRANSFER_STATUS";
     private static String ENV_VAR_FILE_IS_TRANSFERRED = "YADE_FILE_IS_TRANSFERRED";
@@ -942,7 +942,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return transferStatus;
     }
 
-    public boolean isTransferred() {
+    private boolean isTransferred() {
         return transferStatus.equals(TransferStatus.transferred);
     }
 
@@ -950,7 +950,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return sourceFileSteady;
     }
 
-    public String getTargetAtomicFileName(final SOSBaseOptions options) {
+    private String getTargetAtomicFileName(final SOSBaseOptions options) {
         targetTransferFileName = targetTransferFileName + options.atomicSuffix.getValue().trim();
         targetTransferFileName = options.atomicPrefix.getValue() + targetTransferFileName;
         targetAtomicFileName = targetTransferFileName.trim();
@@ -973,13 +973,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         return name;
     }
 
-    public long getBytesTransferred() {
+    private long getBytesTransferred() {
         return bytesTransferred;
-    }
-
-    public void setBytesTransferred(final long val) {
-        bytesTransferred = val;
-        LOGGER.info(SOSVfs_D_0112.params(val));
     }
 
     protected String normalized(String str) {
@@ -1218,8 +1213,10 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     } catch (Exception e) {
                         transferStatus = TransferStatus.transfer_aborted;
                         targetFile.delete(false);
-                        LOGGER.info(String.format("[%s][transfer_aborted]Target=%s deleted", transferNumber, SOSCommonProvider.normalizePath(
-                                targetFile.getName())));
+                        String msg = String.format("[%s][transfer_aborted]Target=%s deleted", transferNumber, SOSCommonProvider.normalizePath(
+                                targetFile.getName()));
+                        LOGGER.info(msg);
+                        JADE_REPORT_LOGGER.info(msg);
                         throw e;
                     }
                 }
@@ -1256,15 +1253,13 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 .equals(TransferStatus.ignoredDueToZerobyteConstraint);
     }
 
-    public void setNotOverwritten(ISOSProviderFile targetFile) {
+    private void setNotOverwritten(ISOSProviderFile targetFile) {
         transferStatus = TransferStatus.notOverwritten;
         endTime = Instant.now();
-        LOGGER.info(String.format("[%s][skip][DisableOverwriteFiles=true]Target=%s", transferNumber, SOSCommonProvider.normalizePath(targetFile
-                .getName())));
-    }
-
-    public boolean isNotOverwritten() {
-        return transferStatus.equals(TransferStatus.notOverwritten);
+        String msg = String.format("[%s][skip][DisableOverwriteFiles=true]Target=%s", transferNumber, SOSCommonProvider.normalizePath(targetFile
+                .getName()));
+        LOGGER.info(msg);
+        JADE_REPORT_LOGGER.info(msg);
     }
 
     public void setParent(final SOSFileList list) {
@@ -1312,33 +1307,12 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    public void setStatusEndTransfer() {
-        setStatus(TransferStatus.transferred);
-    }
-
-    public void setStatusEndTransfer(final long val, long fileSize) throws Exception {
-        setNoOfBytesTransferred(val, fileSize);
-        setStatusEndTransfer();
-    }
-
-    public void setStatusStartTransfer() {
-        setStatus(TransferStatus.transferring);
-    }
-
     public void setSourceFileSteady(final boolean val) {
         sourceFileSteady = val;
     }
 
-    public void setTransferProgress(final long val) {
+    private void setTransferProgress(final long val) {
         setStatus(TransferStatus.transferInProgress);
-    }
-
-    public void setTransferSkipped() {
-        transferStatus = TransferStatus.transfer_skipped;
-        endTime = Instant.now();
-        String msg = String.format("[%s]%s", transferNumber, SOSVfs_D_0110.params(sourceFileName));
-        LOGGER.debug(msg);
-        JADE_REPORT_LOGGER.info(msg);
     }
 
     public void setIgnoredDueToZerobyteConstraint() {

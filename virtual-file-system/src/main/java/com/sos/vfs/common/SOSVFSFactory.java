@@ -29,8 +29,8 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSVFSFactory.class);
 
+    public static final String REPORT_LOGGER_NAME = "JadeReportLog";
     public final static String BUNDLE_NAME = "SOSVirtualFileSystem";
-    public static String LOGGER_NAME = "SOSVfsReportLog";
 
     @I18NMessages(value = { @I18NMessage("%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "en_UK", explanation = "%1$s returns instance of %2$s"),
@@ -38,7 +38,6 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "es", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "fr", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") }, msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
-    private static String PARENT_LOGGER_NAME = "";
 
     private SOSBaseOptions options = null;
 
@@ -82,18 +81,6 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             LOGGER.trace(provider.getClass().getName());
         }
         return provider;
-    }
-
-    public static void setParentLogger(final String name) {
-        PARENT_LOGGER_NAME = name;
-    }
-
-    public static String getLoggerName() {
-        String name = LOGGER_NAME;
-        if (!PARENT_LOGGER_NAME.isEmpty()) {
-            name = PARENT_LOGGER_NAME + "." + name;
-        }
-        return name;
     }
 
     public ISOSProvider getConnectedProvider(SOSProviderOptions providerOptions) throws SOSYadeSourceConnectionException,
@@ -160,7 +147,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             }
         }
     }
-    
+
     private void handleProviderOptions(SOSProviderOptions providerOptions) throws Exception {
         if (providerOptions.transferMode.isDirty() && providerOptions.transferMode.isNotEmpty()) {
             // client.transferMode(providerOptions.transferMode);
