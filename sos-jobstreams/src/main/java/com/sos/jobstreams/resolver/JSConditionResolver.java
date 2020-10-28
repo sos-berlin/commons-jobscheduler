@@ -144,12 +144,12 @@ public class JSConditionResolver {
             }
         }
 
-        for (Map.Entry<Long,JSJobStreamStarter > entry : listOfJobStreamStarter.entrySet()) {
-            for (JSStarterJob jsStarterJob:entry.getValue().getListOfJobs()) {
-                jsStarterJob.setListOfDates(sosHibernateSession,this.settings);
+        for (Map.Entry<Long, JSJobStreamStarter> entry : listOfJobStreamStarter.entrySet()) {
+            for (JSStarterJob jsStarterJob : entry.getValue().getListOfJobs()) {
+                jsStarterJob.setListOfDates(sosHibernateSession, this.settings);
             }
         }
-     }
+    }
 
     public boolean haveGlobalEvents() {
         return this.jsJobInConditions.getHaveGlobalConditions();
@@ -385,8 +385,8 @@ public class JSConditionResolver {
     }
 
     private String expressionPrepare(String e) {
-        return "<###" + e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ", "###|||###")
-                .replaceAll("not ", "###!!!###") + "###>";
+        return "<###" + e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" (?i)and ", "###&&&###").replaceAll(" (?i)or ", "###|||###")
+                .replaceAll("(?i)not ", "###!!!###") + "###>";
 
     }
 
@@ -499,6 +499,8 @@ public class JSConditionResolver {
 
                 jsEventKey.setGlobalEvent(jsCondition.typeIsGlobalEvent());
                 jsEventKey.setSchedulerId(settings.getSchedulerId());
+                LOGGER.debug("condition.getJobStream():" + condition.getJobStream());
+                LOGGER.debug("jsCondition.getConditionJobStream():" + jsCondition.getConditionJobStream());
                 if (jsCondition.getConditionJobStream().isEmpty()) {
                     jsEventKey.setJobStream(condition.getJobStream());
                 } else {
@@ -507,12 +509,12 @@ public class JSConditionResolver {
 
                 if (jsCondition.typeIsGlobalEvent() || (jsEventKey.getJobStream() != null && !"".equals(jsCondition.getConditionJobStream()))) {
                     String session = eventDate.getEventDate(date);
-                    LOGGER.debug("Jobstream context: setting session to: " + session);
+                    LOGGER.debug("Jobstream: setting context to: " + session);
                     jsEventKey.setSession(session);
                 }
-                
+
                 if (jsCondition.typeIsGlobalEvent()) {
-                    jsEventKey.setJobStream("");  
+                    jsEventKey.setJobStream("");
                 }
 
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
@@ -557,71 +559,70 @@ public class JSConditionResolver {
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             LOGGER.debug("Resolving jobstream " + jobStream.getValue().getJobStream());
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
-                if (jobStream.getValue() != null) {
-                    for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
-                        if (jsHistoryEntry.isRunning()) {
-                            LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
-                                    .getJobStream(), jsHistoryEntry.getContextId()));
-                            UUID contextId = jsHistoryEntry.getContextId();
-                            if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
-                                LOGGER.debug("No in conditions defined. Nothing to do");
-                            } else {
-                                try {
-                                    for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                                        for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                                            sosHibernateSession.beginTransaction();
-                                            String logPrompt = "";
-                                            if (isTraceEnabled) {
-                                                logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
-                                                        + " Expression: " + inCondition.getExpression();
-                                            }
-                                            if (!(inCondition.isConsumed(contextId) || !inCondition.isMarkExpression())) {
-                                                if (!inCondition.jobIsRunning(contextId)) {
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    if (jsHistoryEntry.isRunning()) {
+                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                                .getJobStream(), jsHistoryEntry.getContextId()));
+                        UUID contextId = jsHistoryEntry.getContextId();
+                        if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
+                            LOGGER.debug("No in conditions defined. Nothing to do");
+                        } else {
+                            try {
+                                for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                                    for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                                        sosHibernateSession.beginTransaction();
+                                        String logPrompt = "";
+                                        if (isTraceEnabled) {
+                                            logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream()
+                                                    + " Expression: " + inCondition.getExpression();
+                                        }
+                                        if (!(inCondition.isConsumed(contextId) || !inCondition.isMarkExpression())) {
+                                            if (!inCondition.jobIsRunning(contextId)) { //&& inCondition.getJobStream().equals(jobStream.getValue().getJobStream())) {
 
-                                                    if (isTraceEnabled) {
-                                                        LOGGER.trace("---InCondition is: " + inCondition.toStr());
-                                                    }
+                                                if (isTraceEnabled) {
+                                                    LOGGER.trace("---InCondition is: " + inCondition.toStr());
+                                                }
 
-                                                    JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry
-                                                            .getItemJobStreamHistory().getJobStream());
-                                                    JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
-                                                    boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
-                                                    if (!endedByJob) {
-                                                        if (validate(sosHibernateSession, null, contextId, inCondition)) {
-                                                            StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
-                                                                    listOfParameters.get(contextId), schedulerXmlCommandExecutor);
+                                                JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory()
+                                                        .getJobStream());
+                                                JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
+                                                boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
+                                                if (!endedByJob) {
+                                                    if (validate(sosHibernateSession, null, contextId, inCondition)) {
+                                                        StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
+                                                                listOfParameters.get(contextId), schedulerXmlCommandExecutor);
 
-                                                            handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
-                                                            inCondition.setEvaluatedContextId(contextId);
-                                                            LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
-                                                            listOfValidatedInconditions.add(inCondition);
-                                                        } else {
-                                                            if (isTraceEnabled) {
-                                                                LOGGER.trace(logPrompt + " evaluated to --> false");
-                                                            }
+                                                        handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
+                                                        inCondition.setEvaluatedContextId(contextId);
+                                                        LOGGER.debug("Adding in condition: " + SOSString.toString(inCondition));
+                                                        listOfValidatedInconditions.add(inCondition);
+                                                    } else {
+                                                        if (isTraceEnabled) {
+                                                            LOGGER.trace(logPrompt + " evaluated to --> false");
                                                         }
-                                                    }
-                                                } else {
-                                                    if (isTraceEnabled) {
-                                                        LOGGER.trace(logPrompt + " not executed --> job is running");
                                                     }
                                                 }
                                             } else {
                                                 if (isTraceEnabled) {
-                                                    LOGGER.trace(logPrompt + " not executed --> already consumed");
+                                                    LOGGER.trace(logPrompt + " not executed --> job is running");
                                                 }
                                             }
-                                            sosHibernateSession.commit();
+                                        } else {
+                                            if (isTraceEnabled) {
+                                                LOGGER.trace(logPrompt + " not executed --> already consumed");
+                                            }
                                         }
+                                        sosHibernateSession.commit();
                                     }
-                                } catch (Exception e) {
-                                    LOGGER.error(e.getMessage(), e);
-                                    sosHibernateSession.rollback();
                                 }
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                                sosHibernateSession.rollback();
                             }
                         }
                     }
                 }
+
             }
         }
         return listOfValidatedInconditions;
@@ -696,7 +697,7 @@ public class JSConditionResolver {
                         if (validate(sosHibernateSession, taskEndEvent.getReturnCode(), contextId, outCondition)) {
                             LOGGER.trace("create/remove events ------>");
                             DBItemJobStreamHistory historyEntry = listOfHistoryIds.get(contextId);
-                            
+
                             dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
                                     newJsEvents, removeJsEvents);
                             outCondition.storeOutConditionEvents(sosHibernateSession, defaultSession, historyEntry, jsEvents, newJsEvents,
