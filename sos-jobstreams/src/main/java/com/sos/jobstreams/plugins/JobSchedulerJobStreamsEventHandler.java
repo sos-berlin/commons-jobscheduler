@@ -21,6 +21,7 @@ import javax.json.JsonValue;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -217,6 +218,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public class GlobalPollingTask extends TimerTask {
 
         public void run() {
+            MDC.put("plugin", getIdentifier());
+
             SOSHibernateSession sosHibernateSession;
             try {
                 sosHibernateSession = reportingFactory.openStatelessSession();
@@ -248,6 +251,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         private static final String ACTIVE = "active";
 
         public void run() {
+            MDC.put("plugin", getIdentifier());
 
             while (synchronizeNextStart) {
                 try {
@@ -269,6 +273,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 nextStarter.setLastStart(nextStarter.getNextStart().getTime());
 
                 if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
+                    nextStarter.initActualParameters();
                     startJobs(nextStarter);
                 } else {
                     LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter().getTitle()
@@ -338,7 +343,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             JSHistoryEntry historyEntry = new JSHistoryEntry();
             historyEntry.setCreated(new Date());
             historyEntry.setItemJobStreamHistory(dbItemJobStreamHistory);
-            conditionResolver.addParameters(contextId, jobStreamStarter.getListOfParameters());
+            conditionResolver.addParameters(contextId, jobStreamStarter.getListOfActualParameters());
 
             JSJobStream jobStream = conditionResolver.getJsJobStreams().getJobStream(jobStreamStarter.getItemJobStreamStarter().getJobStream());
             LOGGER.debug(String.format("Adding history entry with context-id %s to jobStream %s", dbItemJobStreamHistory.getContextId(), jobStream
@@ -609,7 +614,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             if (!Constants.getSession().equals(this.session)) {
                 try {
-                     this.session = Constants.getSession();
+                    this.session = Constants.getSession();
                     LOGGER.debug("Change session to: " + this.session);
                     synchronizeNextStart = true;
                     conditionResolver.reInit(sosHibernateSession);
@@ -688,6 +693,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             JSJobStreamStarter jsJobStreamStarter = conditionResolver.getListOfJobStreamStarter().get(customEvent
                                     .getJobStreamStarterId());
                             if (jsJobStreamStarter != null) {
+                                jsJobStreamStarter.initActualParameters();
+                                for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
+                                    jsJobStreamStarter.addActualParameter(param.getKey(),param.getValue());
+                                }
                                 startJobs(jsJobStreamStarter);
                                 resolveInConditions = true;
 
@@ -903,9 +912,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
             }
-            if (resolveInConditions)
-
-            {
+            if (resolveInConditions) {
                 resolveInConditions(sosHibernateSession);
             }
         } catch (

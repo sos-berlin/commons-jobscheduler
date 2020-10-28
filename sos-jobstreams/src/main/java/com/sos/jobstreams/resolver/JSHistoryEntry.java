@@ -77,19 +77,7 @@ public class JSHistoryEntry {
                     }
                 }
               
-                /*for (JobStreamContext jobStreamContext : jsInConditions.getListOfInConditions().values()) {
-                    boolean isConsumed = jsInCondition.isConsumed(this.getContextId());
-                    LOGGER.debug("jsInCondition expression:" + jsInCondition.getExpression());
-                    LOGGER.debug("jsInCondition is consumed :" + isConsumed);
-                    LOGGER.debug("jsInCondition is job :" + jsInCondition.getNormalizedJob());
-                    if (isConsumed && jsInCondition.getNormalizedJob().equals(jsJobStreamStarter
-                            .getItemJobStreamStarter().getEndOfJobStream())) {
-                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsInCondition
-                                .getNormalizedJob() + " for the instance " + this.getContextId());
-                        endReached = true;
-                        break;
-                    }
-                }*/
+              
             }
         }
 

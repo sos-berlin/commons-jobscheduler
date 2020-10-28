@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.json.JsonObject;
-import javax.json.JsonValue;
-
-import com.sos.joc.model.common.NameValuePair;
 
 public class ConditionCustomEvent {
     // {"variables":{"source":"CustomEventsUtilTest"},"TYPE":"VariablesCustomEvent","key":"InitConditionResolver","eventId":1554989954492000}
@@ -16,7 +13,7 @@ public class ConditionCustomEvent {
     private String event;
     private boolean globalEvent;
     private String outConditionId;
-    private Long JobStreamStarterId;
+    private Long jobStreamStarterId;
     private String source;
     private String jobStream;
     private String job;
@@ -50,9 +47,9 @@ public class ConditionCustomEvent {
             this.globalEvent = "true".equals(variables.getString("globalEvent", "false"));
             this.outConditionId = variables.getString("outConditionId", "");
             try {
-                this.JobStreamStarterId = Long.valueOf(variables.getString("starterId", ""));
+                this.jobStreamStarterId = Long.valueOf(variables.getString("starterId", ""));
             } catch (NumberFormatException e) {
-                this.JobStreamStarterId = -1L;
+                this.jobStreamStarterId = -1L;
             }
         }
         this.eventId = entry.getInt("eventId");
@@ -104,7 +101,7 @@ public class ConditionCustomEvent {
 
     
     public Long getJobStreamStarterId() {
-        return JobStreamStarterId;
+        return jobStreamStarterId;
     }
 
     

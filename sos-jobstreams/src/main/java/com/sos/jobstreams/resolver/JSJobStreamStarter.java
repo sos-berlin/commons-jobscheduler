@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +33,14 @@ public class JSJobStreamStarter {
     private static final String MAX_DATE = "01-01-2038";
     private static final Logger LOGGER = LoggerFactory.getLogger(JSJobStreamStarter.class);
     private Map<String, String> listOfParameters;
+    private Map<String, String> listOfActualParameters;
     private DBItemJobStreamStarter itemJobStreamStarter;
+    
     private Date nextStart;
     private List<JSStarterJob> listOfJobs;
     private JobStreamScheduler jobStreamScheduler;
     private String jobStreamName;
     private Long lastStart;
-
-    public Map<String, String> getListOfParameters() {
-        return listOfParameters;
-    }
 
     public JSJobStreamStarter() {
         super();
@@ -59,11 +58,7 @@ public class JSJobStreamStarter {
         }
         return null;
     }
-
-    public void setListOfParameters(Map<String, String> listOfParameters) {
-        this.listOfParameters = listOfParameters;
-    }
-
+ 
     public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         LOGGER.debug("schedule for:" + this.getItemJobStreamStarter().getTitle());
         jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
@@ -148,7 +143,7 @@ public class JSJobStreamStarter {
             JobStarterOptions jobStartOptions = new JobStarterOptions();
             jobStartOptions.setJob(jsStarterJob.getDbItemJobStreamStarterJob().getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
-            jobStartOptions.setListOfParameters(listOfParameters);
+            jobStartOptions.setListOfParameters(listOfActualParameters);
             jobStartOptions.setSkipOutCondition(jsStarterJob.getDbItemJobStreamStarterJob().getSkipOutCondition());
 
             jobStartOptions.setNormalizedJob(normalizePath(jsStarterJob.getDbItemJobStreamStarterJob().getJob()));
@@ -216,4 +211,19 @@ public class JSJobStreamStarter {
         return normalizePath(itemJobStreamStarter.getEndOfJobStream());
     }
 
+  
+    public Map<String, String> getListOfActualParameters() {
+        return listOfActualParameters;
+    }
+
+    public void initActualParameters() {
+        listOfActualParameters =  new HashMap<String, String>();
+        for (Entry<String, String> param: listOfParameters.entrySet()) {
+            addActualParameter(param.getKey(), param.getValue());
+        }
+    }
+
+    public void addActualParameter(String key, String value) {
+        listOfActualParameters.put(key, value);
+    }
 }
