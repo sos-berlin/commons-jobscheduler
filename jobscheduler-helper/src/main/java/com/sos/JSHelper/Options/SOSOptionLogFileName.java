@@ -24,7 +24,6 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
     private static Logger LOGGER = LoggerFactory.getLogger(SOSOptionLogFileName.class);
     private String htmlLogFile = "";
     public String ControlType = "file";
-    // private FileAppender fileAppender = null;
 
     public SOSOptionLogFileName(final JSOptionsClass parent, final String key, final String description, final String value,
             final String defaultValue, final boolean mandatory) {
@@ -147,13 +146,26 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
     private FileAppender.Builder<?> createBuilder(FileAppender source) {
         try {
             FileAppender.Builder<?> b = FileAppender.newBuilder();
-            b.setName(source.getName());
             b.setFilter(source.getFilter());
+            b.setIgnoreExceptions(source.ignoreExceptions());
             b.setLayout(source.getLayout());
-            b.withAppend(source.getManager().isAppend());
-            b.withCreateOnDemand(false);
-            b.withLocking(false);
+            b.setName(source.getName());
+            b.setPropertyArray(source.getPropertyArray());
+
             b.withAdvertise(false);
+            // b.withAdvertiseUri(advertiseUri)
+            b.withImmediateFlush(source.getImmediateFlush());
+            if (source.getManager() != null) {
+                b.withAppend(source.getManager().isAppend());
+                // b.withBufferedIo(bufferedIo);
+                b.withBufferSize(source.getManager().getBufferSize());
+                b.withCreateOnDemand(source.getManager().isCreateOnDemand());
+                b.withFileGroup(source.getManager().getFileGroup());
+                b.withFileOwner(source.getManager().getFileOwner());
+                // b.withFilePermissions(source.getManager().getFilePermissions());
+                b.withLocking(source.getManager().isLocking());
+            }
+
             return b;
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
@@ -164,16 +176,29 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
     private RollingFileAppender.Builder<?> createBuilder(RollingFileAppender source) {
         try {
             RollingFileAppender.Builder<?> b = RollingFileAppender.newBuilder();
-            b.setName(source.getName());
             b.setFilter(source.getFilter());
+            b.setIgnoreExceptions(source.ignoreExceptions());
             b.setLayout(source.getLayout());
+            b.setName(source.getName());
+            b.setPropertyArray(source.getPropertyArray());
+
+            b.withAdvertise(false);
+            // b.withAdvertiseUri(advertiseUri);
             b.withFilePattern(source.getFilePattern());
             b.withPolicy(source.getTriggeringPolicy());
-            b.withStrategy(source.getManager().getRolloverStrategy());
-            b.withAppend(source.getManager().isAppend());
-            b.withCreateOnDemand(source.getManager().isCreateOnDemand());
-            b.withLocking(source.getManager().isLocking());
-            b.withAdvertise(false);
+
+            if (source.getManager() != null) {
+                b.withAppend(source.getManager().isAppend());
+                // b.withBufferedIo(bufferedIo);
+                b.withBufferSize(source.getManager().getBufferSize());
+                b.withCreateOnDemand(source.getManager().isCreateOnDemand());
+                b.withFileGroup(source.getManager().getFileGroup());
+                b.withFileOwner(source.getManager().getFileOwner());
+                // b.withFilePermissions(source.getManager().getFilePermissions());
+                b.withImmediateFlush(source.getImmediateFlush());
+                b.withLocking(source.getManager().isLocking());
+                b.withStrategy(source.getManager().getRolloverStrategy());
+            }
             return b;
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
@@ -184,14 +209,27 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
     private RollingRandomAccessFileAppender.Builder<?> createBuilder(RollingRandomAccessFileAppender source) {
         try {
             RollingRandomAccessFileAppender.Builder<?> b = RollingRandomAccessFileAppender.newBuilder();
-            b.setName(source.getName());
             b.setFilter(source.getFilter());
+            b.setIgnoreExceptions(source.ignoreExceptions());
             b.setLayout(source.getLayout());
-            b.withFilePattern(source.getFilePattern());
-            b.withPolicy(source.getManager().getTriggeringPolicy());
-            b.withStrategy(source.getManager().getRolloverStrategy());
-            b.withAppend(source.getManager().isAppend());
+            b.setName(source.getName());
+            b.setPropertyArray(source.getPropertyArray());
+
             b.withAdvertise(false);
+            // b.withAdvertiseUri(advertiseUri);
+            b.withFilePattern(source.getFilePattern());
+
+            if (source.getManager() != null) {
+                b.withAppend(source.getManager().isAppend());
+                // b.withBufferedIo(bufferedIo);
+                b.withBufferSize(source.getManager().getBufferSize());
+                b.withFileGroup(source.getManager().getFileGroup());
+                b.withFileOwner(source.getManager().getFileOwner());
+                // b.withFilePermissions(source.getManager().getFilePermissions());
+                b.withImmediateFlush(source.getImmediateFlush());
+                b.withStrategy(source.getManager().getRolloverStrategy());
+                b.withPolicy(source.getManager().getTriggeringPolicy());
+            }
             return b;
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
@@ -200,11 +238,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
     }
 
     public String getHtmlLogFileName() {
-        if (!isEmpty(htmlLogFile)) {
-            return htmlLogFile;
-        } else {
-            return "";
-        }
+        return SOSString.isEmpty(htmlLogFile) ? "" : htmlLogFile;
     }
 
     public void resetHTMLEntities() {
