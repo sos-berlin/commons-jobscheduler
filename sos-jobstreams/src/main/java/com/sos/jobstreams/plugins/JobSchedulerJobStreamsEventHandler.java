@@ -81,7 +81,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private Timer globalEventsPollTimer;
     private Timer nextJobStartTimer;
     private JSJobStreamStarter nextStarter;
-    private int waitInterval = 2;
+    private int waitInterval = 0;
     private String session;
     private boolean synchronizeNextStart;
     JSConditionResolver conditionResolver;
@@ -225,12 +225,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 sosHibernateSession = reportingFactory.openStatelessSession();
                 try {
                     if (conditionResolver.haveGlobalEvents()) {
-                        synchronizeNextStart = true;
-                        conditionResolver.reInitEvents(sosHibernateSession);
-                        synchronizeNextStart = false;
+                      //  synchronizeNextStart = true;
+                      //  conditionResolver.reInitEvents(sosHibernateSession);
+                      //  synchronizeNextStart = false;
                     }
-                    refreshStarters();
-                    resolveInConditions(sosHibernateSession);
+                    //refreshStarters();
+                    //resolveInConditions(sosHibernateSession);
                 } catch (Exception e) {
                     e.printStackTrace();
                     LOGGER.error("Timer Task Error", e);
@@ -718,7 +718,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             DBItemJobStreamHistory dbItemJobStreamHistory = null;
                             filterJobStreamHistory = new FilterJobStreamHistory();
                             filterJobStreamHistory.setSchedulerId(super.getSettings().getSchedulerId());
-                            filterJobStreamHistory.setContextId(session);
+                            filterJobStreamHistory.addContextId(session);
                             dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
                             List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(
                                     filterJobStreamHistory, 0);
@@ -790,7 +790,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
 
-                            filterJobStreamHistory.setContextId(customEvent.getSession());
+                            filterJobStreamHistory.addContextId(customEvent.getSession());
                             List<DBItemJobStreamHistory> l = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
                             if (l.size() <= 0) {
                                 LOGGER.warn("Could not add Event " + customEvent.getEvent() + " as session " + customEvent.getSession()

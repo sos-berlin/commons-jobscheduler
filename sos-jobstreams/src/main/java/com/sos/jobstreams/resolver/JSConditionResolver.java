@@ -561,7 +561,7 @@ public class JSConditionResolver {
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                     if (jsHistoryEntry.isRunning()) {
-                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                        LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         UUID contextId = jsHistoryEntry.getContextId();
                         if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
@@ -577,7 +577,7 @@ public class JSConditionResolver {
                                                     + " Expression: " + inCondition.getExpression();
                                         }
                                         if (!(inCondition.isConsumed(contextId) || !inCondition.isMarkExpression())) {
-                                            if (!inCondition.jobIsRunning(contextId)) { //&& inCondition.getJobStream().equals(jobStream.getValue().getJobStream())) {
+                                            if (!inCondition.jobIsRunning(contextId) && inCondition.getJobStream().equals(jobStream.getValue().getJobStream())) {
 
                                                 if (isTraceEnabled) {
                                                     LOGGER.trace("---InCondition is: " + inCondition.toStr());
@@ -635,7 +635,7 @@ public class JSConditionResolver {
                 List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
                 for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                     if (jsHistoryEntry.getContextId().toString().equals(contextId.toString()) && jsHistoryEntry.isRunning()) {
-                        LOGGER.debug(String.format("Running JobStream: %s mit contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                        LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         if (!jsHistoryEntry.checkRunning(this)) {
                             try {
