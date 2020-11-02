@@ -114,6 +114,10 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     public void deleteSourceFile() {
         parent.getSourceProvider().getFile(sourceFileName).delete(false);
+        logSourceFileDeleted();
+    }
+
+    private void logSourceFileDeleted() {
         String msg = String.format("[%s]%s", transferNumber, SOSVfs_I_0113.params(sourceFileName));
         LOGGER.info(msg);
         JADE_REPORT_LOGGER.info(msg);
@@ -1210,6 +1214,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     try {
                         sourceFile.delete(false);
                         transferStatus = TransferStatus.moved;
+                        logSourceFileDeleted();
                     } catch (Exception e) {
                         transferStatus = TransferStatus.transfer_aborted;
                         targetFile.delete(false);
