@@ -5,8 +5,9 @@ import java.util.Map.Entry;
 
 public class PublishEventOrder {
 
-    String eventKey;
-    Map<String, String> values;
+    private boolean published=false;
+    private String eventKey;
+    private Map<String, String> values;
 
     public String getEventKey() {
         return eventKey;
@@ -30,6 +31,16 @@ public class PublishEventOrder {
             s = s + entry.getKey() + "=" + entry.getValue() + " ";
         }
         return s;
+    }
+
+    
+    public boolean isPublished() {
+        return published;
+    }
+
+    
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
 }
