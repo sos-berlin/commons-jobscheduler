@@ -120,7 +120,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             publishEventTimer.purge();
         }
         publishEventTimer = new Timer();
-        publishEventTimer.schedule(new PublishEventTask(), 1000, 1000);
+        publishEventTimer.schedule(new PublishEventTask(), 0, 1000);
     }
 
     public void resetGlobalEventsPollTimer() {
@@ -136,13 +136,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void addPublishEventOrder(PublishEventOrder publishEventOrder) {
+        boolean resetPublishEventTimer= false;
         if (listOfPublishEventOrders == null) {
             listOfPublishEventOrders =  new ArrayList<PublishEventOrder>() ;
         }
         if (listOfPublishEventOrders.isEmpty()) {
-            resetPublishEventTimer();
+            resetPublishEventTimer = true;;
         }
         listOfPublishEventOrders.add(publishEventOrder);
+        if (resetPublishEventTimer) {
+            resetPublishEventTimer();
+        }
     }
 
     private void refreshStarters() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
@@ -224,8 +228,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
                                     .getItemJobStreamStarter().getId()));
-                            // publishCustomEvent(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
-                            // .getItemJobStreamStarter().getId()));
+                             
 
                         }
                     } catch (SOSHibernateException e) {
@@ -250,6 +253,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         Map<String, String> values = new HashMap<String, String>();
         values.put(name, value);
         publishEventOrder.setValues(values);
+        LOGGER.debug("== >add event: " + publishEventOrder.asString()); 
         addPublishEventOrder(publishEventOrder);
     }
 
@@ -257,6 +261,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         PublishEventOrder publishEventOrder = new PublishEventOrder();
         publishEventOrder.setEventKey(customEventKey);
         publishEventOrder.setValues(values);
+        LOGGER.debug("== >add event: " + publishEventOrder.asString()); 
         addPublishEventOrder(publishEventOrder);
     }
 
@@ -280,6 +285,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             java.lang.Thread.sleep(10);
                         }
                         if (!published) {
+                            if (publishEventTimer != null) {
+                                publishEventTimer.cancel();
+                                publishEventTimer.purge();
+                            }
                             listOfPublishEventOrders.clear();
                         }
                     }
@@ -735,7 +744,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         break;
                     case "TaskEnded":
                         LOGGER.debug("Event to be executed: " + jobSchedulerEvent.getType());
+
                         TaskEndEvent taskEndEvent = new TaskEndEvent((JsonObject) entry);
+                        LOGGER.debug("== >Task ended: " + taskEndEvent.getTaskId()); 
                         values = new HashMap<String, String>();
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
                         values.put("path", taskEndEvent.getJobPath());
