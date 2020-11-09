@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +58,7 @@ import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.PublishEventOrder;
 import com.sos.jobstreams.classes.QueuedEvents;
+import com.sos.jobstreams.classes.ResolveOutConditionResult;
 import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
@@ -89,10 +92,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private String session;
     private boolean synchronizeNextStart;
     JSConditionResolver conditionResolver;
-    private List<PublishEventOrder> listOfPublishEventOrders;
+    private Collection<PublishEventOrder> listOfPublishEventOrders;
 
     public static enum CustomEventType {
-        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive
+        InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive, JobStreamCompleted
     }
 
     public static enum CustomEventTypeValue {
@@ -135,11 +138,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public void addPublishEventOrder(PublishEventOrder publishEventOrder) {
         boolean resetPublishEventTimer = false;
         if (listOfPublishEventOrders == null) {
-            listOfPublishEventOrders = new ArrayList<PublishEventOrder>();
+            listOfPublishEventOrders = Collections.synchronizedCollection(new ArrayList<>());
         }
         if (listOfPublishEventOrders.isEmpty()) {
             resetPublishEventTimer = true;
-            ;
+
         }
         listOfPublishEventOrders.add(publishEventOrder);
         if (resetPublishEventTimer) {
@@ -267,19 +270,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             boolean published = false;
             try {
                 if (listOfPublishEventOrders != null) {
-                    for (PublishEventOrder publishEventOrder : listOfPublishEventOrders) {
+                    synchronized (listOfPublishEventOrders) {
+                        for (PublishEventOrder publishEventOrder : listOfPublishEventOrders) {
 
-                        if (isDebugEnabled) {
-                            LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
+                            if (!publishEventOrder.isPublished()) {
+
+                                if (isDebugEnabled) {
+                                    LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
+                                }
+                                publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
+                                publishEventOrder.setPublished(true);
+                                published = true;
+                            }
                         }
-                        if (!publishEventOrder.isPublished()) {
-                            publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
-                            publishEventOrder.setPublished(true);
-                            published = true;
-                        }
-                        java.lang.Thread.sleep(10);
                     }
-                    if (!published) {
+                    if (!published || listOfPublishEventOrders.size() > 1000) {
                         if (publishEventTimer != null) {
                             publishEventTimer.cancel();
                             publishEventTimer.purge();
@@ -498,7 +503,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         synchronizeNextStart = false;
         super.onActivate(notifier);
         String method = "onActivate";
-        session = Constants.getSession();
+
         SOSHibernateSession sosHibernateSession = null;
 
         try {
@@ -511,7 +516,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 getSettings().setTimezone(timeZoneFromInstances(sosHibernateSession));
             }
             Constants.settings = getSettings();
-
+            session = Constants.getSession();
             Constants.baseUrl = this.getBaseUrl();
 
             conditionResolver = new JSConditionResolver(this.getXmlCommandExecutor(), this.getSettings());
@@ -527,9 +532,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
                     EventType.OrderFinished };
             LOGGER.debug("Session: " + this.session);
+
             sosHibernateSession.close();
             start(observedEventTypes);
-
         } catch (Exception e) {
             conditionResolver = null;
             getNotifier().notifyOnError(method, e);
@@ -569,11 +574,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private void performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         conditionResolver.checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
-
-        boolean dbChange = conditionResolver.resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
+        ResolveOutConditionResult resolveOutConditionResult = conditionResolver.resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
                 .getJobPath());
         UUID contextId = conditionResolver.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
         if (contextId != null) {
+            
+            if (resolveOutConditionResult.isJobstreamCompleted()) {
+                Map<String, String> values = new HashMap<String, String>();
+                values.put(CustomEventType.JobStreamCompleted.name(), resolveOutConditionResult.getJobStream());
+                values.put("contextId", contextId.toString());
+                addPublishEventOrder(CUSTOM_EVENT_KEY, values);
+            }
             conditionResolver.enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
 
             for (JSEvent jsNewEvent : conditionResolver.getNewJsEvents().getListOfEvents().values()) {
@@ -596,12 +607,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         if (!conditionResolver.getNewJsEvents().isEmpty() || !conditionResolver.getRemoveJsEvents().isEmpty()) {
             boolean reinint = false;
             addQueuedEvents.handleEventlistBuffer(conditionResolver.getNewJsEvents());
-            if (dbChange && !this.addQueuedEvents.isEmpty()) {
+            if (resolveOutConditionResult.isDbChange() && !this.addQueuedEvents.isEmpty()) {
                 this.addQueuedEvents.storetoDb(sosHibernateSession, conditionResolver.getJsEvents());
                 reinint = true;
             }
             delQueuedEvents.handleEventlistBuffer(conditionResolver.getRemoveJsEvents());
-            if (dbChange && !this.delQueuedEvents.isEmpty()) {
+            if (resolveOutConditionResult.isDbChange() && !this.delQueuedEvents.isEmpty()) {
                 this.addQueuedEvents.deleteFromDb(sosHibernateSession, conditionResolver.getJsEvents());
                 reinint = true;
             }

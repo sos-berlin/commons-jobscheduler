@@ -54,6 +54,7 @@ import com.sos.jobstreams.classes.CheckHistoryValue;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.classes.JobStarterOptions;
+import com.sos.jobstreams.classes.ResolveOutConditionResult;
 import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
@@ -638,7 +639,9 @@ public class JSConditionResolver {
 
     }
 
-    public void checkRunning(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
+    public ResolveOutConditionResult checkRunning(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
+        ResolveOutConditionResult resolveOutConditionResult = new ResolveOutConditionResult();
+        resolveOutConditionResult.setJobstreamCompleted(false);
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
@@ -648,7 +651,10 @@ public class JSConditionResolver {
                                 .getJobStream(), jsHistoryEntry.getContextId()));
                         if (!jsHistoryEntry.checkRunning(this)) {
                             try {
+                                JSJobStream jsJobStream = getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory().getJobStream());
                                 LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
+                                resolveOutConditionResult.setJobstreamCompleted(true);
+                                resolveOutConditionResult.setJobStream(jsJobStream.getJobStream()); 
                                 jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
                                 DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
                                 DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
@@ -672,14 +678,17 @@ public class JSConditionResolver {
                 jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
             }
         }
+        return resolveOutConditionResult;
     }
 
-    public boolean resolveOutConditions(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent, String jobSchedulerId, String job)
+    public ResolveOutConditionResult resolveOutConditions(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent, String jobSchedulerId, String job)
             throws SOSHibernateException {
 
+        ResolveOutConditionResult resolveOutConditionResult = new ResolveOutConditionResult();
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
         String defaultSession = Constants.getSession();
-        boolean dbChange = false;
+        resolveOutConditionResult.setDbChange(false);
+        resolveOutConditionResult.setJobstreamCompleted(false);
 
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         this.newJsEvents = new JSEvents();
@@ -696,7 +705,9 @@ public class JSConditionResolver {
                 LOGGER.debug("using contextId from in condition");
             }
             if (contextId != null) {
-                checkRunning(sosHibernateSession, contextId);
+                ResolveOutConditionResult j = checkRunning(sosHibernateSession, contextId);
+                resolveOutConditionResult.setJobstreamCompleted(j.isJobstreamCompleted());
+                resolveOutConditionResult.setJobStream(j.getJobStream());
                 LOGGER.debug("resolve outconditions using context:" + contextId.toString());
                 if (jobOutConditions != null) {
                     for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
@@ -707,8 +718,8 @@ public class JSConditionResolver {
                             LOGGER.trace("create/remove events ------>");
                             DBItemJobStreamHistory historyEntry = listOfHistoryIds.get(contextId);
 
-                            dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
-                                    newJsEvents, removeJsEvents);
+                            resolveOutConditionResult.setDbChange( outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
+                                    newJsEvents, removeJsEvents) );
                             outCondition.storeOutConditionEvents(sosHibernateSession, defaultSession, historyEntry, jsEvents, newJsEvents,
                                     removeJsEvents);
                         } else {
@@ -725,7 +736,7 @@ public class JSConditionResolver {
             }
         }
 
-        return dbChange;
+        return resolveOutConditionResult;
     }
 
     public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
