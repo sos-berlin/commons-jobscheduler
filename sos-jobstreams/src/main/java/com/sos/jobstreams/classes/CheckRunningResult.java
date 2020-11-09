@@ -1,19 +1,11 @@
 package com.sos.jobstreams.classes;
 
 
-public class ResolveOutConditionResult {
-    private boolean dbChange;
+public class CheckRunningResult {
     private boolean jobstreamCompleted;
     private String jobStream;
     
-    public boolean isDbChange() {
-        return dbChange;
-    }
-    
-    public void setDbChange(boolean dbChange) {
-        this.dbChange = dbChange;
-    }
-    
+   
     public boolean isJobstreamCompleted() {
         return jobstreamCompleted;
     }

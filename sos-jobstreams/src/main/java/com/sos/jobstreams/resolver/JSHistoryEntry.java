@@ -64,20 +64,21 @@ public class JSHistoryEntry {
         boolean endReached = false;
         for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
             if (!"".equals(jsJobStreamStarter.getEndJob()) && jsJobStreamStarter.getEndJob() != null) {
-                LOGGER.debug("end job found for starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " Job: " + jsJobStreamStarter.getEndJob());
-              
-                Map <UUID, List<JobStarterOptions>> mapOfContexts = jobStreamContexts.getListOfContexts();
-                List<JobStarterOptions> listOfJobStarterOptions = mapOfContexts.get(this.getContextId()); 
-                for (JobStarterOptions jobStarterOptions:listOfJobStarterOptions) {
+                LOGGER.debug("end job found for starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " Job: " + jsJobStreamStarter
+                        .getEndJob());
+
+                Map<UUID, List<JobStarterOptions>> mapOfContexts = jobStreamContexts.getListOfContexts();
+                List<JobStarterOptions> listOfJobStarterOptions = mapOfContexts.get(this.getContextId());
+                for (JobStarterOptions jobStarterOptions : listOfJobStarterOptions) {
                     LOGGER.trace("check job: " + jobStarterOptions.getJob());
                     if (jobStarterOptions.getJob().equals(jsJobStreamStarter.getEndJob())) {
                         endReached = true;
-                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsJobStreamStarter.getEndJob() + " for the instance " + this.getContextId());
+                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsJobStreamStarter
+                                .getEndJob() + " for the instance " + this.getContextId());
                         break;
                     }
                 }
-              
-              
+
             }
         }
 
@@ -147,6 +148,17 @@ public class JSHistoryEntry {
                             break;
                         }
                     }
+                }
+            }
+        }
+
+        if (!running) {
+            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
+                LOGGER.debug("- InCondition Job is running : " + jsInCondition.jobIsRunning(this.getContextId()));
+                if (jsInCondition.isStartToday() && jsInCondition.jobIsRunning(this.getContextId())) {
+                    running = true;
+                    break;
                 }
             }
         }
