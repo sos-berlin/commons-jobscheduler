@@ -93,25 +93,30 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
 
-            if (outConditionEvent.isCreateCommand()) {
-                LOGGER.trace("---> Add event: " + event.getSession() + " " + event.getEvent());
-                itemEvent.setSession(session);
-                jsEvents.addEvent(event);
-                jsNewEvents.addEvent(event);
-                dbChange = !event.store(sosHibernateSession);
-            } else {
-                if (outConditionEvent.isDeleteCommand()) {
-                    JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
-                    event.setEvent(jsCondition.getEventName());
-                    event.setSession(session);
-                    if (jsCondition.getConditionJobStream() != "") {
-                        event.setJobStream(jsCondition.getConditionJobStream());
+            boolean eventExist = (jsEvents.getEvent(event.getKey()) != null);
+
+            if (!eventExist) {
+
+                if (outConditionEvent.isCreateCommand()) {
+                    LOGGER.trace("---> Add event: " + event.getSession() + " " + event.getEvent());
+                    itemEvent.setSession(session);
+                    jsEvents.addEvent(event);
+                    jsNewEvents.addEvent(event);
+                    dbChange = !event.store(sosHibernateSession);
+                } else {
+                    if (outConditionEvent.isDeleteCommand()) {
+                        JSCondition jsCondition = new JSCondition(outConditionEvent.getEventValue());
+                        event.setEvent(jsCondition.getEventName());
+                        event.setSession(session);
+                        if (jsCondition.getConditionJobStream() != "") {
+                            event.setJobStream(jsCondition.getConditionJobStream());
+                        }
+                        LOGGER.trace("---> Delete event: " + event.getSession() + " " + event.getEvent());
+                        jsEvents.removeEvent(event);
+                        jsRemoveEvents.addEvent(event);
+                        dbChange = !event.deleteEvent(sosHibernateSession);
                     }
-                    LOGGER.trace("---> Delete event: " + event.getSession() + " " + event.getEvent());
-                    jsEvents.removeEvent(event);
-                    jsRemoveEvents.addEvent(event);
-                    dbChange = !event.deleteEvent(sosHibernateSession);
-                 }
+                }
             }
         }
         return dbChange;
