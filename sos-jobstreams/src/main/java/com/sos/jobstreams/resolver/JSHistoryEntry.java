@@ -69,16 +69,17 @@ public class JSHistoryEntry {
 
                 Map<UUID, List<JobStarterOptions>> mapOfContexts = jobStreamContexts.getListOfContexts();
                 List<JobStarterOptions> listOfJobStarterOptions = mapOfContexts.get(this.getContextId());
-                for (JobStarterOptions jobStarterOptions : listOfJobStarterOptions) {
-                    LOGGER.trace("check job: " + jobStarterOptions.getJob());
-                    if (jobStarterOptions.getJob().equals(jsJobStreamStarter.getEndJob())) {
-                        endReached = true;
-                        LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsJobStreamStarter
-                                .getEndJob() + " for the instance " + this.getContextId());
-                        break;
+                if (listOfJobStarterOptions != null) {
+                    for (JobStarterOptions jobStarterOptions : listOfJobStarterOptions) {
+                        LOGGER.trace("check job: " + jobStarterOptions.getJob());
+                        if (jobStarterOptions.getJob().equals(jsJobStreamStarter.getEndJob())) {
+                            endReached = true;
+                            LOGGER.debug("- JobStream " + jsJobStream.getJobStream() + " has reached the end of stream job: " + jsJobStreamStarter
+                                    .getEndJob() + " for the instance " + this.getContextId());
+                            break;
+                        }
                     }
                 }
-
             }
         }
 
