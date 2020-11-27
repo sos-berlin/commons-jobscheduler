@@ -1,6 +1,7 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,12 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.transform.TransformerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSInvalidDataException;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JobStreamScheduler;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
@@ -59,7 +64,7 @@ public class JSJobStreamStarter {
         return null;
     }
  
-    public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
+    public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, ParseException, SOSInvalidDataException, DOMException, TransformerException, ParseException  {
         LOGGER.debug("schedule for:" + this.getItemJobStreamStarter().getTitle());
         jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
         if (this.getRunTime() != null) {
@@ -84,7 +89,7 @@ public class JSJobStreamStarter {
     }
 
     public void setItemJobStreamStarter(DBItemJobStreamStarter itemJobStreamStarter) throws JsonParseException, JsonMappingException,
-            JsonProcessingException, IOException, Exception {
+            JsonProcessingException, IOException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
         LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
         this.itemJobStreamStarter = itemJobStreamStarter;
         schedule();
@@ -157,15 +162,21 @@ public class JSJobStreamStarter {
                 String jobXml = jobStarter.buildJobStartXml(jobStartOptions, at);
                 String answer = "";
 
-                LOGGER.trace("JSInConditionCommand:startJob XML for job start is: " + jobXml);
+                LOGGER.debug("JSInConditionCommand:startJob XML for job start is: " + jobXml);
                 if (schedulerXmlCommandExecutor != null) {
                     answer = schedulerXmlCommandExecutor.executeXml(jobXml);
-                    LOGGER.trace(answer);
+                    LOGGER.debug(answer);
                 } else {
                     answer = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><spooler> <answer time=\"2020-03-18T14:23:09.033Z\"> <ok> <task enqueued=\"2020-03-18T14:23:09.045Z\" force_start=\"no\" id=\"298620\" job=\"/myJob4711\" log_file=\"D:/documents/sos-berlin.com/scheduler_joc_cockpit/logs/scheduler-2020-03-18-134738.scheduler_joc_cockpit.log\" name=\"\" start_at=\"2020-03-18T14:23:09.040Z\" state=\"none\" steps=\"0\" task=\"298620\"> <log level=\"info\"/>  </task> </ok> </answer></spooler>";
                     LOGGER.debug("Start job will be ignored as running in debug  mode.: " + jobStartOptions.getJob());
                 }
+
                 SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
+                String errCode = xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ERROR/@code");
+                if (errCode != null) {
+                    String errText = xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ERROR/@text");
+                    LOGGER.warn(errCode + ":" + errText);
+                }
                 Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
                 jobStartOptions.setTaskId(taskId);
             } else {

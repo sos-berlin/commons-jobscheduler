@@ -3,6 +3,9 @@ package com.sos.jobstreams.resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.jobstreams.db.FilterEvents;
+import com.sos.jobstreams.classes.EventDate;
+
 public class JSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSCondition.class);
@@ -17,8 +20,10 @@ public class JSCondition {
     private String conditionQuery;
     private String eventName;
     private boolean globalEvent;
+    private boolean haveDate;
 
     public JSCondition(String condition) {
+        haveDate = false;
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
         conditionJobStream = getConditionJobStream(conditionParam);
@@ -55,6 +60,7 @@ public class JSCondition {
                 } catch (java.util.regex.PatternSyntaxException e) {
                     LOGGER.warn(e.getMessage());
                 }
+                haveDate = true;
                 return s.trim();
             }
         }
@@ -109,8 +115,15 @@ public class JSCondition {
 
     private String getConditionJobStream(String conditionParam) {
         String s = "";
-        if (conditionParam.indexOf(".") >= 0) {
-            s = conditionParam.substring(0, conditionParam.indexOf("."));
+        String p = "";
+        String[] conditionParts = conditionParam.split("\\[");
+        if (conditionParts.length > 1) {
+           p = conditionParts[0];
+        }else {
+            p = conditionParam;
+        }
+        if (p.indexOf(".") >= 0) {
+            s = p.substring(0, p.indexOf("."));
         }
         return s;
     }
@@ -172,4 +185,30 @@ public class JSCondition {
     public boolean isGlobalEvent() {
         return globalEvent;
     }
+
+    public boolean isHaveDate() {
+        return haveDate;
+    }
+
+    public boolean isNonContextEvent() {
+        return (this.typeIsEvent() && (this.isHaveDate() || this.isGlobalEvent() || !"".equals(this.getConditionJobStream())));
+    }
+
+    public FilterEvents getFilterEventsNonContextEvent(String jobSchedulerId) {
+        FilterEvents filterEvents = new FilterEvents();
+        filterEvents.setSchedulerId(jobSchedulerId);
+        filterEvents.setGlobalEvent(this.isGlobalEvent());
+        filterEvents.setEvent(this.eventName);
+        if (this.isHaveDate()) {
+            EventDate eventDate = new EventDate();
+            String session = eventDate.getEventDate(this.getConditionDate());
+            filterEvents.setSession(session);
+        }
+        if (!("".equals(this.getConditionJobStream()))) {
+            filterEvents.setJobStream(this.getConditionJobStream());
+        }
+        return filterEvents;
+
+    }
+
 }

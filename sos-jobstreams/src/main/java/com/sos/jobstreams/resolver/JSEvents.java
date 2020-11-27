@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 
 import sos.util.SOSString;
@@ -39,11 +40,20 @@ public class JSEvents {
     }
 
     public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
-        for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
-            if (itemEvent != null && itemEvent.getDbItemEvent() != null && itemEvent.getDbItemOutCondition() != null) {
+        for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+            if (dbItemOutConditionWithEvent != null) {
+                DBItemEvent itemEvent = new DBItemEvent();
+                itemEvent.setCreated(dbItemOutConditionWithEvent.getCreated());
+                itemEvent.setEvent(dbItemOutConditionWithEvent.getEvent());
+                itemEvent.setGlobalEvent(dbItemOutConditionWithEvent.getGlobalEvent());
+                itemEvent.setId(dbItemOutConditionWithEvent.getEventId());
+                itemEvent.setJobStream(dbItemOutConditionWithEvent.getJobStream());
+                itemEvent.setJobStreamHistoryId(dbItemOutConditionWithEvent.getJobStreamHistoryId());
+                itemEvent.setOutConditionId(dbItemOutConditionWithEvent.getOutConditionId());
+                itemEvent.setSession(dbItemOutConditionWithEvent.getSession());
                 JSEvent jsEvent = new JSEvent();
-                jsEvent.setItemEvent(itemEvent.getDbItemEvent());
-                jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
+                jsEvent.setItemEvent(itemEvent);
+                jsEvent.setSchedulerId(dbItemOutConditionWithEvent.getJobSchedulerId());
                 addEvent(jsEvent);
             }
         }

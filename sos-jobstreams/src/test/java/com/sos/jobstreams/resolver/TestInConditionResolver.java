@@ -26,6 +26,8 @@ import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.JocException;
+
+import sos.xml.SOSXMLXPath;
  
 
 public class TestInConditionResolver {
@@ -62,14 +64,24 @@ public class TestInConditionResolver {
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");
         settings.setSchedulerId("scheduler_joc_cockpit");
         JSConditionResolver conditionResolver = new JSConditionResolver(null,settings);
-        conditionResolver.init(session);
+        conditionResolver.initComplete(session);
         conditionResolver.resolveInConditions(session);
       //  conditionResolver.resolveOutConditions();
     }
 
     @Test
-    @Ignore
     public void testEventList() throws UnsupportedEncodingException, MalformedURLException, InterruptedException, SOSException, URISyntaxException     {
+       String answer = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><spooler><answer time=\"2020-11-19T15:36:34.794Z\"><ok code=\"SCHEDULER-161\" text=\"SCHEDULER-161  There is no Job '/fsdlgklf'\" time=\"2020-11-19T15:36:34Z\"/></answer></spooler>";
+   
+    SOSXMLXPath xPathSchedulerXml;
+    try {
+        xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
+        System.out.println(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ERROR/@code"));
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+        
         EventHandlerSettings settings = new EventHandlerSettings();
         settings.setSchedulerId("scheduler_joc_cockpit");
         SOSHibernateSession session = getSession("src/test/resources/reporting.hibernate.cfg.xml");

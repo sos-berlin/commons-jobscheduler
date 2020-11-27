@@ -20,6 +20,8 @@ public class JobStreamsPlugin extends LoopEventHandlerPlugin {
 
         eventHandler = new JobSchedulerJobStreamsEventHandler(xmlCommandExecutor, eventBus);
         eventHandler.setPeriodBegin(getJobSchedulerVariable("sos.jobstream_period_begin"));
+        eventHandler.setTestDelay(getJobSchedulerVariable("sos.jobstream_test_delay"));
+
         eventHandler.setIdentifier(getIdentifier());
     }
     

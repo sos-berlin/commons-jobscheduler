@@ -21,6 +21,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
@@ -141,6 +142,9 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
             try {
                 sosHibernateSession.beginTransaction();
+                if (this.itemInCondition.getCreated() == null) {
+                    this.itemInCondition.setCreated(new Date());
+                }
                 sosHibernateSession.update(this.itemInCondition);
                 sosHibernateSession.commit();
             } catch (Exception e) {
@@ -160,20 +164,19 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         consumedForContext.add(contextId);
     }
 
-    public void setListOfDates(SOSHibernateSession sosHibernateSession, String schedulerId) {
-        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
-        filterCalendarUsage.setPath(normalizedJob);
-        filterCalendarUsage.setSchedulerId(schedulerId);
+    public void setListOfDates(SOSHibernateSession sosHibernateSession, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages) {
         this.listOfDates = new HashSet<LocalDate>();
 
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
         Set<LocalDate> l;
 
         try {
-            l = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
-            if (l != null) {
+            if (listOfCalendarUsages.get(normalizedJob) != null) {
+                l = jobStreamCalendar.getListOfDates(listOfCalendarUsages.get(normalizedJob));
+                if (l != null) {
 
-                this.listOfDates.addAll(l);
+                    this.listOfDates.addAll(l);
+                }
             }
 
             try {
@@ -182,7 +185,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 LOGGER.error("Could not set the next period", e);
             }
         } catch (Exception e) {
-            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+            LOGGER.error("could not read the list of dates: " + normalizedJob, e);
         }
 
     }
@@ -192,17 +195,22 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         LOGGER.trace("execute commands ------>");
         StartJobReturn startJobReturn = new StartJobReturn();
         startJobReturn.setStartedJob("");
+
         String isMark = "";
         if (!this.isMarkExpression()) {
             isMark = " and will be executed again";
         }
-        LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
-
-        this.markAsConsumed(sosHibernateSession, contextId);
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
             startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);
         }
+
+        LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
+
+        if (startJobReturn.isStarted()) {
+            this.markAsConsumed(sosHibernateSession, contextId);
+        }
+
         return startJobReturn;
     }
 
@@ -253,6 +261,26 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public DBItemInCondition getItemInCondition() {
         return itemInCondition;
+    }
+
+    
+    public Set<UUID> getConsumedForContext() {
+        return consumedForContext;
+    }
+
+    
+    public void setConsumedForContext(Set<UUID> consumedForContext) {
+        this.consumedForContext = consumedForContext;
+    }
+
+    
+    public Map<UUID, Boolean> getListOfRunningJobs() {
+        return listOfRunningJobs;
+    }
+
+    
+    public void setListOfRunningJobs(Map<UUID, Boolean> listOfRunningJobs) {
+        this.listOfRunningJobs = listOfRunningJobs;
     }
 
 }
