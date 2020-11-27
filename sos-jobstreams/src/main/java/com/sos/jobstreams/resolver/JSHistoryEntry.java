@@ -105,7 +105,7 @@ public class JSHistoryEntry {
         JSInConditions jsInConditions = jsConditionResolver.getJsJobStreamInConditions().getListOfJobStreamInConditions().get(
                 jsJobStreamConditionKey);
         JobStreamContexts jobStreamContexts = jsConditionResolver.getJobStreamContexts();
-        if (jsInConditions != null) {
+        if (jsInConditions != null && jsInConditions.getListOfInConditions() != null) {
 
             boolean endedByJob = this.endOfStream(jsJobStream, jobStreamContexts);
             if (!endedByJob) {
@@ -120,7 +120,7 @@ public class JSHistoryEntry {
                         for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
                             if (!jsOutConditionEvent.isGlobal()) {
                                 localEvents.add(jsOutConditionEvent.getEvent());
-                                LOGGER.debug("- Event: " + jsOutConditionEvent.getEvent());
+                                LOGGER.trace("- Event: " + jsOutConditionEvent.getEvent());
 
                             }
                         }
@@ -153,7 +153,7 @@ public class JSHistoryEntry {
             }
         }
 
-        if (!running) {
+        if (!running && jsInConditions != null && jsInConditions.getListOfInConditions() != null) {
             for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                 LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
                 LOGGER.debug("- InCondition Job is running : " + jsInCondition.jobIsRunning(this.getContextId()));
