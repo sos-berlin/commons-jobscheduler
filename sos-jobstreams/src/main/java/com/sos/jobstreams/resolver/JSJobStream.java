@@ -1,19 +1,26 @@
 package com.sos.jobstreams.resolver;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.TransformerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSInvalidDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemJobStream;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamParameter;
@@ -81,8 +88,8 @@ public class JSJobStream {
     }
 
     public void setJobStreamStarters(EventHandlerSettings settings, List<DBItemJobStreamStarter> listOfJobStreamStarters,
-            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, SOSHibernateSession sosHibernateSession) throws JsonParseException,
-            JsonMappingException, JsonProcessingException, IOException, Exception {
+            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages, SOSHibernateSession sosHibernateSession) throws JsonParseException,
+            JsonMappingException, JsonProcessingException, IOException, SOSInvalidDataException, DOMException, ParseException, TransformerException, SOSHibernateException {
         DBLayerJobStreamParameters dbLayerJobStreamParameters = new DBLayerJobStreamParameters(sosHibernateSession);
         for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfJobStreamStarters) {
             JSJobStreamStarter jobStreamStarter = new JSJobStreamStarter();
@@ -99,7 +106,7 @@ public class JSJobStream {
 
                 JSStarterJob jsStarterJob = new JSStarterJob();
                 jsStarterJob.setDbItemJobStreamStarterJob(dbItemJobStreamStarterJob);
-                jsStarterJob.setListOfDates(sosHibernateSession,settings);
+                jsStarterJob.setListOfDates(sosHibernateSession, listOfCalendarUsages);
                 listOfJSStarterJobs.add(jsStarterJob);
             }
 

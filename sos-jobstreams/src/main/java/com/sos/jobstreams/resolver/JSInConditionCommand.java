@@ -67,6 +67,16 @@ public class JSInConditionCommand {
 
                 SOSXMLXPath xPathSchedulerXml = new SOSXMLXPath(new StringBuffer(answer));
                 Long taskId = Long.valueOf(xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ok/task/@id"));
+                String errCode = xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ERROR/@code");
+                if (errCode != null) {
+                    String errText = xPathSchedulerXml.selectSingleNodeValue("/spooler/answer/ERROR/@text");
+                    startJobReturn.setErrCode(errCode);
+                    startJobReturn.setErrText(errText);
+                    startJobReturn.setStarted(false);
+                    LOGGER.warn(errCode + ":" + errText);
+                }else {
+                    startJobReturn.setStarted(true);
+                }
                 startJobReturn.setTaskId(taskId);
                 LOGGER.trace(answer);
                 startJobReturn.setStartedJob(jobStartOptions.getJob());

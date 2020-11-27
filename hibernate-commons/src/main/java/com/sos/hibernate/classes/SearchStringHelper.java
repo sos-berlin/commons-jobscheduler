@@ -71,23 +71,15 @@ public class SearchStringHelper {
 		for (String s : values) {
 			sql.append(fieldName + getSearchOperator(s) + "'" + s + "'").append(" or ");
 		}
-		sql.append("1=0");
-
-		return " (" + sql.toString() + ") ";
+		
+	     String s = sql.toString();
+	     s = s.substring(0, s.length() - 4);
+	     return " (" + s + ") ";
 	}
 
     public static String getStringListPathSql(Collection<String> values, String fieldName) {
         return values.stream().map(s -> getSearchPathValue(s)).map(s -> fieldName + getSearchOperator(s) + "'" + s + "'").collect(Collectors.joining(
                 " or ", " (", ") "));
-//		StringBuilder sql = new StringBuilder();
-//
-//		for (String s : values) {
-//			s = getSearchPathValue(s);
-//			sql.append(fieldName + getSearchOperator(s) + "'" + s + "'").append(" or ");
-//		}
-//		sql.append("1=0");
-//
-//		return " (" + sql.toString() + ") ";
 	}
 
 	public static boolean isDBWildcardSearch(String regex) {

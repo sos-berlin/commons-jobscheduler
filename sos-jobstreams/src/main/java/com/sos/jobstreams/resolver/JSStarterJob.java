@@ -7,6 +7,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamStarterJob;
 import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jobstreams.classes.JobStreamCalendar;
@@ -47,9 +50,9 @@ public class JSStarterJob {
         return listOfDates;
     }
 
-    public void setListOfDates(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) {
+    public void setListOfDates(SOSHibernateSession sosHibernateSession, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages) {
 
-        this.listOfDates = this.getListOfDatesFromCalendar(sosHibernateSession, settings);
+        this.listOfDates = this.getListOfDatesFromCalendar(listOfCalendarUsages);
 
         try {
             this.setNextPeriod(sosHibernateSession);
@@ -109,18 +112,17 @@ public class JSStarterJob {
 
     }
 
-    private Set<LocalDate> getListOfDatesFromCalendar(SOSHibernateSession sosHibernateSession, EventHandlerSettings settings) {
+    private Set<LocalDate> getListOfDatesFromCalendar(Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages) {
         Set<LocalDate> listOfDates = new HashSet<LocalDate>();
-        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
-        filterCalendarUsage.setPath(normalizePath(dbItemJobStreamStarterJob.getJob()));
-        filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
 
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
 
         try {
-            listOfDates = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
+            if (listOfCalendarUsages.get(normalizePath(dbItemJobStreamStarterJob.getJob())) != null) {
+                listOfDates = jobStreamCalendar.getListOfDates(listOfCalendarUsages.get(normalizePath(dbItemJobStreamStarterJob.getJob())));
+            }
         } catch (Exception e) {
-            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+            LOGGER.error("could not read the list of dates: " + normalizePath(dbItemJobStreamStarterJob.getJob()), e);
         }
         return listOfDates;
 
