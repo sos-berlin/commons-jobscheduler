@@ -583,8 +583,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     private void copyConditionResolverData(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        this.getConditionResolver().assign(sosHibernateSession, getLastConditionResolver());
         try {
+            this.getConditionResolver().assign(sosHibernateSession, getLastConditionResolver());
             this.resolveInConditions(sosHibernateSession);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
