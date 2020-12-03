@@ -96,6 +96,7 @@ public class JSConditionResolver {
     private Map<UUID, Map<String, String>> listOfParameters;
     private Map<Long, JSJobStreamStarter> listOfJobStreamStarter;
     private Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages;
+    private List<String> listOfMissingEvents;
 
     public JSConditionResolver(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, EventHandlerSettings settings) {
         super();
@@ -516,6 +517,7 @@ public class JSConditionResolver {
     }
 
     public boolean validate(SOSHibernateSession sosHibernateSession, Integer taskReturnCode, UUID contextId, IJSCondition condition) {
+        listOfMissingEvents = new ArrayList<String>();
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
@@ -641,6 +643,8 @@ public class JSConditionResolver {
                     expressionValue = this.expressionPrepare(expressionValue);
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
+                }else {
+                    listOfMissingEvents.add(jsCondition.getConditionValue());
                 }
 
                 break;
@@ -1073,6 +1077,11 @@ public class JSConditionResolver {
         }
         this.initCheckHistory(sosHibernateSession);
 
+    }
+
+    
+    public List<String> getListOfMissingEvents() {
+        return listOfMissingEvents;
     }
 
 }
