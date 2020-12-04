@@ -15,6 +15,7 @@ public class JSCondition {
     private String conditionJobStream;
     private String conditionDate;
     private String conditionValue;
+    private String conditionValueShort;
     private String conditionJob;
     private String conditionJobChain;
     private String conditionQuery;
@@ -33,6 +34,7 @@ public class JSCondition {
         conditionDate = getConditionDate(conditionParam);
         eventName = getConditionEventName(conditionParam);
         conditionValue = condition;
+        conditionValueShort = condition.replaceAll("event:", "");
         globalEvent = typeIsGlobalEvent();
     }
 
@@ -209,6 +211,11 @@ public class JSCondition {
         }
         return filterEvents;
 
+    }
+
+    
+    public String getConditionValueShort() {
+        return conditionValueShort;
     }
 
 }

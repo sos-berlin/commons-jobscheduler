@@ -644,7 +644,7 @@ public class JSConditionResolver {
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
                 }else {
-                    listOfMissingEvents.add(jsCondition.getConditionValue());
+                    listOfMissingEvents.add(jsCondition.getConditionValueShort());
                 }
 
                 break;
