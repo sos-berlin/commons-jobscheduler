@@ -153,7 +153,7 @@ public class JSHistoryEntry {
             }
         }
 
-        if (!running && jsInConditions != null && jsInConditions.getListOfInConditions() != null) {
+        if (!running && jsInConditions != null && jsInConditions.getListOfInConditions() != null && jsInConditions.getListOfInConditions().values() != null) {
             for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                 LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
                 LOGGER.debug("- InCondition Job is running : " + jsInCondition.jobIsRunning(this.getContextId()));
