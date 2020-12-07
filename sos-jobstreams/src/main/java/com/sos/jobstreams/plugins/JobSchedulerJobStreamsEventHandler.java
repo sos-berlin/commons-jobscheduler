@@ -444,7 +444,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reinitComplet");
 
             getConditionResolver().reInitComplete(sosHibernateSession);
-            getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+            nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
         } finally {
             synchronizeNextStart.release();
         }
@@ -458,7 +458,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         SOSHibernateSession sosHibernateSession;
         try {
-            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reinitComplet");
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reConsumedInConditions");
             getConditionResolver().reInitConsumedInConditions(sosHibernateSession);
         } finally {
             synchronizeNextStart.release();
@@ -824,7 +824,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             synchronizeNextStart.acquire();
             this.addConditionResolver(jsConditionResolver);
             this.copyConditionResolverData(sosHibernateSession);
-            getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+            nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
             resetNextJobStartTimer(sosHibernateSession);
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
         } catch (Exception e) {
