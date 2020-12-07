@@ -210,7 +210,7 @@ public class JSJobStreamStarter {
     }
     
     public void setLastStart(long lastStart) {
-        LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + this.getNextStart());
+        LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + lastStart);
         this.lastStart = lastStart;
     }
    

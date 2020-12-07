@@ -59,8 +59,9 @@ public class JSJobStreams {
     }
 
     public void setListOfJobStreams(EventHandlerSettings settings, List<DBItemJobStream> listOfJobStreams,
-            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages, SOSHibernateSession sosHibernateSession) throws JsonParseException,
-            JsonMappingException, JsonProcessingException, IOException, SOSInvalidDataException, DOMException, SOSHibernateException, ParseException, TransformerException {
+            Map<Long, JSJobStreamStarter> listOfJobStreamStarterGlobal, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages,
+            SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException,
+            SOSInvalidDataException, DOMException, SOSHibernateException, ParseException, TransformerException {
 
         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
         DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
@@ -71,7 +72,8 @@ public class JSJobStreams {
             FilterJobStreamStarters filterJobStreamStarters = new FilterJobStreamStarters();
             filterJobStreamStarters.setJobStreamId(itemJobStream.getId());
             List<DBItemJobStreamStarter> listOfJobStreamStarters = dbLayerJobStreamStarters.getJobStreamStartersList(filterJobStreamStarters, 0);
-            jsStreamStream.setJobStreamStarters(settings, listOfJobStreamStarters, listOfJobStreamStarterGlobal, listOfCalendarUsages, sosHibernateSession);
+            jsStreamStream.setJobStreamStarters(settings, listOfJobStreamStarters, listOfJobStreamStarterGlobal, listOfCalendarUsages,
+                    sosHibernateSession);
 
             FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
             filterJobStreamHistory.setJobStreamId(itemJobStream.getId());
@@ -112,7 +114,7 @@ public class JSJobStreams {
             }
         }
         if (nextJsJobStreamStarter != null) {
-            LOGGER.debug("--> Next starter ist: " + nextJsJobStreamStarter.getItemJobStreamStarter().getTitle() + " at " + nextJsJobStreamStarter
+            LOGGER.debug("--> Next starter is: " + nextJsJobStreamStarter.getItemJobStreamStarter().getTitle() + " at " + nextJsJobStreamStarter
                     .getNextStart());
         } else {
             LOGGER.debug("Could not find a next starter");
@@ -133,8 +135,10 @@ public class JSJobStreams {
     public JSJobStreamStarter reInitLastStart(JSJobStreamStarter nextStarter) {
         if (nextStarter != null) {
             for (JSJobStream jsJobStream : listOfJobStreams.values()) {
+
                 for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-                    if (jsJobStreamStarter.getItemJobStreamStarter().getId() == nextStarter.getItemJobStreamStarter().getId()) {
+
+                    if (nextStarter.getItemJobStreamStarter().getId().equals(jsJobStreamStarter.getItemJobStreamStarter().getId())) {
                         LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getTitle()
                                 + " last start: reinit " + new Date(jsJobStreamStarter.getLastStart()) + " --> " + new Date(nextStarter
                                         .getLastStart()));

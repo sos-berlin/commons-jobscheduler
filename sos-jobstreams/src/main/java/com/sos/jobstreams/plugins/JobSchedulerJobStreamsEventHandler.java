@@ -441,12 +441,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reinitComplet");
 
             getConditionResolver().reInitComplete(sosHibernateSession);
-            getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+            nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
         } finally {
             synchronizeNextStart.release();
         }
     }
-
+    
+     
+    
     private void reConsumedInConditions() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         try {
             synchronizeNextStart.acquire();
@@ -821,7 +823,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             synchronizeNextStart.acquire();
             this.addConditionResolver(jsConditionResolver);
             this.copyConditionResolverData(sosHibernateSession);
-            getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+            nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
             resetNextJobStartTimer(sosHibernateSession);
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
         } catch (Exception e) {
