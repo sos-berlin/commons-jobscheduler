@@ -8,7 +8,7 @@ import com.sos.jitl.jobstreams.db.DBItemOutCondition;
 
 public class JSOutConditions {
 
-    Map<Long, JSOutCondition> listOfOutConditions;
+    private Map<Long, JSOutCondition> listOfOutConditions;
 
     public JSOutConditions() {
         super();

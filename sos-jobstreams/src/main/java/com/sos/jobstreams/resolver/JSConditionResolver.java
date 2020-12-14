@@ -8,8 +8,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
@@ -97,6 +100,7 @@ public class JSConditionResolver {
     private Map<Long, JSJobStreamStarter> listOfJobStreamStarter;
     private Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages;
     private List<String> listOfMissingEvents;
+    private List<String> listOfPresentEvents;
 
     public JSConditionResolver(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, EventHandlerSettings settings) {
         super();
@@ -275,6 +279,17 @@ public class JSConditionResolver {
 
     }
 
+    public void initJobOutConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        FilterOutConditions filterOutConditions = new FilterOutConditions();
+        filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+        List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+        jsJobOutConditions = new JSJobOutConditions();
+        jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+        jsJobStreamOutConditions = new JSJobStreamOutConditions();
+        jsJobStreamOutConditions.setListOfJobStreamOutConditions(jsJobOutConditions);
+    }
+    
     private void init(SOSHibernateSession sosHibernateSession, boolean complete) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
 
@@ -308,14 +323,7 @@ public class JSConditionResolver {
         }
 
         if (jsJobOutConditions == null) {
-            FilterOutConditions filterOutConditions = new FilterOutConditions();
-            filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-            jsJobOutConditions = new JSJobOutConditions();
-            jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
-            jsJobStreamOutConditions = new JSJobStreamOutConditions();
-            jsJobStreamOutConditions.setListOfJobStreamOutConditions(jsJobOutConditions);
+            initJobOutConditions(sosHibernateSession);
         }
 
         if (jsJobStreams == null && complete) {
@@ -518,6 +526,8 @@ public class JSConditionResolver {
 
     public boolean validate(SOSHibernateSession sosHibernateSession, Integer taskReturnCode, UUID contextId, IJSCondition condition) {
         listOfMissingEvents = new ArrayList<String>();
+        listOfPresentEvents = new ArrayList<String>();
+
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
@@ -643,7 +653,8 @@ public class JSConditionResolver {
                     expressionValue = this.expressionPrepare(expressionValue);
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
-                }else {
+                    listOfPresentEvents.add(jsCondition.getConditionValueShort());
+                } else {
                     listOfMissingEvents.add(jsCondition.getConditionValueShort());
                 }
 
@@ -1079,9 +1090,31 @@ public class JSConditionResolver {
 
     }
 
-    
     public List<String> getListOfMissingEvents() {
         return listOfMissingEvents;
     }
+
+    public List<String> getListOfPresentEvents() {
+        return listOfPresentEvents;
+    }
+    
+    public JSOutCondition getOutConditionForEvent(String event,JSJobStreamConditionKey jobConditionKey) {
+        JSOutConditions jsOutConditions = this.jsJobStreamOutConditions.getOutConditions(jobConditionKey);
+        if (jsOutConditions != null){
+          for (Entry <Long,JSOutCondition> entry:jsOutConditions.getListOfOutConditions().entrySet()) {
+              JSOutCondition jsOutCondition = entry.getValue();
+              jsOutCondition.getListOfOutConditionEvent();
+              for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                  if (jsOutConditionEvent.getCommand().endsWith("create") && jsOutConditionEvent.getEvent().equals(event)) {
+                      return jsOutCondition;
+                  }
+              }
+              
+          }
+            
+        }
+        return null;
+    }
+    
 
 }
