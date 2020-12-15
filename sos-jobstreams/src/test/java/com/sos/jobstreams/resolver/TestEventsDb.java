@@ -90,24 +90,5 @@ public class TestEventsDb {
         }
     }
 
-    @Ignore
-    @Test
-    public void testDeleteOutWorkflow() throws SOSHibernateException {
-        SOSHibernateSession sosHibernateSession = getSession("src/test/resources/reporting.hibernate.cfg.xml");
-        sosHibernateSession.setAutoCommit(false);
-
-        try {
-            FilterEvents filter = new FilterEvents();
-            Constants.periodBegin = "00:00";
-            filter.setSession(Constants.getSession());
-            filter.setSchedulerId("scheduler_joc_cockpit");
-            filter.setJobStream("test");
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsWithOutConditions(filter);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-        }
-    }
+  
 }

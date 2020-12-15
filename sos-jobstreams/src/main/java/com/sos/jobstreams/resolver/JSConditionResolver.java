@@ -279,8 +279,9 @@ public class JSConditionResolver {
 
     }
 
-    public void initJobOutConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+    public void initJobOutConditions(SOSHibernateSession sosHibernateSession, String jobStream) throws SOSHibernateException {
         FilterOutConditions filterOutConditions = new FilterOutConditions();
+        filterOutConditions.setJobStream(jobStream);
         filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
         DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
         List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
@@ -289,7 +290,7 @@ public class JSConditionResolver {
         jsJobStreamOutConditions = new JSJobStreamOutConditions();
         jsJobStreamOutConditions.setListOfJobStreamOutConditions(jsJobOutConditions);
     }
-    
+
     private void init(SOSHibernateSession sosHibernateSession, boolean complete) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
 
@@ -323,7 +324,7 @@ public class JSConditionResolver {
         }
 
         if (jsJobOutConditions == null) {
-            initJobOutConditions(sosHibernateSession);
+            initJobOutConditions(sosHibernateSession, "");
         }
 
         if (jsJobStreams == null && complete) {
@@ -952,23 +953,7 @@ public class JSConditionResolver {
 
     }
 
-    public void removeEventsFromJobStream(SOSHibernateSession sosHibernateSession, FilterEvents filter) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolver::removeEventsFromJobStream --> " + filter.getJobStream() + "." + filter.getJob());
-        try {
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsWithOutConditions(filter);
-            sosHibernateSession.commit();
-
-            jsEvents = null;
-            initEvents(sosHibernateSession);
-        } catch (
-
-        Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-    }
+    
 
     public void addEvent(SOSHibernateSession sosHibernateSession, JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver::addEvent --> " + event.getJobStream() + "." + event.getEvent());
@@ -1097,24 +1082,25 @@ public class JSConditionResolver {
     public List<String> getListOfPresentEvents() {
         return listOfPresentEvents;
     }
-    
-    public JSOutCondition getOutConditionForEvent(String event,JSJobStreamConditionKey jobConditionKey) {
-        JSOutConditions jsOutConditions = this.jsJobStreamOutConditions.getOutConditions(jobConditionKey);
-        if (jsOutConditions != null){
-          for (Entry <Long,JSOutCondition> entry:jsOutConditions.getListOfOutConditions().entrySet()) {
-              JSOutCondition jsOutCondition = entry.getValue();
-              jsOutCondition.getListOfOutConditionEvent();
-              for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
-                  if (jsOutConditionEvent.getCommand().endsWith("create") && jsOutConditionEvent.getEvent().equals(event)) {
-                      return jsOutCondition;
-                  }
-              }
-              
-          }
-            
-        }
-        return null;
-    }
-    
 
+    public JSOutCondition getOutConditionForEvent(String event, JSJobStreamConditionKey jobConditionKey) {
+        JSOutConditions jsOutConditions = this.jsJobStreamOutConditions.getOutConditions(jobConditionKey);
+        JSOutCondition jsDefaultOutCondition = null;
+        if (jsOutConditions != null) {
+            for (Entry<Long, JSOutCondition> entry : jsOutConditions.getListOfOutConditions().entrySet()) {
+                if (jsDefaultOutCondition == null) {
+                    jsDefaultOutCondition = entry.getValue();
+                }
+                JSOutCondition jsOutCondition = entry.getValue();
+                jsOutCondition.getListOfOutConditionEvent();
+                for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                    if (jsOutConditionEvent.getCommand().endsWith("create") && jsOutConditionEvent.getEvent().equals(event)) {
+                        return jsOutCondition;
+                    }
+                }
+            }
+        }
+        
+        return jsDefaultOutCondition;
+    }
 }
