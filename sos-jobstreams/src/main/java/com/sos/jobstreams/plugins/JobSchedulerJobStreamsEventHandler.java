@@ -702,7 +702,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("Plugin closed");
     }
 
-    private void performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
+    private boolean performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         getConditionResolver().checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
         boolean dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(),
@@ -753,6 +753,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 reInitConsumedInConditions();
             }
         }
+
+        return dbChanged;
     }
 
     private String timeZoneFromInstances(SOSHibernateSession sosHibernateSesssion) throws DBInvalidDataException, DBConnectionRefusedException {
@@ -775,10 +777,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         try {
 
-            boolean skippedTask = false;
+            boolean eventCreated = false;
             do {
-                skippedTask = false;
-
                 List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession);
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
@@ -799,14 +799,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     taskEndEvent.setEvaluatedContextId(jsInCondition.getEvaluatedContextId());
                                     LOGGER.debug(String.format("Job %s skipped. Job run will be simulated with rc=0", jsInCondition.getJob()));
                                     inConditionCommand.setExecuted(true);
-                                    performTaskEnd(sosHibernateSession, taskEndEvent);
-                                    skippedTask = true;
+                                    eventCreated = performTaskEnd(sosHibernateSession, taskEndEvent);
+
                                 }
                             }
                         }
                     }
                 }
-            } while (skippedTask);
+
+            } while (eventCreated);
             if (isDebugEnabled & duration != null) {
                 duration.end("Resolving all InConditions: ");
             }
