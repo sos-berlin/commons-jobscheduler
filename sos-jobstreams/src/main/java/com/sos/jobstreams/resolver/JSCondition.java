@@ -120,8 +120,8 @@ public class JSCondition {
         String p = "";
         String[] conditionParts = conditionParam.split("\\[");
         if (conditionParts.length > 1) {
-           p = conditionParts[0];
-        }else {
+            p = conditionParts[0];
+        } else {
             p = conditionParam;
         }
         if (p.indexOf(".") >= 0) {
@@ -204,7 +204,9 @@ public class JSCondition {
         if (this.isHaveDate()) {
             EventDate eventDate = new EventDate();
             String session = eventDate.getEventDate(this.getConditionDate());
-            filterEvents.setSession(session);
+            if (!"*".equals(session)) {
+                filterEvents.setSession(session);
+            }
         }
         if (!("".equals(this.getConditionJobStream()))) {
             filterEvents.setJobStream(this.getConditionJobStream());
@@ -213,7 +215,6 @@ public class JSCondition {
 
     }
 
-    
     public String getConditionValueShort() {
         return conditionValueShort;
     }

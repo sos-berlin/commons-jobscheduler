@@ -1076,7 +1076,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 if (customEvent.isGlobalEvent()) {
                                     event.setSession(Constants.getSession());
                                 } else {
-                                    event.setSession(customEvent.getSession());
+                                    event.setSession(customEvent.getSource());
                                 }
 
                                 try {
@@ -1128,15 +1128,16 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 event.setEvent(customEvent.getEvent());
                                 event.setJobStream(customEvent.getJobStream());
 
-                                event.setSession(customEvent.getSession());
+                                event.setSession(customEvent.getSource());
                                 event.setSchedulerId(super.getSettings().getSchedulerId());
                                 event.setGlobalEvent(customEvent.isGlobalEvent());
 
                                 getConditionResolver().removeEvent(sosHibernateSession, event);
 
-                                event.setSession(Constants.getSession());
-                                getConditionResolver().removeEvent(sosHibernateSession, event);
-
+                                if (customEvent.getSource().equals(customEvent.getSession())) {
+                                    event.setSession(Constants.getSession());
+                                    getConditionResolver().removeEvent(sosHibernateSession, event);
+                                }
                                 delQueuedEvents.handleEventlistBuffer(getConditionResolver().getRemoveJsEvents());
                                 if (!getConditionResolver().getRemoveJsEvents().isEmpty() && !this.delQueuedEvents.isEmpty()) {
                                     this.addQueuedEvents.deleteFromDb(sosHibernateSession, getConditionResolver().getJsEvents());
