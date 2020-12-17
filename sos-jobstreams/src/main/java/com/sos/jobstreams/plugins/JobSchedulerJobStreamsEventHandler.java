@@ -86,6 +86,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private Timer nextJobStartTimer;
     private Timer publishEventTimer;
     private Timer checkEventTimer;
+    private Timer pollResolverTimer;
 
     private JSJobStreamStarter nextStarter;
 
@@ -98,6 +99,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private CompletableFuture<Void> createNewModel = null;
     private static Semaphore synchronizeNextStart = new Semaphore(1, true);
     private static Semaphore eventHandlerSemaphore = new Semaphore(1, true);
+    private static Semaphore resolveConditionsSemaphore = new Semaphore(1, true);
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive, JobStreamCompleted
@@ -115,6 +117,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         publishEventTimer = new Timer();
         publishEventTimer.schedule(new PublishEventTask(), 0, 1000);
+    }
+
+    public void resetPollResolverTimer() {
+        if (pollResolverTimer != null) {
+            pollResolverTimer.cancel();
+            pollResolverTimer.purge();
+        }
+        pollResolverTimer = new Timer();
+        if (Constants.pollInterval > 0) {
+            pollResolverTimer.schedule(new PollResolverTask(), 0, 1000 * 60 * Constants.pollInterval);
+        }
     }
 
     public void resetCheckInitTimer() {
@@ -313,6 +326,25 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                 checkEventTimer.cancel();
                 checkEventTimer.purge();
+            }
+        }
+    }
+
+    public class PollResolverTask extends TimerTask {
+
+        public void run() {
+            MDC.put("plugin", getIdentifier());
+            SOSHibernateSession sosHibernateSession = null;
+            try {
+                sosHibernateSession = reportingFactory.openStatelessSession("JobstreamModelCreatorThread");
+                LOGGER.debug("Poll in conditions..");
+                resolveInConditions(sosHibernateSession);
+            } catch (Exception e) {
+                LOGGER.error("Timer Task Error in PollResolverTask", e);
+            } finally {
+                if (sosHibernateSession != null) {
+                    sosHibernateSession.close();
+                }
             }
         }
     }
@@ -651,11 +683,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             getConditionResolver().initComplete(sosHibernateSession);
             LOGGER.debug("onActivate reset timers");
             this.resetNextJobStartTimer(sosHibernateSession);
+            this.resetPollResolverTimer();
             refreshStarters();
             LOGGER.debug("onActivate initEventHandler");
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
                     EventType.OrderFinished };
+            LOGGER.debug("Pollinterval: " + Constants.pollInterval);
             LOGGER.debug("Session: " + this.session);
 
             resolveInConditions(sosHibernateSession);
@@ -775,6 +809,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             duration = new DurationCalculator();
         }
 
+        resolveConditionsSemaphore.acquire();
         try {
 
             boolean eventCreated = false;
@@ -811,6 +846,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             if (isDebugEnabled & duration != null) {
                 duration.end("Resolving all InConditions: ");
             }
+
+            resolveConditionsSemaphore.release();
 
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
@@ -1131,6 +1168,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
             if (resolveInConditions) {
+                resetPollResolverTimer();
                 resolveInConditions(sosHibernateSession);
             }
         } catch (
@@ -1171,6 +1209,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public void setPeriodBegin(String periodBegin) {
         LOGGER.debug("Period starts at: " + periodBegin);
         Constants.periodBegin = periodBegin;
+    }
+
+    public void setPollInterval(String pollInterval) {
+        LOGGER.debug("Pollinterval: " + pollInterval);
+        try {
+            Constants.pollInterval = Integer.parseInt(pollInterval);
+        } catch (NumberFormatException e) {
+            Constants.pollInterval = 2;
+        }
     }
 
     public void setTestDelay(String testDelay) {
