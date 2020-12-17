@@ -86,7 +86,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private Timer nextJobStartTimer;
     private Timer publishEventTimer;
     private Timer checkEventTimer;
-    private Timer pollResolverTimer;
+    private Timer jobStreamCheckIntervalTimer;
 
     private JSJobStreamStarter nextStarter;
 
@@ -119,14 +119,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         publishEventTimer.schedule(new PublishEventTask(), 0, 1000);
     }
 
-    public void resetPollResolverTimer() {
-        if (pollResolverTimer != null) {
-            pollResolverTimer.cancel();
-            pollResolverTimer.purge();
+    public void resetJobStreamCheckIntervalTimer() {
+        if (jobStreamCheckIntervalTimer != null) {
+            jobStreamCheckIntervalTimer.cancel();
+            jobStreamCheckIntervalTimer.purge();
         }
-        pollResolverTimer = new Timer();
-        if (Constants.pollInterval > 0) {
-            pollResolverTimer.schedule(new PollResolverTask(), 0, 1000 * 60 * Constants.pollInterval);
+        jobStreamCheckIntervalTimer = new Timer();
+        if (Constants.jobstreamCheckInterval > 0) {
+            jobStreamCheckIntervalTimer.schedule(new JobStreamCheckIntervalTask(), 0, 1000 * 60 * Constants.jobstreamCheckInterval);
         }
     }
 
@@ -330,7 +330,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    public class PollResolverTask extends TimerTask {
+    public class JobStreamCheckIntervalTask extends TimerTask {
 
         public void run() {
             MDC.put("plugin", getIdentifier());
@@ -683,13 +683,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             getConditionResolver().initComplete(sosHibernateSession);
             LOGGER.debug("onActivate reset timers");
             this.resetNextJobStartTimer(sosHibernateSession);
-            this.resetPollResolverTimer();
+            this.resetJobStreamCheckIntervalTimer();
             refreshStarters();
             LOGGER.debug("onActivate initEventHandler");
 
             EventType[] observedEventTypes = new EventType[] { EventType.TaskClosed, EventType.TaskEnded, EventType.VariablesCustomEvent,
                     EventType.OrderFinished };
-            LOGGER.debug("Pollinterval: " + Constants.pollInterval);
+            LOGGER.debug("Jobstream Check Interval: " + Constants.jobstreamCheckInterval);
             LOGGER.debug("Session: " + this.session);
 
             resolveInConditions(sosHibernateSession);
@@ -1168,7 +1168,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
             if (resolveInConditions) {
-                resetPollResolverTimer();
+                resetJobStreamCheckIntervalTimer();
                 resolveInConditions(sosHibernateSession);
             }
         } catch (
@@ -1211,12 +1211,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         Constants.periodBegin = periodBegin;
     }
 
-    public void setPollInterval(String pollInterval) {
-        LOGGER.debug("Pollinterval: " + pollInterval);
+    public void setJobStreamCheckInterval(String jobStreamCheckInterval) {
+        LOGGER.debug("Pollinterval: " + jobStreamCheckInterval);
         try {
-            Constants.pollInterval = Integer.parseInt(pollInterval);
+            Constants.jobstreamCheckInterval = Integer.parseInt(jobStreamCheckInterval);
         } catch (NumberFormatException e) {
-            Constants.pollInterval = 2;
+            Constants.jobstreamCheckInterval = 2;
         }
     }
 
