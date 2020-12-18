@@ -337,10 +337,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             SOSHibernateSession sosHibernateSession = null;
             try {
                 sosHibernateSession = reportingFactory.openStatelessSession("JobstreamModelCreatorThread");
-                LOGGER.debug("Poll in conditions..");
+                LOGGER.debug("Check jobstreams ...");
                 resolveInConditions(sosHibernateSession);
             } catch (Exception e) {
-                LOGGER.error("Timer Task Error in PollResolverTask", e);
+                LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask", e);
             } finally {
                 if (sosHibernateSession != null) {
                     sosHibernateSession.close();
@@ -1213,7 +1213,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void setJobStreamCheckInterval(String jobStreamCheckInterval) {
-        LOGGER.debug("Pollinterval: " + jobStreamCheckInterval);
+        LOGGER.debug("Check Jobstreams interval: " + jobStreamCheckInterval);
         try {
             Constants.jobstreamCheckInterval = Integer.parseInt(jobStreamCheckInterval);
         } catch (NumberFormatException e) {
