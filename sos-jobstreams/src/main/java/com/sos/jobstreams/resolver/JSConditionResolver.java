@@ -820,7 +820,7 @@ public class JSConditionResolver {
 
         CheckRunningResult resolveOutConditionResult = new CheckRunningResult();
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
-        String defaultSession = Constants.getSession();
+
         boolean dbChanged = false;
 
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
@@ -855,8 +855,7 @@ public class JSConditionResolver {
 
                             dbChanged = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
                                     newJsEvents, removeJsEvents);
-                            outCondition.storeOutConditionEvents(sosHibernateSession, defaultSession, historyEntry, jsEvents, newJsEvents,
-                                    removeJsEvents);
+                           
                         } else {
                             LOGGER.trace(expression + "-->false");
                         }
