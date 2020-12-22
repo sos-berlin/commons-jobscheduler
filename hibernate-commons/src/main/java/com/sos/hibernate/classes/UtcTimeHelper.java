@@ -25,11 +25,26 @@ public class UtcTimeHelper {
         return TimeZone.getDefault().getID();
     }
 
-    public static String convertTimeZoneToTimeZone(String dateFormat, String fromTimeZone, String toTimeZone, String fromDateTime) {
+    public static String convertTimeZoneToTimeZone(String dateFormat, String fromTimeZone, String toTimeZone, String fromDateTime) throws Exception {
         LOGGER.debug("dateFormat:" + dateFormat);
         LOGGER.debug("fromTimeZone:" + fromTimeZone);
         LOGGER.debug("toTimeZone:" + toTimeZone);
         LOGGER.debug("fromDateTime:" + fromDateTime);
+        if (ZoneId.SHORT_IDS.get(fromTimeZone) != null) {
+            fromTimeZone = ZoneId.SHORT_IDS.get(fromTimeZone);
+        }
+
+        if (ZoneId.SHORT_IDS.get(toTimeZone) != null) {
+            toTimeZone = ZoneId.SHORT_IDS.get(toTimeZone);
+        }
+
+        if (!ZoneId.getAvailableZoneIds().contains(toTimeZone)) {
+            throw new Exception("Wrong value for timezone:" + toTimeZone);
+        }
+        
+        if (!ZoneId.getAvailableZoneIds().contains(fromTimeZone)) {
+            throw new Exception("Wrong value for timezone:" + fromTimeZone);
+        }
 
         java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern(dateFormat);
 
@@ -46,6 +61,7 @@ public class UtcTimeHelper {
     }
 
     public static String convertTimeZonesToString(String dateFormat, String fromTimeZone, String toTimeZone, DateTime fromDateTime) {
+
         DateTimeZone fromZone = DateTimeZone.forID(fromTimeZone);
         DateTimeZone toZone = DateTimeZone.forID(toTimeZone);
         DateTime dateTime = new DateTime(fromDateTime);
