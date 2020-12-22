@@ -219,4 +219,8 @@ public class JSCondition {
         return conditionValueShort;
     }
 
+    public boolean haveCustomSession() {
+        return haveDate  && !"today".equals(conditionDate) && !"*".equals(conditionDate) && !conditionDate.contains("yesterday") && !conditionDate.contains("prev");
+    }
+
 }
