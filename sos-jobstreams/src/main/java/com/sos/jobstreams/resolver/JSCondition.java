@@ -220,7 +220,11 @@ public class JSCondition {
     }
 
     public boolean haveCustomSession() {
-        return haveDate  && !"today".equals(conditionDate) && !"*".equals(conditionDate) && !conditionDate.contains("yesterday") && !conditionDate.contains("prev");
+        return haveDate && !"today".equals(conditionDate) && !"*".equals(conditionDate) && !"yesterday".equals(conditionDate) && !"prev".equals(
+                conditionDate) && !"prevsuccessful".equalsIgnoreCase(conditionDate) && !"preverror".equalsIgnoreCase(conditionDate) && !conditionDate
+                        .contains("yesterday-") && !conditionDate.contains("yesterday+") && !conditionDate.contains("today-") && !conditionDate
+                                .contains("today+") && !(conditionDate.contains(".") && conditionDate.length() == 5);
+
     }
 
 }
