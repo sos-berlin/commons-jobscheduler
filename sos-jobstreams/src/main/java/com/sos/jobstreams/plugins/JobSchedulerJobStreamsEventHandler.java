@@ -166,6 +166,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             List<DBItemJobStreamStarter> listOfStarter = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
             sosHibernateSession.beginTransaction();
+            LOGGER.debug("acquire updateStarters 3");
+
+            updateStarters.acquire();
             for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfStarter) {
                 Date now = new Date();
                 if (dbItemJobStreamStarter.getRunTime() != null && !"".equals(dbItemJobStreamStarter.getRunTime())) {
@@ -175,7 +178,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         if (nextStart != null) {
                             dbItemJobStreamStarter.setNextStart(nextStart);
 
-                            updateStarters.acquire();
                             dbLayerJobStreamStarters.update(dbItemJobStreamStarter);
                             LOGGER.debug("Refreshed next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
                                     + " to " + nextStart);
@@ -185,6 +187,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
         } finally {
+            LOGGER.debug("relase updateStarters 3");
             updateStarters.release();
             sosHibernateSession.commit();
             sosHibernateSession.close();
@@ -227,6 +230,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                                 try {
+                                LOGGER.debug("acquire updateStarters 1");
                                     updateStarters.acquire();
                                     sosHibernateSession.beginTransaction();
                                     DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
@@ -239,6 +243,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 } catch (InterruptedException e) {
                                 } finally {
+                                LOGGER.debug("release updateStarters 1");
                                     updateStarters.release();
                                 }
                                 addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
@@ -450,6 +455,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                         DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
 
+                        LOGGER.debug("acquire updateStarters 2");
                         updateStarters.acquire();
                         try {
                             sosHibernateSession.beginTransaction();
@@ -459,6 +465,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             sosHibernateSession.commit();
                         } finally {
+                            LOGGER.debug("release updateStarters 1");
+
                             updateStarters.release();
                         }
 
