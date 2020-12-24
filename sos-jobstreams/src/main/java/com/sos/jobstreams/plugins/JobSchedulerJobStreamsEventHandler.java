@@ -166,7 +166,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             List<DBItemJobStreamStarter> listOfStarter = dbLayerJobStreamStarters.getJobStreamStartersList(filter, 0);
             sosHibernateSession.beginTransaction();
-            LOGGER.debug("acquire updateStarters 3");
 
             updateStarters.acquire();
             for (DBItemJobStreamStarter dbItemJobStreamStarter : listOfStarter) {
@@ -187,7 +186,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
         } finally {
-            LOGGER.debug("relase updateStarters 3");
             updateStarters.release();
             sosHibernateSession.commit();
             sosHibernateSession.close();
@@ -230,7 +228,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                                 try {
-                                    LOGGER.debug("acquire updateStarters 1");
                                     updateStarters.acquire();
                                     sosHibernateSession.beginTransaction();
                                     DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
@@ -243,7 +240,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 } catch (InterruptedException e) {
                                 } finally {
-                                    LOGGER.debug("release updateStarters 1");
                                     updateStarters.release();
                                 }
                                 addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
@@ -455,7 +451,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                         DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
 
-                        LOGGER.debug("acquire updateStarters 2");
                         updateStarters.acquire();
                         try {
                             sosHibernateSession.beginTransaction();
@@ -465,7 +460,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                             sosHibernateSession.commit();
                         } finally {
-                            LOGGER.debug("release updateStarters 1");
 
                             updateStarters.release();
                         }
@@ -771,10 +765,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private boolean performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         getConditionResolver().checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
+        resolveConditionsSemaphore.acquire();
         boolean dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(),
                 taskEndEvent.getJobPath());
         UUID contextId = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-        resolveConditionsSemaphore.acquire();
         try {
             if (contextId != null) {
 
@@ -808,7 +802,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } finally {
             resolveConditionsSemaphore.release();
         }
-        
 
         if (!getConditionResolver().getNewJsEvents().isEmpty() || !getConditionResolver().getRemoveJsEvents().isEmpty()) {
             boolean reinint = false;
@@ -886,10 +879,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 duration.end("Resolving all InConditions: ");
             }
 
-
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
-        }finally {
+        } finally {
             resolveConditionsSemaphore.release();
         }
     }
