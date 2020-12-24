@@ -230,7 +230,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 DBLayerJobStreamStarters dbLayerJobStreamStarters = new DBLayerJobStreamStarters(sosHibernateSession);
                                 try {
-                                LOGGER.debug("acquire updateStarters 1");
+                                    LOGGER.debug("acquire updateStarters 1");
                                     updateStarters.acquire();
                                     sosHibernateSession.beginTransaction();
                                     DBItemJobStreamStarter dbItemJobStreamStarter = nextStarter.getItemJobStreamStarter();
@@ -243,7 +243,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 } catch (InterruptedException e) {
                                 } finally {
-                                LOGGER.debug("release updateStarters 1");
+                                    LOGGER.debug("release updateStarters 1");
                                     updateStarters.release();
                                 }
                                 addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
@@ -533,6 +533,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:startJobs");
         sosHibernateSession.beginTransaction();
+        resolveConditionsSemaphore.acquire();
+
         try {
 
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
@@ -587,6 +589,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
+            resolveConditionsSemaphore.release();
             sosHibernateSession.close();
         }
     }
@@ -771,35 +774,42 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         boolean dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(),
                 taskEndEvent.getJobPath());
         UUID contextId = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
-        if (contextId != null) {
+        resolveConditionsSemaphore.acquire();
+        try {
+            if (contextId != null) {
 
-            getConditionResolver().enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
-            CheckRunningResult checkRunningResult = getConditionResolver().checkRunning(sosHibernateSession, contextId);
+                getConditionResolver().enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
+                CheckRunningResult checkRunningResult = getConditionResolver().checkRunning(sosHibernateSession, contextId);
 
-            if (checkRunningResult.isJobstreamCompleted()) {
-                Map<String, String> values = new HashMap<String, String>();
-                values.put(CustomEventType.JobStreamCompleted.name(), checkRunningResult.getJobStream());
-                values.put("contextId", contextId.toString());
-                addPublishEventOrder(CUSTOM_EVENT_KEY, values);
-            }
-
-            for (JSEvent jsNewEvent : getConditionResolver().getNewJsEvents().getListOfEvents().values()) {
-                if (jsNewEvent.getSession().equals(contextId.toString())) {
+                if (checkRunningResult.isJobstreamCompleted()) {
                     Map<String, String> values = new HashMap<String, String>();
-                    values.put(CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                    values.put(CustomEventType.JobStreamCompleted.name(), checkRunningResult.getJobStream());
                     values.put("contextId", contextId.toString());
                     addPublishEventOrder(CUSTOM_EVENT_KEY, values);
                 }
-            }
-            for (JSEvent jsNewEvent : getConditionResolver().getRemoveJsEvents().getListOfEvents().values()) {
-                if (jsNewEvent.getSession().equals(contextId.toString())) {
-                    Map<String, String> values = new HashMap<String, String>();
-                    values.put(CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
-                    values.put("contextId", contextId.toString());
-                    addPublishEventOrder(CUSTOM_EVENT_KEY, values);
+
+                for (JSEvent jsNewEvent : getConditionResolver().getNewJsEvents().getListOfEvents().values()) {
+                    if (jsNewEvent.getSession().equals(contextId.toString())) {
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put(CustomEventType.EventCreated.name(), jsNewEvent.getEvent());
+                        values.put("contextId", contextId.toString());
+                        addPublishEventOrder(CUSTOM_EVENT_KEY, values);
+                    }
+                }
+                for (JSEvent jsNewEvent : getConditionResolver().getRemoveJsEvents().getListOfEvents().values()) {
+                    if (jsNewEvent.getSession().equals(contextId.toString())) {
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put(CustomEventType.EventRemoved.name(), jsNewEvent.getEvent());
+                        values.put("contextId", contextId.toString());
+                        addPublishEventOrder(CUSTOM_EVENT_KEY, values);
+                    }
                 }
             }
+        } finally {
+            resolveConditionsSemaphore.release();
         }
+        
+
         if (!getConditionResolver().getNewJsEvents().isEmpty() || !getConditionResolver().getRemoveJsEvents().isEmpty()) {
             boolean reinint = false;
             addQueuedEvents.handleEventlistBuffer(getConditionResolver().getNewJsEvents());
@@ -876,10 +886,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 duration.end("Resolving all InConditions: ");
             }
 
-            resolveConditionsSemaphore.release();
 
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
+        }finally {
+            resolveConditionsSemaphore.release();
         }
     }
 
