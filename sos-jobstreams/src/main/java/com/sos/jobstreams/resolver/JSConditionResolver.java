@@ -71,6 +71,7 @@ import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
+import scala.reflect.macros.whitebox.Context;
 import sos.util.SOSString;
 
 public class JSConditionResolver {
@@ -685,10 +686,13 @@ public class JSConditionResolver {
         }
     }
 
-    public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession) throws NumberFormatException, Exception {
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession, UUID instance) throws NumberFormatException, Exception {
 
         LOGGER.debug("JSConditionResolver::resolveInConditions");
 
+        if (instance != null) {
+            LOGGER.debug("Resolving contextId " + instance.toString());
+        }
         List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
 
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
@@ -698,9 +702,13 @@ public class JSConditionResolver {
                     if (!jsHistoryEntry.isRunning()) {
                         continue;
                     }
+                    UUID contextId = jsHistoryEntry.getContextId();
+                    if (jsHistoryEntry.isSkipValidation() && !(instance == null || contextId.equals(instance))) {
+                        LOGGER.debug(contextId.toString() + " is running but will be skipped");
+                        continue;
+                    }
                     LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
                             .getJobStream(), jsHistoryEntry.getContextId()));
-                    UUID contextId = jsHistoryEntry.getContextId();
                     if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
                         LOGGER.debug("No in conditions defined. Nothing to do");
                     } else {
@@ -743,6 +751,10 @@ public class JSConditionResolver {
                                     JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
                                     boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
                                     if (!endedByJob) {
+                                        
+                                        jsHistoryEntry.setSkipValidation(inCondition.isHaveOnlyInstanceEvents());
+                                        
+                                        
                                         if (validate(sosHibernateSession, null, contextId, inCondition)) {
                                             StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
                                                     listOfParameters.get(contextId), schedulerXmlCommandExecutor);

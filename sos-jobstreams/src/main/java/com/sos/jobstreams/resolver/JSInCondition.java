@@ -25,7 +25,6 @@ import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
-import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.JobStreamCalendar;
 import com.sos.jobstreams.classes.StartJobReturn;
@@ -41,10 +40,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private List<JSInConditionCommand> listOfInConditionCommands;
     private Set<UUID> consumedForContext;
     private Map<UUID, Boolean> listOfRunningJobs;
+    private boolean haveOnlyInstanceEvents=true;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
     private UUID evaluatedContextId;
-
+    
+  
     public JSInCondition() {
         super();
         listOfRunningJobs = new HashMap<UUID, Boolean>();
@@ -63,6 +64,18 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public void setItemInCondition(DBItemInCondition itemInCondition) {
         this.itemInCondition = itemInCondition;
         this.normalizedJob = normalizePath(itemInCondition.getJob());
+        
+        String expressionValue = getExpression() + " ";
+        expressionValue = JSConditions.normalizeExpression(expressionValue);
+        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
+        for (JSCondition jsCondition : listOfConditions) {
+            if (jsCondition.isGlobalEvent() || jsCondition.isNonContextEvent() || !"event".equals(jsCondition.getConditionType()) ){
+                haveOnlyInstanceEvents = false;
+                break;
+            }
+        }
+
+        
     }
 
     public Long getId() {
@@ -282,5 +295,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public void setListOfRunningJobs(Map<UUID, Boolean> listOfRunningJobs) {
         this.listOfRunningJobs = listOfRunningJobs;
     }
+
+    
+    public boolean isHaveOnlyInstanceEvents() {
+        return haveOnlyInstanceEvents;
+    }
+
+ 
 
 }

@@ -20,6 +20,7 @@ public class JSHistoryEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSHistoryEntry.class);
 
     private DBItemJobStreamHistory itemJobStreamHistory;
+    private boolean skipValidation=true;
 
     public JSHistoryEntry() {
         super();
@@ -189,6 +190,16 @@ public class JSHistoryEntry {
         } else if (!itemJobStreamHistory.getId().equals(other.itemJobStreamHistory.getId()))
             return false;
         return true;
+    }
+
+    
+    public boolean isSkipValidation() {
+        return skipValidation;
+    }
+
+    
+    public void setSkipValidation(boolean skipValidation) {
+        this.skipValidation = skipValidation;
     }
 
 }

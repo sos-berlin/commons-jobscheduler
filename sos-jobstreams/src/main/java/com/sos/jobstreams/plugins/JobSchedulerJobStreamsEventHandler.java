@@ -185,12 +185,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         } finally {
             sosHibernateSession.commit();
-            sosHibernateSession.close();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
 
     }
 
-    public void resetNextJobStartTimer(SOSHibernateSession sosHibernateSession) {
+    public void resetNextJobStartTimer() throws SOSHibernateOpenSessionException {
 
         try {
             synchronizeNextStart.acquire();
@@ -205,7 +207,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         nextJobStartTimer = new Timer();
         Long delay = -1L;
 
+        SOSHibernateSession sosHibernateSession = null;
+
         try {
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:resetNextJobStartTimer");
+            sosHibernateSession.setAutoCommit(false);
             do {
                 if (this.getConditionResolver().getJsJobStreams() != null) {
                     nextStarter = this.getConditionResolver().getNextStarttime();
@@ -249,9 +255,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             if (nextStarter == null) {
                 LOGGER.info("no more start times found");
             }
-        } finally
-
-        {
+        } finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
             synchronizeNextStart.release();
         }
 
@@ -455,12 +462,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
 
-                resetNextJobStartTimer(sosHibernateSession);
+                resetNextJobStartTimer();
 
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.error("Timer Task Error", e);
-                resetNextJobStartTimer(sosHibernateSession);
+                try {
+                    resetNextJobStartTimer();
+                } catch (SOSHibernateOpenSessionException e1) {}
             } finally {
                 synchronizeNextStart.release();
                 if (sosHibernateSession != null) {
@@ -567,7 +576,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.error(e.getMessage(), e);
         } finally {
             resolveConditionsSemaphore.release();
-            sosHibernateSession.close();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
     }
 
@@ -626,7 +637,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private void copyConditionResolverData(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         try {
             this.getConditionResolver().assign(sosHibernateSession, getLastConditionResolver());
-            this.resolveInConditions(sosHibernateSession);
+            this.resolveInConditions(sosHibernateSession, null);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -691,7 +702,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("onActivate init condition resolver");
             getConditionResolver().initComplete(sosHibernateSession);
             LOGGER.debug("onActivate reset timers");
-            this.resetNextJobStartTimer(sosHibernateSession);
+            this.resetNextJobStartTimer();
             this.resetJobStreamCheckIntervalTimer();
             refreshStarters();
             LOGGER.debug("onActivate initEventHandler");
@@ -702,7 +713,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("Session: " + this.session);
 
             resolveInConditions(sosHibernateSession);
-            sosHibernateSession.close();
 
             start(observedEventTypes);
         } catch (Exception e) {
@@ -817,7 +827,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception {
+    private void resolveInConditions(SOSHibernateSession sosHibernateSession, UUID forInstance) throws Exception {
         DurationCalculator duration = null;
         if (isDebugEnabled) {
             LOGGER.debug("Resolve in-conditions");
@@ -829,7 +839,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             boolean eventCreated = false;
             do {
-                List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession);
+                List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession, forInstance);
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                         LOGGER.debug("checking whether to execute out conditions for skipped jobs");
@@ -869,6 +879,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
+    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception {
+        this.resolveInConditions(sosHibernateSession, null);
+    }
+
     private void assignNewModel(JSConditionResolver jsConditionResolver) throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = null;
         try {
@@ -878,12 +892,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             this.addConditionResolver(jsConditionResolver);
             this.copyConditionResolverData(sosHibernateSession);
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
-            resetNextJobStartTimer(sosHibernateSession);
+            resetNextJobStartTimer();
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         } finally {
-            sosHibernateSession.close();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
             synchronizeNextStart.release();
             ;
         }
@@ -896,6 +912,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         boolean resolveInConditions = false;
         eventHandlerSemaphore.acquire();
+        UUID taskEndUuid = null;
 
         SOSHibernateSession sosHibernateSession = null;
 
@@ -908,7 +925,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 createConditionResolver();
                 try {
                     getConditionResolver().initComplete(sosHibernateSession);
-                    this.resetNextJobStartTimer(sosHibernateSession);
+                    this.resetNextJobStartTimer();
 
                 } catch (Exception e) {
                     this.listOfConditionResolver = null;
@@ -959,7 +976,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         values = new HashMap<String, String>();
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
                         values.put("path", taskEndEvent.getJobPath());
-                        if (getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong()) != null) {
+                        taskEndUuid = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+                        if (taskEndUuid != null) {
                             values.put("contextId", getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong())
                                     .toString());
                         }
@@ -1185,7 +1203,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
             if (resolveInConditions) {
                 resetJobStreamCheckIntervalTimer();
-                resolveInConditions(sosHibernateSession);
+                resolveInConditions(sosHibernateSession, taskEndUuid);
             }
         } catch (
 
