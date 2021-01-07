@@ -976,10 +976,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         values = new HashMap<String, String>();
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
                         values.put("path", taskEndEvent.getJobPath());
+                        if (taskEndEvent.getReturnCode() != 0){
+                            values.put("taskEndState", "FAILED");
+                        }else {
+                            values.put("taskEndState", "SUCCESSFUL");
+                        }
+                                
                         taskEndUuid = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
                         if (taskEndUuid != null) {
-                            values.put("contextId", getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong())
-                                    .toString());
+                            values.put("contextId", taskEndUuid.toString());
                         }
 
                         performTaskEnd(sosHibernateSession, taskEndEvent);
