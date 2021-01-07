@@ -375,6 +375,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
                                 }
                                 publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
+                                if (publishEventOrder.getValues().get(CustomEventType.TaskEnded.name()) != null) {
+                                    java.lang.Thread.sleep(2000);
+                                }
                                 publishEventOrder.setPublished(true);
                                 published = true;
                             }
@@ -385,6 +388,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             publishEventTimer.cancel();
                             publishEventTimer.purge();
                         }
+                        listOfPublishEventOrders.clear();
                     }
                 }
 
@@ -468,7 +472,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.error("Timer Task Error", e);
                 try {
                     resetNextJobStartTimer();
-                } catch (SOSHibernateOpenSessionException e1) {}
+                } catch (SOSHibernateOpenSessionException e1) {
+                }
             } finally {
                 synchronizeNextStart.release();
                 if (sosHibernateSession != null) {
@@ -916,16 +921,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
-            
-            boolean clear = true;
-            for (PublishEventOrder publishEventOrder : listOfPublishEventOrders) {
-                if (!publishEventOrder.isPublished()) {
-                    clear = false;
-                }
-            }
-            if (clear){
-                listOfPublishEventOrders.clear();
-            }
 
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
 
@@ -985,12 +980,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         values = new HashMap<String, String>();
                         values.put(CustomEventType.TaskEnded.name(), taskEndEvent.getTaskId());
                         values.put("path", taskEndEvent.getJobPath());
-                        if (taskEndEvent.getReturnCode() != 0){
+                        if (taskEndEvent.getReturnCode() != 0) {
                             values.put("taskEndState", "FAILED");
-                        }else {
+                        } else {
                             values.put("taskEndState", "SUCCESSFUL");
                         }
-                                
+
                         taskEndUuid = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
                         if (taskEndUuid != null) {
                             values.put("contextId", taskEndUuid.toString());
