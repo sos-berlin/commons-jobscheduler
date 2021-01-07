@@ -385,7 +385,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             publishEventTimer.cancel();
                             publishEventTimer.purge();
                         }
-                        listOfPublishEventOrders.clear();
                     }
                 }
 
@@ -917,6 +916,16 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         SOSHibernateSession sosHibernateSession = null;
 
         try {
+            
+            boolean clear = true;
+            for (PublishEventOrder publishEventOrder : listOfPublishEventOrders) {
+                if (!publishEventOrder.isPublished()) {
+                    clear = false;
+                }
+            }
+            if (clear){
+                listOfPublishEventOrders.clear();
+            }
 
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:execute");
 
