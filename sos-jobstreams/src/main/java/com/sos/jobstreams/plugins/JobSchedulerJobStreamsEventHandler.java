@@ -378,9 +378,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
                                 }
                                 publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
-                                if (publishEventOrder.getValues().get(CustomEventType.TaskEnded.name()) != null) {
-                                    java.lang.Thread.sleep(2000);
-                                }
+
                                 publishEventOrder.setPublished(true);
                                 published = true;
                             }else {
