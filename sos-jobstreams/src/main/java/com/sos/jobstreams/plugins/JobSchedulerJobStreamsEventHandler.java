@@ -140,16 +140,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void addPublishEventOrder(PublishEventOrder publishEventOrder) {
+        LOGGER.debug("Add PublishEventOrder:" + publishEventOrder.asString());
         boolean resetPublishEventTimer = false;
         if (listOfPublishEventOrders == null) {
             listOfPublishEventOrders = Collections.synchronizedCollection(new ArrayList<>());
         }
         if (listOfPublishEventOrders.isEmpty()) {
             resetPublishEventTimer = true;
-
         }
         listOfPublishEventOrders.add(publishEventOrder);
         if (resetPublishEventTimer) {
+            LOGGER.debug("Reset PublishEventTimer");
             resetPublishEventTimer();
         }
     }
@@ -235,6 +236,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                                 dbItemJobStreamStarter.setNextStart(new Date(next));
                                 dbLayerJobStreamStarters.updateNextStart(dbItemJobStreamStarter);
+                                nextStarter.setItemJobStreamStarterNoSchedule(dbLayerJobStreamStarters.getJobStreamStartersDbItem(dbItemJobStreamStarter.getId()));
+
                                 sosHibernateSession.commit();
                                 LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
                                         + " to " + dbItemJobStreamStarter.getNextStart());
@@ -368,7 +371,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 if (listOfPublishEventOrders != null) {
                     synchronized (listOfPublishEventOrders) {
                         for (PublishEventOrder publishEventOrder : listOfPublishEventOrders) {
-
                             if (!publishEventOrder.isPublished()) {
 
                                 if (isDebugEnabled) {
@@ -380,6 +382,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 }
                                 publishEventOrder.setPublished(true);
                                 published = true;
+                            }else {
+                                LOGGER.debug("Custom event already published:" + publishEventOrder.asString());
+
                             }
                         }
                     }
@@ -454,6 +459,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         dbItemJobStreamStarter.setNextStart(new Date(next));
                         dbLayerJobStreamStarters.updateNextStart(dbItemJobStreamStarter);
+                        nextStarter.setItemJobStreamStarterNoSchedule(dbLayerJobStreamStarters.getJobStreamStartersDbItem(dbItemJobStreamStarter.getId()));
 
                         sosHibernateSession.commit();
 

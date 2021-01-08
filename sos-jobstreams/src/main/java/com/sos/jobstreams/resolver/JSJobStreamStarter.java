@@ -88,6 +88,12 @@ public class JSJobStreamStarter {
         }
     }
 
+
+    public void setItemJobStreamStarterNoSchedule(DBItemJobStreamStarter itemJobStreamStarter)  {
+        LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
+        this.itemJobStreamStarter = itemJobStreamStarter;
+    }
+    
     public void setItemJobStreamStarter(DBItemJobStreamStarter itemJobStreamStarter) throws JsonParseException, JsonMappingException,
             JsonProcessingException, IOException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
         LOGGER.trace("Setting starter with timeZone: " + Constants.settings.getTimezone());
