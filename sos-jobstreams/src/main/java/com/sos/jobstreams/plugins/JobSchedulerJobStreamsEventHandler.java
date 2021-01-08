@@ -145,10 +145,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         if (listOfPublishEventOrders == null) {
             listOfPublishEventOrders = Collections.synchronizedCollection(new ArrayList<>());
         }
-        if (listOfPublishEventOrders.isEmpty()) {
+        if (listOfPublishEventOrders.isEmpty() || publishEventTimer == null) {
             resetPublishEventTimer = true;
         }
         listOfPublishEventOrders.add(publishEventOrder);
+        LOGGER.debug(listOfPublishEventOrders.size() + " events in list");
         if (resetPublishEventTimer) {
             LOGGER.debug("Reset PublishEventTimer");
             resetPublishEventTimer();
@@ -392,6 +393,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         if (publishEventTimer != null) {
                             publishEventTimer.cancel();
                             publishEventTimer.purge();
+                            publishEventTimer = null;
                         }
                         listOfPublishEventOrders.clear();
                     }
