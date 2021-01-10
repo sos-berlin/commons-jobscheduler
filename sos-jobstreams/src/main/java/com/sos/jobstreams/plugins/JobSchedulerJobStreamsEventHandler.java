@@ -126,7 +126,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         jobStreamCheckIntervalTimer = new Timer();
         if (Constants.jobstreamCheckInterval > 0) {
-            jobStreamCheckIntervalTimer.schedule(new JobStreamCheckIntervalTask(), 0, 1000 * 60 * Constants.jobstreamCheckInterval);
+            jobStreamCheckIntervalTimer.schedule(new JobStreamCheckIntervalTask(), 1000 * 60 * Constants.jobstreamCheckInterval, 1000 * 60 * Constants.jobstreamCheckInterval);
         }
     }
 
@@ -350,7 +350,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             MDC.put("plugin", getIdentifier());
             SOSHibernateSession sosHibernateSession = null;
             try {
-                sosHibernateSession = reportingFactory.openStatelessSession("JobstreamModelCreatorThread");
+                sosHibernateSession = reportingFactory.openStatelessSession("JobStreamCheckIntervalTask");
                 LOGGER.debug("Check jobstreams ...");
                 resolveInConditions(sosHibernateSession);
             } catch (Exception e) {
