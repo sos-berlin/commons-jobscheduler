@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,7 +51,9 @@ import com.sos.jitl.jobstreams.db.DBLayerJobStreamStarters;
 import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
 import com.sos.jitl.jobstreams.db.FilterJobStreamStarters;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
 import com.sos.jobstreams.classes.CheckRunningResult;
 import com.sos.jobstreams.classes.ConditionCustomEvent;
 import com.sos.jobstreams.classes.DurationCalculator;
@@ -353,6 +356,44 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             SOSHibernateSession sosHibernateSession = null;
             try {
                 sosHibernateSession = reportingFactory.openStatelessSession("JobStreamCheckIntervalTask");
+                ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(sosHibernateSession);
+                reportTaskExecutionsDBLayer.resetFilter();
+                reportTaskExecutionsDBLayer.getFilter().setSchedulerId(getSettings().getSchedulerId());
+
+                for (Entry<UUID, DBItemJobStreamHistory> entry : getConditionResolver().getListOfHistoryIds().entrySet()) {
+                    if ((getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(entry.getKey()) != null) && (getConditionResolver()
+                            .getJobStreamContexts().getTaskIdsOfContext(entry.getKey()).size() > 0)) {
+                        LOGGER.debug("Select open tasks for " + entry.getKey());
+                        LOGGER.debug("Taskids in filter:" + getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(entry.getKey()).size());
+                        reportTaskExecutionsDBLayer.getFilter().setTaskIds(getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(entry
+                                .getKey()));
+                        if (isDebugEnabled) {
+                            LOGGER.debug(SOSString.toString(reportTaskExecutionsDBLayer.getFilter()));
+                            for (Long taskId : getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(entry.getKey())) {
+                                LOGGER.debug("task:" + taskId);
+                            }
+                        }
+                        List<DBItemReportTask> listOfOpenTasks = reportTaskExecutionsDBLayer.getHistoryItems();
+                        if (isDebugEnabled) {
+                            LOGGER.debug(listOfOpenTasks.size() + " tasks found for " + entry.getKey());
+                        }
+                        for (DBItemReportTask dbItemReportTask : listOfOpenTasks) {
+                            if (dbItemReportTask.getEndTime() != null) {
+                                if (isDebugEnabled) {
+                                    LOGGER.debug("Task " + dbItemReportTask.getHistoryId() + " is terminated but not resolved");
+                                }
+                                TaskEndEvent taskEndEvent = new TaskEndEvent();
+                                taskEndEvent.setEvaluatedContextId(entry.getKey());
+                                taskEndEvent.setReturnCode(dbItemReportTask.getExitCode());
+                                taskEndEvent.setTaskId(dbItemReportTask.getHistoryIdAsString());
+                                taskEndEvent.setJobPath(dbItemReportTask.getName());
+
+                                performTaskEnd(sosHibernateSession, taskEndEvent);
+                            }
+                        }
+                    }
+                }
+
                 LOGGER.debug("Check jobstreams ...");
                 resolveInConditions(sosHibernateSession);
             } catch (Exception e) {
@@ -377,14 +418,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             if (!publishEventOrder.isPublished()) {
 
                                 if (isDebugEnabled) {
-                                    LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
+                                    LOGGER.trace("Publish custom event:" + publishEventOrder.asString());
                                 }
                                 publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
 
                                 publishEventOrder.setPublished(true);
                                 published = true;
                             } else {
-                                LOGGER.debug("Custom event already published:" + publishEventOrder.asString());
+                                LOGGER.trace("Custom event already published:" + publishEventOrder.asString());
 
                             }
                         }
@@ -770,12 +811,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private boolean performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
+        boolean dbChanged = false;
         getConditionResolver().checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
-        resolveInConditionsSemaphore.acquire();
-        boolean dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(),
-                taskEndEvent.getJobPath());
-        UUID contextId = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+        resolveOutConditionsSemaphore.acquire();
         try {
+            dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
+                    .getJobPath());
+            UUID contextId = getConditionResolver().getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+            if (getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(contextId) != null) {
+                getConditionResolver().getJobStreamContexts().getTaskIdsOfContext(contextId).remove(taskEndEvent.getTaskIdLong());
+            }
+
             if (contextId != null) {
 
                 getConditionResolver().enableInconditionsForJob(getSettings().getSchedulerId(), taskEndEvent.getJobPath(), contextId);
@@ -806,7 +852,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
         } finally {
-            resolveInConditionsSemaphore.release();
+            resolveOutConditionsSemaphore.release();
         }
 
         if (!getConditionResolver().getNewJsEvents().isEmpty() || !getConditionResolver().getRemoveJsEvents().isEmpty()) {
@@ -1001,16 +1047,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             values.put("contextId", taskEndUuid.toString());
                         }
 
-                        try {
-                            resolveOutConditionsSemaphore.acquire();
+                        performTaskEnd(sosHibernateSession, taskEndEvent);
 
-                            performTaskEnd(sosHibernateSession, taskEndEvent);
-
-                            resetJobStreamCheckIntervalTimer();
-                            resolveInConditions(sosHibernateSession, taskEndUuid);
-                        } finally {
-                            resolveOutConditionsSemaphore.release();
-                        }
+                        resetJobStreamCheckIntervalTimer();
+                        resolveInConditions(sosHibernateSession, taskEndUuid);
 
                         addPublishEventOrder(CUSTOM_EVENT_KEY, values);
                         break;

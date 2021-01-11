@@ -21,11 +21,14 @@ public class JobStreamContexts {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStreamContexts.class);
     private Map<UUID, List<JobStarterOptions>> listOfContexts;
     private Map<Long, UUID> listOfTaskIds;
- 
+    private Map<UUID, List<Long>> taskIdsOfContext;
+
+    
     public JobStreamContexts() {
         super();
         listOfContexts = new HashMap<UUID, List<JobStarterOptions>>();
         listOfTaskIds = new HashMap<Long, UUID>();
+        taskIdsOfContext = new HashMap<UUID,List<Long>>();
     }
 
     public void addTaskToContext(UUID contextId, String schedulerId, JobStarterOptions startedJob, SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
@@ -49,10 +52,19 @@ public class JobStreamContexts {
         listOfContexts.get(contextId).add(startedJob);
         LOGGER.debug("adding taskid " + startedJob.getTaskId());
         listOfTaskIds.put(startedJob.getTaskId(), contextId);
+        if (taskIdsOfContext.get(contextId) == null) {
+            taskIdsOfContext.put(contextId, new ArrayList<Long>());
+        }
+        taskIdsOfContext.get(contextId).add(startedJob.getTaskId()); 
+
     }
 
     public UUID getContext(Long taskId) {
         return listOfTaskIds.get(taskId);
+    }
+    
+    public List<Long> getTaskIdsOfContext(UUID context) {
+        return taskIdsOfContext.get(context);
     }
 
     public Map<UUID, List<JobStarterOptions>> getListOfContexts() {
@@ -74,6 +86,10 @@ public class JobStreamContexts {
             jobStarterOptions.setTaskId(dbItemJobStreamTaskContext.getTaskId());
             listOfContexts.get(contextId).add(jobStarterOptions);
             listOfTaskIds.put(dbItemJobStreamTaskContext.getTaskId(), contextId);
+            if (taskIdsOfContext.get(contextId) == null) {
+                taskIdsOfContext.put(contextId, new ArrayList<Long>());
+            }
+            taskIdsOfContext.get(contextId).add(dbItemJobStreamTaskContext.getTaskId()); 
         }
     }
 

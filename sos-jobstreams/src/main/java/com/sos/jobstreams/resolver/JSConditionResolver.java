@@ -8,11 +8,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
@@ -29,7 +27,6 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
-import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
@@ -71,7 +68,6 @@ import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
-import scala.reflect.macros.whitebox.Context;
 import sos.util.SOSString;
 
 public class JSConditionResolver {
@@ -256,6 +252,7 @@ public class JSConditionResolver {
         listOfHistoryIds = new HashMap<UUID, DBItemJobStreamHistory>();
         FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
         filterJobStreamHistory.setSchedulerId(settings.getSchedulerId());
+        filterJobStreamHistory.setRunning(true);
         DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
         List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
         for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfJobStreamHistory) {
