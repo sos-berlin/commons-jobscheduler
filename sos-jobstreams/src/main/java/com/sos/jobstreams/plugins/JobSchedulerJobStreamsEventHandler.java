@@ -950,6 +950,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             synchronizeNextStart.acquire();
             this.addConditionResolver(jsConditionResolver);
             this.copyConditionResolverData(sosHibernateSession);
+
+            refreshStarters();
+
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
             resetNextJobStartTimer();
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
@@ -997,6 +1000,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     this.session = Constants.getSession();
                     LOGGER.debug("Change session to: " + this.session);
                     reInitComplete();
+                    this.resetNextJobStartTimer();
+
 
                 } catch (SOSHibernateException e) {
                     this.listOfConditionResolver = null;
@@ -1155,7 +1160,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         case "IsAlive":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
-                            addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.IsAlive.name(), super.getSettings().getSchedulerId());
+                            values = new HashMap<String, String>();
+                            values.put( CustomEventType.IsAlive.name(), super.getSettings().getSchedulerId());
+                            publishCustomEvent(CUSTOM_EVENT_KEY, values);
                             break;
                         case "AddEvent":
                             LOGGER.debug("VariablesCustomEvent event to be executed: " + customEvent.getKey() + " --> " + customEvent.getEvent());
