@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
@@ -132,29 +130,36 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         LOGGER.debug("Setting next period for job: " + this.getJob() + " expression: " + this.getExpression());
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        LocalDate today = LocalDate.now(ZoneId.of(Constants.settings.getTimezone()));
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
+        boolean update = false;
 
         for (LocalDate d : this.listOfDates) {
 
-            if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
+            if (d.isBefore(last) && (d.isAfter(today) || d.equals(today))) {
                 last = d;
                 next = d;
             }
         }
+        if (this.itemInCondition.getNextPeriod() != null) {
+            update = true;
+        }
         this.itemInCondition.setNextPeriod(null);
         if (next != null) {// Empty if today.
             if (next.isAfter(today)) {
-
+                LOGGER.debug("next: " + next + " today: " + today);
                 Instant nextPeriod = last.atStartOfDay(ZoneId.of(Constants.settings.getTimezone())).toInstant();
                 Date d = new Date(nextPeriod.toEpochMilli());
                 LOGGER.debug("Setting next period:" + nextPeriod.toString());
                 this.itemInCondition.setNextPeriod(d);
+                update = true;
             } else {
+                this.itemInCondition.setNextPeriod(null);
                 LOGGER.debug(next.toString() + " is not after " + today.toString());
             }
-
+        }
+        if (update) {
             try {
                 sosHibernateSession.beginTransaction();
                 if (this.itemInCondition.getCreated() == null) {
@@ -234,7 +239,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
             return true;
         }
         for (LocalDate d : listOfDates) {
-            if (HistoryHelper.isToday(d)) {
+            if (d.equals(Constants.getToday())) {
                 return true;
             }
         }
@@ -264,6 +269,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public void removeConsumed(UUID contextId) {
         consumedForContext.remove(contextId);
+        listOfRunningJobs.remove(contextId);
     }
 
     public UUID getEvaluatedContextId() {
@@ -296,6 +302,12 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
     public boolean isHaveOnlyInstanceEvents() {
         return haveOnlyInstanceEvents;
+    }
+
+    public String asString() {
+        String s = "Jobstream: " + this.getJobStream() + " Job: " + this.normalizedJob + " Expression: " + this.getExpression() + "Consumed: "
+                + this.consumedForContext.size();
+        return s;
     }
 
 }

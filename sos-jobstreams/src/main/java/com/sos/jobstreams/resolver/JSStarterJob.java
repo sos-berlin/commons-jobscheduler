@@ -67,7 +67,7 @@ public class JSStarterJob {
             return true;
         }
         for (LocalDate d : listOfDates) {
-            if (HistoryHelper.isToday(d)) {
+            if (d.equals(Constants.getToday())) {
                 return true;
             }
         }
@@ -77,14 +77,15 @@ public class JSStarterJob {
 
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         LOGGER.debug("Setting next period for job: " + this.dbItemJobStreamStarterJob.getJob());
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        LocalDate today = Constants.getToday();
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
 
         if (this.listOfDates != null) {
             for (LocalDate d : this.listOfDates) {
 
-                if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
+                if (d.isBefore(last) && (d.isAfter(today) || (d.equals(Constants.getToday())))) {
+ 
                     last = d;
                     next = d;
                 }

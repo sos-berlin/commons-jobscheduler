@@ -119,6 +119,7 @@ public class JSJobStreamStarter {
                 LOGGER.trace("check start:" + new Date(start));
                 if (start > lastStart) {
                     Date nextStart = new Date(start);
+                 
                     LOGGER.trace("---> next start:" + nextStart);
                     return nextStart;
                 }

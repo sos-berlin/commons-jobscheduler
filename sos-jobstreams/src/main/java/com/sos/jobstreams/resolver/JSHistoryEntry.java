@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jobstreams.classes.JobStarterOptions;
 
-import sos.util.SOSString;
-
 public class JSHistoryEntry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSHistoryEntry.class);
@@ -131,7 +129,7 @@ public class JSHistoryEntry {
 
                 for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
                     LOGGER.debug("- InCondition consumed : " + jsInCondition.isConsumed(this.getContextId()));
-                    LOGGER.debug(SOSString.toString(jsInCondition));
+                    LOGGER.debug(jsInCondition.asString());
                     if (jsInCondition.isStartToday() && !jsInCondition.isConsumed(this.getContextId())) {
                         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
                         LOGGER.debug("- InCondition expression : " + jsInCondition.getExpression());
