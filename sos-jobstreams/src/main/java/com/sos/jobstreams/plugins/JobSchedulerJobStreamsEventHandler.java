@@ -914,6 +914,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             boolean eventCreated = false;
             do {
                 changeSession();
+                eventCreated = false;
 
                 List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession, forInstance);
                 if (listOfValidatedInconditions != null) {

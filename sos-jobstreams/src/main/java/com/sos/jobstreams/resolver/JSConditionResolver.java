@@ -130,11 +130,13 @@ public class JSConditionResolver {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
 
         JSJobStreams _jsJobStreams = new JSJobStreams();
-        for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
-            _jsJobStreams.listOfJobStreamNames.put(entry.getKey(), entry.getValue());
-        }
-        for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
-            _jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+        if (jsJobStreams != null && jsJobStreams.listOfJobStreamNames != null) {
+            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
+                _jsJobStreams.listOfJobStreamNames.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
+                _jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+            }
         }
 
         jsJobInConditions = null;
@@ -152,20 +154,22 @@ public class JSConditionResolver {
 
         this.init(sosHibernateSession, complete);
 
-        for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
-            JSJobStream jsJobStream = jsJobStreams.listOfJobStreamNames.get(entry.getKey());
-            jsJobStream.getListOfJobStreamStarter().clear();
-            JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey());
-            for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
-                jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+        if (jsJobStreams != null &&_jsJobStreams.listOfJobStreamNames != null) {
+            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
+                JSJobStream jsJobStream = jsJobStreams.listOfJobStreamNames.get(entry.getKey());
+                jsJobStream.getListOfJobStreamStarter().clear();
+                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey());
+                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
+                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+                }
             }
-        }
-        for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
-            JSJobStream jsJobStream = jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
-            jsJobStream.getListOfJobStreamStarter().clear();
-            JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreams.get(entry.getKey());
-            for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
-                jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
+                JSJobStream jsJobStream = jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+                jsJobStream.getListOfJobStreamStarter().clear();
+                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreams.get(entry.getKey());
+                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
+                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+                }
             }
         }
     }
@@ -710,7 +714,7 @@ public class JSConditionResolver {
     public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession, UUID instance) throws NumberFormatException, Exception {
 
         LOGGER.debug("JSConditionResolver::resolveInConditions");
- 
+
         if (instance != null) {
             LOGGER.debug("Resolving contextId " + instance.toString());
         }
