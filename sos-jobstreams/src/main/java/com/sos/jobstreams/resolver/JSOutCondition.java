@@ -106,7 +106,7 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
                 dbChange = b || dbChange;
                 itemEvent.setSession(Constants.getSession());
                 executStoreOutConditionEvents(sosHibernateSession,outConditionEvent,itemEvent,historyEntry,jsEvents,jsNewEvents,jsRemoveEvents);
-
+                dbChange = b || dbChange;
             }
         }
         return dbChange;
