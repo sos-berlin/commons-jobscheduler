@@ -117,25 +117,26 @@ public class JobStarter {
         return parameters;
     }
 
-    private List<NameValuePair> getDefaultEnvVars(JobStarterOptions inCondition) {
+    private List<NameValuePair> getDefaultEnvVars(JobStarterOptions jobStarterOptions) {
 
         EnvVarCreator envVarCreator = new EnvVarCreator();
 
         List<NameValuePair> envVars = new ArrayList<NameValuePair>();
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBSTREAM"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_TIME"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_CENTURY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DAY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YYYY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH_NAME"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YYYY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_FOLDER"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBNAME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_INSTANCE_ID"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_JOBSTREAM"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_TIME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_CENTURY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DAY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR_YY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR_YYYY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_MONTH"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_MONTH_NAME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE_YY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE_YYYY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_FOLDER"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_JOBNAME"));
 
         return envVars;
     }

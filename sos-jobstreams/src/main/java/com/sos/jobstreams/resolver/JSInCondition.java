@@ -222,7 +222,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            startJobReturn = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this, listOfParameters);
+            startJobReturn = inConditionCommand.executeCommand(contextId, schedulerXmlCommandExecutor, this, listOfParameters);
         }
 
         LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);

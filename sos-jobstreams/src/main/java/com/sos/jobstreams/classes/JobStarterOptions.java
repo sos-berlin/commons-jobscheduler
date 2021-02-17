@@ -3,6 +3,7 @@ package com.sos.jobstreams.classes;
 import java.util.Map;
 
 public class JobStarterOptions {
+    private String instanceId;
     private String normalizedJob;
     private String jobStream;
     private String job;
@@ -73,5 +74,15 @@ public class JobStarterOptions {
     
     public void setSkipOutCondition(boolean skipOutCondition) {
         this.skipOutCondition = skipOutCondition;
+    }
+
+    
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 }

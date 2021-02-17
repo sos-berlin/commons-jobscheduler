@@ -580,9 +580,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private void startJobs(JSJobStreamStarter jobStreamStarter) throws Exception {
 
         changeSession();
-        List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(getXmlCommandExecutor());
 
         UUID contextId = UUID.randomUUID();
+        List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(contextId,getXmlCommandExecutor());
+
 
         SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:startJobs");
         sosHibernateSession.beginTransaction();
@@ -1178,7 +1179,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
                                         getConditionResolver().getListOfParameters().get(contextId).put(param.getKey(), param.getValue());
                                     }
-                                    StartJobReturn startJobReturn = jsInConditionCommand.startJob(this.getXmlCommandExecutor(), inCondition,
+                                    StartJobReturn startJobReturn = jsInConditionCommand.startJob(contextId,this.getXmlCommandExecutor(), inCondition,
                                             getConditionResolver().getListOfParameters().get(contextId));
                                     sosHibernateSession.beginTransaction();
                                     getConditionResolver().handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
 
@@ -147,12 +148,13 @@ public class JSJobStreamStarter {
         }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
-
-    public List<JobStarterOptions> startJobs(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws Exception {
+ 
+    public List<JobStarterOptions> startJobs(UUID contextId, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws Exception {
         JobStarter jobStarter = new JobStarter();
         List<JobStarterOptions> listOfHandledJobs = new ArrayList<JobStarterOptions>();
         for (JSStarterJob jsStarterJob : listOfJobs) {
             JobStarterOptions jobStartOptions = new JobStarterOptions();
+            jobStartOptions.setInstanceId(contextId.toString());
             jobStartOptions.setJob(jsStarterJob.getDbItemJobStreamStarterJob().getJob());
             jobStartOptions.setJobStream(this.jobStreamName);
             jobStartOptions.setListOfParameters(listOfActualParameters);

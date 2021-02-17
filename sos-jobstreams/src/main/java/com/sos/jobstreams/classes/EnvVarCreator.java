@@ -20,64 +20,57 @@ class EnvVarCreator {
         Date today = new Date();
         calendar.setTime(today);
 
+        envVar.setName(functionName);
+
         switch (functionName) {
-        case "JS_JOBSTREAM":
-            envVar.setName(envVarName);
+        case "SCHEDULER_JOBSTREAM_INSTANCE_ID":
+            envVar.setValue(jobStarterOptions.getInstanceId());
+            return envVar;
+        case "SCHEDULER_JOBSTREAM_JOBSTREAM":
             envVar.setValue(jobStarterOptions.getJobStream());
             return envVar;
-        case "JS_TIME":
+        case "SCHEDULER_JOBSTREAM_TIME":
             outFormat = new SimpleDateFormat("HH:mm:ss");
-            envVar.setName("JS_TIME");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
 
-        case "JS_CENTURY":
+        case "SCHEDULER_JOBSTREAM_CENTURY":
             outFormat = new SimpleDateFormat("yyyy");
-            envVar.setName("JS_CENTURY");
             envVar.setValue(outFormat.format(calendar.getTime()).substring(0,2));
             return envVar;
-        case "JS_DAY":
+        case "SCHEDULER_JOBSTREAM_DAY":
             outFormat = new SimpleDateFormat("dd");
-            envVar.setName("JS_DAY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_YEAR":
-        case "JS_YEAR_YYYY":
+        case "SCHEDULER_JOBSTREAM_YEAR":
+        case "SCHEDULER_JOBSTREAM_YEAR_YYYY":
             outFormat = new SimpleDateFormat("yyyy");
-            envVar.setName("JS_YEAR_YYYY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_YEAR_YY":
+        case "SCHEDULER_JOBSTREAM_YEAR_YY":
             outFormat = new SimpleDateFormat("yy");
-            envVar.setName("JS_YEAR_YY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_MONTH":
+        case "SCHEDULER_JOBSTREAM_MONTH":
             outFormat = new SimpleDateFormat("MM");
-            envVar.setName("JS_MONTH");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_MONTH_NAME":
-            envVar.setName("JS_MONTH_NAME");
+        case "SCHEDULER_JOBSTREAM_MONTH_NAME":
             envVar.setValue(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.UK));
             return envVar;
-        case "JS_DATE_YY":
+        case "SCHEDULER_JOBSTREAM_DATE_YY":
             outFormat = new SimpleDateFormat("yyMMdd");
-            envVar.setName("JS_DATE_YY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_DATE":
-        case "JS_DATE_YYYY":
+        case "SCHEDULER_JOBSTREAM_DATE":
+        case "SCHEDULER_JOBSTREAM_DATE_YYYY":
             outFormat = new SimpleDateFormat("yyyyMMdd");
-            envVar.setName("JS_DATE_YYYY");
             envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
-        case "JS_FOLDER":
-            envVar.setName(envVarName);
+        case "SCHEDULER_JOBSTREAM_FOLDER":
             envVar.setValue(Globals.getParent(jobStarterOptions.getJob()));
             return envVar;
-        case "JS_JOBNAME":
-            envVar.setName(envVarName);
+        case "SCHEDULER_JOBSTREAM_JOBNAME":
             envVar.setValue(jobStarterOptions.getJob());
             return envVar;
         default:
