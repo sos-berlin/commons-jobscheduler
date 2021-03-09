@@ -36,7 +36,7 @@ class EnvVarCreator {
 
         case "SCHEDULER_JOBSTREAM_CENTURY":
             outFormat = new SimpleDateFormat("yyyy");
-            envVar.setValue(outFormat.format(calendar.getTime()).substring(0,2));
+            envVar.setValue(outFormat.format(calendar.getTime()));
             return envVar;
         case "SCHEDULER_JOBSTREAM_DAY":
             outFormat = new SimpleDateFormat("dd");
@@ -49,7 +49,7 @@ class EnvVarCreator {
             return envVar;
         case "SCHEDULER_JOBSTREAM_YEAR_YY":
             outFormat = new SimpleDateFormat("yy");
-            envVar.setValue(outFormat.format(calendar.getTime()));
+            envVar.setValue(outFormat.format(calendar.getTime()).substring(2,2));
             return envVar;
         case "SCHEDULER_JOBSTREAM_MONTH":
             outFormat = new SimpleDateFormat("MM");
