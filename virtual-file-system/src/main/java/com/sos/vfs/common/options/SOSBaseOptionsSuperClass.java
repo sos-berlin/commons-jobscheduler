@@ -699,4 +699,8 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionString connection_error_retry_interval = new SOSOptionString(this, CLASS_NAME + ".connection_error_retry_interval",
             "The connection_error_retry_interval", "0s", "0s", false);
 
+    @JSOptionDefinition(name = "return-values", description = "environment variable transfer history", key = "return-values", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString return_values = new SOSOptionString(this, CLASS_NAME + ".return-values", "environment variable transfer history", "", "",
+            false);
+
 }
