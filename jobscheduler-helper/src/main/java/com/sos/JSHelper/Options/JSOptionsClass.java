@@ -399,7 +399,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
                 if (name != null) {
                     value = arg;
                     isOption = true;
-                    settings.put(name, value);
+                    settings.put(name, stripQuotes(value));
                     if ("password".equalsIgnoreCase(name) || "proxy_password".equalsIgnoreCase(name)) {
                         signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", method, name, "*****"));
                     } else {
@@ -683,10 +683,10 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
                 } catch (final ClassCastException e) {
                     //
-                } catch (final Exception e) {
-                    throw new RuntimeException(e);
                 }
             }
+        } catch (final RuntimeException x) {
+            throw x;
         } catch (final Exception x) {
             throw new RuntimeException(x);
         } finally {
