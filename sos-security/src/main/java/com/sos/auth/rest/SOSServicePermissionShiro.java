@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.sos.auth.client.ClientCertificateHandler;
 import com.sos.auth.rest.permission.model.SOSPermissionCommandsMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
@@ -293,6 +294,20 @@ public class SOSServicePermissionShiro {
             SOSHibernateException {
         MDC.put("context", ThreadCtx);
         Globals.loginClientId = loginClientId;
+        if (request != null) {
+            String clientCertCN = null;
+            try {
+                ClientCertificateHandler clientCertHandler = new ClientCertificateHandler(request);
+                clientCertCN = clientCertHandler.getClientCN();
+                if(clientCertCN == null) {
+                    LOGGER.info("Client Certificate CN read from Login: n/a");
+                } else {
+                    LOGGER.info("Client Certificate CN read from Login: " + clientCertCN);
+                }
+            } catch (IOException e) {
+                LOGGER.debug("No Client certificate read from HttpServletRequest.");
+            } 
+        }
         try {
             return login(request, basicAuthorization, user, pwd);
         } finally {
