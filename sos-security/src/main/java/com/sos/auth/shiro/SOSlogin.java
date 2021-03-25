@@ -2,6 +2,8 @@ package com.sos.auth.shiro;
 
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -54,11 +56,17 @@ public class SOSlogin {
 
     }
 
-    public void createSubject(String user, String pwd) {
+    public void createSubject(String user, String pwd, HttpServletRequest httpServletRequest) {
         LOGGER.debug("sosLogin.createSubject(): " + user);
 
         clearCache(user);
-        UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
+        UsernamePasswordToken token = null;
+
+        if (httpServletRequest != null) {
+            token = new SOSUsernameRequestToken(user, pwd, httpServletRequest);
+        } else {
+            token = new UsernamePasswordToken(user, pwd);
+        }
         if (currentUser != null) {
             try {
                 LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
@@ -83,7 +91,7 @@ public class SOSlogin {
         }
     }
 
-    public void login(String user, String pwd) {
+    public void login(String user, String pwd, HttpServletRequest httpServletRequest) {
         if (user == null) {
             currentUser = null;
         } else {
@@ -91,7 +99,7 @@ public class SOSlogin {
                 logout();
             }
             this.init();
-            createSubject(user, pwd);
+            createSubject(user, pwd, httpServletRequest);
         }
     }
 

@@ -572,7 +572,7 @@ public class SOSServicePermissionShiro {
         }
         SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(currentUser);
         sosLogin = new SOSlogin(Globals.getShiroIniSecurityManagerFactory());
-        sosLogin.login(currentUser.getUsername(), currentUser.getPassword());
+        sosLogin.login(currentUser.getUsername(), currentUser.getPassword(),currentUser.getHttpServletRequest());
 
         currentUser.setCurrentSubject(sosLogin.getCurrentUser());
 
