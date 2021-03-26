@@ -51,10 +51,14 @@ public class SOSX509AuthorizingRealm extends AuthorizingRealm {
                 clientCertCN = clientCertHandler.getClientCN();
                 if (clientCertCN != null) {
                     LOGGER.info("Login with certificate");
-                    success = clientCertCN.equals(myAuthToken.getUsername());
+                    success = (myAuthToken.getUsername()==null) || myAuthToken.getUsername().isEmpty() || clientCertCN.equals(myAuthToken.getUsername());
                 }else {
                     LOGGER.debug("clientCertCN could not read");
                 }
+                if (success && ((myAuthToken.getUsername()==null) || myAuthToken.getUsername().isEmpty())){
+                    myAuthToken.setUsername(clientCertCN);
+                }
+                
             } catch (IOException e) {
                 LOGGER.debug("AuthenticationToken does not have a client certificate.");
             }
