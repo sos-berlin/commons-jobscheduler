@@ -404,9 +404,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.debug("Check jobstreams ...");
                 resolveInConditions(sosHibernateSession);
             } catch (SOSHibernateInvalidSessionException e) {
-                //ignore.
+                // ignore.
             } catch (Exception e) {
-                 LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask",e);
+                LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask", e);
             } finally {
                 reinitSemaphore.release();
                 if (sosHibernateSession != null) {
@@ -486,7 +486,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                 if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
                     nextStarter.initActualParameters();
-                    startJobs(nextStarter);
+                    UUID contextId = UUID.randomUUID();
+                    startJobs(nextStarter, contextId);
                 } else {
                     LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter().getTitle()
                             + " is not active. Not started");
@@ -577,13 +578,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
-    private void startJobs(JSJobStreamStarter jobStreamStarter) throws Exception {
+    private void startJobs(JSJobStreamStarter jobStreamStarter, UUID contextId) throws Exception {
 
         changeSession();
 
-        UUID contextId = UUID.randomUUID();
-        List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(contextId,getXmlCommandExecutor());
-
+        List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(contextId, getXmlCommandExecutor());
 
         SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:startJobs");
         sosHibernateSession.beginTransaction();
@@ -1004,7 +1003,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 java.lang.Thread.sleep(3 * 1000);
                 refreshStarters();
 
-
             } catch (SOSHibernateException e) {
                 this.listOfConditionResolver = null;
                 getNotifier().smartNotifyOnError(getClass(), e);
@@ -1022,7 +1020,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     java.lang.Thread.sleep(1000);
                     resetNextJobStartTimer();
                 }
-                
+
             }
         }
 
@@ -1132,7 +1130,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                 for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
                                     jsJobStreamStarter.addActualParameter(param.getKey(), param.getValue());
                                 }
-                                startJobs(jsJobStreamStarter);
+                                UUID contextId;
+                                String session = customEvent.getSession();
+                                if ((session != null) && !session.isEmpty()) {
+                                    contextId = UUID.fromString(session);
+                                } else {
+                                    contextId = UUID.randomUUID();
+                                }
+                                startJobs(jsJobStreamStarter, contextId);
                                 resolveInConditions = true;
 
                             } else {
@@ -1179,8 +1184,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                     for (Entry<String, String> param : customEvent.getParameters().entrySet()) {
                                         getConditionResolver().getListOfParameters().get(contextId).put(param.getKey(), param.getValue());
                                     }
-                                    StartJobReturn startJobReturn = jsInConditionCommand.startJob(contextId,this.getXmlCommandExecutor(), inCondition,
-                                            getConditionResolver().getListOfParameters().get(contextId));
+                                    StartJobReturn startJobReturn = jsInConditionCommand.startJob(contextId, this.getXmlCommandExecutor(),
+                                            inCondition, getConditionResolver().getListOfParameters().get(contextId));
                                     sosHibernateSession.beginTransaction();
                                     getConditionResolver().handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
                                     sosHibernateSession.commit();

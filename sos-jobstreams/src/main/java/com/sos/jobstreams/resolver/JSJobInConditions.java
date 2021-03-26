@@ -41,7 +41,8 @@ public class JSJobInConditions {
         return this.listOfJobInConditions.get(jobConditionKey);
     }
 
-    public void setListOfJobInConditions(SOSHibernateSession sosHibernateSession, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages, List<DBItemInConditionWithCommand> listOfInConditions) {
+    public void setListOfJobInConditions(SOSHibernateSession sosHibernateSession, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages,
+            List<DBItemInConditionWithCommand> listOfInConditions) {
         for (DBItemInConditionWithCommand itemInConditionWithCommand : listOfInConditions) {
             JSInCondition jsInCondition = null;
             JSJobConditionKey jobConditionKey = new JSJobConditionKey(itemInConditionWithCommand);
@@ -59,7 +60,7 @@ public class JSJobInConditions {
             itemInConditionCommand.setCommandParam(itemInConditionWithCommand.getCommandParam());
             itemInConditionCommand.setCreated(itemInConditionWithCommand.getCommandCreated());
             itemInConditionCommand.setInConditionId(itemInConditionWithCommand.getInConditionId());
-            
+
             inConditionCommand.setItemInConditionCommand(itemInConditionCommand);
 
             DBItemInCondition itemInCondition = new DBItemInCondition();
@@ -73,10 +74,12 @@ public class JSJobInConditions {
             itemInCondition.setNextPeriod(itemInConditionWithCommand.getNextPeriod());
             itemInCondition.setSchedulerId(itemInConditionWithCommand.getJobSchedulerId());
             itemInCondition.setSkipOutCondition(itemInConditionWithCommand.getSkipOutCondition());
-             
+
             jsInCondition.addCommand(inConditionCommand);
             jsInCondition.setItemInCondition(itemInCondition);
-            jsInCondition.setListOfDates(sosHibernateSession, listOfCalendarUsages);
+            if (listOfCalendarUsages != null) {
+                jsInCondition.setListOfDates(sosHibernateSession, listOfCalendarUsages);
+            }
             if (itemInConditionWithCommand.getConsumedForContext() != null) {
                 for (String context : itemInConditionWithCommand.getConsumedForContext()) {
                     try {
