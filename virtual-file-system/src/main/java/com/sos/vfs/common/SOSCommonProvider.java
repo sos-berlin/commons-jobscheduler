@@ -18,6 +18,8 @@ import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
+import sos.util.SOSString;
+
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements ISOSProvider {
 
@@ -152,6 +154,21 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     public static String normalizePath(String path) {
         return path.replace('\\', '/');
+    }
+
+    public static String normalizePath(String dir, String subPath) {
+        subPath = subPath == null ? "" : normalizePath(subPath);
+        if (SOSString.isEmpty(dir)) {
+            return subPath;
+        }
+        dir = normalizePath(dir);
+        if (dir.endsWith("/")) {
+            if (subPath.startsWith("/")) {
+                return dir.substring(0, dir.length() - 1) + subPath;
+            }
+            return dir + subPath;
+        }
+        return dir + subPath;
     }
 
     @Override

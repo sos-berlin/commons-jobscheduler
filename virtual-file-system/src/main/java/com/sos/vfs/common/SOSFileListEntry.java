@@ -921,7 +921,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     }
 
     public String getTargetFileNameAndPath() {
-        return parent.getBaseOptions().targetDir.getValue() + targetFileName;
+        return SOSCommonProvider.normalizePath(parent.getBaseOptions().targetDir.getValue(), targetFileName);
     }
 
     public void setTransactional() {
