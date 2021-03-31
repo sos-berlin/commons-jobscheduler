@@ -1,6 +1,7 @@
 package com.sos.auth.shiro;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -71,6 +72,16 @@ public class SOSlogin {
             try {
                 LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
                 currentUser.login(token);
+
+                SimplePrincipalCollection spc = (SimplePrincipalCollection) currentUser.getPrincipals();
+                Set<String> realmNames = spc.getRealmNames();
+                for (String s : realmNames) {
+                    if (s.equals(SOSX509AuthorizingRealm.getRealmIdentifier())) {
+                        LOGGER.debug("SessionTimeout for user " + token.getUsername() + " set to endless");
+                        currentUser.getSession().setTimeout(-1);
+                    }
+
+                }
             } catch (UnknownAccountException uae) {
                 setMsg("There is no user with username/password combination of " + token.getPrincipal());
                 currentUser = null;

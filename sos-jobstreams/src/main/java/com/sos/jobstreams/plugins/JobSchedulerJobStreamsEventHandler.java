@@ -71,6 +71,7 @@ import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.jobstreams.resolver.JSInConditionCommand;
 import com.sos.jobstreams.resolver.JSJobStream;
 import com.sos.jobstreams.resolver.JSJobStreamStarter;
+import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -194,9 +195,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
         } finally {
             sosHibernateSession.commit();
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
         }
 
     }
@@ -317,9 +316,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             j = null;
         } finally {
             eventHandlerSemaphore.release();
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
         }
         return j;
     }
@@ -409,9 +406,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask", e);
             } finally {
                 reinitSemaphore.release();
-                if (sosHibernateSession != null) {
-                    sosHibernateSession.close();
-                }
+                Globals.disconnect(sosHibernateSession);
+
             }
         }
     }
@@ -538,9 +534,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             } finally {
                 synchronizeNextStart.release();
-                if (sosHibernateSession != null) {
-                    sosHibernateSession.close();
-                }
+                Globals.disconnect(sosHibernateSession);
+
             }
         }
 
@@ -552,14 +547,16 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (InterruptedException e) {
             LOGGER.info("reInitComplete interrupted");
         }
-        SOSHibernateSession sosHibernateSession;
+        SOSHibernateSession sosHibernateSession=null;
         try {
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reinitComplet");
 
             getConditionResolver().reInitComplete(sosHibernateSession);
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
         } finally {
+            Globals.disconnect(sosHibernateSession);
             synchronizeNextStart.release();
+            
         }
     }
 
@@ -569,11 +566,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (InterruptedException e) {
             LOGGER.info("reConsumedInConditions interrupted");
         }
-        SOSHibernateSession sosHibernateSession;
+        SOSHibernateSession sosHibernateSession=null;
         try {
             sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reConsumedInConditions");
             getConditionResolver().reInitConsumedInConditions(sosHibernateSession);
         } finally {
+            Globals.disconnect(sosHibernateSession);
             synchronizeNextStart.release();
         }
     }
@@ -584,11 +582,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(contextId, getXmlCommandExecutor());
 
-        SOSHibernateSession sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:startJobs");
-        sosHibernateSession.beginTransaction();
         resolveInConditionsSemaphore.acquire();
+        SOSHibernateSession sosHibernateSession = null;
 
         try {
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:startJobs");
+            sosHibernateSession.beginTransaction();
 
             DBItemJobStreamHistory dbItemJobStreamHistory = new DBItemJobStreamHistory();
             dbItemJobStreamHistory.setSchedulerId(super.getSettings().getSchedulerId());
@@ -644,9 +643,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.error(e.getMessage(), e);
         } finally {
             resolveInConditionsSemaphore.release();
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
+
         }
     }
 
@@ -789,9 +787,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             getNotifier().notifyOnError(method, e);
             LOGGER.error(String.format("%s: %s", method, e.toString()), e);
         } finally {
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
         }
     }
 
@@ -977,9 +973,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         } finally {
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
             synchronizeNextStart.release();
 
         }
@@ -1342,9 +1336,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } finally {
             synchronizeNextStart.release();
             eventHandlerSemaphore.release();
-            if (sosHibernateSession != null) {
-                sosHibernateSession.close();
-            }
+            Globals.disconnect(sosHibernateSession);
+
         }
     }
 
