@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import sos.net.SOSMailOrder;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
-import sos.textprocessor.SOSDocumentFactoryTextProcessor;
+//import sos.textprocessor.SOSDocumentFactoryTextProcessor;
 import sos.textprocessor.SOSPlainTextProcessor;
 import sos.textprocessor.SOSTextProcessor;
 import sos.util.SOSDate;
@@ -30,7 +30,7 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
     protected String attachmentCharset = "iso-8859-1";
     protected SOSTextProcessor mailTextProcessor = null;
     protected SOSPlainTextProcessor mailPlainTextProcessor = null;
-    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
+//    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
     protected boolean hasDatabase = true;
 
     public boolean spooler_init() {
