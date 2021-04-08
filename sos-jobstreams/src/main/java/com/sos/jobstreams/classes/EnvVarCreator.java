@@ -49,7 +49,7 @@ class EnvVarCreator {
             return envVar;
         case "SCHEDULER_JOBSTREAM_YEAR_YY":
             outFormat = new SimpleDateFormat("yy");
-            envVar.setValue(outFormat.format(calendar.getTime()).substring(2,2));
+            envVar.setValue(outFormat.format(calendar.getTime()).substring(0,2));
             return envVar;
         case "SCHEDULER_JOBSTREAM_MONTH":
             outFormat = new SimpleDateFormat("MM");
