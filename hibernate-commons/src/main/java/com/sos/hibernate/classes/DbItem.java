@@ -32,7 +32,6 @@ public class DbItem {
         return this.dateTimeZone4Getters;
     }
 
-
     private boolean isToday(Date d) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return formatter.format(d).equals(formatter.format(new Date()));
@@ -112,8 +111,7 @@ public class DbItem {
             return seconds;
         }
     }
- 
-    
+
     @Transient
     public String getValueOrBlank(String c) {
         if (c == null) {
@@ -122,10 +120,18 @@ public class DbItem {
             return c;
         }
     }
-    
+
     @Transient
     public String normalizePath(String s) {
-        return ("/"+s).replaceAll("//+", "/");
+        return ("/" + s).replaceAll("//+", "/");
+    }
+
+    @Transient
+    public static String normalizeValue(String val, int maxLen) {
+        if (val != null && val.length() > maxLen) {
+            val = val.substring(0, maxLen);
+        }
+        return val;
     }
 
 }
