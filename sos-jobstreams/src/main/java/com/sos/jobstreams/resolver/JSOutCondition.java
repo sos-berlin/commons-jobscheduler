@@ -11,6 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
+import com.sos.jitl.jobstreams.classes.JSEventKey;
 import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
 import com.sos.jitl.jobstreams.db.DBItemOutCondition;
@@ -121,7 +122,9 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
 
+            LOGGER.trace("Check existing of event:");
             boolean eventExist = (jsEvents.getEvent(event.getKey()) != null);
+            LOGGER.trace("JobSchedulerId:" + event.getKey().getSchedulerId() + " jobstream:" + event.getKey().getJobStream() + " session:" + event.getKey().getSession() + " event:" + event.getKey().getEvent() + " --> " + eventExist );
 
             if (outConditionEvent.isCreateCommand()) {
                 if (!eventExist) {

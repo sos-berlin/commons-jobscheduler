@@ -98,13 +98,7 @@ public class JSEvents {
     }
 
     public void removeEvent(JSEvent event) {
-        JSEventKey jsEventKey = new JSEventKey();
-        jsEventKey.setEvent(event.getEvent());
-        jsEventKey.setJobStream(event.getJobStream());
-        jsEventKey.setSession(event.getSession());
-        jsEventKey.setSchedulerId(event.getSchedulerId());
-        jsEventKey.setGlobalEvent(event.isGlobalEvent());
-        this.removeEvent(jsEventKey);
+        this.removeEvent(event.getKey());
     }
 
     public void newList() {

@@ -780,7 +780,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("Session: " + this.session);
 
             resolveInConditions(sosHibernateSession);
-
+                          
             start(observedEventTypes);
         } catch (Exception e) {
             this.listOfConditionResolver = null;
@@ -1276,7 +1276,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             filterJobStreamHistory.addContextId(customEvent.getSession());
                             List<DBItemJobStreamHistory> lHistoryDeleted = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
                             if (lHistoryDeleted.size() <= 0) {
-                                LOGGER.warn("Could not add Event " + customEvent.getEvent() + " as session " + customEvent.getSession()
+                                LOGGER.warn("Could not remove Event " + customEvent.getEvent() + " as session " + customEvent.getSession()
                                         + " has not been found");
                             } else {
                                 JSEvent event = new JSEvent();
