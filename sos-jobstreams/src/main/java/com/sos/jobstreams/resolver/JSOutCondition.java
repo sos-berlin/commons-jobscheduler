@@ -121,8 +121,11 @@ public class JSOutCondition implements IJSJobConditionKey, IJSCondition {
             event.setItemEvent(itemEvent);
             event.setSchedulerId(jobSchedulerId);
 
+            LOGGER.trace("Check existing of event:");
             boolean eventExist = (jsEvents.getEvent(event.getKey()) != null);
+            LOGGER.trace("JobSchedulerId:" + event.getKey().getSchedulerId() + " jobstream:" + event.getKey().getJobStream() + " session:" + event.getKey().getSession() + " event:" + event.getKey().getEvent() + " --> " + eventExist );
 
+         
             if (outConditionEvent.isCreateCommand()) {
                 if (!eventExist) {
                     LOGGER.trace("---> Add event: " + event.getSession() + " " + event.getEvent());

@@ -70,7 +70,7 @@ public class JSEvents {
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
         JSEvent returnEvent;
-        if (jsEventKey.getSession() == null){
+        if ((jsEventKey.getSession() == null) || (jsEventKey.getEvent() == null)){
             return null;
         }
         if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
@@ -79,6 +79,8 @@ public class JSEvents {
             LOGGER.debug("Event direct return: " + returnEvent);
             return returnEvent;
         } else {
+        	 
+        	 
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
                     .getEvent()) && ("*".equals(jsEventKey.getSession()) || jsEventKey.getSession().equals(jsEvent.getKey().getSession()))
                     && (jsEventKey.getJobStream().isEmpty() || jsEventKey.getJobStream().equals(jsEvent.getValue().getJobStream())) && (jsEventKey
@@ -98,14 +100,9 @@ public class JSEvents {
     }
 
     public void removeEvent(JSEvent event) {
-        JSEventKey jsEventKey = new JSEventKey();
-        jsEventKey.setEvent(event.getEvent());
-        jsEventKey.setJobStream(event.getJobStream());
-        jsEventKey.setSession(event.getSession());
-        jsEventKey.setSchedulerId(event.getSchedulerId());
-        jsEventKey.setGlobalEvent(event.isGlobalEvent());
-        this.removeEvent(jsEventKey);
+        this.removeEvent(event.getKey());
     }
+
 
     public void newList() {
         this.listOfEvents = new HashMap<JSEventKey, JSEvent>();
