@@ -99,7 +99,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(e.toString()), e);
         }
-                
+
         return schedulerParameters;
     }
 
@@ -156,6 +156,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected HashMap<String, String> getJobOrOrderParameters(Order order) {
         try {
             HashMap<String, String> params = new HashMap<String, String>();
+            if (order==null) {
+                taskParams=null;
+            }
             params.putAll(getTaskParams(spooler_task.params()));
             if (order != null) {
                 Variable_set orderParams = order.params();
