@@ -294,8 +294,8 @@ public class SOSServicePermissionShiro {
             SOSHibernateException {
         MDC.put("context", ThreadCtx);
         Globals.loginClientId = loginClientId;
+        String clientCertCN = null;
         if (request != null) {
-            String clientCertCN = null;
             try {
                 ClientCertificateHandler clientCertHandler = new ClientCertificateHandler(request);
                 clientCertCN = clientCertHandler.getClientCN();
@@ -309,7 +309,7 @@ public class SOSServicePermissionShiro {
             } 
         }
         try {
-            return login(request, basicAuthorization, user, pwd);
+            return login(request, basicAuthorization,clientCertCN, user, pwd);
         } finally {
             MDC.remove("context");
         }
@@ -622,7 +622,7 @@ public class SOSServicePermissionShiro {
 
     }
 
-    private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) throws UnsupportedEncodingException,
+    private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String clientCertCN, String user, String pwd) throws UnsupportedEncodingException,
             JocException {
         String authorization = EMPTY_STRING;
 
@@ -646,6 +646,10 @@ public class SOSServicePermissionShiro {
             user = authorization.substring(0, idx);
             pwd = authorization.substring(idx + 1);
         }
+        
+        if (user.isEmpty() && clientCertCN != null){
+            user = clientCertCN;
+        }
 
         return new SOSShiroCurrentUser(user, pwd, authorization);
     }
@@ -658,6 +662,7 @@ public class SOSServicePermissionShiro {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
         sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.getCurrentSubject().isAuthenticated());
         sosShiroCurrentUserAnswer.setAccessToken(currentUser.getAccessToken());
+        
         sosShiroCurrentUserAnswer.setUser(currentUser.getUsername());
         sosShiroCurrentUserAnswer.setSessionTimeout(sosShiroSession.getTimeout());
         sosShiroCurrentUserAnswer.setCallerHostName(currentUser.getCallerHostName());
@@ -688,7 +693,7 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization, String user, String pwd) throws JocException,
+    private JOCDefaultResponse login(HttpServletRequest request, String basicAuthorization,String clientCertCN, String user, String pwd) throws JocException,
             SOSHibernateException {
         Globals.setServletBaseUri(uriInfo);
 
@@ -718,7 +723,7 @@ public class SOSServicePermissionShiro {
             SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
             sosShiroIniShare.provideIniFile();
 
-            currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
+            currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization,clientCertCN, user, pwd);
 
             if (currentUser == null || currentUser.getAuthorization() == null) {
                 return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
