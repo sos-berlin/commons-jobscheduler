@@ -523,19 +523,19 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
 
+                synchronizeNextStart.release();
                 resetNextJobStartTimer();
 
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.error("Timer Task Error", e);
                 try {
+                    synchronizeNextStart.release();
                     resetNextJobStartTimer();
                 } catch (SOSHibernateOpenSessionException e1) {
                 }
             } finally {
-                synchronizeNextStart.release();
                 Globals.disconnect(sosHibernateSession);
-
             }
         }
 
@@ -968,14 +968,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             refreshStarters();
 
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+            synchronizeNextStart.release();
             resetNextJobStartTimer();
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
+            synchronizeNextStart.release();
         } finally {
             Globals.disconnect(sosHibernateSession);
-            synchronizeNextStart.release();
-
         }
     }
 
