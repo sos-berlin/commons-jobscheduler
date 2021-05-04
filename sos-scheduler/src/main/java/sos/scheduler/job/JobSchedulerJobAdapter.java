@@ -28,6 +28,8 @@ import com.sos.localization.Messages;
 import sos.scheduler.misc.SpoolerProcess;
 import sos.spooler.IMonitor_impl;
 import sos.spooler.Job;
+import sos.spooler.Job_chain;
+import sos.spooler.Job_chain_node;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
 import sos.util.ParameterSubstitutor;
@@ -68,11 +70,66 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
+    private Map<String, String> getSpecialVariables() {
+
+        Map<String, String> specialVariables = new HashMap<String, String>();
+        if (spooler_task != null) {
+            setJobId(spooler_task.id());
+        }
+        if (spooler_job != null) {
+            String jobName = spooler_job.name();
+
+            setJobName(jobName);
+            setJobFolder(spooler_job.folder_path());
+            setJobTitle(spooler_job.title());
+        }
+
+        specialVariables.put("SCHEDULER_JOB_FOLDER", this.getJobFolder());
+        specialVariables.put("SCHEDULER_JOB_PATH", this.getJobFolder() + "/" + this.getJobName());
+
+        specialVariables.put("SCHEDULER_JOB_NAME", spooler_job.name());
+        specialVariables.put("SCHEDULER_JOB_TITLE", spooler_job.title());
+        specialVariables.put("SCHEDULER_TASK_ID", String.valueOf(spooler_task.id()));
+
+        specialVariables.put("SCHEDULER_ID", String.valueOf(spooler.id()));
+        if (spooler_task.order() != null) {
+            specialVariables.put("SCHEDULER_JOB_CHAIN", String.valueOf(spooler_task.order().job_chain().name()));
+            specialVariables.put("SCHEDULER_ORDER_ID", String.valueOf(spooler_task.order().id()));
+
+            Job_chain jobChain = spooler_task.order().job_chain();
+            if (jobChain != null) {
+                Job_chain_node jobChainNode = spooler_task.order().job_chain_node();
+                specialVariables.put("SCHEDULER_JOB_CHAIN_NAME", jobChain.name());
+                specialVariables.put("SCHEDULER_JOB_CHAIN_TITLE", jobChain.title());
+                specialVariables.put("SCHEDULER_JOB_CHAIN_PATH", jobChain.path());
+                specialVariables.put("SCHEDULER_ORDER_ID", spooler_task.order().id());
+                specialVariables.put("SCHEDULER_NODE_NAME", getCurrentNodeName(spooler_task.order(), false));
+                specialVariables.put("SCHEDULER_NEXT_NODE_NAME", jobChainNode.next_state());
+                specialVariables.put("SCHEDULER_NEXT_ERROR_NODE_NAME", jobChainNode.error_state());
+            }
+
+        }
+        specialVariables.put("SCHEDULER_CONFIGURATION_DIRECTORY", String.valueOf(spooler.configuration_directory()));
+        specialVariables.put("SCHEDULER_DIRECTORY", String.valueOf(spooler.directory()));
+        specialVariables.put("SCHEDULER_HOST", String.valueOf(spooler.hostname()));
+        specialVariables.put("SCHEDULER_TCP_PORT", String.valueOf(spooler.tcp_port()));
+        specialVariables.put("SCHEDULER_UDP_PORT", String.valueOf(spooler.udp_port()));
+        if (spooler.supervisor_client() != null) {
+            specialVariables.put("SCHEDULER_SUPERVISOR_HOST", String.valueOf(spooler.supervisor_client().hostname()));
+            specialVariables.put("SCHEDULER_SUPERVISOR_PORT", String.valueOf(spooler.supervisor_client().tcp_port()));
+        } else {
+            specialVariables.put("SCHEDULER_SUPERVISOR_HOST", "");
+            specialVariables.put("SCHEDULER_SUPERVISOR_PORT", "");
+        }
+        return specialVariables;
+    }
+
     protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> params) {
         schedulerParameters = new HashMap<String, String>();
         try {
             if (isNotNull(params)) {
                 schedulerParameters = params;
+
                 for (String key : schedulerParameters.keySet()) {
                     String value = schedulerParameters.get(key);
                     if (value != null) {
@@ -156,8 +213,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected HashMap<String, String> getJobOrOrderParameters(Order order) {
         try {
             HashMap<String, String> params = new HashMap<String, String>();
-            if (order==null) {
-                taskParams=null;
+            if (order == null) {
+                taskParams = null;
             }
             params.putAll(getTaskParams(spooler_task.params()));
             if (order != null) {
@@ -220,8 +277,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     private void fillParameterSubstitutor() {
         if (parameterSubstitutor == null) {
+
+            Map<String, String> variables = new HashMap<String, String>();
+            variables.putAll(schedulerParameters);
+            variables.putAll(this.getSpecialVariables());
+
             parameterSubstitutor = new ParameterSubstitutor();
-            for (Entry<String, String> entry : schedulerParameters.entrySet()) {
+            for (Entry<String, String> entry : variables.entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
                 if (value != null && !value.isEmpty()) {
