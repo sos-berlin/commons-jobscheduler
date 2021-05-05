@@ -39,7 +39,6 @@ public class SOSUserRoleDBItem extends DbItem {
         this.sosUserPermissionDBItems = sosUserPermissionDBItems;
     }
 
-    @Column(name = "[SOS_USER_ROLE`", nullable = false)
     public void setSosUserRole(String sosUserRole) {
         this.sosUserRole = sosUserRole;
     }

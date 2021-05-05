@@ -3,23 +3,21 @@ package com.sos.JSHelper.Options;
 import java.io.File;
 import java.util.HashMap;
 
-import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFolder;
 
-/** @author KB */
 public class SOSOptionFolderName extends SOSOptionFileName {
 
     private static final long serialVersionUID = 1197392401084895147L;
-    private static final HashMap<String, String> defaultProposals = new HashMap<>();
+    private static final HashMap<String, String> DEFAULT_PROPOSALS = new HashMap<>();
 
-    public SOSOptionFolderName(final String pstrFolderName) {
-        super(null, "", "description", pstrFolderName, "", false);
+    public SOSOptionFolderName(final String name) {
+        super(null, "", "description", name, "", false);
     }
 
-    public SOSOptionFolderName(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue,
-            final String pstrDefaultValue, final boolean pflgIsMandatory) {
-        super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
+    public SOSOptionFolderName(final JSOptionsClass parent, final String key, final String description, final String value, final String defaultValue,
+            final boolean isMandatory) {
+        super(parent, key, description, value, defaultValue, isMandatory);
         intOptionType = isOptionTypeFolder;
     }
 
@@ -28,76 +26,77 @@ public class SOSOptionFolderName extends SOSOptionFileName {
         if (strValue == null) {
             strValue = "";
         }
-        String strLValue = super.getValue();
-        if (isNotEmpty() && !(strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder())) {
-                strLValue = strLValue + "/";
-            }
-        return strLValue;
+        String value = super.getValue();
+        if (isNotEmpty() && !(value.endsWith("/") || value.endsWith("\\") || isDotFolder())) {
+            value = value + "/";
+        }
+        return value;
     }
 
     public boolean isDotFolder() {
-        String strT = super.getValue();
-        return ".".equals(strT) || "..".equals(strT);
+        String val = super.getValue();
+        return ".".equals(val) || "..".equals(val);
     }
 
     public File[] listFiles() {
-        File[] objFL = this.getJSFile().listFiles();
-        if (objFL == null) {
+        File[] list = this.getJSFile().listFiles();
+        if (list == null) {
             throw new JobSchedulerException(String.format("No Files found for pathname '%1$s'", strValue));
         }
-        return objFL;
+        return list;
     }
 
     public String[] getSubFolderArray() {
-        String[] strRet = null;
+        String[] result = null;
         try {
             String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
-            String strPath = "";
-            String strSlash = "";
+            String slash = "";
             int iStart = 0;
             if (path.startsWith("/")) {
-                strSlash = "/";
+                slash = "/";
                 iStart = 1;
             }
-            String[] pathArray = path.substring(iStart).split("/");
-            strRet = new String[pathArray.length];
+
+            String[] arr = path.substring(iStart).split("/");
+            result = new String[arr.length];
             int i = 0;
-            for (String strSubFolder : pathArray) {
-                strPath += strSlash + strSubFolder;
-                strSlash = "/";
-                strRet[i] = strPath;
+            StringBuilder sb = new StringBuilder();
+            for (String subFolder : arr) {
+                sb.append(slash).append(subFolder);
+                slash = "/";
+                result[i] = sb.toString();
                 i++;
             }
         } catch (Exception e) {
             //
         }
-        return strRet;
+        return result;
     }
 
     public String[] getSubFolderArrayReverse() {
-        String[] strRet = null;
+        String[] result = null;
         try {
             String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
-            String strPath = "";
-            String strSlash = "";
+            String slash = "";
             int iStart = 0;
             if (path.startsWith("/")) {
-                strSlash = "/";
+                slash = "/";
                 iStart = 1;
             }
-            String[] pathArray = path.substring(iStart).split("/");
-            strRet = new String[pathArray.length];
-            int i = pathArray.length - 1;
-            for (String strSubFolder : pathArray) {
-                strPath += strSlash + strSubFolder;
-                strSlash = "/";
-                strRet[i] = strPath;
+            String[] arr = path.substring(iStart).split("/");
+            result = new String[arr.length];
+            int i = arr.length - 1;
+            StringBuilder sb = new StringBuilder();
+            for (String subFolder : arr) {
+                sb.append(slash).append(subFolder);
+                slash = "/";
+                result[i] = sb.toString();
                 i--;
             }
         } catch (Exception e) {
             //
         }
-        return strRet;
+        return result;
     }
 
     public JSFolder getFolder() {
@@ -105,16 +104,16 @@ public class SOSOptionFolderName extends SOSOptionFileName {
     }
 
     @Override
-    public void addProposal(final String pstrProposal) {
-        if (pstrProposal != null && !pstrProposal.trim().isEmpty()) {
-            String strT = pstrProposal.trim();
-            SOSOptionFolderName.defaultProposals.put(strT, strT);
+    public void addProposal(final String proposal) {
+        if (proposal != null && !proposal.trim().isEmpty()) {
+            String p = proposal.trim();
+            SOSOptionFolderName.DEFAULT_PROPOSALS.put(p, p);
         }
     }
 
     @Override
     public String[] getAllProposals(String text) {
-        return SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
+        return SOSOptionFolderName.DEFAULT_PROPOSALS.keySet().toArray(new String[0]);
     }
 
 }

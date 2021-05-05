@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 public class JSFileTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSFileTest.class);
-    private static final String CLASSNAME = "JSFileTest";
     private static final String REC = "Eine Zeile zum Test ...";
     private static final String FOLDERNAME = "R:/nobackup/junittests/testdata/JSFileTest/";
     private String strTestFileName = FOLDERNAME + "test.txt";
@@ -273,7 +272,7 @@ public class JSFileTest {
 
     @Test
     public void testExistsAndCanWrite() {
-        JSTextFile objFile = new JSTextFile("src/test/resources/log4j.properties");
+        JSTextFile objFile = new JSTextFile("src/test/resources/log4j.xml");
         if (!objFile.exists() && objFile.getParentFile().canWrite()) {
             assertTrue("geht nicht", false);
         }

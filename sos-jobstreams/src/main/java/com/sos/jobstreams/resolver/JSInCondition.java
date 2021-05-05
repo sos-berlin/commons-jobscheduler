@@ -1,31 +1,32 @@
 package com.sos.jobstreams.resolver;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import javax.xml.bind.JAXBException;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.checkhistory.HistoryHelper;
 import com.sos.jitl.jobstreams.Constants;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
-import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jitl.jobstreams.interfaces.IJSJobConditionKey;
 import com.sos.jobstreams.classes.JobStreamCalendar;
+import com.sos.jobstreams.classes.StartJobReturn;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 import sos.util.SOSString;
@@ -35,17 +36,17 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSInCondition.class);
     private DBItemInCondition itemInCondition;
     private List<JSInConditionCommand> listOfInConditionCommands;
-    private boolean consumed;
-    private boolean jobIsRunning;
+    private Set<UUID> consumedForContext;
+    private Map<UUID, Boolean> listOfRunningJobs;
+    private boolean haveOnlyInstanceEvents = true;
     private String normalizedJob;
     private Set<LocalDate> listOfDates;
-    private boolean haveCalendars;
+    private UUID evaluatedContextId;
 
     public JSInCondition() {
         super();
-        haveCalendars = false;
-        jobIsRunning = false;
-
+        listOfRunningJobs = new HashMap<UUID, Boolean>();
+        this.consumedForContext = new HashSet<UUID>();
         this.listOfDates = new HashSet<LocalDate>();
         this.listOfInConditionCommands = new ArrayList<JSInConditionCommand>();
     }
@@ -60,6 +61,17 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     public void setItemInCondition(DBItemInCondition itemInCondition) {
         this.itemInCondition = itemInCondition;
         this.normalizedJob = normalizePath(itemInCondition.getJob());
+
+        String expressionValue = getExpression() + " ";
+        expressionValue = JSConditions.normalizeExpression(expressionValue);
+        List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
+        for (JSCondition jsCondition : listOfConditions) {
+            if (jsCondition.isGlobalEvent() || jsCondition.isNonContextEvent() || !"event".equals(jsCondition.getConditionType())) {
+                haveOnlyInstanceEvents = false;
+                break;
+            }
+        }
+
     }
 
     public Long getId() {
@@ -79,7 +91,11 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
     }
 
     public String getExpression() {
-        return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") + " ";
+        if (itemInCondition.getExpression() != null) {
+            return itemInCondition.getExpression().replaceAll("\\s*\\[", "[") + " ";
+        } else {
+            return "";
+        }
     }
 
     public String getJobStream() {
@@ -102,73 +118,85 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return listOfInConditionCommands;
     }
 
-    protected void markAsConsumed(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        this.consumed = true;
+    protected void markAsConsumed(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
+        setConsumed(contextId);
         DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
         dbItemConsumedInCondition.setCreated(new Date());
         dbItemConsumedInCondition.setInConditionId(this.getId());
-        dbItemConsumedInCondition.setSession(Constants.getSession());
-        try {
-            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-        }
+        dbItemConsumedInCondition.setSession(String.valueOf(contextId));
+        DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+        dbLayerConsumedInConditions.deleteInsert(dbItemConsumedInCondition);
     }
 
     protected void setNextPeriod(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        LocalDate today = LocalDate.now();
+        LOGGER.debug("Setting next period for job: " + this.getJob() + " expression: " + this.getExpression());
+        LocalDate today = LocalDate.now(ZoneId.of(Constants.settings.getTimezone()));
         LocalDate last = LocalDate.of(2099, Month.JANUARY, 1);
         LocalDate next = null;
+        boolean update = false;
 
         for (LocalDate d : this.listOfDates) {
 
-            if (d.isBefore(last) && (d.isAfter(today) || d.getDayOfYear() == today.getDayOfYear())) {
+            if (d.isBefore(last) && (d.isAfter(today) || d.equals(today))) {
                 last = d;
                 next = d;
             }
         }
-        
+        if (this.itemInCondition.getNextPeriod() != null) {
+            update = true;
+        }
         this.itemInCondition.setNextPeriod(null);
-        if (next != null && next.isAfter(today)) {// Empty if today.
-            this.itemInCondition.setNextPeriod(Date.from(last.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        if (next != null) {// Empty if today.
+            if (next.isAfter(today)) {
+                LOGGER.debug("next: " + next + " today: " + today);
+                Instant nextPeriod = last.atStartOfDay(ZoneId.of(Constants.settings.getTimezone())).toInstant();
+                Date d = new Date(nextPeriod.toEpochMilli());
+                LOGGER.debug("Setting next period:" + nextPeriod.toString());
+                this.itemInCondition.setNextPeriod(d);
+                update = true;
+            } else {
+                this.itemInCondition.setNextPeriod(null);
+                LOGGER.debug(next.toString() + " is not after " + today.toString());
+            }
         }
-        try {
-            sosHibernateSession.beginTransaction();
-            sosHibernateSession.update(this.itemInCondition);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
+        if (update) {
+            try {
+                sosHibernateSession.beginTransaction();
+                if (this.itemInCondition.getCreated() == null) {
+                    this.itemInCondition.setCreated(new Date());
+                }
+                sosHibernateSession.update(this.itemInCondition);
+                sosHibernateSession.commit();
+            } catch (Exception e) {
+                sosHibernateSession.rollback();
+            }
         }
-
     }
 
-    public boolean isConsumed() {
-        return consumed;
+    public boolean isConsumed(UUID contextId) {
+        LOGGER.debug("check consumed " + this.getExpression() + " is consumed for context " + contextId + " ---> " + consumedForContext.contains(
+                contextId));
+        return consumedForContext.contains(contextId);
     }
 
-    public void setConsumed(boolean consumed) {
-        this.consumed = consumed;
+    public void setConsumed(UUID contextId) {
+        LOGGER.debug(this.getExpression() + " is consumed for context " + contextId);
+        consumedForContext.add(contextId);
     }
 
-    public void setListOfDates(SOSHibernateSession sosHibernateSession, String schedulerId) {
-        FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
-        filterCalendarUsage.setPath(normalizedJob);
-        filterCalendarUsage.setSchedulerId(schedulerId);
+    public void setListOfDates(SOSHibernateSession sosHibernateSession, Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages) {
         this.listOfDates = new HashSet<LocalDate>();
 
         JobStreamCalendar jobStreamCalendar = new JobStreamCalendar();
         Set<LocalDate> l;
 
         try {
-            l = jobStreamCalendar.getListOfDates(sosHibernateSession, filterCalendarUsage);
-            if (l == null) {
-                haveCalendars = false;
-            } else {
-                haveCalendars = true;
-                this.listOfDates.addAll(l);
+            if (listOfCalendarUsages.get(normalizedJob) != null) {
+                l = jobStreamCalendar.getListOfDates(listOfCalendarUsages.get(normalizedJob));
+                if (l != null) {
+
+                    this.listOfDates.addAll(l);
+                }
             }
 
             try {
@@ -177,35 +205,41 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
                 LOGGER.error("Could not set the next period", e);
             }
         } catch (Exception e) {
-            LOGGER.error("could not read the list of dates: " + SOSString.toString(filterCalendarUsage), e);
+            LOGGER.error("could not read the list of dates: " + normalizedJob, e);
         }
 
     }
 
-    public String executeCommand(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor)
-            throws SOSHibernateException, JocException, JAXBException {
+    public StartJobReturn executeCommand(SOSHibernateSession sosHibernateSession, UUID contextId, Map<String, String> listOfParameters,
+            SchedulerXmlCommandExecutor schedulerXmlCommandExecutor) throws NumberFormatException, Exception {
         LOGGER.trace("execute commands ------>");
-        String startedJob = "";
-        if (this.isMarkExpression()) {
-            LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed");
-            this.markAsConsumed(sosHibernateSession);
+        StartJobReturn startJobReturn = new StartJobReturn();
+        startJobReturn.setStartedJob("");
+
+        String isMark = "";
+        if (!this.isMarkExpression()) {
+            isMark = " and will be executed again";
         }
 
         for (JSInConditionCommand inConditionCommand : this.getListOfInConditionCommand()) {
-            String s = inConditionCommand.executeCommand(schedulerXmlCommandExecutor, this);
-            if (!s.isEmpty()) {
-                startedJob = s;
-            }
+            startJobReturn = inConditionCommand.executeCommand(contextId, schedulerXmlCommandExecutor, this, listOfParameters);
         }
-        return startedJob;
+
+        LOGGER.trace("Expression: " + this.getExpression() + " now marked as consumed " + isMark);
+
+        if (startJobReturn.isStarted()) {
+            this.markAsConsumed(sosHibernateSession, contextId);
+        }
+
+        return startJobReturn;
     }
 
     public boolean isStartToday() {
-        if (!haveCalendars) {
+        if (listOfDates == null || listOfDates.isEmpty()) {
             return true;
         }
         for (LocalDate d : listOfDates) {
-            if (HistoryHelper.isToday(d)) {
+            if (d.equals(Constants.getToday())) {
                 return true;
             }
         }
@@ -217,16 +251,63 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
         return this.getExpression() + "::" + SOSString.toString(this);
     }
 
-    public boolean jobIsRunning() {
-        return jobIsRunning;
+    public boolean jobIsRunning(UUID contextId) {
+        Boolean b = listOfRunningJobs.get(contextId);
+        if (b == null) {
+            b = false;
+        }
+        return b;
     }
 
-    public void setJobIsRunning(boolean jobIsRunning) {
-        this.jobIsRunning = jobIsRunning;
+    public void setJobIsRunning(UUID contextId, boolean jobIsRunning) {
+        this.listOfRunningJobs.put(contextId, jobIsRunning);
     }
 
     public Date getNextPeriod() {
         return this.itemInCondition.getNextPeriod();
+    }
+
+    public void removeConsumed(UUID contextId) {
+        consumedForContext.remove(contextId);
+        listOfRunningJobs.remove(contextId);
+    }
+
+    public UUID getEvaluatedContextId() {
+        return evaluatedContextId;
+    }
+
+    public void setEvaluatedContextId(UUID evaluatedContextId) {
+        this.evaluatedContextId = evaluatedContextId;
+    }
+
+    public DBItemInCondition getItemInCondition() {
+        return itemInCondition;
+    }
+
+    public Set<UUID> getConsumedForContext() {
+        return consumedForContext;
+    }
+
+    public void setConsumedForContext(Set<UUID> consumedForContext) {
+        this.consumedForContext = consumedForContext;
+    }
+
+    public Map<UUID, Boolean> getListOfRunningJobs() {
+        return listOfRunningJobs;
+    }
+
+    public void setListOfRunningJobs(Map<UUID, Boolean> listOfRunningJobs) {
+        this.listOfRunningJobs = listOfRunningJobs;
+    }
+
+    public boolean isHaveOnlyInstanceEvents() {
+        return haveOnlyInstanceEvents;
+    }
+
+    public String asString() {
+        String s = "Jobstream: " + this.getJobStream() + " Job: " + this.normalizedJob + " Expression: " + this.getExpression() + "Consumed: "
+                + this.consumedForContext.size();
+        return s;
     }
 
 }

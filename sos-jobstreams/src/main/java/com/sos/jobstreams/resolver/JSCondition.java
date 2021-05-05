@@ -3,6 +3,9 @@ package com.sos.jobstreams.resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.jobstreams.db.FilterEvents;
+import com.sos.jobstreams.classes.EventDate;
+
 public class JSCondition {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSCondition.class);
@@ -12,13 +15,16 @@ public class JSCondition {
     private String conditionJobStream;
     private String conditionDate;
     private String conditionValue;
+    private String conditionValueShort;
     private String conditionJob;
     private String conditionJobChain;
     private String conditionQuery;
     private String eventName;
     private boolean globalEvent;
+    private boolean haveDate;
 
     public JSCondition(String condition) {
+        haveDate = false;
         conditionType = getConditionType(condition);
         conditionParam = getConditionTypeParam(condition);
         conditionJobStream = getConditionJobStream(conditionParam);
@@ -28,6 +34,7 @@ public class JSCondition {
         conditionDate = getConditionDate(conditionParam);
         eventName = getConditionEventName(conditionParam);
         conditionValue = condition;
+        conditionValueShort = condition.replaceAll("event:", "");
         globalEvent = typeIsGlobalEvent();
     }
 
@@ -55,6 +62,7 @@ public class JSCondition {
                 } catch (java.util.regex.PatternSyntaxException e) {
                     LOGGER.warn(e.getMessage());
                 }
+                haveDate = true;
                 return s.trim();
             }
         }
@@ -109,8 +117,15 @@ public class JSCondition {
 
     private String getConditionJobStream(String conditionParam) {
         String s = "";
-        if (conditionParam.indexOf(".") >= 0) {
-            s = conditionParam.substring(0, conditionParam.indexOf("."));
+        String p = "";
+        String[] conditionParts = conditionParam.split("\\[");
+        if (conditionParts.length > 1) {
+            p = conditionParts[0];
+        } else {
+            p = conditionParam;
+        }
+        if (p.indexOf(".") >= 0) {
+            s = p.substring(0, p.indexOf("."));
         }
         return s;
     }
@@ -172,4 +187,44 @@ public class JSCondition {
     public boolean isGlobalEvent() {
         return globalEvent;
     }
+
+    public boolean isHaveDate() {
+        return haveDate;
+    }
+
+    public boolean isNonContextEvent() {
+        return (this.typeIsEvent() && (this.isHaveDate() || this.isGlobalEvent() || !"".equals(this.getConditionJobStream())));
+    }
+
+    public FilterEvents getFilterEventsNonContextEvent(String jobSchedulerId) {
+        FilterEvents filterEvents = new FilterEvents();
+        filterEvents.setSchedulerId(jobSchedulerId);
+        filterEvents.setGlobalEvent(this.isGlobalEvent());
+        filterEvents.setEvent(this.eventName);
+        if (this.isHaveDate()) {
+            EventDate eventDate = new EventDate();
+            String session = eventDate.getEventDate(this.getConditionDate());
+            if (!"*".equals(session)) {
+                filterEvents.setSession(session);
+            }
+        }
+        if (!("".equals(this.getConditionJobStream()))) {
+            filterEvents.setJobStream(this.getConditionJobStream());
+        }
+        return filterEvents;
+
+    }
+
+    public String getConditionValueShort() {
+        return conditionValueShort;
+    }
+
+    public boolean haveCustomSession() {
+        return haveDate && !"today".equals(conditionDate) && !"*".equals(conditionDate) && !"yesterday".equals(conditionDate) && !"prev".equals(
+                conditionDate) && !"prevsuccessful".equalsIgnoreCase(conditionDate) && !"preverror".equalsIgnoreCase(conditionDate) && !conditionDate
+                        .contains("yesterday-") && !conditionDate.contains("yesterday+") && !conditionDate.contains("today-") && !conditionDate
+                                .contains("today+") && !(conditionDate.contains(".") && conditionDate.length() == 5);
+
+    }
+
 }

@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -20,7 +25,43 @@ public class UtcTimeHelper {
         return TimeZone.getDefault().getID();
     }
 
+    public static String convertTimeZoneToTimeZone(String dateFormat, String fromTimeZone, String toTimeZone, String fromDateTime) throws Exception {
+        LOGGER.debug("dateFormat:" + dateFormat);
+        LOGGER.debug("fromTimeZone:" + fromTimeZone);
+        LOGGER.debug("toTimeZone:" + toTimeZone);
+        LOGGER.debug("fromDateTime:" + fromDateTime);
+        if (ZoneId.SHORT_IDS.get(fromTimeZone) != null) {
+            fromTimeZone = ZoneId.SHORT_IDS.get(fromTimeZone);
+        }
+
+        if (ZoneId.SHORT_IDS.get(toTimeZone) != null) {
+            toTimeZone = ZoneId.SHORT_IDS.get(toTimeZone);
+        }
+
+        if (!ZoneId.getAvailableZoneIds().contains(toTimeZone)) {
+            throw new Exception("Wrong value for timezone:" + toTimeZone);
+        }
+        
+        if (!ZoneId.getAvailableZoneIds().contains(fromTimeZone)) {
+            throw new Exception("Wrong value for timezone:" + fromTimeZone);
+        }
+
+        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern(dateFormat);
+
+        if (dateFormat.length() > 8) {
+            LocalDateTime dateTime = LocalDateTime.parse(fromDateTime, dateTimeFormatter);
+            ZonedDateTime toDateTime = ZonedDateTime.now(ZoneId.of(fromTimeZone)).with(dateTime).withZoneSameInstant(ZoneId.of(toTimeZone));
+            return toDateTime.format(dateTimeFormatter);
+        } else {
+            LocalTime dateTime = LocalTime.parse(fromDateTime, dateTimeFormatter);
+            ZonedDateTime toDateTime = ZonedDateTime.now(ZoneId.of(fromTimeZone)).with(dateTime).withZoneSameInstant(ZoneId.of(toTimeZone));
+            return toDateTime.format(dateTimeFormatter);
+        }
+
+    }
+
     public static String convertTimeZonesToString(String dateFormat, String fromTimeZone, String toTimeZone, DateTime fromDateTime) {
+
         DateTimeZone fromZone = DateTimeZone.forID(fromTimeZone);
         DateTimeZone toZone = DateTimeZone.forID(toTimeZone);
         DateTime dateTime = new DateTime(fromDateTime);
@@ -52,7 +93,7 @@ public class UtcTimeHelper {
         }
     }
 
-    public Date getNowUtc() {
+    public static Date getNowUtc() {
         return convertTimeZonesToDate(DateTimeZone.getDefault().getID(), DateTimeZone.UTC.getID(), new DateTime());
     }
 

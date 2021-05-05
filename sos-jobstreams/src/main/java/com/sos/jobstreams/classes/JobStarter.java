@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.jobchainnodeparameter.JobchainNodeConfiguration;
 import com.sos.jitl.jobstreams.Constants;
-import com.sos.jobstreams.resolver.JSInCondition;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobsVCallable;
 import com.sos.joc.exceptions.JocException;
@@ -93,6 +92,7 @@ public class JobStarter {
             jobchainNodeConfiguration.substituteTaskParamters();
 
             for (NameValuePair entry : parameters) {
+                LOGGER.debug("substitute: " + entry.getName() + "=" + entry.getValue());
                 String paramName = entry.getName();
                 String paramValue = jobchainNodeConfiguration.getListOfTaskParameters().get(paramName);
 
@@ -117,25 +117,26 @@ public class JobStarter {
         return parameters;
     }
 
-    private List<NameValuePair> getDefaultEnvVars(JSInCondition inCondition) {
+    private List<NameValuePair> getDefaultEnvVars(JobStarterOptions jobStarterOptions) {
 
         EnvVarCreator envVarCreator = new EnvVarCreator();
 
         List<NameValuePair> envVars = new ArrayList<NameValuePair>();
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBSTREAM"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_TIME"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_CENTURY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DAY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_YEAR_YYYY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_MONTH_NAME"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_DATE_YYYY"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_FOLDER"));
-        envVars.add(envVarCreator.getEnvVar(inCondition, "JS_JOBNAME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_INSTANCE_ID"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_JOBSTREAM"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_TIME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_CENTURY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DAY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR_YY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_YEAR_YYYY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_MONTH"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_MONTH_NAME"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE_YY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_DATE_YYYY"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_FOLDER"));
+        envVars.add(envVarCreator.getEnvVar(jobStarterOptions, "SCHEDULER_JOBSTREAM_JOBNAME"));
 
         return envVars;
     }
@@ -144,10 +145,10 @@ public class JobStarter {
         return getMapOfAttributes(commandParam);
     }
 
-    public String buildJobStartXml(JSInCondition inCondition, String commandParam) throws JocException, JAXBException {
-        JobV jobV = this.getJob(inCondition.getNormalizedJob());
+    public String buildJobStartXml(JobStarterOptions jobStartOptions, String commandParam) throws JocException, JAXBException {
+        JobV jobV = this.getJob(jobStartOptions.getNormalizedJob());
         XMLBuilder xml = new XMLBuilder("start_job");
-        xml.addAttribute("job", inCondition.getNormalizedJob());
+        xml.addAttribute("job", jobStartOptions.getNormalizedJob());
 
         Map<String, String> listOfAttributes = getMapOfAttributes(commandParam);
         if (listOfAttributes.get("force") == null) {
@@ -155,18 +156,47 @@ public class JobStarter {
         }
         listOfAttributes.forEach((name, value) -> xml.addAttribute(name, value));
 
-        List<NameValuePair> envVars = getDefaultEnvVars(inCondition);
-        List<NameValuePair> params = substituteParameters(jobV.getParams(), envVars);
+        List<NameValuePair> envVars = getDefaultEnvVars(jobStartOptions);
+        List<NameValuePair>params = jobV.getParams();
+        
+        if (jobStartOptions.getListOfParameters() != null) {
+            if (params == null) {
+                params = new ArrayList<NameValuePair>();
+            }
+            for (Entry<String, String> param : jobStartOptions.getListOfParameters().entrySet()) {
+                NameValuePair nameValuePair = new NameValuePair();
+                nameValuePair.setName(param.getKey());
+                if (param.getValue() == null) {
+                    nameValuePair.setValue("");
+                }else {
+                    nameValuePair.setValue(param.getValue());
+                }
+                LOGGER.debug(nameValuePair.getName() + "=" + nameValuePair.getValue());
+
+                params.add(nameValuePair);
+            }
+        }else {
+            LOGGER.debug("no parameters in the starter");
+        }
+        
+        params = substituteParameters(params, envVars);
+        
+ 
         xml.add(getParams(params));
         xml.add(getEnv(envVars));
-        return xml.asXML();
+        String xmlString = xml.asXML();
+        xmlString =  xmlString.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+        return xmlString;
     }
 
     private Element getParams(List<NameValuePair> params) throws SessionNotExistException {
         Element paramsElem = XMLBuilder.create("params");
         if (params != null) {
             for (NameValuePair param : params) {
-                paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                if (param.getValue() != null) {
+                    String value = param.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", value);
+                }
             }
         }
 
@@ -177,7 +207,14 @@ public class JobStarter {
         Element paramsElem = XMLBuilder.create("environment");
         if (envVars != null) {
             for (NameValuePair envVar : envVars) {
-                paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", envVar.getValue());
+                if (envVar.getValue() != null) {
+                    String value = envVar.getValue().replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]", "");
+                    try {
+                        paramsElem.addElement("variable").addAttribute("name", envVar.getName()).addAttribute("value", value);
+                    } catch (Exception e) {
+
+                    }
+                }
             }
         }
         return paramsElem;

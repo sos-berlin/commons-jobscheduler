@@ -14,53 +14,55 @@ import org.slf4j.LoggerFactory;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.interfaces.IAutoCompleteProposal;
-import com.sos.JSHelper.io.Files.JSXMLFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOptions, IAutoCompleteProposal {
 
-    protected static final String conNullButMandatory = "JSO-D-0011";
-    protected static final String conChangedMsg = "JSO-D-0010";
-    protected static final Logger logger = LoggerFactory.getLogger(SOSOptionElement.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSOptionElement.class);
+
+    public static boolean gflgProcessHashMap = true;
+    public static boolean gflgCreateShortXML = false;
+    public static final int isOptionTypeOptions = 4;
+    public static boolean flgShowPasswords = false;
+    public final String ControlType = "text";
+    public IValueChangedListener objParentControl = null;
+
     protected static final int isOptionTypeString = 0;
     protected static final int isOptionTypeBoolean = 1;
     protected static final int isOptionTypeFileName = 2;
     protected static final int isOptionTypeInteger = 3;
     protected static final int isOptionTypeFolder = 5;
-    protected boolean flgHideValue = false;
-    protected boolean flgHideOption = false;
-    protected boolean isCData = false;
     protected JSOptionsClass objParentClass = null;
-    protected String strKey = "";
-    protected String strValue = "";
-    protected boolean flgValue = false;
     protected JSOptionsClass objOptions = null;
     protected Vector<String> objAliase = new Vector<String>();
     protected Vector<Object> objObjectStore = new Vector<Object>();
+    protected String strKey = "";
+    protected String strValue = "";
     protected int intOptionType = 0;
+    protected boolean flgValue = false;
+
+    private static boolean flgIncludeProcessingInProgress = false;
     private static final String constPrefixForEnviromentVariables = "env:";
     private static final long serialVersionUID = -7652466722187678671L;
     private static final HashMap<String, String> defaultProposals = new HashMap<>();
-    private final boolean flgSelecteDirtyOnly = true;
-    private boolean gflgProtected = false;
+    private static final String conNullButMandatory = "JSO-D-0011";
     private Stack<String> objValueStack = null;
     private ArrayList<IValueChangedListener> lstValueChangedListeners = null;
     private String strDefaultValue = "";
-    private boolean flgIsDirty = false;
-    private boolean flgIsMandatory = false;
     private String strDescription = "";
-    private int intSize = 0;
     private String strTitle = "";
     private String strColumnHeader = "";
     private String strXMLTagName = "";
     private String strFormatString = "";
-    public final String ControlType = "text";
-    public static boolean gflgProcessHashMap = true;
-    public static boolean gflgCreateShortXML = false;
-    public IValueChangedListener objParentControl = null;
-    public static final int isOptionTypeOptions = 4;
-    public static boolean flgShowPasswords = false;
+
+    private final boolean flgSelecteDirtyOnly = true;
+    private boolean flgHideValue = false;
+    private boolean flgHideOption = false;
+    private boolean gflgProtected = false;
+    private boolean flgIsDirty = false;
+    private boolean flgIsMandatory = false;
+    private int intSize = 0;
 
     public SOSOptionElement(final String pstrFolderName) {
         this.setMessageResource("com_sos_JSHelper_Messages");
@@ -87,7 +89,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
             this.setValue(getValue(pstrValue));
             flgIsDirty = false;
         } catch (final Exception objException) {
-            logger.error(objException.getMessage(), objException);
+            LOGGER.error(objException.toString(), objException);
         }
     }
 
@@ -417,20 +419,20 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     public void mapValue() {
         if (!this.isEmpty(strKey)) {
-            String strV = objParentClass.getItem(strKey, null);
-            if (strV == null) {
-                for (String strAlias : objAliase) {
-                    strV = objParentClass.getItem(strAlias, null);
-                    if (strV != null) {
+            String value = objParentClass.getItem(strKey, null);
+            if (value == null) {
+                for (String alias : objAliase) {
+                    value = objParentClass.getItem(alias, null);
+                    if (value != null) {
                         break;
                     }
                 }
             }
-            if (strV == null) {
-                strV = strDefaultValue;
+            if (value == null) {
+                value = strDefaultValue;
             } else {
-                this.setValue(strV);
-                this.setProtected(JSOptionsClass.flgIncludeProcessingInProgress);
+                this.setValue(value);
+                this.setProtected(flgIncludeProcessingInProgress);
             }
             if (intOptionType == isOptionTypeOptions) {
                 this.setValue(objParentClass.getIndexedItem(strKey, this.getDescription(), ";"));
@@ -523,16 +525,16 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         strValue = null;
     }
 
-    public String setPrefix(final String strPrefix) {
-        String strT = strKey;
-        int i = strT.indexOf(".");
+    public String setPrefix(final String prefix) {
+        String key = strKey;
+        int i = key.indexOf(".");
         if (i > 0) {
-            strT = strT.replaceFirst("\\.", "." + strPrefix);
+            key = key.replaceFirst("\\.", "." + prefix);
         } else {
-            strT = strPrefix + strT;
+            key = prefix + key;
         }
-        strKey = strT;
-        return strT;
+        strKey = key;
+        return strKey;
     }
 
     public int getIntSize() {
@@ -552,9 +554,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     public boolean string2Bool() {
         boolean flgT = false;
         String pstrVal = strValue;
-        if (isNotEmpty(pstrVal)
-                && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                        || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+        if (isNotEmpty(pstrVal) && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(
+                pstrVal) || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
             flgT = true;
         }
         return flgT;
@@ -573,13 +574,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
             strTitle = "";
         }
         return strTitle;
-    }
-
-    public SOSOptionElement title(final String pstrTitle) {
-        if (pstrTitle != null) {
-            strTitle = pstrTitle;
-        }
-        return this;
     }
 
     public String toKeyValuePair(final String pstrAlternatePrefix) {
@@ -609,10 +603,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         return strRet;
     }
 
-    public String toOut() throws Exception {
-        return String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.getValue());
-    }
-
     @Override
     public String toString() {
         String strR = "";
@@ -624,50 +614,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
             strR = strKey + " (" + strDescription + "): " + strV;
         }
         return strR;
-    }
-
-    public String toXml() throws Exception {
-        String strT = "";
-        if (gflgCreateShortXML) {
-            strT = createShortXml();
-        } else {
-            strT = "<" + this.getXMLTagName();
-            strT += " mandatory=" + getQuotedValue(boolean2String(flgIsMandatory));
-            if (isNotEmpty(strDefaultValue)) {
-                strT += " default=" + getQuotedValue(strDefaultValue);
-            }
-            if (isNotEmpty(strTitle)) {
-                strT += " title=" + getQuotedValue(strTitle);
-            }
-            strT += ">";
-            if (!this.getValue().isEmpty()) {
-                if (isCData) {
-                    strT += "<![CDATA[" + this.getFormattedValue() + "]]>";
-                } else {
-                    strT += this.getValue();
-                }
-            }
-            strT += "</" + this.getXMLTagName() + ">";
-        }
-        return strT;
-    }
-
-    public void toXml(final JSXMLFile pobjXMLFile) throws Exception {
-        pobjXMLFile.writeLine(this.toXml());
-    }
-
-    public String toXml(final String pstrTagName) throws Exception {
-        String strRet = " ";
-        String strT = this.getXMLTagName();
-        try {
-            this.xmlTagName(pstrTagName);
-            strRet = toXml();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            this.xmlTagName(strT);
-        }
-        return strRet;
     }
 
     public String getValue() throws RuntimeException {
@@ -684,7 +630,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         }
         if (pstrValue != null) {
             if (objParentClass != null) {
-                final String strTemp = objParentClass.substituteVariables(pstrValue);
                 Properties objP = objParentClass.getTextProperties();
                 objP.put(getShortKey(), pstrValue);
             }
@@ -708,23 +653,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         return strXMLTagName;
     }
 
-    public SOSOptionElement xmlTagName(final String pstrXMLTagName) {
-        if (pstrXMLTagName != null) {
-            strXMLTagName = pstrXMLTagName;
-        }
-        return this;
-    }
-
-    public String[] getValueList() {
+    private String[] getValueList() {
         return new String[] {};
-    }
-
-    public String getUserDir() {
-        String strT = System.getProperty("user.dir");
-        if (objParentClass != null) {
-            strT = objParentClass.baseDirectory.getValue();
-        }
-        return strT;
     }
 
     @Override

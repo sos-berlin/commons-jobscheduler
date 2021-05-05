@@ -1,18 +1,22 @@
 package sos.scheduler.process;
 
+import sos.spooler.Variable_set;
 
 /** @author andreas. pueschel */
 public class ProcessJobMonitor extends ProcessBaseMonitor {
 
     public boolean spooler_task_before() {
         try {
-            if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
-                this.setConfigurationPath(spooler_task.params().value("configuration_path"));
+            Variable_set taskParams = spooler_task.params();
+            String configurationPath = taskParams.value("configuration_path");
+            if (configurationPath != null && !configurationPath.isEmpty()) {
+                this.setConfigurationPath(configurationPath);
             }
-            if (spooler_task.params().value("configuration_file") != null && !spooler_task.params().value("configuration_file").isEmpty()) {
-                this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
+            String configurationFile = taskParams.value("configuration_file");
+            if (configurationFile != null && !configurationFile.isEmpty()) {
+                this.setConfigurationFilename(configurationFile);
             }
-            this.prepareConfiguration();
+            prepareConfiguration();
             return true;
         } catch (Exception e) {
             spooler_log.warn("error occurred in spooler_process_before(): " + e.getMessage());
@@ -32,7 +36,8 @@ public class ProcessJobMonitor extends ProcessBaseMonitor {
         } finally {
             try {
                 this.cleanupConfiguration();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 

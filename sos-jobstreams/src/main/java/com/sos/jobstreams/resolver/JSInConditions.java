@@ -34,5 +34,6 @@ public class JSInConditions {
     public Map<Long, JSInCondition> getListOfInConditions() {
         return listOfInConditions;
     }
+ 
 
 }

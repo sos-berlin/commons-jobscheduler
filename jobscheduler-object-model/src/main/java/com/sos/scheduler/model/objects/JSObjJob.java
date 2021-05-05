@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.LanguageDescriptorList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
@@ -52,7 +52,7 @@ public class JSObjJob extends Job {
         afterUnmarshal();
     }
 
-    public JSObjJob(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjJob(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         super();
         super.strFileNameExtension = fileNameExtension;
         objFactory = schedulerObjectFactory;

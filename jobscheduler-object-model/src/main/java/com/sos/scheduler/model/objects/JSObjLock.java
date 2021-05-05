@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 import javax.xml.bind.JAXBElement;
 
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** \class JSObjLock
@@ -49,7 +49,7 @@ public class JSObjLock extends Lock {
     }
 
     @SuppressWarnings("unchecked")
-    public JSObjLock(SchedulerObjectFactory schedulerObjectFactory, ISOSVirtualFile pobjVirtualFile) {
+    public JSObjLock(SchedulerObjectFactory schedulerObjectFactory, ISOSProviderFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         this.objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom((Lock) this.objJAXBElement.getValue());

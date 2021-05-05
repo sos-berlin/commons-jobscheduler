@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSSettings;
-import sos.textprocessor.SOSDocumentFactoryTextProcessor;
+//import sos.textprocessor.SOSDocumentFactoryTextProcessor;
 import sos.textprocessor.SOSPlainTextProcessor;
 import sos.textprocessor.SOSTextProcessor;
 import sos.util.SOSClassUtil;
@@ -30,7 +30,7 @@ public class SOSMailOrder extends SOSMail {
     protected SOSConnection sosConnection;
     protected boolean hasLocalizedTemplates = true;
     protected SOSPlainTextProcessor mailPlainTextProcessor = null;
-    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
+//    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
     private int mailingId = 0;
     private int jobId;
     private String messageId;
@@ -89,10 +89,10 @@ public class SOSMailOrder extends SOSMail {
                 this.mailPlainTextProcessor.setHasLocalizedTemplates(this.hasLocalizedTemplates());
                 this.mailPlainTextProcessor.getTemplates(this.getSectionMailTemplates(), this.getApplicationMailTemplates());
                 this.mailPlainTextProcessor.getScripts(this.getSectionMailScripts(), this.getApplicationMailScripts());
-                this.mailDocumentFactoryTextProcessor = new SOSDocumentFactoryTextProcessor((SOSConnectionSettings) sosSettings);
-                this.mailDocumentFactoryTextProcessor.setHasLocalizedTemplates(this.hasLocalizedTemplates());
-                this.mailDocumentFactoryTextProcessor.getTemplates(this.getSectionMailTemplatesFactory(), this.getApplicationMailTemplatesFactory());
-                this.mailDocumentFactoryTextProcessor.getScripts(this.getSectionMailScripts(), this.getApplicationMailScripts());
+//                this.mailDocumentFactoryTextProcessor = new SOSDocumentFactoryTextProcessor((SOSConnectionSettings) sosSettings);
+//                this.mailDocumentFactoryTextProcessor.setHasLocalizedTemplates(this.hasLocalizedTemplates());
+//                this.mailDocumentFactoryTextProcessor.getTemplates(this.getSectionMailTemplatesFactory(), this.getApplicationMailTemplatesFactory());
+//                this.mailDocumentFactoryTextProcessor.getScripts(this.getSectionMailScripts(), this.getApplicationMailScripts());
             }
         } catch (Exception e) {
             throw new Exception("failed to initialize processors: " + e);
@@ -454,34 +454,34 @@ public class SOSMailOrder extends SOSMail {
     }
 
     public void setSectionMailScripts(String sectionMailScripts) {
-        mailDocumentFactoryTextProcessor = null;
+//        mailDocumentFactoryTextProcessor = null;
         mailPlainTextProcessor = null;
         super.setSectionMailScripts(sectionMailScripts);
     }
 
     public void setSectionMailTemplates(String sectionMailTemplates) {
-        mailDocumentFactoryTextProcessor = null;
+//        mailDocumentFactoryTextProcessor = null;
         mailPlainTextProcessor = null;
         super.setSectionMailTemplates(sectionMailTemplates);
     }
 
     public void setSectionMailTemplatesFactory(String sectionMailTemplatesFactory) {
-        mailDocumentFactoryTextProcessor = null;
+//        mailDocumentFactoryTextProcessor = null;
         mailPlainTextProcessor = null;
         super.setSectionMailTemplatesFactory(sectionMailTemplatesFactory);
     }
 
     private void processSubject() throws Exception {
         if (getSubjectTemplate() != null && !getSubjectTemplate().isEmpty()) {
-            if (mailDocumentFactoryTextProcessor == null) {
+            if (mailPlainTextProcessor == null) {
                 initProcessors();
             }
             SOSTextProcessor processor = null;
-            if (getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY || getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
-                processor = mailDocumentFactoryTextProcessor;
-            } else {
+//            if (getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY || getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
+//                processor = mailDocumentFactoryTextProcessor;
+//            } else {
                 processor = mailPlainTextProcessor;
-            }
+//            }
             if (getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY_FILE || getSubjectTemplateType() == TEMPLATE_TYPE_PLAIN_FILE) {
                 File subjectTemplateFile = new File(getSubjectTemplate());
                 processor.setLanguage(getLanguage());
@@ -499,15 +499,15 @@ public class SOSMailOrder extends SOSMail {
 
     private void processBody() throws Exception {
         if (getBodyTemplate() != null && !getBodyTemplate().trim().isEmpty()) {
-            if (mailDocumentFactoryTextProcessor == null) {
+            if (mailPlainTextProcessor == null) {
                 initProcessors();
             }
             SOSTextProcessor processor = null;
-            if (getBodyTemplateType() == TEMPLATE_TYPE_FACTORY || getBodyTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
-                processor = mailDocumentFactoryTextProcessor;
-            } else {
+//            if (getBodyTemplateType() == TEMPLATE_TYPE_FACTORY || getBodyTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
+//                processor = mailDocumentFactoryTextProcessor;
+//            } else {
                 processor = mailPlainTextProcessor;
-            }
+//            }
             if (getBodyTemplateType() == TEMPLATE_TYPE_FACTORY_FILE || getBodyTemplateType() == TEMPLATE_TYPE_PLAIN_FILE) {
                 File bodyTemplateFile = new File(getBodyTemplate());
                 processor.setLanguage(getLanguage());

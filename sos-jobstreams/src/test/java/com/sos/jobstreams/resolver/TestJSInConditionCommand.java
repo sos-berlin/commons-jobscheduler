@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.sos.jobstreams.classes.JobStarter;
 
+ 
 
 public class TestJSInConditionCommand {
 

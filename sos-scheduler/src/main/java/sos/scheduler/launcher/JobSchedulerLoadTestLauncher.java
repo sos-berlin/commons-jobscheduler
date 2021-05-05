@@ -8,7 +8,6 @@ import org.w3c.dom.Node;
 
 import sos.scheduler.command.SOSSchedulerCommand;
 import sos.util.SOSClassUtil;
-import sos.util.SOSLogger;
 import sos.util.SOSString;
 import sos.xml.SOSXMLXPath;
 
@@ -500,7 +499,6 @@ public class JobSchedulerLoadTestLauncher {
                         + "-port=<port> -job=<job name>");
                 System.exit(0);
             }
-            sos.util.SOSStandardLogger sosLogger = new sos.util.SOSStandardLogger(9);
             JobSchedulerLoadTestLauncher launcher = null;
             for (int i = 0; i < args.length; i++) {
                 String[] currArg = args[i].split("=");

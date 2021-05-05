@@ -1,11 +1,9 @@
 package com.sos.scheduler.model.objects;
 
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.SOSVFSFactory;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-
 
 import java.io.File;
 import java.math.BigInteger;
@@ -21,7 +19,6 @@ public class JSObjJobChain extends JobChain {
     public final static String fileNameExtension = ".job_chain.xml";
     public static final String conFileNameExtension4NodeParameterFile = ".config.xml";
 
-
     public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
         super();
         objFactory = schedulerObjectFactory;
@@ -33,7 +30,7 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(origOrder);
     }
 
-    public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+    public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory, final ISOSProviderFile pobjVirtualFile) {
         this(schedulerObjectFactory);
         super.objVirtualFile = pobjVirtualFile;
         setHotFolderSrc(super.objVirtualFile);
@@ -51,9 +48,8 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(jobChain);
         if (super.objVirtualFile == null) {
             try {
-                ISOSVFSHandler sosVFSHandler = VFSFactory.getHandler("local");
-                ISOSVfsFileTransfer sosVFSFileTransfer = (ISOSVfsFileTransfer) sosVFSHandler;
-                ISOSVirtualFile virtualFile = sosVFSFileTransfer.getFileHandle(file.getAbsolutePath());
+                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local");
+                ISOSProviderFile virtualFile = sosVFSFileTransfer.getFile(file.getAbsolutePath());
                 super.objVirtualFile = virtualFile;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
@@ -249,8 +245,6 @@ public class JSObjJobChain extends JobChain {
         }
         return strM;
     }
-
-  
 
     @Override
     public BigInteger getmaxOrders() {

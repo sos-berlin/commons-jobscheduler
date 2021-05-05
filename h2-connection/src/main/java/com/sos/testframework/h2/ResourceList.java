@@ -1,11 +1,13 @@
 package com.sos.testframework.h2;
 
-import com.google.common.io.Resources;
 import com.sos.resources.ResourceHelper;
+import com.sos.resources.SOSResourceFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,9 +38,10 @@ public class ResourceList {
      * It is possible to add new member with the different variants of the add()
      * method.
      * 
-     * @param resources */
-    public ResourceList(Map<String, ?> resources) {
-        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory();
+     * @param resources 
+     * @throws IOException */
+    public ResourceList(Map<String, ?> resources) throws IOException {
+        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory().toFile();
         for (String className : resources.keySet()) {
             Object o = resources.get(className);
             if (o instanceof String) {
@@ -59,9 +62,10 @@ public class ResourceList {
     }
 
     /** A constructor to create an empty resource list. It is possible to add new
-     * member with the different variants of the add() method. */
-    public ResourceList() {
-        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory();
+     * member with the different variants of the add() method. 
+     * @throws IOException */
+    public ResourceList() throws IOException {
+        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory().toFile();
     }
 
     /** Add a resource to the list.
@@ -77,7 +81,7 @@ public class ResourceList {
      * @param className
      * @param resource */
     public void add(String className, URL resource) {
-        File resourceFile = ResourceHelper.getInstance().createFileFromURL(resource);
+        File resourceFile = ResourceHelper.getInstance().createFileFromURL(resource).toFile();
         resources.put(className, resourceFile);
     }
 
@@ -90,8 +94,8 @@ public class ResourceList {
     }
 
     private File createFileFromResource(String resource) {
-        URL url = Resources.getResource(resource);
-        File resourceFile = ResourceHelper.getInstance().createFileFromURL(url);
+        URL url = SOSResourceFactory.asURL(resource);
+        File resourceFile = ResourceHelper.getInstance().createFileFromURL(url).toFile();
         return resourceFile;
     }
 

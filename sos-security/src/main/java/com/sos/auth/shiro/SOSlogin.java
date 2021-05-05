@@ -1,6 +1,9 @@
 package com.sos.auth.shiro;
 
 import java.util.Collection;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -9,7 +12,6 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.InvalidSessionException;
@@ -20,123 +22,136 @@ import org.slf4j.LoggerFactory;
 
 public class SOSlogin {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SOSlogin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSlogin.class);
 
-	private Subject currentUser;
-	private String msg;
-	private IniSecurityManagerFactory factory = null;
+    private Subject currentUser;
+    private String msg;
+    private IniSecurityManagerFactory factory = null;
 
-	public SOSlogin(IniSecurityManagerFactory factory) {
-		this.factory = factory;
-	}
+    public SOSlogin(IniSecurityManagerFactory factory) {
+        this.factory = factory;
+    }
 
-	private void clearCache(String user) {
-		LOGGER.debug("sosLogin.clearCache(): " + user);
+    private void clearCache(String user) {
+        LOGGER.debug("sosLogin.clearCache(): " + user);
 
-		RealmSecurityManager mgr = (RealmSecurityManager) SecurityUtils.getSecurityManager();
+        RealmSecurityManager mgr = (RealmSecurityManager) SecurityUtils.getSecurityManager();
 
-		Collection<Realm> realmCollection = mgr.getRealms();
-		if (realmCollection != null) {
-			for (Realm realm : realmCollection) {
-				if (realm instanceof AuthorizingRealm) {
-					SimplePrincipalCollection spc = new SimplePrincipalCollection();
-					spc.add(user, realm.getName());
+        Collection<Realm> realmCollection = mgr.getRealms();
+        if (realmCollection != null) {
+            for (Realm realm : realmCollection) {
+                if (realm instanceof AuthorizingRealm) {
+                    SimplePrincipalCollection spc = new SimplePrincipalCollection();
+                    spc.add(user, realm.getName());
 
-					AuthorizingRealm authRealm = (AuthorizingRealm) realm;
-					if (authRealm.getAuthenticationCache() != null) {
-						authRealm.getAuthenticationCache().remove(spc);
-					}
-					if (authRealm.getAuthorizationCache() != null) {
-						authRealm.getAuthorizationCache().remove(spc);
-					}
-				}
-			}
-		}
+                    AuthorizingRealm authRealm = (AuthorizingRealm) realm;
+                    if (authRealm.getAuthenticationCache() != null) {
+                        authRealm.getAuthenticationCache().remove(spc);
+                    }
+                    if (authRealm.getAuthorizationCache() != null) {
+                        authRealm.getAuthorizationCache().remove(spc);
+                    }
+                }
+            }
+        }
 
-	}
+    }
 
-	public void createSubject(String user, String pwd) {
-		LOGGER.debug("sosLogin.createSubject(): " + user);
+    public void createSubject(String user, String pwd, HttpServletRequest httpServletRequest) {
+        LOGGER.debug("sosLogin.createSubject(): " + user);
 
-		clearCache(user);
-		UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
-		if (currentUser != null) {
-			try {
-				LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
-				currentUser.login(token);
-			} catch (UnknownAccountException uae) {
-				setMsg("There is no user with username/password combination of " + token.getPrincipal());
-				currentUser = null;
-			} catch (IncorrectCredentialsException ice) {
-				setMsg("There is no user with username / password combination of " + token.getPrincipal());
-				currentUser = null;
-			} catch (LockedAccountException lae) {
-				setMsg("The account for username " + token.getPrincipal() + " is locked.  "
-						+ "Please contact your administrator to unlock it.");
-				currentUser = null;
-			} catch (Exception ee) {
-				String cause = "";
-				if (ee.getCause() != null) {
-					cause = ee.getCause().toString();
-				}
-				setMsg("Exception while logging in " + token.getPrincipal() + " " + ee.toString() + ": " + cause);
-				currentUser = null;
-			}
-		}
-	}
+        clearCache(user);
+        UsernamePasswordToken token = null;
 
-	public void login(String user, String pwd) {
-		if (user == null) {
-			currentUser = null;
-		} else {
-			if (currentUser != null && currentUser.isAuthenticated()) {
-				logout();
-			}
-			this.init();
+        if (httpServletRequest != null) {
+            token = new SOSUsernameRequestToken(user, pwd, httpServletRequest);
+        } else {
+            token = new UsernamePasswordToken(user, pwd);
+        }
+        if (currentUser != null) {
+            try {
+                LOGGER.debug("sosLogin.createSubject() ... currentUser.login(): " + user);
+                currentUser.login(token);
 
-			createSubject(user, pwd);
-		}
-	}
+                SimplePrincipalCollection spc = (SimplePrincipalCollection) currentUser.getPrincipals();
+                Set<String> realmNames = spc.getRealmNames();
+                for (String s : realmNames) {
+                    if (s.equals(SOSX509AuthorizingRealm.getRealmIdentifier())) {
+                        LOGGER.debug("SessionTimeout for user " + token.getUsername() + " set to endless");
+                        currentUser.getSession().setTimeout(-1);
+                    }
 
-	public void logout() {
-		if (currentUser != null) {
-			currentUser.logout();
-		}
-	}
+                }
+            } catch (UnknownAccountException uae) {
+                setMsg("There is no user with username/password combination of " + token.getPrincipal());
+                currentUser = null;
+            } catch (IncorrectCredentialsException ice) {
+                setMsg("There is no user with username / password combination of " + token.getPrincipal());
+                currentUser = null;
+            } catch (LockedAccountException lae) {
+                setMsg("The account for username " + token.getPrincipal() + " is locked.  " + "Please contact your administrator to unlock it.");
+                currentUser = null;
+            } catch (Exception ee) {
+                String cause = "";
+                if (ee.getCause() != null) {
+                    cause = ee.getCause().toString();
+                }
+                setMsg("Exception while logging in " + token.getPrincipal() + " " + ee.toString() + ": " + cause);
+                currentUser = null;
+            }
+        }
+    }
 
-	private void init() {
+    public void login(String user, String pwd, HttpServletRequest httpServletRequest) {
+        if (user == null) {
+            currentUser = null;
+        } else {
+            if (currentUser != null && currentUser.isAuthenticated()) {
+                logout();
+            }
+            this.init();
+            createSubject(user, pwd, httpServletRequest);
+        }
+    }
 
-		LOGGER.debug("sosLogin.init()");
-		if (factory != null) {
-			SecurityManager securityManager = factory.getInstance();
-			SecurityUtils.setSecurityManager(securityManager);
-		} else {
-			LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
-		}
+    public void logout() {
+        if (currentUser != null) {
+            currentUser.logout();
+        }
+    }
 
-		LOGGER.debug("sosLogin.init(): buildSubject");
-		currentUser = new Subject.Builder().buildSubject();
+    private void init() {
+        LOGGER.debug("sosLogin.init()");
+        if (factory != null) {
+            org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
+            SecurityUtils.setSecurityManager(securityManager);
+        } else {
+            LOGGER.error("Shiro init: SecurityManagerFactory is not defined");
+        }
 
-		try {
-			logout();
-		} catch (InvalidSessionException e) {
-			// ignore this.
-		} catch (Exception e) {
-			LOGGER.info(String.format("Shiro init: %1$s: %2$s", e.getClass().getSimpleName(), e.getMessage()));
-		}
-	}
+        LOGGER.debug("sosLogin.init(): buildSubject");
+        currentUser = new Subject.Builder().buildSubject();
 
-	public Subject getCurrentUser() {
-		return currentUser;
-	}
+        try {
+            logout();
+        } catch (InvalidSessionException e) {
+            // ignore this.
+        } catch (Exception e) {
+            LOGGER.info(String.format("Shiro init: %1$s: %2$s", e.getClass().getSimpleName(), e.getMessage()));
+        }
+    }
 
-	public String getMsg() {
-		return msg;
-	}
+    public Subject getCurrentUser() {
+        return currentUser;
+    }
 
-	public void setMsg(String msg) {
-		LOGGER.debug("sosLogin: setMsg=" + msg);
-		this.msg = msg;
-	}
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        LOGGER.debug("sosLogin: setMsg=" + msg);
+        this.msg = msg;
+    }
 
 }

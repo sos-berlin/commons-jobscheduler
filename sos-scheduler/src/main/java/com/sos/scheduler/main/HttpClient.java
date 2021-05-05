@@ -64,7 +64,7 @@ public class HttpClient {
             SOSXmlCommand sosXmlCommand = new SOSXmlCommand(String.format(XML_COMMAND_API_PATH, hostPort));
             sosXmlCommand.setConnectTimeout(5000);
             sosXmlCommand.setReadTimeout(5000);
-            String response = sosXmlCommand.executeXMLPost(xmlCommand);
+            String response = sosXmlCommand.executeXMLPost("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" + xmlCommand);
             String responseError = sosXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ERROR/@text");
             if (responseError != null && !responseError.isEmpty()) {
                 throw new SOSException(responseError);

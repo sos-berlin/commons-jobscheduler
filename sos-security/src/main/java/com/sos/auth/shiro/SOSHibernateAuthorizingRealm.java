@@ -2,8 +2,6 @@ package com.sos.auth.shiro;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -13,24 +11,23 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
+import com.sos.hibernate.classes.ClassList;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 
 public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateAuthorizingRealm.class);
-    private String hibernateConfigurationFile;
     private ISOSAuthorizing authorizing;
     private UsernamePasswordToken authToken;
 
-    public void setHibernateConfigurationFile(String filename) {
-        this.hibernateConfigurationFile = filename;
-    }
-
     public boolean supports(AuthenticationToken token) {
         SOSHibernateAuthorizing authorizing = new SOSHibernateAuthorizing();
-        authorizing.setConfigurationFileName(hibernateConfigurationFile);
         setAuthorizing(authorizing);
         return true;
     }
@@ -60,23 +57,49 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
         return null;
     }
 
+    private static ClassList getShiroClassMapping() {
+        ClassList cl = new ClassList();
+        cl.add(com.sos.auth.shiro.db.SOSUserDBItem.class);
+        cl.add(com.sos.auth.shiro.db.SOSUserRoleDBItem.class);
+        cl.add(com.sos.auth.shiro.db.SOSUser2RoleDBItem.class);
+        cl.add(com.sos.auth.shiro.db.SOSUserPermissionDBItem.class);
+        return cl;
+    }
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
         authToken = (UsernamePasswordToken) authcToken;
         SOSUserDBLayer sosUserDBLayer;
+        SOSHibernateSession sosHibernateSession = null;
+
         try {
-            sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
+            Globals.sosHibernateFactory = Globals.getHibernateFactory();
+            Globals.sosHibernateFactory.close();
+            Globals.sosHibernateFactory.addClassMapping(getShiroClassMapping());
+            Globals.sosHibernateFactory.build();
+            sosHibernateSession = Globals.sosHibernateFactory.openSession("SOSHibernateAuthorizingRealm");
+            sosUserDBLayer = new SOSUserDBLayer(sosHibernateSession);
+
         } catch (Exception e1) {
             e1.printStackTrace();
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
             return null;
         }
+
         sosUserDBLayer.getFilter().setUserName(authToken.getUsername());
         List<SOSUserDBItem> sosUserList = null;
         try {
             sosUserList = sosUserDBLayer.getSOSUserList(0);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+        } finally {
+            if (sosHibernateSession != null) {
+                sosHibernateSession.close();
+            }
         }
+
         SOSUserDBItem sosUserDBItem = sosUserList.get(0);
         String s = sosUserDBItem.getSosUserPassword();
         String pw = String.valueOf(authToken.getPassword());

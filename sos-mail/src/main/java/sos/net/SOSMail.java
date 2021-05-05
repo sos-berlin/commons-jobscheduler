@@ -599,13 +599,14 @@ public class SOSMail {
         DataHandler data_handler = new DataHandler(data_source);
         attachment.setDataHandler(data_handler);
         attachment.setFileName(att.getFile().getName());
+
         if (att.getContentType().startsWith("text/")) {
             String s = "";
             FileReader fr = new FileReader(att.getFile());
             for (int c; (c = fr.read()) != -1;) {
                 s += (char) c;
             }
-            attachment.setText(s, att.getCharset());
+            attachment.setContent(s, att.getContentType() + ";charset= " + att.getCharset());
             fr.close();
         }
         Object m = message.getContent();
@@ -614,6 +615,7 @@ public class SOSMail {
         }
         ((MimeMultipart) m).addBodyPart(attachment);
         attachment.setHeader("Content-Transfer-Encoding", att.getEncoding());
+
     }
 
     public void loadFile(final File messageFile) throws Exception {
@@ -840,10 +842,10 @@ public class SOSMail {
                 }
                 for (Iterator<SOSMailAttachment> iter = attachmentList.values().iterator(); iter.hasNext();) {
                     SOSMailAttachment attachment = iter.next();
-                    String content_type = attachment.getContentType();
-                    if (content_type == null) {
+                    if (attachment.getContentType() == null) {
                         throw new Exception("content_type ist null");
                     }
+
                     LOGGER.debug(SOSClassUtil.getMethodName() + "-->" + "Attachment=" + attachment.getFile());
                     addFile(attachment);
                 }
@@ -896,7 +898,6 @@ public class SOSMail {
     public String dumpMessageAsString() throws Exception {
         return dumpMessageAsString(false);
     }
-
 
     private void dumpFailedMessageToFile(final boolean withAttachment) throws Exception {
         Date d = new Date();
@@ -1538,8 +1539,19 @@ public class SOSMail {
         sosMail.setFrom("xyz@sos-berlin.com");
         sosMail.setEncoding("8bit");
         sosMail.setattachmentEncoding("Base64");
+        sosMail.setAttachmentCharset("UTF-8");
+
         sosMail.setSubject("Betreff");
+        sosMail.setAttachmentContentType("text/html");
         sosMail.setReplyTo("xyz@sos-berlin.com");
+
+        File attachmentFile = new File("c:/temp/1.txt");
+        SOSMailAttachment attachment = new SOSMailAttachment(sosMail, attachmentFile);
+        attachment.setCharset(sosMail.getAttachmentCharset());
+        attachment.setEncoding(sosMail.getAttachmentEncoding());
+        attachment.setContentType(sosMail.getAttachmentContentType());
+        sosMail.addAttachment(attachment);
+
         String s = "Hello\\nWorld";
         sosMail.setBody(s);
         sosMail.addRecipient("xyz@sos-berlin.com");
@@ -1634,7 +1646,6 @@ public class SOSMail {
         }
     }
 
-    
     public void setQueueFailedPraefix(String queueFailedPraefix) {
         this.queueFailedPraefix = queueFailedPraefix;
     }

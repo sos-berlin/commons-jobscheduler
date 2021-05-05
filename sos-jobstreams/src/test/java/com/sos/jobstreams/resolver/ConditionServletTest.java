@@ -2,6 +2,7 @@ package com.sos.jobstreams.resolver;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ public class ConditionServletTest {
     public static void main(String[] args) throws Exception {
 
         final String METHOD = "init";
+        System.out.println(ZoneId.systemDefault());
+
         LOGGER.info(METHOD);
         String host = "localhost";
         String port = "40444";

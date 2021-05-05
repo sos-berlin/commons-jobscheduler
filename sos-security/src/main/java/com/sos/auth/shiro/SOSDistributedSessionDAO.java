@@ -8,6 +8,7 @@ import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.db.configuration.JocConfigurationFilter;
 import com.sos.joc.exceptions.JocException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,176 +18,183 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SOSDistributedSessionDAO extends CachingSessionDAO {
-	private static final String SHIRO_SESSION = "SHIRO_SESSION";
-	private static final Logger LOGGER = LoggerFactory.getLogger(SOSDistributedSessionDAO.class);
-	private HashMap<String, String> serializedSessions;
 
-	private void putSerializedSession(String sessionId, String sessionString) {
-		if (serializedSessions == null) {
-			serializedSessions = new HashMap<String, String>();
-		}
-		serializedSessions.put(sessionId, sessionString);
-	}
+    private static final String SHIRO_SESSION = "SHIRO_SESSION";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSDistributedSessionDAO.class);
+    private HashMap<String, String> serializedSessions;
 
-	private String getSessionId(Session session) {
-		if (session == null || session.getId() == null) {
-			return "";
-		} else {
-			return session.getId().toString();
-		}
+    private void putSerializedSession(String sessionId, String sessionString) {
+        if (serializedSessions == null) {
+            serializedSessions = new HashMap<String, String>();
+        }
+        serializedSessions.put(sessionId, sessionString);
+    }
 
-	}
+    private String getSessionId(Session session) {
+        if (session == null || session.getId() == null) {
+            return "";
+        } else {
+            return session.getId().toString();
+        }
+    }
 
-	private void copySessionToDb(Serializable sessionId, String session) {
-		SOSHibernateSession sosHibernateSession = null;
-		try {
-			LOGGER.debug("SOSDistributedSessionDAO: copySessionToDb");
+    private void copySessionToDb(Serializable sessionId, String session) {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
+            LOGGER.debug("SOSDistributedSessionDAO: copySessionToDb");
 
-			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
-			sosHibernateSession.setAutoCommit(false);
-			Globals.beginTransaction(sosHibernateSession);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+            sosHibernateSession.setAutoCommit(false);
+            Globals.beginTransaction(sosHibernateSession);
 
-			JocConfigurationDbItem jocConfigurationDbItem;
-			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-			jocConfigurationDBLayer.getFilter().setAccount(".");
-			jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
-			jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-			List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
-			if (listOfConfigurtions.size() > 0) {
-				jocConfigurationDbItem = listOfConfigurtions.get(0);
-			} else {
-				jocConfigurationDbItem = new JocConfigurationDbItem();
-				jocConfigurationDbItem.setId(null);
-				jocConfigurationDbItem.setAccount(".");
-				jocConfigurationDbItem.setConfigurationType(SHIRO_SESSION);
-				jocConfigurationDbItem.setName(sessionId.toString());
-				jocConfigurationDbItem.setShared(true);
-				jocConfigurationDbItem.setInstanceId(0L);
-				jocConfigurationDbItem.setSchedulerId("");
-			}
+            JocConfigurationDbItem jocConfigurationDbItem;
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
 
-			jocConfigurationDbItem.setConfigurationItem(session);
-			Long id = jocConfigurationDBLayer.saveOrUpdateConfiguration(jocConfigurationDbItem);
-			if (jocConfigurationDbItem.getId() == null) {
-				jocConfigurationDbItem.setId(id);
-			}
-			Globals.commit(sosHibernateSession);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+            filter.setAccount(".");
+            filter.setName(sessionId.toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
+            if (listOfConfigurtions.size() > 0) {
+                jocConfigurationDbItem = listOfConfigurtions.get(0);
+            } else {
+                jocConfigurationDbItem = new JocConfigurationDbItem();
+                jocConfigurationDbItem.setId(null);
+                jocConfigurationDbItem.setAccount(".");
+                jocConfigurationDbItem.setConfigurationType(SHIRO_SESSION);
+                jocConfigurationDbItem.setName(sessionId.toString());
+                jocConfigurationDbItem.setShared(true);
+                jocConfigurationDbItem.setInstanceId(0L);
+                jocConfigurationDbItem.setSchedulerId("");
+            }
 
-		} finally {
-			Globals.disconnect(sosHibernateSession);
-			sosHibernateSession = null;
-		}
-	}
+            jocConfigurationDbItem.setConfigurationItem(session);
+            Long id = jocConfigurationDBLayer.saveOrUpdateConfiguration(jocConfigurationDbItem);
+            if (jocConfigurationDbItem.getId() == null) {
+                jocConfigurationDbItem.setId(id);
+            }
+            Globals.commit(sosHibernateSession);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
 
-	private String readSessionFromDb(Serializable sessionId) {
-		SOSHibernateSession sosHibernateSession = null;
-		try {
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+            sosHibernateSession = null;
+        }
+    }
 
-			String sessionIdString = "";
-			if (sessionId != null) {
-				sessionIdString = sessionId.toString();
-			}
-			LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
+    private String readSessionFromDb(Serializable sessionId) {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
 
-			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+            String sessionIdString = "";
+            if (sessionId != null) {
+                sessionIdString = sessionId.toString();
+            }
+            LOGGER.debug("SOSDistributedSessionDAO: readSessionFromDb: " + sessionIdString);
 
-			sosHibernateSession.setAutoCommit(false);
-			Globals.beginTransaction(sosHibernateSession);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
 
-			JocConfigurationDbItem jocConfigurationDbItem;
-			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-			jocConfigurationDBLayer.getFilter().setAccount(".");
-			jocConfigurationDBLayer.getFilter().setName(sessionId.toString());
-			jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-			List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(0);
-			Globals.commit(sosHibernateSession);
-			sosHibernateSession.close();
+            sosHibernateSession.setAutoCommit(false);
+            Globals.beginTransaction(sosHibernateSession);
 
-			if (listOfConfigurtions.size() > 0) {
-				jocConfigurationDbItem = listOfConfigurtions.get(0);
-				return jocConfigurationDbItem.getConfigurationItem();
-			} else {
-				return "";
-			}
-		} catch (SOSHibernateException e) {
-			throw new RuntimeException(e);
+            JocConfigurationDbItem jocConfigurationDbItem;
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
+            filter.setAccount(".");
+            filter.setName(sessionId.toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            List<JocConfigurationDbItem> listOfConfigurtions = jocConfigurationDBLayer.getJocConfigurationList(filter,0);
+            Globals.commit(sosHibernateSession);
+            sosHibernateSession.close();
 
-		} catch (JocException e) {
-			throw new RuntimeException(e);
-		} finally {
-			Globals.disconnect(sosHibernateSession);
-		}
-	}
+            if (listOfConfigurtions.size() > 0) {
+                jocConfigurationDbItem = listOfConfigurtions.get(0);
+                return jocConfigurationDbItem.getConfigurationItem();
+            } else {
+                return "";
+            }
+        } catch (SOSHibernateException e) {
+            throw new RuntimeException(e);
 
-	@Override
-	protected Serializable doCreate(Session session) {
-		LOGGER.debug("SOSDistributedSessionDAO: doCreate Session ->" + getSessionId(session));
-		Serializable sessionId = generateSessionId(session);
-		assignSessionId(session, sessionId);
-		String sessionString = SOSSerializerUtil.object2toString(session);
-		putSerializedSession(session.getId().toString(), sessionString);
-		copySessionToDb(sessionId, sessionString);
-		return session.getId();
-	}
+        } catch (JocException e) {
+            throw new RuntimeException(e);
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+        }
+    }
 
-	@Override
-	protected void doUpdate(Session session) {
-		LOGGER.debug("SOSDistributedSessionDAO: doUpdate Session ->" + getSessionId(session));
-		if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
-			return;
-		}
-		LOGGER.debug("SOSDistributedSessionDAO: session is valid");
-		String sessionString = SOSSerializerUtil.object2toString(session);
-		putSerializedSession(session.getId().toString(), sessionString);
-		copySessionToDb(session.getId(), sessionString);
-	}
+    @Override
+    protected Serializable doCreate(Session session) {
+        LOGGER.debug("SOSDistributedSessionDAO: doCreate Session ->" + getSessionId(session));
+        session.setAttribute("dao", "true");
 
-	@Override
-	protected void doDelete(Session session) {
-		SOSHibernateSession sosHibernateSession = null;
-		try {
-			LOGGER.debug("SOSDistributedSessionDAO: doDelete Session ->" + getSessionId(session));
+        Serializable sessionId = generateSessionId(session);
+        assignSessionId(session, sessionId);
+        String sessionString = SOSSerializerUtil.object2toString(session);
+        putSerializedSession(session.getId().toString(), sessionString);
+        copySessionToDb(sessionId, sessionString);
+        return session.getId();
+    }
 
-			sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
-			sosHibernateSession.setAutoCommit(false);
-			Globals.beginTransaction(sosHibernateSession);
-			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
-			jocConfigurationDBLayer.getFilter().setAccount(".");
-			jocConfigurationDBLayer.getFilter().setName(session.getId().toString());
-			jocConfigurationDBLayer.getFilter().setConfigurationType(SHIRO_SESSION);
-			jocConfigurationDBLayer.delete();
-			putSerializedSession(session.getId().toString(), null);
-			Globals.commit(sosHibernateSession);
-			sosHibernateSession.close();
-		} catch (SOSHibernateException e) {
-			throw new RuntimeException(e);
-		} catch (JocException e) {
-			throw new RuntimeException(e);
-		} finally {
-			Globals.disconnect(sosHibernateSession);
+    @Override
+    protected void doUpdate(Session session) {
+        LOGGER.debug("SOSDistributedSessionDAO: doUpdate Session ->" + getSessionId(session));
+        if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
+            return;
+        }
+        LOGGER.debug("SOSDistributedSessionDAO: session is valid");
+        String sessionString = SOSSerializerUtil.object2toString(session);
+        putSerializedSession(session.getId().toString(), sessionString);
+        copySessionToDb(session.getId(), sessionString);
+    }
 
-		}
-	}
+    @Override
+    protected void doDelete(Session session) {
+        SOSHibernateSession sosHibernateSession = null;
+        try {
+            LOGGER.debug("SOSDistributedSessionDAO: doDelete Session ->" + getSessionId(session));
 
-	@Override
-	protected Session doReadSession(Serializable sessionId) {
-		if (serializedSessions == null) {
-			LOGGER.debug("SOSDistributedSessionDAO: doReadSession: initialize serializedSessions");
-			serializedSessions = new HashMap<String, String>();
-		}
-		String session = "";
-		session = serializedSessions.get(sessionId.toString());
-		if (session == null) {
-			session = readSessionFromDb(sessionId);
-			serializedSessions.put(sessionId.toString(), session);
-		}
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("SOSDistributedSessionDAO");
+            sosHibernateSession.setAutoCommit(false);
+            Globals.beginTransaction(sosHibernateSession);
+            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
+            JocConfigurationFilter filter = new JocConfigurationFilter();
 
-		if (session.length() == 0) {
-			LOGGER.debug("SOSDistributedSessionDAO: session is empty");
-			return null;
-		}
-		return (Session) SOSSerializerUtil.fromString(session);
-	}
+            filter.setAccount(".");
+            filter.setName(session.getId().toString());
+            filter.setConfigurationType(SHIRO_SESSION);
+            jocConfigurationDBLayer.delete(filter);
+            putSerializedSession(session.getId().toString(), null);
+            Globals.commit(sosHibernateSession);
+            sosHibernateSession.close();
+        } catch (SOSHibernateException e) {
+            throw new RuntimeException(e);
+        } catch (JocException e) {
+            throw new RuntimeException(e);
+        } finally {
+            Globals.disconnect(sosHibernateSession);
+
+        }
+    }
+
+    @Override
+    protected Session doReadSession(Serializable sessionId) {
+        if (serializedSessions == null) {
+            LOGGER.debug("SOSDistributedSessionDAO: doReadSession: initialize serializedSessions");
+            serializedSessions = new HashMap<String, String>();
+        }
+        String session = "";
+        session = serializedSessions.get(sessionId.toString());
+        if (session == null) {
+            session = readSessionFromDb(sessionId);
+            serializedSessions.put(sessionId.toString(), session);
+        }
+
+        if (session.length() == 0) {
+            LOGGER.debug("SOSDistributedSessionDAO: session is empty");
+            return null;
+        }
+        return (Session) SOSSerializerUtil.fromString(session);
+    }
 }

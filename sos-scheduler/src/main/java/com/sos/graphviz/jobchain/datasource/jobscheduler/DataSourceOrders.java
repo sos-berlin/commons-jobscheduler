@@ -2,10 +2,9 @@ package com.sos.graphviz.jobchain.datasource.jobscheduler;
 
 import java.io.File;
 import java.util.ArrayList;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.SOSVFSFactory;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.graphviz.jobchain.interfaces.IDataSourceOrders;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
@@ -15,6 +14,7 @@ import com.sos.scheduler.model.objects.JSObjJobChain;
 import com.sos.scheduler.model.objects.JSObjOrder;
 
 public class DataSourceOrders implements IDataSourceOrders {
+
     private SchedulerObjectFactory schedulerObjectFactory;
     private ArrayList<JSObjOrder> listOfOrders;
     private File liveFolder;
@@ -43,11 +43,9 @@ public class DataSourceOrders implements IDataSourceOrders {
     public void getList() {
         reset();
         String liveFolderName = liveFolder.getAbsolutePath();
-        ISOSVFSHandler objVFS;
         try {
-            objVFS = VFSFactory.getHandler("local");
-            ISOSVfsFileTransfer objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
-            ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(liveFolderName);
+            ISOSProvider objFileSystemHandler = SOSVFSFactory.getProvider("local");
+            ISOSProviderFile objHotFolder = objFileSystemHandler.getFile(liveFolderName);
             SchedulerHotFolder objSchedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(objHotFolder);
             SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.loadOrderObjects();
             for (JSObjBase hotFolderItem : objSchedulerHotFolderFileList.getOrderList()) {
@@ -63,7 +61,7 @@ public class DataSourceOrders implements IDataSourceOrders {
             throw new RuntimeException(e);
         }
     }
-    
+
     public String getName() {
         String name = jobChain.getObjectName();
         if (name == null || name.isEmpty()) {

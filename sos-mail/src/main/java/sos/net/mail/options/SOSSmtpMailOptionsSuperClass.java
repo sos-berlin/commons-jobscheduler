@@ -309,7 +309,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     }
 
     public SOSSmtpMailOptionsSuperClass() {
-        objParentClass = this.getClass();
+        currentClass = this.getClass();
     }
 
     public SOSSmtpMailOptionsSuperClass(final JSListener pobjListener) {
@@ -317,16 +317,14 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         this.registerMessageListener(pobjListener);
     }
 
-    public SOSSmtpMailOptionsSuperClass(final HashMap<String, String> JSSettings) throws Exception {
+    public SOSSmtpMailOptionsSuperClass(final HashMap<String, String> settings) throws Exception {
         this();
-        this.setAllOptions(JSSettings);
+        this.setAllOptions(settings);
     }
 
     @Override
-    public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-        objSettings = pobjJSSettings;
-        super.setSettings(objSettings);
-        super.setAllOptions(pobjJSSettings);
+    public void setAllOptions(HashMap<String, String> settings) {
+        super.setAllOptions(settings);
     }
 
     @Override
@@ -341,7 +339,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     @Override
     public void commandLineArgs(final String[] pstrArgs) {
         super.commandLineArgs(pstrArgs);
-        this.setAllOptions(super.objSettings);
+        this.setAllOptions(super.getSettings());
     }
 
 }

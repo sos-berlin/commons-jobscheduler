@@ -75,7 +75,7 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
     public String getValue() {
         String strT = strValue;
         try {
-            if (objParentClass != null && objParentClass.gflgSubsituteVariables) {
+            if (objParentClass != null) {
                 strT = substituteAllDate();
             } else {
                 strT = substituteAllDate();

@@ -3,6 +3,7 @@ package com.sos.hibernate.classes;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -158,37 +159,23 @@ public class TestSearchStringHelper {
 	
 	@Test
 	public void testGetStringListPathSql() {
-		// public static String getSetSql(Set<String> values, String fieldName) { }
-		ArrayList<String> values = new ArrayList<String>();
-		values.add("test");
-		String s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
+		String s2 = SearchStringHelper.getStringListPathSql(Arrays.asList("test"), "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, " (fieldname like '%test' or 1=0) ");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like '%test') ");
 
-		values = new ArrayList<String>();
-		values.add("te%st");
-		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
+		s2 = SearchStringHelper.getStringListPathSql(Arrays.asList("te%st"), "fieldname");
 		System.out.println(s2);
-		assertEquals("testGetSetPathSql", s2, " (fieldname like '%te%st' or 1=0) ");
+		assertEquals("testGetSetPathSql", s2, " (fieldname like '%te%st') ");
 
-		values = new ArrayList<String>();
-		values.add("te%st");
-		values.add("test");
-		values.add("%test");
-		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
+		s2 = SearchStringHelper.getStringListPathSql(Arrays.asList("te%st","test", "%test"), "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				" (fieldname like '%te%st' or fieldname like '%test' or fieldname like '%test' or 1=0) ");
+				" (fieldname like '%te%st' or fieldname like '%test' or fieldname like '%test') ");
 
-		values = new ArrayList<String>();
-		values.add("/te%st");
-		values.add("/rest");
-		values.add("%fest");
-		values.add("fest");
-		s2 = SearchStringHelper.getStringListPathSql(values, "fieldname");
+		s2 = SearchStringHelper.getStringListPathSql(Arrays.asList("/te%st","/rest", "%fest", "fest"), "fieldname");
 		System.out.println(s2);
 		assertEquals("testGetSetPathSql", s2,
-				" (fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname like '%fest' or 1=0) ");
+				" (fieldname like '/te%st' or fieldname='/rest' or fieldname like '%fest' or fieldname like '%fest') ");
 
 	}
 

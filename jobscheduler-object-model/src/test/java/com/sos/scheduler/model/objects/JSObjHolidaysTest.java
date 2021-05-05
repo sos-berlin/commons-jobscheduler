@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.io.Files;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.LiveConnector;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.TestBase;
@@ -200,7 +200,7 @@ public class JSObjHolidaysTest extends TestBase {
     }
 
     private final void testInclude(final SchedulerObjectFactory factory, final String configurationFile) {
-        ISOSVirtualFile vfOrder = factory.getFileHandleOrNull(configurationFile);
+        ISOSProviderFile vfOrder = factory.getFileHandleOrNull(configurationFile);
         JSObjOrder order = new JSObjOrder(factory, vfOrder);
         JSObjRunTime runtime = order.getJSObjRunTime();
         assertEquals(configurationFile, PathResolver.normalizePath(order.getHotFolderSrc().getName()));

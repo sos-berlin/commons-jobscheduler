@@ -15,7 +15,7 @@ public class SOSCommandline {
 
     public String[] splitArguments(final String arguments) throws Exception {
         String[] resultArguments = null;
-        Vector resultVector = new Vector();
+        Vector<String> resultVector = new Vector<String>();
         int resultIndex = 0;
         String resultString = "";
         boolean inQuote = false;
@@ -65,12 +65,12 @@ public class SOSCommandline {
         }
     }
 
-    public Vector execute(final String command) {
+    public Vector<Object> execute(final String command) {
         return this.execute(command, null);
     }
 
-    public Vector execute(final String command, final Object objDummy) {
-        Vector returnValues = new Vector();
+    public Vector<Object> execute(final String command, final Object objDummy) {
+        Vector<Object> returnValues = new Vector<Object>();
         try {
             try {
                 Process p = Runtime.getRuntime().exec(splitArguments(command));
@@ -149,7 +149,7 @@ public class SOSCommandline {
             if (password != null && password.startsWith("`") && password.endsWith("`")) {
                 String command = password.substring(1, password.length() - 1);
                 LOGGER.debug("Trying to get password by executing command in backticks: " + command);
-                Vector returnValues = execute(command, LOGGER);
+                Vector<Object> returnValues = execute(command, LOGGER);
                 Integer exitValue = (Integer) returnValues.elementAt(0);
                 if (exitValue.compareTo(new Integer(0)) == 0 && (String) returnValues.elementAt(1) != null) {
                     returnPassword = (String) returnValues.elementAt(1);

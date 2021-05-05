@@ -7,91 +7,116 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-import sos.net.ssh.SOSSSHJob2;
-import sos.net.ssh.SOSSSHJobOptions;
-import sos.net.ssh.exceptions.SSHExecutionError;
 
-public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+import sos.net.ssh.SOSSSHJobOptions;
+import sos.scheduler.job.impl.SOSSSHCheckRemotePidJob;
+import sos.scheduler.job.impl.SOSSSHKillRemotePidJob;
+import sos.scheduler.job.impl.SOSSSHTerminateRemotePidJob;
+import sos.spooler.Variable_set;
+import sos.util.SOSString;
+
+public class SOSSSHKillJobJSAdapter extends JobSchedulerJobAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillJobJSAdapter.class);
 
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
     private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
     private static final String PARAM_SSH_JOB_TIMEOUT_KILL_AFTER = "ssh_job_timeout_kill_after";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSSHKillJobJSAdapter.class);
     private HashMap<String, String> allParams;
 
     @Override
     public boolean spooler_process() throws Exception {
-        boolean successfull = true;
         try {
             super.spooler_process();
-            successfull = doProcessing();
+            if (doProcessing()) {
+                return getSpoolerProcess().isOrderJob();
+            } else {
+                return false;
+            }
         } catch (Exception e) {
-            LOGGER.error(stackTrace2String(e));
+            LOGGER.error(e.toString(), e);
             throw new JobSchedulerException(e);
-        }
-        if (successfull) {
-            return signalSuccess();
-        } else {
-            return signalFailure();
         }
     }
 
     private boolean doProcessing() throws Exception {
-        SOSSSHJob2 sshJob;
         allParams = getGlobalSchedulerParameters();
-        allParams.putAll(getParameters());
+        allParams.putAll(getJobOrOrderParameters(getSpoolerProcess().getOrder()));
+
+        String currentNodeName = getCurrentNodeName(getSpoolerProcess().getOrder(), false);
+        SOSSSHCheckRemotePidJob job = executeCheckPids(currentNodeName);
+        Variable_set orderParams = null;
+        if (getSpoolerProcess().getOrder() != null) {
+            orderParams = getSpoolerProcess().getOrder().params();
+        }
+        if (job.getPids() != null && orderParams != null) {
+            orderParams.set_var(PARAM_PIDS_TO_KILL, job.getPids());
+        }
+
         boolean taskIsActive = true;
         boolean timeoutAfterKillIsSet = false;
-        if (allParams.get(PARAM_SSH_JOB_TASK_ID) != null && !allParams.get(PARAM_SSH_JOB_TASK_ID).isEmpty()) {
-            taskIsActive = isTaskActive(allParams.get(PARAM_SSH_JOB_TASK_ID));
+
+        String sshJobTaskId = allParams.get(PARAM_SSH_JOB_TASK_ID);
+        if (!SOSString.isEmpty(sshJobTaskId)) {
+            taskIsActive = isTaskActive(sshJobTaskId);
         } else {
             taskIsActive = false;
         }
         if (allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.get(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()) {
             timeoutAfterKillIsSet = true;
         }
-        LOGGER.info("Task is still active: " + taskIsActive);
-        sshJob = executeCheckPids();
-        if (((SOSSSHCheckRemotePidJob) sshJob).getPids() != null) {
-            spooler_log.debug9(((SOSSSHCheckRemotePidJob) sshJob).getPids());
-            getOrderParams().set_var(PARAM_PIDS_TO_KILL, ((SOSSSHCheckRemotePidJob) sshJob).getPids());
+        LOGGER.info(String.format("Task is still active: %s", taskIsActive));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Task %s", sshJobTaskId));
         }
-        String runningPids = spooler_task.order().params().value(PARAM_PIDS_TO_KILL);
-        if (taskIsActive && runningPids != null && !runningPids.isEmpty()) {
-            // if task is still running and remote pids are still available -->
-            // do nothing check again after some delay
-            LOGGER.info("Task and remote processes are still active, do nothing!");
-            return false;
-        } else if (taskIsActive && (runningPids == null || runningPids.isEmpty())) {
-            // if task is still running but remote pid is not available anymore (finished) --> kill task
-            LOGGER.info("Task is still active, try to end task!");
-            String killTaskXml = new String("<kill_task job=\"" + allParams.get(PARAM_SSH_JOB_NAME) + "\" id=\""
-                    + allParams.get(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
-            String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
-            LOGGER.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
-            return true;
-        } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && !timeoutAfterKillIsSet) {
-            LOGGER.info("Task is not active anymore, processing kill remote pids!");
-            // if task is not running anymore but remote pid is still available
-            // and a timeout_kill_after is not set --> kill remote pid immediately
-            sshJob = executeKillPids();
-            return true;
-        } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && timeoutAfterKillIsSet) {
-            LOGGER.info("Task is not active anymore, processing kill remote pids!");
-            // if task is not running anymore but remote pid is still available
-            // and a timeout_kill_after is set --> terminate remote pid
-            // if timeout_kill_after is set, try terminate first and kill after
-            // timeout
-            allParams.put(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
-            sshJob = executeTerminatePids();
-            return true;
-        } else if (!taskIsActive && (runningPids == null || runningPids.isEmpty())) {
-            // if task is not running anymore AND remote pid is not available anymore --> do nothing
-            LOGGER.info("Task is not active anymore, remote pids not available anymore. Nothing to do!");
-            return true;
+
+        String runningPids = null;
+        if (orderParams != null) {
+            runningPids = orderParams.value(PARAM_PIDS_TO_KILL);
         }
-        return true;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("running pids=%s", runningPids));
+        }
+        if (taskIsActive) {
+            if (SOSString.isEmpty(runningPids)) {
+                // if task is still running but remote pid is not available anymore (finished) --> kill task
+                LOGGER.info("Task is still active, try to end task!");
+                String killTaskXml = new String("<kill_task job=\"" + allParams.get(PARAM_SSH_JOB_NAME) + "\" id=\"" + allParams.get(
+                        PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
+                String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
+                LOGGER.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
+                return true;
+            } else {
+                // if task is still running and remote pids are still available -->
+                // do nothing check again after some delay
+                LOGGER.info("Task and remote processes are still active, do nothing!");
+                return false;
+            }
+        } else {
+            if (SOSString.isEmpty(runningPids)) {
+                // if task is not running anymore AND remote pid is not available anymore --> do nothing
+                LOGGER.info("Task is not active anymore, remote pids not available anymore. Nothing to do!");
+                return true;
+            } else {
+                if (timeoutAfterKillIsSet) {
+                    LOGGER.info("Task is not active anymore, processing terminate remote pids!");
+                    // if task is not running anymore but remote pid is still available
+                    // and a timeout_kill_after is set --> terminate remote pid
+                    // if timeout_kill_after is set, try terminate first and kill after
+                    // timeout
+                    allParams.put(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
+                    executeTerminatePids(currentNodeName);
+                    return true;
+                } else {
+                    LOGGER.info("Task is not active anymore, processing kill remote pids!");
+                    // if task is not running anymore but remote pid is still available
+                    // and a timeout_kill_after is not set --> kill remote pid immediately
+                    executeKillPids(currentNodeName);
+                    return true;
+                }
+            }
+        }
     }
 
     private boolean isTaskActive(String taskId) {
@@ -101,97 +126,52 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
         return showTaskAnswerXml.contains("state=\"running");
     }
 
-    private SOSSSHJob2 executeCheckPids() {
-        SOSSSHJob2 sshJob = null;
-        SOSSSHJobOptions options = null;
-        try {
-            sshJob = new SOSSSHCheckRemotePidJob();
-            LOGGER.debug("SOSSSHCheckRemotePidJob instantiated!");
-            options = sshJob.getOptions();
-            options.setCurrentNodeName(this.getCurrentNodeName(false));
-            HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
-            sshJob.setJSJobUtilites(this);
-            options.checkMandatory();
-            sshJob.execute();
-        } catch (Exception e) {
-            if (options.raiseExceptionOnError.value()) {
-                if (options.ignoreError.value()) {
-                    if (options.ignoreStderr.value()) {
-                        LOGGER.debug(this.stackTrace2String(e));
-                    } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                    }
-                } else {
-                    LOGGER.error(this.stackTrace2String(e));
-                    throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                }
-            }
+    private SOSSSHCheckRemotePidJob executeCheckPids(String nodeName) throws Exception {
+        SOSSSHCheckRemotePidJob job = new SOSSSHCheckRemotePidJob();
+        job.setJSJobUtilites(this);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(job.getClass().getSimpleName() + " instantiated!");
         }
-        return sshJob;
+        SOSSSHJobOptions options = job.getOptions();
+        options.setCurrentNodeName(nodeName);
+        HashMap<String, String> params = getSchedulerParameterAsProperties(allParams);
+        options.setAllOptions(options.deletePrefix(params, "ssh_"));
+        options.checkMandatory();
+
+        job.execute();
+        return job;
     }
 
-    private SOSSSHJob2 executeKillPids() {
-        SOSSSHJob2 sshJob = null;
-        SOSSSHJobOptions options = null;
-        try {
-            sshJob = new SOSSSHKillRemotePidJob();
-            LOGGER.debug("SOSSSHKillRemotePidJob instantiated!");
-            options = sshJob.getOptions();
-            options.setCurrentNodeName(this.getCurrentNodeName(false));
-            HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
-            sshJob.setJSJobUtilites(this);
-            options.checkMandatory();
-            sshJob.execute();
-        } catch (Exception e) {
-            if (options.raiseExceptionOnError.value()) {
-                if (options.ignoreError.value()) {
-                    if (options.ignoreStderr.value()) {
-                        LOGGER.debug(this.stackTrace2String(e));
-                    } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                    }
-                } else {
-                    LOGGER.error(this.stackTrace2String(e));
-                    throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                }
-            }
+    private SOSSSHKillRemotePidJob executeKillPids(String nodeName) throws Exception {
+        SOSSSHKillRemotePidJob job = new SOSSSHKillRemotePidJob();
+        job.setJSJobUtilites(this);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(job.getClass().getSimpleName() + " instantiated!");
         }
-        return sshJob;
+        SOSSSHJobOptions options = job.getOptions();
+        options.setCurrentNodeName(nodeName);
+        HashMap<String, String> params = getSchedulerParameterAsProperties(allParams);
+        options.setAllOptions(options.deletePrefix(params, "ssh_"));
+        options.checkMandatory();
+
+        job.execute();
+        return job;
     }
 
-    private SOSSSHJob2 executeTerminatePids() {
-        SOSSSHJob2 sshJob = null;
-        SOSSSHJobOptions options = null;
-        try {
-            sshJob = new SOSSSHTerminateRemotePidJob();
-            LOGGER.debug("SOSSSHTerminateRemotePidJob instantiated!");
-            options = sshJob.getOptions();
-            options.setCurrentNodeName(this.getCurrentNodeName(false));
-            HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
-            sshJob.setJSJobUtilites(this);
-            options.checkMandatory();
-            sshJob.execute();
-        } catch (Exception e) {
-            if (options.raiseExceptionOnError.value()) {
-                if (options.ignoreError.value()) {
-                    if (options.ignoreStderr.value()) {
-                        LOGGER.debug(this.stackTrace2String(e));
-                    } else {
-                        LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                    }
-                } else {
-                    LOGGER.error(this.stackTrace2String(e));
-                    throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
-                }
-            }
+    private SOSSSHTerminateRemotePidJob executeTerminatePids(String nodeName) throws Exception {
+        SOSSSHTerminateRemotePidJob job = new SOSSSHTerminateRemotePidJob();
+        job.setJSJobUtilites(this);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(job.getClass().getSimpleName() + " instantiated!");
         }
-        return sshJob;
+        SOSSSHJobOptions options = job.getOptions();
+        options.setCurrentNodeName(nodeName);
+        HashMap<String, String> params = getSchedulerParameterAsProperties(allParams);
+        options.setAllOptions(options.deletePrefix(params, "ssh_"));
+        options.checkMandatory();
+
+        job.execute();
+        return job;
     }
 
 }

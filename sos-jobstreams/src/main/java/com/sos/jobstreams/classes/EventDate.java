@@ -1,8 +1,8 @@
 package com.sos.jobstreams.classes;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+
+import com.sos.jitl.jobstreams.Constants;
 
 public class EventDate {
 
@@ -31,19 +31,17 @@ public class EventDate {
             }
         }
 
-        Date d = new Date();
-        switch (conditionEventDate) {
+        calendar = Constants.getSessionCalendar();
+         switch (conditionEventDate) {
         case "today":
-            d = addCalendar(new Date(), operand, java.util.Calendar.DATE);
-            calendar.setTime(d);
+            calendar.add(java.util.Calendar.DATE, operand);
             break;
         case "*":
             return "*";
         case "prev":
             return "*";
         case "yesterday":
-            d = addCalendar(new Date(), -1 + operand, java.util.Calendar.DATE);
-            calendar.setTime(d);
+            calendar.add(java.util.Calendar.DATE, -1 + operand);
             break;
         default:
             return conditionEventDate;
@@ -53,13 +51,7 @@ public class EventDate {
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         return String.valueOf(month) + "." + String.valueOf(dayOfMonth);
     }
-
-    private Date addCalendar(Date date, Integer add, Integer c) {
-        java.util.Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        calendar.add(c, add);
-        return calendar.getTime();
-    }
+ 
 
     public boolean isPrev(String conditionEventDate) {
         return conditionEventDate.toLowerCase().trim().startsWith("prev");

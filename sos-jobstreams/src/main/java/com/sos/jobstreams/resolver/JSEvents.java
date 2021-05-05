@@ -8,9 +8,17 @@ import java.util.stream.Collectors;
 
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
+import com.sos.jitl.jobstreams.db.DBItemEvent;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
 
+import sos.util.SOSString;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JSEvents {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSEvents.class);
 
     private Map<JSEventKey, JSEvent> listOfEvents;
 
@@ -32,11 +40,20 @@ public class JSEvents {
     }
 
     public void setListOfEvents(List<DBItemOutConditionWithEvent> listOfEvents) {
-        for (DBItemOutConditionWithEvent itemEvent : listOfEvents) {
-            if (itemEvent != null && itemEvent.getDbItemEvent() != null) {
+        for (DBItemOutConditionWithEvent dbItemOutConditionWithEvent : listOfEvents) {
+            if (dbItemOutConditionWithEvent != null) {
+                DBItemEvent itemEvent = new DBItemEvent();
+                itemEvent.setCreated(dbItemOutConditionWithEvent.getCreated());
+                itemEvent.setEvent(dbItemOutConditionWithEvent.getEvent());
+                itemEvent.setGlobalEvent(dbItemOutConditionWithEvent.getGlobalEvent());
+                itemEvent.setId(dbItemOutConditionWithEvent.getEventId());
+                itemEvent.setJobStream(dbItemOutConditionWithEvent.getJobStream());
+                itemEvent.setJobStreamHistoryId(dbItemOutConditionWithEvent.getJobStreamHistoryId());
+                itemEvent.setOutConditionId(dbItemOutConditionWithEvent.getOutConditionId());
+                itemEvent.setSession(dbItemOutConditionWithEvent.getSession());
                 JSEvent jsEvent = new JSEvent();
-                jsEvent.setItemEvent(itemEvent.getDbItemEvent());
-                jsEvent.setSchedulerId(itemEvent.getJobSchedulerId());
+                jsEvent.setItemEvent(itemEvent);
+                jsEvent.setSchedulerId(dbItemOutConditionWithEvent.getJobSchedulerId());
                 addEvent(jsEvent);
             }
         }
@@ -52,8 +69,15 @@ public class JSEvents {
     }
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
+        JSEvent returnEvent;
+        if ((jsEventKey.getSession() == null) || (jsEventKey.getEvent() == null)){
+            return null;
+        }
         if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
-            return this.getEvent(jsEventKey);
+            returnEvent = this.getEvent(jsEventKey);
+            LOGGER.trace("EventKey:" + SOSString.toString(jsEventKey));
+            LOGGER.debug("Event direct return: " + returnEvent);
+            return returnEvent;
         } else {
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
                     .getEvent()) && ("*".equals(jsEventKey.getSession()) || jsEventKey.getSession().equals(jsEvent.getKey().getSession()))
@@ -63,7 +87,9 @@ public class JSEvents {
 
                     .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
             try {
-                return collect.entrySet().stream().findAny().get().getValue();
+                returnEvent = collect.entrySet().stream().findAny().get().getValue();
+                LOGGER.debug("Event return: " + returnEvent.getEvent());
+                return returnEvent;
             } catch (NoSuchElementException e) {
                 return null;
             }
@@ -72,13 +98,7 @@ public class JSEvents {
     }
 
     public void removeEvent(JSEvent event) {
-        JSEventKey jsEventKey = new JSEventKey();
-        jsEventKey.setEvent(event.getEvent());
-        jsEventKey.setJobStream(event.getJobStream());
-        jsEventKey.setSession(event.getSession());
-        jsEventKey.setSchedulerId(event.getSchedulerId());
-        jsEventKey.setGlobalEvent(event.isGlobalEvent());
-        this.removeEvent(jsEventKey);
+        this.removeEvent(event.getKey());
     }
 
     public void newList() {

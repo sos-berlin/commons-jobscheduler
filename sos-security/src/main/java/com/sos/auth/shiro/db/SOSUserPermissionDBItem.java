@@ -27,7 +27,6 @@ public class SOSUserPermissionDBItem extends DbItem {
         this.id = id;
     }
 
-    @Column(name = "[SOS_USER_PERMISSION`", nullable = false)
     public void setSosUserPermission(String sosUserPermission) {
         this.sosUserPermission = sosUserPermission;
     }
@@ -42,7 +41,6 @@ public class SOSUserPermissionDBItem extends DbItem {
         return userId;
     }
 
-    @Column(name = "[USER_ID]")
     public void setUserId(Long userId) {
         this.userId = userId;
     }
@@ -52,7 +50,6 @@ public class SOSUserPermissionDBItem extends DbItem {
         return roleId;
     }
 
-    @Column(name = "[ROLE_ID]")
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }

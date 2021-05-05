@@ -1,20 +1,18 @@
 package com.sos.auth.shiro.db;
 
 import java.util.List;
-
 import org.hibernate.query.Query;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
-/** @author Uwe Risse */
 public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
     private SOSUserFilter filter = null;
+    private final SOSHibernateSession sosHibernateSession;
 
-    public SOSUserDBLayer(String configurationFileName) throws Exception {
-        super();
-        this.setConfigurationFileName(configurationFileName);
-        this.createStatefullConnection(this.getConfigurationFileName());
+    public SOSUserDBLayer(SOSHibernateSession session) {
+        this.sosHibernateSession = session;
         resetFilter();
     }
 
@@ -25,7 +23,7 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
     public int delete() throws Exception {
         String hql = "delete from SOSUserDBItem " + getWhere();
-        Query query = null;
+        Query<SOSUserDBItem> query = null;
         int row = 0;
         sosHibernateSession.beginTransaction();
         query = sosHibernateSession.createQuery(hql);
@@ -49,18 +47,17 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
         return where;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<SOSUserDBItem> getSOSUserList(final int limit) throws Exception {
+     public List<SOSUserDBItem> getSOSUserList(final int limit) throws Exception {
         List<SOSUserDBItem> sosUserList = null;
         sosHibernateSession.beginTransaction();
-        Query query = sosHibernateSession.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
+        Query<SOSUserDBItem> query = sosHibernateSession.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
         if (filter.getUserName() != null && !filter.getUserName().equals("")) {
             query.setParameter("sosUserName", filter.getUserName());
         }
         if (limit > 0) {
             query.setMaxResults(limit);
         }
-        sosUserList = query.list();
+        sosUserList = query.getResultList();
         return sosUserList;
     }
 

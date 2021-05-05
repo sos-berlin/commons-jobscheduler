@@ -2,52 +2,70 @@ package com.sos.jobstreams.resolver;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
 
-import com.sos.exception.SOSException;
-import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sos.exception.SOSInvalidDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.eventhandler.handler.EventHandlerSettings;
 import com.sos.jitl.eventing.evaluate.BooleanExp;
-import com.sos.jitl.jobstreams.Constants;
 import com.sos.jitl.jobstreams.classes.JSEvent;
 import com.sos.jitl.jobstreams.classes.JSEventKey;
+import com.sos.jitl.jobstreams.db.DBItemCalendarWithUsages;
 import com.sos.jitl.jobstreams.db.DBItemConsumedInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInCondition;
 import com.sos.jitl.jobstreams.db.DBItemInConditionWithCommand;
+import com.sos.jitl.jobstreams.db.DBItemJobStream;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBItemJobStreamTaskContext;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithConfiguredEvent;
 import com.sos.jitl.jobstreams.db.DBItemOutConditionWithEvent;
+import com.sos.jitl.jobstreams.db.DBLayerCalendarUsages;
 import com.sos.jitl.jobstreams.db.DBLayerConsumedInConditions;
 import com.sos.jitl.jobstreams.db.DBLayerEvents;
 import com.sos.jitl.jobstreams.db.DBLayerInConditions;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamHistory;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreams;
+import com.sos.jitl.jobstreams.db.DBLayerJobStreamsTaskContext;
 import com.sos.jitl.jobstreams.db.DBLayerOutConditions;
+import com.sos.jitl.jobstreams.db.FilterCalendarUsage;
 import com.sos.jitl.jobstreams.db.FilterConsumedInConditions;
 import com.sos.jitl.jobstreams.db.FilterEvents;
 import com.sos.jitl.jobstreams.db.FilterInConditions;
+import com.sos.jitl.jobstreams.db.FilterJobStreamHistory;
+import com.sos.jitl.jobstreams.db.FilterJobStreamTaskContext;
+import com.sos.jitl.jobstreams.db.FilterJobStreams;
 import com.sos.jitl.jobstreams.db.FilterOutConditions;
 import com.sos.jobstreams.classes.CheckHistoryCacheRule;
 import com.sos.jobstreams.classes.CheckHistoryCacheRules;
 import com.sos.jobstreams.classes.CheckHistoryCondition;
 import com.sos.jobstreams.classes.CheckHistoryKey;
 import com.sos.jobstreams.classes.CheckHistoryValue;
+import com.sos.jobstreams.classes.CheckRunningResult;
 import com.sos.jobstreams.classes.DurationCalculator;
 import com.sos.jobstreams.classes.EventDate;
+import com.sos.jobstreams.classes.JobStarterOptions;
+import com.sos.jobstreams.classes.StartJobReturn;
+import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.interfaces.IJSCondition;
-import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 
 public class JSConditionResolver {
@@ -58,9 +76,10 @@ public class JSConditionResolver {
     private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
     private JSJobInConditions jsJobInConditions;
+    private JSJobStreamInConditions jsJobStreamInConditions;
     private JSJobOutConditions jsJobOutConditions;
+    private JSJobStreamOutConditions jsJobStreamOutConditions;
     private JSEvents jsEvents;
-    private SOSHibernateSession sosHibernateSession;
     private BooleanExp booleanExpression;
     private EventHandlerSettings settings;
     private CheckHistoryCondition checkHistoryCondition;
@@ -69,110 +88,277 @@ public class JSConditionResolver {
     private String workingDirectory = "";
     private JSEvents newJsEvents = new JSEvents();
     private JSEvents removeJsEvents = new JSEvents();
+    private JSJobStreams jsJobStreams;
+    private JobStreamContexts jobStreamContexts;
+    private Map<UUID, DBItemJobStreamHistory> listOfHistoryIds;
+    private Map<UUID, Map<String, String>> listOfParameters;
+    private Map<Long, JSJobStreamStarter> listOfJobStreamStarter;
+    private Map<String, List<DBItemCalendarWithUsages>> listOfCalendarUsages;
+    private List<String> listOfMissingEvents;
+    private List<String> listOfPresentEvents;
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, SchedulerXmlCommandExecutor schedulerXmlCommandExecutor,
-            EventHandlerSettings settings) {
+    public JSConditionResolver(SchedulerXmlCommandExecutor schedulerXmlCommandExecutor, EventHandlerSettings settings) {
         super();
         this.schedulerXmlCommandExecutor = schedulerXmlCommandExecutor;
         booleanExpression = new BooleanExp("");
-        this.sosHibernateSession = sosHibernateSession;
         this.settings = settings;
-        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
+        if (settings != null) {
+            checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
+        }
     }
 
-    public JSConditionResolver(SOSHibernateSession sosHibernateSession, String schedulerId) {
+    public JSConditionResolver(String schedulerId) {
         super();
         booleanExpression = new BooleanExp("");
-        this.sosHibernateSession = sosHibernateSession;
         this.settings = new EventHandlerSettings();
         settings.setSchedulerId(schedulerId);
         checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
     }
 
-    public void reInit() throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolver reinit jobstream model");
-        jsJobInConditions = null;
-        jsJobOutConditions = null;
-        jsEvents = null;
-        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
-        this.init();
+    public void initComplete(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
+            IOException, Exception {
+        init(sosHibernateSession, true);
     }
 
-    public void reInitEvents(SOSHibernateFactory reportingFactory) throws SOSHibernateException {
+    public void initPartial(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
+            IOException, Exception {
+        init(sosHibernateSession, false);
+    }
+
+    private void reInit(SOSHibernateSession sosHibernateSession, boolean complete) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
+        LOGGER.debug("JSConditionResolver reinit jobstream model");
+
+        JSJobStreams _jsJobStreams = new JSJobStreams();
+        if (jsJobStreams != null && jsJobStreams.listOfJobStreamNames != null) {
+            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
+                _jsJobStreams.listOfJobStreamNames.put(entry.getKey(), entry.getValue());
+            }
+            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
+                _jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        jsJobInConditions = null;
+        jsJobStreamInConditions = null;
+        jsJobOutConditions = null;
+        jsJobStreamOutConditions = null;
+        jsJobStreams = null;
+        jsEvents = null;
+        listOfHistoryIds = null;
+        listOfParameters = null;
+        listOfJobStreamStarter = null;
+        listOfCalendarUsages = null;
+        jobStreamContexts = null;
+        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
+
+        this.init(sosHibernateSession, complete);
+
+        if (jsJobStreams != null &&_jsJobStreams.listOfJobStreamNames != null) {
+            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
+                JSJobStream jsJobStream = jsJobStreams.listOfJobStreamNames.get(entry.getKey());
+                jsJobStream.getListOfJobStreamStarter().clear();
+                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey());
+                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
+                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+                }
+            }
+            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
+                JSJobStream jsJobStream = jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+                jsJobStream.getListOfJobStreamStarter().clear();
+                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreams.get(entry.getKey());
+                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
+                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+                }
+            }
+        }
+    }
+
+    public void reInitComplete(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
+            IOException, Exception {
+        reInit(sosHibernateSession, true);
+    }
+
+    public void reInitPartial(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
+            IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
+        reInit(sosHibernateSession, false);
+    }
+
+    public void reInitEvents(SOSHibernateSession session) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver reinit events injobstream model");
-        SOSHibernateSession session = null;
         try {
-            session = reportingFactory.openStatelessSession("reInitEvents");
             jsEvents = null;
             this.initEvents(session);
         } catch (Exception e) {
             LOGGER.error("Could not reInit Events", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
 
-    public void reinitCalendarUsage() {
-        for (JSInConditions jsInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-            for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
-                jsInCondition.setListOfDates(sosHibernateSession, settings.getSchedulerId());
-            }
         }
     }
 
     public boolean haveGlobalEvents() {
-        return this.jsJobInConditions.getHaveGlobalConditions();
+        if (this.jsJobInConditions != null) {
+            return this.jsJobInConditions.getHaveGlobalConditions();
+        } else {
+            return false;
+        }
     }
 
-    public void init() throws SOSHibernateException {
+    private void initJobInConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        DurationCalculator duration = new DurationCalculator();
+
+        FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+        filterJobStreamHistory.setRunning(true);
+        List<DBItemJobStreamHistory> listOfRunningJobStreams = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+
+        HashMap<Long, List<DBItemConsumedInCondition>> mapOfConsumedInCondition = new HashMap<Long, List<DBItemConsumedInCondition>>();
+        for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfRunningJobStreams) {
+
+            FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+            filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
+            filterConsumedInConditions.setSession(dbItemJobStreamHistory.getContextId());
+            DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+            List<DBItemConsumedInCondition> l = dbLayerCoumsumedInConditions.getConsumedInConditionsList(filterConsumedInConditions, 0);
+            for (DBItemConsumedInCondition dbItemConsumedInCondition : l) {
+                if (mapOfConsumedInCondition.get(dbItemConsumedInCondition.getInConditionId()) == null) {
+                    mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), new ArrayList<DBItemConsumedInCondition>());
+                }
+                mapOfConsumedInCondition.get(dbItemConsumedInCondition.getInConditionId()).add(dbItemConsumedInCondition);
+            }
+        }
+
+        FilterInConditions filterInConditions = new FilterInConditions();
+        filterInConditions.setJobSchedulerId(settings.getSchedulerId());
+
+        DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
+        List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
+        for (DBItemInConditionWithCommand itemInConditionWithCommand : listOfInConditions) {
+            DBItemInCondition itemInCondition = new DBItemInCondition();
+            itemInCondition.setCreated(itemInConditionWithCommand.getIncCreated());
+            itemInCondition.setExpression(itemInConditionWithCommand.getExpression());
+            itemInCondition.setFolder(itemInConditionWithCommand.getFolder());
+            itemInCondition.setId(itemInConditionWithCommand.getIncId());
+            itemInCondition.setJob(itemInConditionWithCommand.getJob());
+            itemInCondition.setJobStream(itemInConditionWithCommand.getJobStream());
+            itemInCondition.setMarkExpression(itemInConditionWithCommand.getMarkExpression());
+            itemInCondition.setNextPeriod(itemInConditionWithCommand.getNextPeriod());
+            itemInCondition.setSchedulerId(itemInConditionWithCommand.getJobSchedulerId());
+            itemInCondition.setSkipOutCondition(itemInConditionWithCommand.getSkipOutCondition());
+            if (itemInCondition.getId() != null && mapOfConsumedInCondition.get(itemInCondition.getId()) != null) {
+                for (DBItemConsumedInCondition dbItemConsumedInCondition : mapOfConsumedInCondition.get(itemInCondition.getId())) {
+                    itemInConditionWithCommand.setConsumed(dbItemConsumedInCondition.getSession());
+                }
+            }
+        }
+
+        jsJobInConditions = new JSJobInConditions();
+        jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfCalendarUsages, listOfInConditions);
+
+        jsJobStreamInConditions = new JSJobStreamInConditions(settings);
+        jsJobStreamInConditions.setListOfJobInConditions(jsJobInConditions);
+
+        duration.end("Init JobStreams in-conditions ");
+
+    }
+
+    private void initJobstreamContext(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        jobStreamContexts = new JobStreamContexts();
+        FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+        filterJobStreamHistory.setRunning(true);
+        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+        DBLayerJobStreamsTaskContext dbLayerJobStreamsTaskContext = new DBLayerJobStreamsTaskContext(sosHibernateSession);
+        List<DBItemJobStreamHistory> listOfRunningStreams = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+        for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfRunningStreams) {
+            FilterJobStreamTaskContext filterTaskContext = new FilterJobStreamTaskContext();
+            filterTaskContext.setJobstreamHistoryId(dbItemJobStreamHistory.getContextId());
+            List<DBItemJobStreamTaskContext> listOfTaskContext = dbLayerJobStreamsTaskContext.getJobStreamStarterJobsList(filterTaskContext, 0);
+            jobStreamContexts.setTaskToContext(listOfTaskContext);
+        }
+    }
+
+    private void initHistoryIds(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        listOfHistoryIds = new HashMap<UUID, DBItemJobStreamHistory>();
+        FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+        filterJobStreamHistory.setSchedulerId(settings.getSchedulerId());
+        filterJobStreamHistory.setRunning(true);
+        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+        List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+        for (DBItemJobStreamHistory dbItemJobStreamHistory : listOfJobStreamHistory) {
+            try {
+                if (dbItemJobStreamHistory.getRunning()) {
+                    this.listOfHistoryIds.put(UUID.fromString(dbItemJobStreamHistory.getContextId()), dbItemJobStreamHistory);
+                }
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not read create uuid from: " + dbItemJobStreamHistory.getContextId());
+            }
+        }
+    }
+
+    private void initJobStreams(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
+            SOSInvalidDataException, DOMException, SOSHibernateException, IOException, ParseException, TransformerException {
+        FilterJobStreams filterJobStreams = new FilterJobStreams();
+        filterJobStreams.setSchedulerId(settings.getSchedulerId());
+        DBLayerJobStreams dbLayerJobStreams = new DBLayerJobStreams(sosHibernateSession);
+        List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
+        jsJobStreams = new JSJobStreams();
+        jsJobStreams.setListOfJobStreams(settings, listOfJobStreams, listOfJobStreamStarter, listOfCalendarUsages, sosHibernateSession);
+
+    }
+
+    public void initJobOutConditions(SOSHibernateSession sosHibernateSession, String jobStream) throws SOSHibernateException {
+        FilterOutConditions filterOutConditions = new FilterOutConditions();
+        filterOutConditions.setJobStream(jobStream);
+        filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
+        DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
+        List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
+        jsJobOutConditions = new JSJobOutConditions();
+        jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+        jsJobStreamOutConditions = new JSJobStreamOutConditions();
+        jsJobStreamOutConditions.setListOfJobStreamOutConditions(jsJobOutConditions);
+    }
+
+    private void init(SOSHibernateSession sosHibernateSession, boolean complete) throws JsonParseException, JsonMappingException,
+            JsonProcessingException, IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
 
         LOGGER.debug("JSConditionResolver::Init");
         DurationCalculator duration = new DurationCalculator();
+        listOfParameters = new HashMap<UUID, Map<String, String>>();
+        listOfJobStreamStarter = new HashMap<Long, JSJobStreamStarter>();
 
-        if (jsJobInConditions == null) {
-            FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-            filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
-            filterConsumedInConditions.setSession(Constants.getSession());
-            DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-            List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
-                    filterConsumedInConditions, 0);
-            HashMap<Long, DBItemConsumedInCondition> mapOfConsumedInCondition = new HashMap<Long, DBItemConsumedInCondition>();
-            for (DBItemConsumedInCondition dbItemConsumedInCondition : listOfConsumedInConditions) {
-                mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), dbItemConsumedInCondition);
-            }
-
-            FilterInConditions filterInConditions = new FilterInConditions();
-            filterInConditions.setJobSchedulerId(settings.getSchedulerId());
-
-            DBLayerInConditions dbLayerInConditions = new DBLayerInConditions(sosHibernateSession);
-            List<DBItemInConditionWithCommand> listOfInConditions = dbLayerInConditions.getInConditionsList(filterInConditions, 0);
-            for (DBItemInConditionWithCommand dbItemInCondition : listOfInConditions) {
-                DBItemInCondition inInCondition = dbItemInCondition.getDbItemInCondition();
-                if (inInCondition != null) {
-                    boolean isConsumed = (mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null);
-                    if (isTraceEnabled) {
-                        LOGGER.trace("Expression " + inInCondition.getExpression() + " in " + inInCondition.getJob() + " is set to consumed="
-                                + isConsumed);
-                    }
-                    dbItemInCondition.setConsumed((mapOfConsumedInCondition.get(dbItemInCondition.getDbItemInCondition().getId()) != null));
-                } else {
-                    dbItemInCondition.setConsumed(false);
+        if (listOfCalendarUsages == null) {
+            FilterCalendarUsage filterCalendarUsage = new FilterCalendarUsage();
+            filterCalendarUsage.setSchedulerId(settings.getSchedulerId());
+            filterCalendarUsage.setObjectType("JOB");
+            DBLayerCalendarUsages dbLayer = new DBLayerCalendarUsages(sosHibernateSession);
+            listOfCalendarUsages = new HashMap<String, List<DBItemCalendarWithUsages>>();
+            List<DBItemCalendarWithUsages> l = dbLayer.getCalendarUsages(filterCalendarUsage, 0);
+            for (DBItemCalendarWithUsages item : l) {
+                if (listOfCalendarUsages.get(item.getPath()) == null) {
+                    List<DBItemCalendarWithUsages> usages = new ArrayList<DBItemCalendarWithUsages>();
+                    listOfCalendarUsages.put(item.getPath(), usages);
                 }
+                listOfCalendarUsages.get(item.getPath()).add(item);
             }
-            jsJobInConditions = new JSJobInConditions(settings);
-            jsJobInConditions.setListOfJobInConditions(sosHibernateSession, listOfInConditions);
+        }
 
+        if (jobStreamContexts == null && complete) {
+            initJobstreamContext(sosHibernateSession);
+        }
+
+        if (jsJobInConditions == null && complete) {
+            initJobInConditions(sosHibernateSession);
         }
 
         if (jsJobOutConditions == null) {
-            FilterOutConditions filterOutConditions = new FilterOutConditions();
-            filterOutConditions.setJobSchedulerId(settings.getSchedulerId());
-            DBLayerOutConditions dbLayerOutConditions = new DBLayerOutConditions(sosHibernateSession);
-            List<DBItemOutConditionWithConfiguredEvent> listOfOutConditions = dbLayerOutConditions.getOutConditionsList(filterOutConditions, 0);
-            jsJobOutConditions = new JSJobOutConditions();
-            jsJobOutConditions.setListOfJobOutConditions(listOfOutConditions);
+            initJobOutConditions(sosHibernateSession, "");
+        }
+
+        if (jsJobStreams == null && complete) {
+            initJobStreams(sosHibernateSession);
+        }
+
+        if (listOfHistoryIds == null && complete) {
+            initHistoryIds(sosHibernateSession);
         }
 
         if (listOfCheckHistoryChacheRules == null) {
@@ -180,73 +366,129 @@ public class JSConditionResolver {
             listOfCheckHistoryChacheRules.initCacheRules();
         }
 
-        initEvents(sosHibernateSession);
-        initCheckHistory();
-        if (isDebugEnabled) {
-            duration.end("Init JobStreams condition model ");
+        if (complete) {
+            initEvents(sosHibernateSession);
+            initCheckHistory(sosHibernateSession);
+        }
+        duration.end("Init JobStreams condition model ");
+        if (jsJobInConditions != null && jsJobOutConditions != null) {
             LOGGER.debug("In Conditions: " + jsJobInConditions.getListOfJobInConditions().size());
             LOGGER.debug("Out Conditions: " + jsJobOutConditions.getListOfJobOutConditions().size());
+        }
+        if (jsEvents != null) {
             LOGGER.debug("Events: " + jsEvents.getListOfEvents().size());
         }
 
     }
 
     public void initEvents(SOSHibernateSession session) throws SOSHibernateException {
+
+        LOGGER.debug("JSConditionResolver::initEvents");
+        if (jsEvents == null) {
+            jsEvents = new JSEvents();
+            DBLayerEvents dbLayerEvents = new DBLayerEvents(session);
+            FilterEvents filterEvents = new FilterEvents();
+            filterEvents.setSchedulerId(settings.getSchedulerId());
+            filterEvents.setIncludingGlobalEvent(false);
+            if (this.listOfHistoryIds.size() > 0) {
+                for (DBItemJobStreamHistory dbItemJobStreamHistory : this.listOfHistoryIds.values()) {
+                    filterEvents.addSession(dbItemJobStreamHistory.getContextId());
+                }
+                List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+                jsEvents.setListOfEvents(listOfEvents);
+            }
+
+            for (JSInConditions jsInConditions : jsJobStreamInConditions.getListOfJobStreamInConditions().values()) {
+                for (JSInCondition jsInCondition : jsInConditions.getListOfInConditions().values()) {
+                    List<JSCondition> listOfConditions = JSConditions.getListOfConditions(jsInCondition.getExpression());
+                    for (JSCondition jsCondition : listOfConditions) {
+                        if (jsCondition.isNonContextEvent()) {
+                            filterEvents = new FilterEvents();
+                            filterEvents = jsCondition.getFilterEventsNonContextEvent(settings.getSchedulerId());
+                            List<DBItemOutConditionWithEvent> listOfNonContextEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+                            this.addEventsFromList(listOfNonContextEvents);
+                        }
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    public void addEventsFromList(List<DBItemOutConditionWithEvent> listOfEvents) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolver::addEventsFromLis");
+        if (jsEvents != null && listOfEvents.size() > 0) {
+            jsEvents.setListOfEvents(listOfEvents);
+        }
+    }
+
+    public void initEvents(SOSHibernateSession session, UUID contextId) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver::initEvents");
         if (jsEvents == null) {
             jsEvents = new JSEvents();
             FilterEvents filterEvents = new FilterEvents();
             filterEvents.setSchedulerId(settings.getSchedulerId());
             filterEvents.setIncludingGlobalEvent(true);
+            if (contextId != null) {
+                filterEvents.setSession(contextId.toString());
+            }
             DBLayerEvents dbLayerEvents = new DBLayerEvents(session);
             List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
     }
 
-    public void reInitConsumedInConditions() throws SOSHibernateException {
+    public void reInitConsumedInConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
+            LOGGER.debug("reInitConsumedInConditions for jobstream" + jobStream.getValue().getJobStream());
+            if (jobStream.getValue().getListOfJobStreamHistory() != null) {
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    UUID contextId = jsHistoryEntry.getContextId();
 
-        LOGGER.debug("JSConditionResolver::reInitConsumedInConditions");
-        FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
-        filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
-        filterConsumedInConditions.setSession(Constants.getSession());
-        DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+                    LOGGER.debug("JSConditionResolver::reInitConsumedInConditions");
+                    FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                    filterConsumedInConditions.setJobSchedulerId(settings.getSchedulerId());
+                    filterConsumedInConditions.setSession(contextId.toString());
+                    DBLayerConsumedInConditions dbLayerCoumsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
 
-        List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
-                filterConsumedInConditions, 0);
-        HashMap<Long, DBItemConsumedInCondition> mapOfConsumedInCondition = new HashMap<Long, DBItemConsumedInCondition>();
-        for (DBItemConsumedInCondition dbItemConsumedInCondition : listOfConsumedInConditions) {
-            mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), dbItemConsumedInCondition);
-        }
-
-        sosHibernateSession.beginTransaction();
-        for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-            for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                if (inCondition.isConsumed() && mapOfConsumedInCondition.get(inCondition.getId()) == null) {
-                    DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
-                    dbItemConsumedInCondition.setCreated(new Date());
-                    dbItemConsumedInCondition.setInConditionId(inCondition.getId());
-                    dbItemConsumedInCondition.setSession(Constants.getSession());
-                    dbLayerCoumsumedInConditions.store(dbItemConsumedInCondition);
-                    if (isTraceEnabled) {
-                        LOGGER.trace(String.format("Consumed In Condition stored %s", inCondition.toStr()));
+                    List<DBItemConsumedInCondition> listOfConsumedInConditions = dbLayerCoumsumedInConditions.getConsumedInConditionsList(
+                            filterConsumedInConditions, 0);
+                    HashMap<Long, DBItemConsumedInCondition> mapOfConsumedInCondition = new HashMap<Long, DBItemConsumedInCondition>();
+                    for (DBItemConsumedInCondition dbItemConsumedInCondition : listOfConsumedInConditions) {
+                        mapOfConsumedInCondition.put(dbItemConsumedInCondition.getInConditionId(), dbItemConsumedInCondition);
                     }
 
-                }
-                if (!inCondition.isConsumed() && mapOfConsumedInCondition.get(inCondition.getId()) != null) {
-                    filterConsumedInConditions.setInConditionId(inCondition.getId());
-                    dbLayerCoumsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
-                    if (isTraceEnabled) {
-                        LOGGER.trace(String.format("Consumed In Condition deleted %s", inCondition.toStr()));
+                    sosHibernateSession.beginTransaction();
+                    for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                        for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                            if (inCondition.isConsumed(contextId) && mapOfConsumedInCondition.get(inCondition.getId()) == null) {
+                                DBItemConsumedInCondition dbItemConsumedInCondition = new DBItemConsumedInCondition();
+                                dbItemConsumedInCondition.setCreated(new Date());
+                                dbItemConsumedInCondition.setInConditionId(inCondition.getId());
+                                dbItemConsumedInCondition.setSession(contextId.toString());
+                                dbLayerCoumsumedInConditions.store(dbItemConsumedInCondition);
+                                if (isTraceEnabled) {
+                                    LOGGER.trace(String.format("Consumed In Condition stored %s", inCondition.toStr()));
+                                }
+
+                            }
+                            if (!inCondition.isConsumed(contextId) && mapOfConsumedInCondition.get(inCondition.getId()) != null) {
+                                filterConsumedInConditions.setInConditionId(inCondition.getId());
+                                dbLayerCoumsumedInConditions.deleteByInConditionId(filterConsumedInConditions);
+                                if (isTraceEnabled) {
+                                    LOGGER.trace(String.format("Consumed In Condition deleted %s", inCondition.toStr()));
+                                }
+                            }
+                        }
                     }
+                    sosHibernateSession.commit();
                 }
             }
-
         }
-        sosHibernateSession.commit();
     }
 
-    public void initCheckHistory() throws SOSHibernateException {
+    public void initCheckHistory(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
 
         LOGGER.debug("JSConditionResolver::initCheckHistory");
         for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
@@ -297,8 +539,8 @@ public class JSConditionResolver {
     }
 
     private String expressionPrepare(String e) {
-        return "<###" + e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" and ", "###&&&###").replaceAll(" or ", "###|||###")
-                .replaceAll("not ", "###!!!###") + "###>";
+        return "<###" + e.replaceAll("\\(", "###(###").replaceAll("\\)", "###)###").replaceAll(" (?i)and ", "###&&&###").replaceAll(" (?i)or ",
+                "###|||###").replaceAll("(?i)not ", "###!!!###") + "###>";
 
     }
 
@@ -309,7 +551,10 @@ public class JSConditionResolver {
 
     }
 
-    public boolean validate(Integer taskReturnCode, IJSCondition condition) {
+    public boolean validate(SOSHibernateSession sosHibernateSession, Integer taskReturnCode, UUID contextId, IJSCondition condition) {
+        listOfMissingEvents = new ArrayList<String>();
+        listOfPresentEvents = new ArrayList<String>();
+
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
@@ -399,15 +644,45 @@ public class JSConditionResolver {
                 } catch (Exception e) {
                     LOGGER.warn("Could not calculate prev date for: " + jsCondition.getConditionJob());
                 }
-                jsEventKey.setSession(eventDate.getEventDate(date));
+                if (jsCondition.typeIsGlobalEvent()) {
+                    String session = eventDate.getEventDate(date);
+                    LOGGER.debug("Global: setting context to: " + session);
+                    jsEventKey.setSession(session);
+                } else {
+                    String session = contextId.toString();
+                    LOGGER.debug("NOT Global: setting session to: " + session);
+                    jsEventKey.setSession(session);
+                }
+
                 jsEventKey.setGlobalEvent(jsCondition.typeIsGlobalEvent());
                 jsEventKey.setSchedulerId(settings.getSchedulerId());
-                jsEventKey.setJobStream(jsCondition.getConditionJobStream());
+                LOGGER.debug("condition.getJobStream():" + condition.getJobStream());
+                LOGGER.debug("jsCondition.getConditionJobStream():" + jsCondition.getConditionJobStream());
+                if (jsCondition.getConditionJobStream().isEmpty()) {
+                    jsEventKey.setJobStream(condition.getJobStream());
+                } else {
+                    jsEventKey.setJobStream(jsCondition.getConditionJobStream());
+                }
+
+                if (jsCondition.typeIsGlobalEvent() || jsCondition.isHaveDate() || (jsEventKey.getJobStream() != null && !"".equals(jsCondition
+                        .getConditionJobStream()))) {
+                    String session = eventDate.getEventDate(date);
+                    LOGGER.debug("Jobstream: setting context to: " + session);
+                    jsEventKey.setSession(session);
+                }
+
+                if (jsCondition.typeIsGlobalEvent()) {
+                    jsEventKey.setJobStream("");
+                }
+
                 JSEvent jsEvent = jsEvents.getEventByJobStream(jsEventKey);
                 if (jsEvent != null) {
                     expressionValue = this.expressionPrepare(expressionValue);
                     expressionValue = expressionValue.replace("###" + jsCondition.getConditionValue() + "###", "###true###");
                     expressionValue = this.expressionBack(expressionValue);
+                    listOfPresentEvents.add(jsCondition.getConditionValueShort());
+                } else {
+                    listOfMissingEvents.add(jsCondition.getConditionValueShort());
                 }
 
                 break;
@@ -424,48 +699,107 @@ public class JSConditionResolver {
         return evaluatedExpression;
     }
 
-    public List<JSInCondition> resolveInConditions(SOSHibernateSession session) throws UnsupportedEncodingException, MalformedURLException,
-            InterruptedException, SOSException, JocException, URISyntaxException, JAXBException {
+    public void handleStartedJob(UUID contextId, SOSHibernateSession sosHibernateSession, StartJobReturn startJobReturn, JSInCondition inCondition)
+            throws SOSHibernateException {
+        if (!startJobReturn.getStartedJob().isEmpty() && startJobReturn.isStarted()) {
+            JobStarterOptions jobStarterOptions = new JobStarterOptions();
+            jobStarterOptions.setJob(startJobReturn.getStartedJob());
+            jobStarterOptions.setJobStream(inCondition.getJobStream());
+            jobStarterOptions.setTaskId(startJobReturn.getTaskId());
+            jobStreamContexts.addTaskToContext(contextId, settings.getSchedulerId(), jobStarterOptions, sosHibernateSession);
+            this.disableInconditionsForJob(settings.getSchedulerId(), startJobReturn.getStartedJob(), contextId);
+        }
+    }
 
+    public List<JSInCondition> resolveInConditions(SOSHibernateSession sosHibernateSession, UUID instance) throws NumberFormatException, Exception {
+
+        LOGGER.debug("JSConditionResolver::resolveInConditions");
+
+        if (instance != null) {
+            LOGGER.debug("Resolving contextId " + instance.toString());
+        }
         List<JSInCondition> listOfValidatedInconditions = new ArrayList<JSInCondition>();
-        if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
-            LOGGER.debug("No in conditions defined. Nothing to do");
 
-        } else {
-
-            LOGGER.debug("JSConditionResolver::resolveInConditions");
-            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                    String logPrompt = "";
-                    if (isTraceEnabled) {
-                        logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream() + " Expression: " + inCondition
-                                .getExpression();
+        for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
+            LOGGER.debug("Resolving jobstream " + jobStream.getValue().getJobStream());
+            if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    if (!jsHistoryEntry.isRunning()) {
+                        continue;
                     }
-                    if (!inCondition.isConsumed()) {
-                        if (!inCondition.jobIsRunning()) {
-
-                            if (isTraceEnabled) {
-                                LOGGER.trace("---InCondition is: " + inCondition.toStr());
-                            }
-                            if (validate(null, inCondition)) {
-                                String startedJob = inCondition.executeCommand(session, schedulerXmlCommandExecutor);
-                                if (!startedJob.isEmpty()) {
-                                    this.disableInconditionsForJob(settings.getSchedulerId(), startedJob);
-                                }
-                                listOfValidatedInconditions.add(inCondition);
-                            } else {
-                                if (isTraceEnabled) {
-                                    LOGGER.trace(logPrompt + " evaluated to --> false");
-                                }
-                            }
-                        } else {
-                            if (isTraceEnabled) {
-                                LOGGER.trace(logPrompt + " not executed --> job is running");
-                            }
-                        }
+                    UUID contextId = jsHistoryEntry.getContextId();
+                    if (jsHistoryEntry.isSkipValidation() && !(instance == null || contextId.equals(instance))) {
+                        LOGGER.debug(contextId.toString() + " is running but will be skipped");
+                        continue;
+                    }
+                    LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                            .getJobStream(), jsHistoryEntry.getContextId()));
+                    if (jsJobInConditions != null && jsJobInConditions.getListOfJobInConditions().size() == 0) {
+                        LOGGER.debug("No in conditions defined. Nothing to do");
                     } else {
-                        if (isTraceEnabled) {
-                            LOGGER.trace(logPrompt + " not executed --> already consumed");
+                        try {
+                            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+
+                                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                                    String logPrompt = "";
+
+                                    if (!inCondition.getJobStream().equals(jobStream.getValue().getJobStream())) {
+                                        continue;
+                                    }
+
+                                    if (isTraceEnabled) {
+                                        logPrompt = "job: " + inCondition.getJob() + " Job Stream: " + inCondition.getJobStream() + " Expression: "
+                                                + inCondition.getExpression();
+                                    }
+
+                                    if (inCondition.jobIsRunning(contextId)) {
+                                        if (isTraceEnabled) {
+                                            LOGGER.trace(logPrompt + " not executed --> job is running");
+                                        }
+                                        continue;
+                                    }
+
+                                    if (inCondition.isConsumed(contextId) && inCondition.isMarkExpression()) {
+                                        if (isTraceEnabled) {
+                                            LOGGER.trace(logPrompt + " not executed --> already consumed");
+                                        }
+                                        continue;
+                                    }
+                                    sosHibernateSession.beginTransaction();
+
+                                    if (isTraceEnabled) {
+                                        LOGGER.trace("---InCondition is: " + inCondition.toStr());
+                                    }
+
+                                    JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory()
+                                            .getJobStream());
+                                    JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
+                                    boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
+                                    if (!endedByJob) {
+
+                                        jsHistoryEntry.setSkipValidation(inCondition.isHaveOnlyInstanceEvents());
+
+                                        if (validate(sosHibernateSession, null, contextId, inCondition)) {
+                                            StartJobReturn startJobReturn = inCondition.executeCommand(sosHibernateSession, contextId,
+                                                    listOfParameters.get(contextId), schedulerXmlCommandExecutor);
+
+                                            handleStartedJob(contextId, sosHibernateSession, startJobReturn, inCondition);
+                                            inCondition.setEvaluatedContextId(contextId);
+                                            LOGGER.debug("Adding in condition: " + inCondition.asString());
+                                            listOfValidatedInconditions.add(inCondition);
+                                        } else {
+                                            if (isTraceEnabled) {
+                                                LOGGER.trace(logPrompt + " evaluated to --> false");
+                                            }
+                                        }
+                                    }
+
+                                    sosHibernateSession.commit();
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error(e.getMessage(), e);
+                            sosHibernateSession.rollback();
                         }
                     }
                 }
@@ -475,124 +809,186 @@ public class JSConditionResolver {
 
     }
 
-    public boolean resolveOutConditions(Integer taskReturnCode, String jobSchedulerId, String job) throws SOSHibernateException {
+    public CheckRunningResult checkRunning(SOSHibernateSession sosHibernateSession, UUID contextId) throws SOSHibernateException {
+        CheckRunningResult resolveOutConditionResult = new CheckRunningResult();
+        resolveOutConditionResult.setJobstreamCompleted(false);
+        for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
+            if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
+                List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
+                for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
+                    if (jsHistoryEntry.getContextId().toString().equals(contextId.toString()) && jsHistoryEntry.isRunning()) {
+                        LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
+                                .getJobStream(), jsHistoryEntry.getContextId()));
+                        if (!jsHistoryEntry.checkRunning(this)) {
+                            try {
+                                JSJobStream jsJobStream = getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory().getJobStream());
+                                LOGGER.debug(jsHistoryEntry.getContextId() + " --> running=false");
+                                resolveOutConditionResult.setJobstreamCompleted(true);
+                                resolveOutConditionResult.setJobStream(jsJobStream.getJobStream());
+                                jsHistoryEntry.getItemJobStreamHistory().setRunning(false);
+                                DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+                                DBItemJobStreamHistory dbItemJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryDbItem(jsHistoryEntry
+                                        .getId());
+
+                                FilterConsumedInConditions filterConsumedInConditions = new FilterConsumedInConditions();
+                                filterConsumedInConditions.setJobSchedulerId(jsJobStream.getJobSchedulerId());
+                                filterConsumedInConditions.setJobStream(resolveOutConditionResult.getJobStream());
+                                filterConsumedInConditions.setSession(contextId.toString());
+                                removeConsumedInconditions(sosHibernateSession, filterConsumedInConditions);
+
+                                if (this.listOfHistoryIds.get(contextId) != null) {
+                                    this.listOfHistoryIds.remove(contextId);
+                                }
+
+                                if (dbItemJobStreamHistory != null) {
+                                    sosHibernateSession.beginTransaction();
+                                    dbItemJobStreamHistory.setRunning(false);
+                                    dbItemJobStreamHistory.setEnded(new Date());
+                                    dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
+                                    sosHibernateSession.commit();
+                                    toRemove.add(jsHistoryEntry);
+                                    this.listOfParameters.remove(contextId);
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                                sosHibernateSession.rollback();
+                            }
+                        }
+                    }
+                }
+                jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
+            }
+        }
+        return resolveOutConditionResult;
+    }
+
+    public boolean resolveOutConditions(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent, String jobSchedulerId, String job)
+            throws SOSHibernateException {
+
+        CheckRunningResult resolveOutConditionResult = new CheckRunningResult();
         LOGGER.debug("JSConditionResolver::resolveOutConditions for job:" + job);
-        boolean dbChange = false;
+
+        boolean dbChanged = false;
+
         JSJobConditionKey jobConditionKey = new JSJobConditionKey();
         this.newJsEvents = new JSEvents();
         this.removeJsEvents = new JSEvents();
         jobConditionKey.setJob(job);
         jobConditionKey.setJobSchedulerId(jobSchedulerId);
-        JSOutConditions jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
+        JSOutConditions jobOutConditions = null;
+        if ((jsJobOutConditions != null) && (jsJobOutConditions.getListOfJobOutConditions() != null)) {
+            jobOutConditions = jsJobOutConditions.getListOfJobOutConditions().get(jobConditionKey);
+        }
         if (jobOutConditions != null && jobOutConditions.getListOfOutConditions().size() == 0) {
             LOGGER.debug("No out conditions defined. Nothing to do");
         } else {
+            UUID contextId = this.getJobStreamContexts().getContext(taskEndEvent.getTaskIdLong());
+            if (contextId == null) {
+                contextId = taskEndEvent.getEvaluatedContextId();
+                LOGGER.debug("using contextId from in condition");
+            }
+            if (contextId != null) {
+                CheckRunningResult j = new CheckRunningResult();
+                resolveOutConditionResult.setJobStream(j.getJobStream());
+                LOGGER.debug("resolve outconditions using context:" + contextId.toString());
+                if (jobOutConditions != null) {
+                    for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
+                        String expression = outCondition.getJob() + ":" + outCondition.getExpression();
 
-            if (jobOutConditions != null) {
-                for (JSOutCondition outCondition : jobOutConditions.getListOfOutConditions().values()) {
-                    String expression = outCondition.getJob() + ":" + outCondition.getExpression();
+                        LOGGER.trace("---OutCondition: " + expression);
+                        if (validate(sosHibernateSession, taskEndEvent.getReturnCode(), contextId, outCondition)) {
+                            LOGGER.trace("create/remove events ------>");
+                            DBItemJobStreamHistory historyEntry = listOfHistoryIds.get(contextId);
 
-                    LOGGER.trace("---OutCondition: " + expression);
-                    if (validate(taskReturnCode, outCondition)) {
-                        LOGGER.trace("create/remove events ------>");
-                        dbChange = outCondition.storeOutConditionEvents(sosHibernateSession, jsEvents, newJsEvents, removeJsEvents);
-                    } else {
-                        LOGGER.trace(expression + "-->false");
+                            dbChanged = outCondition.storeOutConditionEvents(sosHibernateSession, contextId.toString(), historyEntry, jsEvents,
+                                    newJsEvents, removeJsEvents);
+
+                        } else {
+                            LOGGER.trace(expression + "-->false");
+                        }
+                        LOGGER.trace("------------------------------------");
                     }
-                    LOGGER.trace("");
+                } else {
+                    LOGGER.debug("No out conditions for job " + job + " found. Nothing to do");
                 }
-            } else {
-                LOGGER.debug("No out conditions for job " + job + " found. Nothing to do");
             }
         }
-        return dbChange;
+
+        return dbChanged;
     }
 
-    public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job) throws SOSHibernateException {
-        JSJobConditionKey jobConditionKey = new JSJobConditionKey();
-        jobConditionKey.setJob(job);
-        jobConditionKey.setJobSchedulerId(jobSchedulerId);
-        JSInConditions jobInConditions = jsJobInConditions.getListOfJobInConditions().get(jobConditionKey);
-        if (jobInConditions != null && jobInConditions.getListOfInConditions().size() == 0) {
-            LOGGER.debug("No in conditions defined. Nothing to do");
-        } else {
-            if (jobInConditions != null) {
-                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                    inCondition.setJobIsRunning(value);
-                    if (isTraceEnabled) {
-                        if (value) {
-                            LOGGER.trace("In conditions for job " + job + " disabled");
-                        }else {
-                            LOGGER.trace("In conditions for job " + job + " enabled");
+    public void setJobIsRunningInconditionsForJob(boolean value, String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
+        LOGGER.debug("setJobIsRunningInconditionsForJob: " + contextId);
+        if (contextId != null) {
+            JSJobConditionKey jobConditionKey = new JSJobConditionKey();
+            LOGGER.debug("job:" + job);
+            LOGGER.debug("jobSchedulerId:" + jobSchedulerId);
+            jobConditionKey.setJob(job);
+            jobConditionKey.setJobSchedulerId(jobSchedulerId);
+            JSInConditions jobInConditions = jsJobInConditions.getListOfJobInConditions().get(jobConditionKey);
+            if (jobInConditions != null && jobInConditions.getListOfInConditions().size() == 0) {
+                LOGGER.debug("No in conditions defined. Nothing to do");
+            } else {
+                if (jobInConditions != null) {
+                    for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                        inCondition.setJobIsRunning(contextId, value);
+                        if (isTraceEnabled) {
+                            if (value) {
+                                LOGGER.trace("In conditions for job " + job + " disabled");
+                            } else {
+                                LOGGER.trace("In conditions for job " + job + " enabled");
+                            }
                         }
                     }
+                } else {
+                    LOGGER.debug("No in conditions for job " + job + " found. Nothing to do");
                 }
-            } else {
-                LOGGER.debug("No in conditions for job " + job + " found. Nothing to do");
             }
+        } else {
+            LOGGER.debug("ContextId is null: " + job + " Nothing to do");
         }
     }
 
-
-    public void enableInconditionsForJob(String jobSchedulerId, String job) throws SOSHibernateException {
-        setJobIsRunningInconditionsForJob(false, jobSchedulerId, job);
-    }
-    
-    public void disableInconditionsForJob(String jobSchedulerId, String job) throws SOSHibernateException {
-        setJobIsRunningInconditionsForJob(true, jobSchedulerId, job);
+    public void enableInconditionsForJob(String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
+        setJobIsRunningInconditionsForJob(false, jobSchedulerId, job, contextId);
     }
 
-    
+    public void disableInconditionsForJob(String jobSchedulerId, String job, UUID contextId) throws SOSHibernateException {
+        setJobIsRunningInconditionsForJob(true, jobSchedulerId, job, contextId);
+    }
+
     public BooleanExp getBooleanExpression() {
         return booleanExpression;
     }
 
-    public void removeConsumedInconditions(FilterConsumedInConditions filterConsumedInConditions) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolver::removeConsumedInconditions --> " + filterConsumedInConditions.getJobStream() + "."
-                + filterConsumedInConditions.getJob());
+    private void removeConsumedInconditions(SOSHibernateSession sosHibernateSession, FilterConsumedInConditions filterConsumedInConditions)
+            throws SOSHibernateException {
+
+        LOGGER.debug("JSConditionResolver::removeConsumedInconditions --> " + filterConsumedInConditions.getSession() + "::"
+                + filterConsumedInConditions.getJobStream() + "." + filterConsumedInConditions.getJob());
 
         try {
-            DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-
-        for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
-            for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
-                String expression = inCondition.getJob() + ":" + inCondition.getExpression();
-                if ((filterConsumedInConditions.getJobStream().equals(inCondition.getJobStream()) || filterConsumedInConditions.getJobStream()
-                        .isEmpty()) && (filterConsumedInConditions.getJob().equals(inCondition.getJob()) || filterConsumedInConditions.getJob()
-                                .isEmpty()) && inCondition.isConsumed()) {
-                    LOGGER.trace(expression + " no longer consumed");
-                    inCondition.setConsumed(false);
+            UUID contextId = UUID.fromString(filterConsumedInConditions.getSession());
+            /*
+             * try { DBLayerConsumedInConditions dbLayerConsumedInConditions = new DBLayerConsumedInConditions(sosHibernateSession);
+             * sosHibernateSession.beginTransaction(); dbLayerConsumedInConditions.deleteConsumedInConditions(filterConsumedInConditions);
+             * sosHibernateSession.commit(); } catch (Exception e) { LOGGER.error(e.getMessage(), e); sosHibernateSession.rollback(); }
+             */
+            for (JSInConditions jobInConditions : jsJobInConditions.getListOfJobInConditions().values()) {
+                for (JSInCondition inCondition : jobInConditions.getListOfInConditions().values()) {
+                    if ((filterConsumedInConditions.getJobStream().equals(inCondition.getJobStream()) || filterConsumedInConditions.getJobStream()
+                            .isEmpty()) && (filterConsumedInConditions.getJob().equals(inCondition.getJob()) || filterConsumedInConditions.getJob()
+                                    .isEmpty()) && inCondition.isConsumed(contextId)) {
+                        inCondition.removeConsumed(contextId);
+                    }
                 }
             }
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("could not create contextId from " + filterConsumedInConditions.getSession());
         }
     }
 
-    public void removeEventsFromJobStream(FilterEvents filter) throws SOSHibernateException {
-        LOGGER.debug("JSConditionResolver::removeEventsFromJobStream --> " + filter.getJobStream() + "." + filter.getJob());
-        try {
-            DBLayerEvents dbLayerEvents = new DBLayerEvents(sosHibernateSession);
-            sosHibernateSession.beginTransaction();
-            dbLayerEvents.deleteEventsWithOutConditions(filter);
-            sosHibernateSession.commit();
-
-            jsEvents = null;
-            initEvents(sosHibernateSession);
-        } catch (
-
-        Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            sosHibernateSession.rollback();
-        }
-    }
-
-    public void addEvent(JSEvent event) throws SOSHibernateException {
+    public void addEvent(SOSHibernateSession sosHibernateSession, JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver::addEvent --> " + event.getJobStream() + "." + event.getEvent());
         this.newJsEvents = new JSEvents();
         event.store(sosHibernateSession);
@@ -601,7 +997,7 @@ public class JSConditionResolver {
         LOGGER.debug(event.getEvent() + " added");
     }
 
-    public void removeEvent(JSEvent event) throws SOSHibernateException {
+    public void removeEvent(SOSHibernateSession sosHibernateSession, JSEvent event) throws SOSHibernateException {
         LOGGER.debug("JSConditionResolver::removeEvent --> " + event.getEvent());
         this.removeJsEvents = new JSEvents();
         event.deleteEvent(sosHibernateSession);
@@ -615,7 +1011,7 @@ public class JSConditionResolver {
         return jsEvent != null;
     }
 
-    public void checkHistoryCache(String jobPath, Integer taskReturnCode) throws Exception {
+    public void checkHistoryCache(SOSHibernateSession sosHibernateSession, String jobPath, Integer taskReturnCode) throws Exception {
         CheckHistoryKey checkHistoryKey = new CheckHistoryKey(JOB, jobPath, "");
         if (listOfCheckHistoryChacheRules == null) {
             LOGGER.warn("History not initialized");
@@ -630,10 +1026,6 @@ public class JSConditionResolver {
                 }
             }
         }
-    }
-
-    public void setReportingSession(SOSHibernateSession reportingSession) {
-        this.sosHibernateSession = reportingSession;
     }
 
     public void setWorkingDirectory(String workingDirectory) {
@@ -653,4 +1045,95 @@ public class JSConditionResolver {
         return removeJsEvents;
     }
 
+    public JSJobStreamStarter getNextStarttime() {
+        return jsJobStreams.getNextStarter();
+    }
+
+    public JobStreamContexts getJobStreamContexts() {
+        return jobStreamContexts;
+    }
+
+    public JSJobStreams getJsJobStreams() {
+        return jsJobStreams;
+    }
+
+    public JSJobStreamInConditions getJsJobStreamInConditions() {
+        return jsJobStreamInConditions;
+    }
+
+    public JSJobStreamOutConditions getJsJobStreamOutConditions() {
+        return jsJobStreamOutConditions;
+    }
+
+    public void addParameters(UUID uuid, Map<String, String> listOfParameters) {
+        this.listOfParameters.put(uuid, listOfParameters);
+    }
+
+    public Map<Long, JSJobStreamStarter> getListOfJobStreamStarter() {
+        return listOfJobStreamStarter;
+    }
+
+    public Map<UUID, DBItemJobStreamHistory> getListOfHistoryIds() {
+        return listOfHistoryIds;
+    }
+
+    public Map<UUID, Map<String, String>> getListOfParameters() {
+        return listOfParameters;
+    }
+
+    public void setListOfParameters(Map<UUID, Map<String, String>> listOfParameters) {
+        this.listOfParameters = listOfParameters;
+    }
+
+    public JSJobInConditions getJsJobInConditions() {
+        return this.jsJobInConditions;
+    }
+
+    public void assign(SOSHibernateSession sosHibernateSession, JSConditionResolver lastConditionResolver) throws SOSHibernateException,
+            JsonParseException, JsonMappingException, JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException,
+            TransformerException {
+        LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
+        jobStreamContexts = lastConditionResolver.jobStreamContexts;
+        initJobStreams(sosHibernateSession);
+        listOfHistoryIds = lastConditionResolver.listOfHistoryIds;
+
+        this.initJobInConditions(sosHibernateSession);
+        jsEvents = lastConditionResolver.jsEvents;
+
+        for (UUID uuid : listOfHistoryIds.keySet()) {
+            LOGGER.debug("Running sesion: " + uuid.toString());
+            checkRunning(sosHibernateSession, uuid);
+        }
+        this.initCheckHistory(sosHibernateSession);
+
+    }
+
+    public List<String> getListOfMissingEvents() {
+        return listOfMissingEvents;
+    }
+
+    public List<String> getListOfPresentEvents() {
+        return listOfPresentEvents;
+    }
+
+    public JSOutCondition getOutConditionForEvent(String event, JSJobStreamConditionKey jobConditionKey) {
+        JSOutConditions jsOutConditions = this.jsJobStreamOutConditions.getOutConditions(jobConditionKey);
+        JSOutCondition jsDefaultOutCondition = null;
+        if (jsOutConditions != null) {
+            for (Entry<Long, JSOutCondition> entry : jsOutConditions.getListOfOutConditions().entrySet()) {
+                if (jsDefaultOutCondition == null) {
+                    jsDefaultOutCondition = entry.getValue();
+                }
+                JSOutCondition jsOutCondition = entry.getValue();
+                jsOutCondition.getListOfOutConditionEvent();
+                for (JSOutConditionEvent jsOutConditionEvent : jsOutCondition.getListOfOutConditionEvent()) {
+                    if (jsOutConditionEvent.getCommand().endsWith("create") && jsOutConditionEvent.getEvent().equals(event)) {
+                        return jsOutCondition;
+                    }
+                }
+            }
+        }
+
+        return jsDefaultOutCondition;
+    }
 }

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Holidays.Weekdays.Day;
 import com.sos.scheduler.model.tools.RunTimeElement;
@@ -30,7 +30,7 @@ public class JSObjHolidays extends Holidays {
         objFactory = schedulerObjectFactory;
     }
 
-    public JSObjHolidays(SchedulerObjectFactory schedulerObjectFactory, ISOSVirtualFile pobjVirtualFile) {
+    public JSObjHolidays(SchedulerObjectFactory schedulerObjectFactory, ISOSProviderFile pobjVirtualFile) {
         this(schedulerObjectFactory);
         Holidays objHolidays = (Holidays) unMarshal(pobjVirtualFile);
         setObjectFieldsFrom(objHolidays);

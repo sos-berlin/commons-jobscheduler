@@ -17,6 +17,7 @@ public class FunctionResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(FunctionResolver.class);
 
     public String resolveFunctions(String paramValue) {
+        LOGGER.debug("resolveFunction " + paramValue);
         String newValue = paramValue;
         boolean haveResolved;
         do {
@@ -24,21 +25,26 @@ public class FunctionResolver {
             String[] functions = paramValue.split("%%");
             for (int i = 0; i < functions.length; i++) {
                 String f = functions[i];
-                if (f.toUpperCase().matches("(TODAY|GETENV|CALCDATE|SUBSTRING)\\(.*\\)")) {
-                    String functionName = HistoryHelper.getMethodName(f).toLowerCase();
-                    String parameter = HistoryHelper.getParameter(f);
-                    try {
-                        f = f.replaceAll("\\)", "\\\\)");
-                        f = f.replaceAll("\\(", "\\\\(");
-                        String s = resolveFunction(functionName, parameter);
-                        if (!s.isEmpty()) {
-                            newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
-                        }
-                        haveResolved = true;
-                    } catch (Exception e) {
-                        LOGGER.warn("Could not parse " + paramValue);
-                        return paramValue;
+                if (f.length() > 0) {
+                    if (f.toUpperCase().matches("(TODAY|GETENV|CALCDATE|SUBSTRING)\\(.*\\)")) {
+                        String functionName = HistoryHelper.getMethodName(f).toLowerCase();
+                        String parameter = HistoryHelper.getParameter(f);
+                        try {
+                            f = f.replaceAll("\\)", "\\\\)");
+                            f = f.replaceAll("\\(", "\\\\(");
+                            String s = resolveFunction(functionName, parameter);
+                            LOGGER.debug("resolved to " + s);
+                            if (!s.isEmpty()) {
+                                newValue = newValue.replaceAll("\\%\\%" + f + "\\%\\%", s);
+                            }
+                            haveResolved = true;
+                        } catch (Exception e) {
+                            LOGGER.warn("Could not parse " + paramValue);
+                            return paramValue;
 
+                        }
+                    } else {
+                        LOGGER.debug(f.toUpperCase() + " did not match (TODAY|GETENV|CALCDATE|SUBSTRING)\\\\(.*\\\\)");
                     }
                 }
             }
@@ -49,6 +55,8 @@ public class FunctionResolver {
     }
 
     private String todayAsIso() {
+        LOGGER.debug("--> todayAsIso");
+
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         df.setTimeZone(tz);
@@ -82,6 +90,8 @@ public class FunctionResolver {
     }
 
     private String resolveFunction(String functionName, String parameter) {
+
+        LOGGER.debug("Resolving: " + functionName + " with parameter " + parameter);
         String[] params = parameter.split(",");
 
         switch (functionName) {

@@ -12,14 +12,20 @@ public class JobStreamsPlugin extends LoopEventHandlerPlugin {
 
     private final JobSchedulerJobStreamsEventHandler eventHandler;
 
+
     @Inject
     public JobStreamsPlugin(Scheduler scheduler, SchedulerXmlCommandExecutor xmlCommandExecutor, VariableSet variables, EventPublisher eventBus) {
         super(scheduler, xmlCommandExecutor, variables);
         setIdentifier("jobstreams");
 
         eventHandler = new JobSchedulerJobStreamsEventHandler(xmlCommandExecutor, eventBus);
+        eventHandler.setPeriodBegin(getJobSchedulerVariable("sos.jobstream_period_begin"));
+        eventHandler.setJobStreamCheckInterval(getJobSchedulerVariable("sos.jobstream_check_interval"));
+        eventHandler.setTestDelay(getJobSchedulerVariable("sos.jobstream_test_delay"));
+
         eventHandler.setIdentifier(getIdentifier());
     }
+    
 
     @Override
     public void onPrepare() {
