@@ -40,7 +40,7 @@ public class ResourceListTest {
     }
 
     @Test
-    public void testURL() {
+    public void testURL() throws IOException {
         URL url = Resources.getResource(TEST_RESOURCE);
         ResourceList r = new ResourceList();
         r.add("com.sos.testframework.h2.Table1DBItem", url);
