@@ -85,10 +85,14 @@ public class JSCondition {
     private String getConditionQuery(String conditionParam) {
         String s = conditionParam;
         if (conditionParam.indexOf(".") >= 0) {
-            s = conditionParam.split("\\.")[1];
+            String[] splittedCondition = conditionParam.split("\\.");
+            if (splittedCondition.length == 2) {
+                s = conditionParam.split("\\.")[1];
+            }
         }
         return s;
     }
+
 
     private String getConditionType(String condition) {
         String[] conditionParts = condition.split(":");
