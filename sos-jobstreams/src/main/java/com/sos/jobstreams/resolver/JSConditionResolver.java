@@ -558,7 +558,7 @@ public class JSConditionResolver {
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
-        LOGGER.trace("JSConditionResolver::validate");
+        LOGGER.debug("JSConditionResolver::validate " + expressionValue);
         for (JSCondition jsCondition : listOfConditions) {
             LOGGER.trace("JSConditionResolver::validate --> " + jsCondition.getConditionType());
 
@@ -692,7 +692,7 @@ public class JSConditionResolver {
             }
 
         }
-        LOGGER.trace(condition.getExpression() + " after replacement  -->  " + expressionValue);
+        LOGGER.debug(condition.getExpression() + " after replacement  -->  " + expressionValue);
         booleanExpression.setBoolExp(expressionValue);
         boolean evaluatedExpression = booleanExpression.evaluateExpression();
         LOGGER.trace(condition.getExpression() + " evaluated to: " + evaluatedExpression);
