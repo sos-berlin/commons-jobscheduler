@@ -567,7 +567,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             Globals.disconnect(sosHibernateSession);
             LOGGER.debug("release:3 synchronizeNextStart");
             synchronizeNextStart.release();
-
         }
     }
 
@@ -650,8 +649,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug(jobStreamStarter.getAllJobNames() + " started");
             if (getConditionResolver().getListOfHistoryIds() == null) {
                 LOGGER.debug("!list of historyIds is null");
-                reInitComplete();
-            }
+                getConditionResolver().reInitComplete(sosHibernateSession);
+                nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
+             }
             getConditionResolver().getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -839,7 +839,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         boolean dbChanged = false;
         getConditionResolver().checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
-        LOGGER.debug("acquire: resolveOutConditionsSemaphore");
+        LOGGER.debug("acquire:1 resolveOutConditionsSemaphore");
         resolveOutConditionsSemaphore.acquire();
         try {
             dbChanged = getConditionResolver().resolveOutConditions(sosHibernateSession, taskEndEvent, getSettings().getSchedulerId(), taskEndEvent
@@ -989,7 +989,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             refreshStarters();
 
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
-            LOGGER.debug("release: synchronizeNextStart");
+            LOGGER.debug("release:5 synchronizeNextStart");
             synchronizeNextStart.release();
             resetNextJobStartTimer();
             addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), "");
