@@ -14,6 +14,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.graphviz.enums.FileType;
 import com.sos.graphviz.jobchain.diagram.JobChainDiagramCreator;
 import com.sos.scheduler.model.SchedulerHotFolder;
@@ -40,7 +41,8 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
-        fileSystemHandler = SOSVFSFactory.getProvider("local");
+        SOSBaseOptions vfsOptions = new SOSBaseOptions();
+        fileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider);
         schedulerObjectFactory = new SchedulerObjectFactory();
         schedulerObjectFactory.initMarshaller(Spooler.class);
         ISOSProviderFile hotFolder = fileSystemHandler.getFile(liveFolderName);
@@ -60,7 +62,8 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
             for (JSObjBase obj : schedulerHotFolderFileList.getSortedFileList()) {
                 if (obj instanceof JSObjJobChain) {
                     JSObjJobChain jsObjJobChain = (JSObjJobChain) obj;
-                    JobChainDiagramCreator jobChainDiagramCreator = new JobChainDiagramCreator(jsObjJobChain, new File(objOptions.liveFolderName.getValue()));
+                    JobChainDiagramCreator jobChainDiagramCreator = new JobChainDiagramCreator(jsObjJobChain, new File(objOptions.liveFolderName
+                            .getValue()));
                     jobChainDiagramCreator.setGraphVizImageType(FileType.pdf);
                     jobChainDiagramCreator.setDotOutputPath(outputFolderName);
                     LOGGER.info(String.format("... call generator %1$s", outputFolderName));

@@ -78,6 +78,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
             envVars.putAll(prefixSchedulerEnvVars(params));
             job.setSchedulerEnvVars(envVars);
         }
+        // ssh_provider parameter - see deletePrefix
         options.setAllOptions(options.deletePrefix(params, "ssh_"));
         job.setJSJobUtilites(this);
         if (!options.commandSpecified()) {

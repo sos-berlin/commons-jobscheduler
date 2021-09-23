@@ -35,6 +35,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.Options.SOSOptionZeroByteTransfer;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.sftp.SOSSFTP.SSHProvider;
 
 @JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -702,5 +703,10 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     @JSOptionDefinition(name = "return-values", description = "environment variable transfer history", key = "return-values", type = "SOSOptionString", mandatory = false)
     public SOSOptionString return_values = new SOSOptionString(this, CLASS_NAME + ".return-values", "environment variable transfer history", "", "",
             false);
+
+    // see sos.net.ssh.SOSSSHJobOptionsSuperClass ssh_provider
+    @JSOptionDefinition(name = "ssh_provider", description = "ssh provider implementation", key = "ssh_provider", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString ssh_provider = new SOSOptionString(this, CLASS_NAME + ".ssh_provider", "ssh provider", SSHProvider.JCRAFT.name(),
+            SSHProvider.JCRAFT.name(), false);
 
 }

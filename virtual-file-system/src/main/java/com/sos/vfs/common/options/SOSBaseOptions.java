@@ -24,7 +24,6 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassPath;
-import com.sos.vfs.common.options.SOSTransfer;
 import com.sos.vfs.common.SOSVFSMessageCodes;
 
 import sos.net.mail.options.SOSSmtpMailOptions;

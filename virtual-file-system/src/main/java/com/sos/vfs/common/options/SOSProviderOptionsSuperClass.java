@@ -294,5 +294,4 @@ public class SOSProviderOptionsSuperClass extends JSOptionsClass {
     @JSOptionDefinition(name = "keepass_attachment_property_name", description = "Keepass attachment property name", key = "keepass_database_entry", type = "SOSOptionString", mandatory = false)
     public SOSOptionString keepass_attachment_property_name = new SOSOptionString(this, CLASS_NAME + ".keepass_attachment_property_name",
             "Keepass attachment property name", "", "", false);
-
 }
