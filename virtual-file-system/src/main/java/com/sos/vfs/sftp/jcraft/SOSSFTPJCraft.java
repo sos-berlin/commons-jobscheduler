@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1010,8 +1011,11 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
 
     public long putFile(final String source, final String target) {
         try {
+            Instant start = Instant.now();
             channelSftp.put(source, normalizePath(target), ChannelSftp.OVERWRITE);
-            reply = "put OK";
+            Instant end = Instant.now();
+
+            reply = new StringBuilder("put OK (").append(SOSDate.getDuration(start, end)).append(")").toString();
             LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", source, target, getReplyString())));
 
             long size = size(target);
@@ -1030,6 +1034,20 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
         channelSftp.chmod(chmod, target);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[put][%s]chmod=%s", target, chmod));
+        }
+    }
+
+    public void get(final String source, final String target) {
+        try {
+            Instant start = Instant.now();
+            channelSftp.get(source, normalizePath(target));
+            Instant end = Instant.now();
+
+            reply = new StringBuilder("get OK (").append(SOSDate.getDuration(start, end)).append(")").toString();
+            LOGGER.info(getHostID(SOSVfs_I_183.params("get", source, target, getReplyString())));
+        } catch (Exception e) {
+            reply = e.toString();
+            throw new JobSchedulerException(SOSVfs_E_185.params("get()", source, target), e);
         }
     }
 

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
@@ -15,6 +16,7 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -845,23 +847,33 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
         }
     }
 
-    private InputStream createInputStream(RemoteFile remoteFile) {
-        return remoteFile.new RemoteFileInputStream() {
+    private InputStream createInputStream(RemoteFile remoteFile) throws IOException {
+        return remoteFile.new ReadAheadRemoteFileInputStream(16) {
 
-            private boolean isClosed = false;
+            private final AtomicBoolean close = new AtomicBoolean();
 
             @Override
-            public synchronized void close() throws IOException {
-                if (!isClosed) {
+            public void close() throws IOException {
+                if (close.get()) {
+                    return;
+                }
+                try {
+                    super.close();
+                } finally {
                     remoteFile.close();
-                    isClosed = true;
+                    close.set(true);
                 }
             }
         };
+        /*
+         * return remoteFile.new RemoteFileInputStream() { private boolean isClosed = false;
+         * @Override public synchronized void close() throws IOException { if (!isClosed) { remoteFile.close(); isClosed = true; } } };
+         */
+
     }
 
     private static OutputStream createOutputStream(RemoteFile remoteFile) {
-        return remoteFile.new RemoteFileOutputStream(0, 64) {
+        return remoteFile.new RemoteFileOutputStream(0, 16) {
 
             private boolean isClosed = false;
 
@@ -935,10 +947,11 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             if (sftpClient == null) {
                 throw new SOSSFTPClientNotInitializedException();
             }
-            // TODO check if ChannelSftp.OVERWRITE
+            Instant start = Instant.now();
             sftpClient.put(new FileSystemFile(source), normalizePath(target));
+            Instant end = Instant.now();
 
-            reply = "put OK";
+            reply = new StringBuilder("put OK (").append(SOSDate.getDuration(start, end)).append(")").toString();
             LOGGER.info(getHostID(SOSVfs_I_183.params("putFile", source, target, getReplyString())));
 
             long size = size(target);
@@ -957,6 +970,24 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
         sftpClient.chmod(target, chmod);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[put][%s]chmod=%s", target, chmod));
+        }
+    }
+
+    public void get(final String source, final String target) {
+        try {
+            if (sftpClient == null) {
+                throw new SOSSFTPClientNotInitializedException();
+            }
+            Instant start = Instant.now();
+            sftpClient.getFileTransfer().setPreserveAttributes(false);
+            sftpClient.get(normalizePath(source), new FileSystemFile(target));
+            Instant end = Instant.now();
+
+            reply = new StringBuilder("get OK (").append(SOSDate.getDuration(start, end)).append(")").toString();
+            LOGGER.info(getHostID(SOSVfs_I_183.params("get", source, target, getReplyString())));
+        } catch (Exception e) {
+            reply = e.toString();
+            throw new JobSchedulerException(SOSVfs_E_185.params("get()", source, target), e);
         }
     }
 

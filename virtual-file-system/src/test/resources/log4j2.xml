@@ -14,5 +14,6 @@
 		<Logger name="org.hibernate" level="fatal" />
 		<Logger name="com.mchange.v2" level="fatal" />
 		<Logger name="com.sos" level="trace" />
+		<Logger name="net.schmizz" level="info" />
 	</Loggers>
 </Configuration>
