@@ -64,6 +64,7 @@ import com.sos.jobstreams.classes.OrderFinishedEvent;
 import com.sos.jobstreams.classes.PublishEventOrder;
 import com.sos.jobstreams.classes.QueuedEvents;
 import com.sos.jobstreams.classes.StartJobReturn;
+import com.sos.jobstreams.classes.StarterScheduleTable;
 import com.sos.jobstreams.classes.TaskEndEvent;
 import com.sos.jobstreams.resolver.JSConditionResolver;
 import com.sos.jobstreams.resolver.JSHistoryEntry;
@@ -84,6 +85,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerJobStreamsEventHandler.class);
     private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
+
+    private static final String ACTIVE = "active";
+
     public static final String CUSTOM_EVENT_KEY = JobSchedulerJobStreamsEventHandler.class.getSimpleName();;
     private SOSHibernateFactory reportingFactory;
     private QueuedEvents addQueuedEvents;
@@ -94,6 +98,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private Timer jobStreamCheckIntervalTimer;
 
     private JSJobStreamStarter nextStarter;
+    private StarterScheduleTable starterScheduleTable;
 
     private String session;
     private LocalDate today;
@@ -106,7 +111,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private static Semaphore eventHandlerSemaphore = new Semaphore(1, true);
     private static Semaphore resolveInConditionsSemaphore = new Semaphore(1, true);
     private static Semaphore resolveOutConditionsSemaphore = new Semaphore(1, true);
-    private static Semaphore reinitSemaphore = new Semaphore(1, true);
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive, JobStreamCompleted
@@ -114,7 +118,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public static enum CustomEventTypeValue {
         incondition
-
     }
 
     public void resetPublishEventTimer() {
@@ -186,8 +189,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                             dbItemJobStreamStarter.setNextStart(nextStart);
 
                             dbLayerJobStreamStarters.updateNextStart(dbItemJobStreamStarter);
-                            LOGGER.debug("Refreshed next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
-                                    + " to " + nextStart);
+                            LOGGER.debug("Refreshed next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter
+                                    .getStarterName() + " to " + nextStart);
 
                         }
                     }
@@ -249,8 +252,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                                         dbItemJobStreamStarter.getId()));
 
                                 sosHibernateSession.commit();
-                                LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter.getTitle()
-                                        + " to " + dbItemJobStreamStarter.getNextStart());
+                                LOGGER.debug("Set next start for " + dbItemJobStreamStarter.getJobStream() + "." + dbItemJobStreamStarter
+                                        .getStarterName() + " to " + dbItemJobStreamStarter.getNextStart());
                                 addPublishEventOrder(CUSTOM_EVENT_KEY, CustomEventType.StartTime.name(), String.valueOf(nextStarter
                                         .getItemJobStreamStarter().getId()));
 
@@ -309,6 +312,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("acquire:1 eventHandlerSemaphore");
             eventHandlerSemaphore.acquire();
             assignNewModel(j);
+            fillStarterScheduleTable();
+
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause instanceof InterruptedException) {
@@ -359,8 +364,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             MDC.put("plugin", getIdentifier());
             SOSHibernateSession sosHibernateSession = null;
             try {
-                LOGGER.debug("acquire:1 reinitSemaphore");
-                reinitSemaphore.acquire();
+
                 LOGGER.debug("Reset PublishEventTimer");
                 resetPublishEventTimer();
 
@@ -403,15 +407,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
 
+                checkLateStarters();
                 LOGGER.debug("Check jobstreams ...");
-                resolveInConditions(sosHibernateSession);
+                resolveInConditions(sosHibernateSession, null);
             } catch (SOSHibernateInvalidSessionException e) {
                 // ignore.
             } catch (Exception e) {
                 LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask", e);
             } finally {
-                reinitSemaphore.release();
-                LOGGER.debug("release:1 reinitSemaphore");
                 Globals.disconnect(sosHibernateSession);
 
             }
@@ -464,8 +467,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public class JobStartTask extends TimerTask {
 
-        private static final String ACTIVE = "active";
-
         public void run() {
             MDC.put("plugin", getIdentifier());
             try {
@@ -485,15 +486,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             try {
                 LOGGER.debug("Start of jobs ==>" + nextStarter.getAllJobNames() + " at " + nextStarter.getNextStart());
+
                 nextStarter.setLastStart(nextStarter.getNextStart().getTime());
 
                 if (ACTIVE.equals(nextStarter.getItemJobStreamStarter().getState())) {
                     nextStarter.initActualParameters();
                     UUID contextId = UUID.randomUUID();
-                    startJobs(nextStarter, contextId);
+                    if (starterScheduleTable.isMarkedAsStarted(nextStarter)) {
+                        LOGGER.info(nextStarter.getStarterName() + " already Started " + nextStarter.getNextStart());
+                    } else {
+                        starterScheduleTable.markAsStarted(nextStarter);
+                        startJobs(nextStarter, contextId);
+                    }
                 } else {
-                    LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter().getTitle()
-                            + " is not active. Not started");
+                    LOGGER.debug("Starter: " + nextStarter.getItemJobStreamStarter().getId() + "." + nextStarter.getItemJobStreamStarter()
+                            .getStarterName() + " is not active. Not started");
                 }
                 if (nextStarter.getNextStartFromList() == null) {
                     nextStarter.schedule();
@@ -550,7 +557,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     }
 
-    private void reInitComplete() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
+    private void fillStarterScheduleTable() {
+        starterScheduleTable = new StarterScheduleTable();
+
+        LOGGER.debug("init all starters");
+        for (JSJobStreamStarter jsJobStreamStarter : getConditionResolver().getListOfJobStreamStarter().values()) {
+            LOGGER.trace("starter: " + jsJobStreamStarter.getItemJobStreamStarter().getStarterName());
+            starterScheduleTable.addStarter(jsJobStreamStarter);
+
+        }
+    }
+
+    private void resetConditionResolver() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, Exception {
         try {
             LOGGER.debug("acquire:3 synchronizeNextStart");
             synchronizeNextStart.acquire();
@@ -559,9 +577,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
         SOSHibernateSession sosHibernateSession = null;
         try {
-            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:reinitComplet");
+            sosHibernateSession = reportingFactory.openStatelessSession("eventhandler:resetConditionResolver");
 
-            getConditionResolver().reInitComplete(sosHibernateSession);
+            // getConditionResolver().reInitComplete(sosHibernateSession);
+            getConditionResolver().reset(sosHibernateSession);
+            fillStarterScheduleTable();
             nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
         } finally {
             Globals.disconnect(sosHibernateSession);
@@ -590,7 +610,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private void startJobs(JSJobStreamStarter jobStreamStarter, UUID contextId) throws Exception {
 
-        changeSession();
+        if (jobStreamCheckIntervalTimer != null) {
+            jobStreamCheckIntervalTimer.cancel();
+            jobStreamCheckIntervalTimer.purge();
+        }
+
+        // changeSession();
 
         List<JobStarterOptions> listOfHandledJobs = jobStreamStarter.startJobs(contextId, getXmlCommandExecutor());
 
@@ -642,7 +667,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
             Map<String, String> values = new HashMap<String, String>();
             values.put(CustomEventType.JobStreamStarted.name(), jobStream.getJobStream() + "." + jobStreamStarter.getItemJobStreamStarter()
-                    .getTitle());
+                    .getStarterName());
             values.put("contextId", contextId.toString());
             addPublishEventOrder(CUSTOM_EVENT_KEY, values);
 
@@ -651,13 +676,14 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 LOGGER.debug("!list of historyIds is null");
                 getConditionResolver().reInitComplete(sosHibernateSession);
                 nextStarter = getConditionResolver().getJsJobStreams().reInitLastStart(nextStarter);
-             }
+            }
             getConditionResolver().getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
             LOGGER.debug("release:1 resolveInConditionsSemaphore");
             resolveInConditionsSemaphore.release();
+            resetJobStreamCheckIntervalTimer();
             Globals.disconnect(sosHibernateSession);
 
         }
@@ -783,7 +809,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             getConditionResolver().setWorkingDirectory(System.getProperty("user.dir"));
             LOGGER.debug("onActivate init condition resolver");
             getConditionResolver().initComplete(sosHibernateSession);
+
             LOGGER.debug("onActivate reset timers");
+            fillStarterScheduleTable();
+
             this.resetNextJobStartTimer();
             this.resetJobStreamCheckIntervalTimer();
             refreshStarters();
@@ -794,8 +823,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("Jobstream Check Interval: " + Constants.jobstreamCheckInterval);
             LOGGER.debug("Session: " + this.session);
 
-            resolveInConditions(sosHibernateSession);
-
+            this.resolveInConditions(sosHibernateSession, null);
             start(observedEventTypes);
         } catch (Exception e) {
             this.listOfConditionResolver = null;
@@ -836,6 +864,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     private boolean performTaskEnd(SOSHibernateSession sosHibernateSession, TaskEndEvent taskEndEvent) throws Exception {
+
+        checkLateStarters();
+
         LOGGER.debug("TaskEnded event to be executed:" + taskEndEvent.getTaskId() + " " + taskEndEvent.getJobPath());
         boolean dbChanged = false;
         getConditionResolver().checkHistoryCache(sosHibernateSession, taskEndEvent.getJobPath(), taskEndEvent.getReturnCode());
@@ -914,6 +945,21 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
     }
 
+    private void checkLateStarters() throws Exception {
+
+        if (nextStarter != null) {
+            List<JSJobStreamStarter> lateStarters = starterScheduleTable.getLateStarters(nextStarter);
+            for (JSJobStreamStarter lateStarter : lateStarters) {
+                if (!starterScheduleTable.isMarkedAsStarted(lateStarter) && ACTIVE.equals(lateStarter.getItemJobStreamStarter().getState())) {
+                    LOGGER.debug("Start of late job stream starter: " + lateStarter.getStarterName() + " planned for " + lateStarter.getNextStart());
+                    UUID contextId = UUID.randomUUID();
+                    starterScheduleTable.markAsStarted(lateStarter);
+                    startJobs(lateStarter, contextId);
+                }
+            }
+        }
+    }
+
     private void resolveInConditions(SOSHibernateSession sosHibernateSession, UUID forInstance) throws Exception {
         DurationCalculator duration = null;
         if (isDebugEnabled) {
@@ -921,6 +967,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             duration = new DurationCalculator();
         }
         LOGGER.debug("acquire:2 resolveInConditionsSemaphore");
+
+        if (jobStreamCheckIntervalTimer != null) {
+            jobStreamCheckIntervalTimer.cancel();
+            jobStreamCheckIntervalTimer.purge();
+        }
+
         resolveInConditionsSemaphore.acquire();
         try {
 
@@ -967,14 +1019,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         } finally {
             LOGGER.debug("release:2 resolveInConditionsSemaphore");
             resolveInConditionsSemaphore.release();
+            resetJobStreamCheckIntervalTimer();
         }
     }
 
-    private void resolveInConditions(SOSHibernateSession sosHibernateSession) throws Exception {
-        if (Constants.getSession().equals(this.session) && Constants.getToday().equals(this.today)) {
-            this.resolveInConditions(sosHibernateSession, null);
-        }
-    }
 
     private void assignNewModel(JSConditionResolver jsConditionResolver) throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = null;
@@ -1006,26 +1054,27 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         String method = "changeSession";
 
         if (!Constants.getSession().equals(this.session) || !Constants.getToday().equals(this.today)) {
+            if (jobStreamCheckIntervalTimer != null) {
+                jobStreamCheckIntervalTimer.cancel();
+                jobStreamCheckIntervalTimer.purge();
+            }
+
+            if (nextJobStartTimer != null) {
+                nextJobStartTimer.cancel();
+                nextJobStartTimer.purge();
+            }
+
+            if (checkEventTimer != null) {
+                checkEventTimer.cancel();
+                checkEventTimer.purge();
+            }
+
             try {
-                LOGGER.debug("acquire:2 reinitSemaphore");
-                boolean acquired = false;
-                do {
 
-                    acquired = reinitSemaphore.tryAcquire();
-                    if (!acquired) {
-                        LOGGER.info("Could not acquire reinitSemaphore. Will wait for notification....");
-                        reinitSemaphore.wait(2000);
-                    }
-                } while (!acquired);
-
-                if (nextJobStartTimer != null) {
-                    nextJobStartTimer.cancel();
-                    nextJobStartTimer.purge();
-                }
                 this.session = Constants.getSession();
                 this.today = Constants.getToday();
                 LOGGER.debug("Change session to: " + this.session + " " + this.today);
-                reInitComplete();
+                resetConditionResolver();
                 java.lang.Thread.sleep(3 * 1000);
                 refreshStarters();
 
@@ -1036,10 +1085,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 throw new RuntimeException(e);
 
             } finally {
-                LOGGER.debug("release:2 reinitSemaphore");
-                reinitSemaphore.release();
-                nextJobStartTimer = new Timer();
                 resetNextJobStartTimer();
+                resetJobStreamCheckIntervalTimer();
+                resetCheckInitTimer();
                 if (nextStarter == null) {
                     nextJobStartTimer.cancel();
                     nextJobStartTimer.purge();
@@ -1047,7 +1095,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     java.lang.Thread.sleep(1000);
                     resetNextJobStartTimer();
                 }
-
             }
         }
 
@@ -1061,6 +1108,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         boolean resolveInConditions = false;
         LOGGER.debug("acquire:2 eventHandlerSemaphore");
         eventHandlerSemaphore.acquire();
+
         UUID taskEndUuid = null;
 
         SOSHibernateSession sosHibernateSession = null;
@@ -1375,6 +1423,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             synchronizeNextStart.release();
             LOGGER.debug("release:2 eventHandlerSemaphore");
             eventHandlerSemaphore.release();
+
             Globals.disconnect(sosHibernateSession);
 
         }

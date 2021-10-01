@@ -85,6 +85,20 @@ public class JSJobStreams {
         }
     }
 
+    public void resetListOfJobStreams(SOSHibernateSession sosHibernateSession) throws SOSHibernateException  {
+
+        DBLayerJobStreamHistory dbLayerJobStreamHistory = new DBLayerJobStreamHistory(sosHibernateSession);
+
+        for (JSJobStream jsJobStream : listOfJobStreams.values()) {
+            jsJobStream.resetHistory();
+            FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
+            filterJobStreamHistory.setJobStreamId(jsJobStream.getId());
+            filterJobStreamHistory.setRunning(true);
+            List<DBItemJobStreamHistory> listOfJobStreamHistory = dbLayerJobStreamHistory.getJobStreamHistoryList(filterJobStreamHistory, 0);
+            jsJobStream.setJobStreamHistory(listOfJobStreamHistory, sosHibernateSession);
+        }
+    }
+
     public Map<Long, JSJobStream> getListOfJobStreams() {
         return listOfJobStreams;
     }
@@ -100,7 +114,7 @@ public class JSJobStreams {
         for (JSJobStream jsJobStream : listOfJobStreams.values()) {
             LOGGER.trace("starters for: " + jsJobStream.getJobStream());
             for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-                LOGGER.trace("starter: " + jsJobStreamStarter.getItemJobStreamStarter().getTitle());
+                LOGGER.trace("starter: " + jsJobStreamStarter.getItemJobStreamStarter().getStarterName());
                 LOGGER.trace("next start from list: " + jsJobStreamStarter.getNextStartFromList());
                 if (next == null || (jsJobStreamStarter.getNextStartFromList() != null) && (jsJobStreamStarter.getNextStartFromList() == next
                         || jsJobStreamStarter.getNextStartFromList().before(next))) {
@@ -126,7 +140,7 @@ public class JSJobStreams {
         LOGGER.debug(id + ": Show all lastStart");
         for (JSJobStream jsJobStream : listOfJobStreams.values()) {
             for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
-                LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getTitle() + " last start: " + new Date(
+                LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getStarterName() + " last start: " + new Date(
                         jsJobStreamStarter.getLastStart()));
             }
         }
@@ -139,7 +153,7 @@ public class JSJobStreams {
                 for (JSJobStreamStarter jsJobStreamStarter : jsJobStream.getListOfJobStreamStarter()) {
 
                     if (nextStarter.getItemJobStreamStarter().getId().equals(jsJobStreamStarter.getItemJobStreamStarter().getId())) {
-                        LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getTitle()
+                        LOGGER.trace(jsJobStream.getJobStream() + "." + jsJobStreamStarter.getItemJobStreamStarter().getStarterName()
                                 + " last start: reinit " + new Date(jsJobStreamStarter.getLastStart()) + " --> " + new Date(nextStarter
                                         .getLastStart()));
                         jsJobStreamStarter.setLastStart(nextStarter.getLastStart());

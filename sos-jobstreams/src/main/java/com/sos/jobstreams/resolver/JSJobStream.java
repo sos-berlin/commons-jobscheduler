@@ -145,4 +145,8 @@ public class JSJobStream {
         return jsHistory;
     }
 
+    public void resetHistory() {
+        jsHistory = new JSHistory();
+    }
+
 }
