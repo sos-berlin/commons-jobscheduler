@@ -52,6 +52,8 @@ public interface ISOSSFTP {
     public long putFile(final String source, final String target);
 
     public void putFile(File source, String target, int chmod) throws Exception;
+    
+    public void get(final String source, final String target);
 
     public ISOSProviderFile getFile(String fileName);
 

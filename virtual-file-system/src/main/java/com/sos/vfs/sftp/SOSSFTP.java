@@ -167,6 +167,11 @@ public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
+    public void get(String source, String target) {
+        provider.get(source, target);
+    }
+
+    @Override
     public String getStdErr() {
         return provider.getStdErr();
     }
