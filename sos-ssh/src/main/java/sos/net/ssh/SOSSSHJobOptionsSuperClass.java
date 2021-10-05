@@ -23,7 +23,6 @@ import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
-import com.sos.vfs.sftp.SOSSFTP.SSHProvider;
 
 @JSOptionClass(name = "SOSSSHJobOptionsSuperClass", description = "Option-Class for a SSH-Connection")
 public class SOSSSHJobOptionsSuperClass extends JSOptionsClass {
@@ -619,7 +618,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass {
     }
 
     // see com.sos.vfs.common.options.SOSBaseOptionsSuperClass ssh_provider
+    // for default value handling see com.sos.vfs.sftp.SOSSFTP
     @JSOptionDefinition(name = "ssh_provider", description = "ssh provider implementation", key = "ssh_provider", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_provider = new SOSOptionString(this, CLASSNAME + ".ssh_provider", "ssh provider", SSHProvider.JCRAFT.name(),
-            SSHProvider.JCRAFT.name(), false);
+    public SOSOptionString ssh_provider = new SOSOptionString(this, CLASSNAME + ".ssh_provider", "ssh provider", "", "", false);
 }

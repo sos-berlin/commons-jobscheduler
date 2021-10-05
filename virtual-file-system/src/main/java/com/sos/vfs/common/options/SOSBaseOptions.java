@@ -41,6 +41,9 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private static final String PREFIX_SOSFTP_ENV_VAR = "sosftp_";
     private static final String FILE_SEPARATOR = "file.separator";
 
+    private static final String ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_1X = "SCHEDULER_YADE_SSH_PROVIDER";
+    private static final String ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_JS7 = "JS7_YADE_SSH_PROVIDER";
+
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private SOSTransfer transfer;// source/target options
@@ -86,6 +89,14 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
 
     public SOSBaseOptions() {
         super();
+    }
+
+    public static String getSSHProviderFromEnv() {
+        String val = System.getenv(ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_1X);
+        if (val == null) {
+            val = System.getenv(ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_JS7);
+        }
+        return val;
     }
 
     @Override

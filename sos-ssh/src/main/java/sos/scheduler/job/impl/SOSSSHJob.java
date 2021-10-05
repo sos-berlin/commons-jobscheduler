@@ -26,6 +26,7 @@ import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.SOSSFTP;
 import com.sos.vfs.common.SOSCommandResult;
@@ -332,6 +333,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void connect(TransferTypes type) {
         try {
             if (handlerOptions == null) {
+                setSSHProvider();
                 setHandlerOptions(objOptions, type);
                 handlerOptions.checkMandatory();
             } else {
@@ -586,6 +588,18 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             // prevent Exception to show in case of postCommandDelete errors
             LOGGER.warn(e.toString(), e);
 
+        }
+    }
+
+    private void setSSHProvider() {
+        if (!objOptions.ssh_provider.isDirty()) {
+            String val = SOSBaseOptions.getSSHProviderFromEnv();
+            if (val != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("set ssh_provider=%s from environment", val));
+                }
+                objOptions.ssh_provider.setValue(val);
+            }
         }
     }
 

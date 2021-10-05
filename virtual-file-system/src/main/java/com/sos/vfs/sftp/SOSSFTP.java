@@ -20,8 +20,6 @@ import com.sos.vfs.sftp.common.SOSSSHServerInfo;
 import com.sos.vfs.sftp.jcraft.SOSSFTPJCraft;
 import com.sos.vfs.sftp.sshj.SOSSFTPSSHJ;
 
-import sos.util.SOSString;
-
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
 
@@ -42,9 +40,6 @@ public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
             sshProviderOption = vfsOptions.ssh_provider;
         }
         String sshPovider = sshProviderOption.getValue().toUpperCase();
-        if (SOSString.isEmpty(sshPovider)) {
-            sshPovider = sshProviderOption.getDefaultValue().toUpperCase();
-        }
         if (sshPovider.equals(SSHProvider.SSHJ.name())) {
             provider = new SOSSFTPSSHJ();
         } else {
