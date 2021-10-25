@@ -61,24 +61,26 @@ public class StarterScheduleTable {
 
     public void addStarter(JSJobStreamStarter starter) {
         Date now = new Date();
-        for (Long startTime : starter.getJobStreamScheduler().getListOfStartTimes()) {
-            if (startTime > now.getTime()) {
-                StarterScheduleKey starterScheduleKey = new StarterScheduleKey();
+        if (starter.getJobStreamScheduler() != null && starter.getJobStreamScheduler().getListOfStartTimes() != null) {
+            for (Long startTime : starter.getJobStreamScheduler().getListOfStartTimes()) {
+                if (startTime > now.getTime()) {
+                    StarterScheduleKey starterScheduleKey = new StarterScheduleKey();
 
-                starterScheduleKey.scheduledFor = startTime;
-                starterScheduleKey.starterName = starter.getStarterName();
-                StarterScheduleTableItem starterScheduleTableItem = new StarterScheduleTableItem();
-                starterScheduleTableItem.setStarted(false);
-                starterScheduleTableItem.setStarter(starter);
-                starterScheduleTableItem.setStartTime(starterScheduleKey.scheduledFor);
-                if (listOfScheduledStarters.get(starterScheduleKey) == null) {
+                    starterScheduleKey.scheduledFor = startTime;
+                    starterScheduleKey.starterName = starter.getStarterName();
+                    StarterScheduleTableItem starterScheduleTableItem = new StarterScheduleTableItem();
+                    starterScheduleTableItem.setStarted(false);
+                    starterScheduleTableItem.setStarter(starter);
+                    starterScheduleTableItem.setStartTime(starterScheduleKey.scheduledFor);
+                    if (listOfScheduledStarters.get(starterScheduleKey) == null) {
 
-                    listOfScheduledStarters.put(starterScheduleKey, starterScheduleTableItem);
+                        listOfScheduledStarters.put(starterScheduleKey, starterScheduleTableItem);
 
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(starterScheduleKey.scheduledFor);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(starterScheduleKey.scheduledFor);
 
-                    LOGGER.trace(starterScheduleKey.starterName + " --> " + calendar.getTime());
+                        LOGGER.trace(starterScheduleKey.starterName + " --> " + calendar.getTime());
+                    }
                 }
             }
         }

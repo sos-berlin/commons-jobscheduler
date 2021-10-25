@@ -304,7 +304,7 @@ public class JSConditionResolver {
         initHistoryIds(sosHibernateSession);
         jsJobStreams.resetListOfJobStreams(sosHibernateSession);
         initEvents(sosHibernateSession);
- 
+
     }
 
     public void initJobOutConditions(SOSHibernateSession sosHibernateSession, String jobStream) throws SOSHibernateException {
@@ -439,6 +439,23 @@ public class JSConditionResolver {
             List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
             jsEvents.setListOfEvents(listOfEvents);
         }
+    }
+
+    public void addEvents(SOSHibernateSession session, String contextId) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolver::initEvents");
+        if (jsEvents == null) {
+            jsEvents = new JSEvents();
+        }
+        FilterEvents filterEvents = new FilterEvents();
+        filterEvents.setSchedulerId(settings.getSchedulerId());
+        filterEvents.setIncludingGlobalEvent(true);
+        if (contextId != null && !contextId.isEmpty()) {
+            filterEvents.setSession(contextId.toString());
+        }
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(session);
+        List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+        jsEvents.setListOfEvents(listOfEvents);
+
     }
 
     public void reInitConsumedInConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {

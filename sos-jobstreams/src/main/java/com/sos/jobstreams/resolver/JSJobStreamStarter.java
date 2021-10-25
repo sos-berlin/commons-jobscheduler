@@ -110,11 +110,7 @@ public class JSJobStreamStarter {
             listOfParameters.put(dbItemJobStreamParameter.getName(), dbItemJobStreamParameter.getValue());
         }
     }
-
-    public com.sos.joc.model.plan.RunTime getPlan() {
-        return jobStreamScheduler.getPlan();
-    }
-
+ 
     public Date getNextStartFromList() {
         
         LOGGER.trace(this.jobStreamName + "--> last start:" + new Date(lastStart));
