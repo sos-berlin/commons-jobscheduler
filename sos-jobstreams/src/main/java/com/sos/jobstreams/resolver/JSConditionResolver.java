@@ -507,6 +507,20 @@ public class JSConditionResolver {
         }
     }
 
+    public void copyConsumedInConditions(JSJobInConditions sourceJobInConditions) throws SOSHibernateException {
+
+        for (Entry<JSJobConditionKey, JSInConditions> entry : jsJobInConditions.getListOfJobInConditions().entrySet()) {
+            JSInConditions soureJSInConditions = sourceJobInConditions.getInConditions(entry.getKey());
+            if (soureJSInConditions != null) {
+                for (JSInCondition inCondition : entry.getValue().getListOfInConditions().values()) {
+                    if (soureJSInConditions.getCondition(inCondition.getId()) != null) {
+                        inCondition.getConsumedForContext().addAll(soureJSInConditions.getCondition(inCondition.getId()).getConsumedForContext());
+                    }
+                }
+            }
+        }
+    }
+
     public void initCheckHistory(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
 
         LOGGER.debug("JSConditionResolver::initCheckHistory");
@@ -1112,20 +1126,27 @@ public class JSConditionResolver {
     public void assign(SOSHibernateSession sosHibernateSession, JSConditionResolver lastConditionResolver) throws SOSHibernateException,
             JsonParseException, JsonMappingException, JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException,
             TransformerException {
-        LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
-        jobStreamContexts = lastConditionResolver.jobStreamContexts;
-        initJobStreams(sosHibernateSession);
-        listOfHistoryIds = lastConditionResolver.listOfHistoryIds;
 
-        this.initJobInConditions(sosHibernateSession);
+        listOfHistoryIds.putAll(lastConditionResolver.listOfHistoryIds); 
+        jobStreamContexts = lastConditionResolver.jobStreamContexts;
         jsEvents = lastConditionResolver.jsEvents;
+        LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
 
         for (UUID uuid : listOfHistoryIds.keySet()) {
             LOGGER.debug("Running sesion: " + uuid.toString());
             checkRunning(sosHibernateSession, uuid);
         }
         this.initCheckHistory(sosHibernateSession);
+        copyConsumedInConditions(lastConditionResolver.getJsJobInConditions());
+        
+    }
 
+    public void initModel(SOSHibernateSession sosHibernateSession) throws SOSHibernateException, JsonParseException, JsonMappingException,
+            JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException, TransformerException {
+
+        initHistoryIds(sosHibernateSession);
+        initJobStreams(sosHibernateSession);
+        this.initJobInConditions(sosHibernateSession);
     }
 
     public List<String> getListOfMissingEvents() {

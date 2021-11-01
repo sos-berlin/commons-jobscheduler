@@ -347,9 +347,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     return reInitModel();
                 }).thenAccept(jsConditionResolver -> {
                     LOGGER.debug("New model creation is ready...");
-                    /*
-                     * try { assignNewModel2(jsConditionResolver); } catch (SOSHibernateException e) { LOGGER.error(e.getMessage(), e); }
-                     */
                 });
 
                 checkEventTimer.cancel();
@@ -743,9 +740,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     private void copyConditionResolverData(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         try {
+            this.getConditionResolver().initModel(sosHibernateSession);
+            LOGGER.debug("acquire:3 resolveInConditionsSemaphore");
+            resolveInConditionsSemaphore.acquire();
             this.getConditionResolver().assign(sosHibernateSession, getLastConditionResolver());
+            LOGGER.debug("release:3 resolveInConditionsSemaphore");
+            resolveInConditionsSemaphore.release();
             this.resolveInConditions(sosHibernateSession, null);
         } catch (Exception e) {
+            LOGGER.debug("release:3 resolveInConditionsSemaphore");
+            resolveInConditionsSemaphore.release();
+
             LOGGER.error(e.getMessage(), e);
         }
     }
@@ -966,13 +971,13 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("Resolve in-conditions: " + forInstance);
             duration = new DurationCalculator();
         }
-        LOGGER.debug("acquire:2 resolveInConditionsSemaphore");
 
         if (jobStreamCheckIntervalTimer != null) {
             jobStreamCheckIntervalTimer.cancel();
             jobStreamCheckIntervalTimer.purge();
         }
 
+        LOGGER.debug("acquire:2 resolveInConditionsSemaphore");
         resolveInConditionsSemaphore.acquire();
         try {
 
@@ -1022,7 +1027,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             resetJobStreamCheckIntervalTimer();
         }
     }
-
 
     private void assignNewModel(JSConditionResolver jsConditionResolver) throws SOSHibernateException {
         SOSHibernateSession sosHibernateSession = null;
