@@ -771,8 +771,10 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 try {
                     session.setEnvVar(entry.getKey(), entry.getValue());
                 } catch (Throwable e) {
-                    LOGGER.warn(String.format("[can't set ssh session environment variable][%s=%s]%s", entry.getKey(), entry.getValue(), e
-                            .toString()), e);
+                    // not throw exception - compatibility to JSCH.
+                    // JSCH not wait for response on set environment variables, so the failed requests are ignored.
+                    // SSHJ waits for response
+                    LOGGER.debug(String.format("[session.setEnvVar failed][%s=%s]%s", entry.getKey(), entry.getValue(), e.toString()));
                 }
             }
         }
@@ -818,7 +820,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     @Override
     public void execSessionSendSignalContinue() throws Exception {
         if (sshClientCommand != null && sshClient != null) {
-            sshClient.getConnection().sendGlobalRequest("keepalive@openssh.com", true, new byte[0]);
+            sshClient.getConnection().sendGlobalRequest("keepalive@openssh.com", false, new byte[0]);
         }
     }
 

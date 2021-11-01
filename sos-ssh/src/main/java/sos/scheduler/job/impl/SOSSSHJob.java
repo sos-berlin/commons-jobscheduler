@@ -279,29 +279,33 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
             @Override
             public Void call() throws Exception {
+                long sleepMillis = 1_000;
                 try {
-                    Thread.sleep(1_000);
+                    // first wait
+                    Thread.sleep(sleepMillis);
                 } catch (InterruptedException e) {
                 }
                 while (!commandExecution.isDone()) {
-                    for (int i = 0; i < 10; i++) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                        }
-                    }
                     try {
                         if (handler.isExecSessionExists()) {
                             if (handler.isExecSessionConnected()) {
                                 handler.execSessionSendSignalContinue();
                                 // LOGGER.trace("send signal CONT");
+                                try {
+                                    // next waits
+                                    Thread.sleep(sleepMillis);
+                                } catch (InterruptedException e) {
+                                }
                             } else {
                                 LOGGER.trace("[send signal CONT][skip]channel not connected");
                                 return null;
                             }
+                        } else {
+                            return null;
                         }
                     } catch (Exception e) {
                         LOGGER.warn(String.format("[send signal CONT]%s", e.toString()), e);
+                        return null;
                     }
                 }
                 return null;
