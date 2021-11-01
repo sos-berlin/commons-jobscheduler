@@ -59,33 +59,7 @@ public class StarterScheduleTable {
         return (starterScheduleTableItem != null) && (starterScheduleTableItem.isStarted());
     }
 
-    public void addStarter(JSJobStreamStarter starter) {
-        Date now = new Date();
-        if (starter.getJobStreamScheduler() != null && starter.getJobStreamScheduler().getListOfStartTimes() != null) {
-            for (Long startTime : starter.getJobStreamScheduler().getListOfStartTimes()) {
-                if (startTime > now.getTime()) {
-                    StarterScheduleKey starterScheduleKey = new StarterScheduleKey();
-
-                    starterScheduleKey.scheduledFor = startTime;
-                    starterScheduleKey.starterName = starter.getStarterName();
-                    StarterScheduleTableItem starterScheduleTableItem = new StarterScheduleTableItem();
-                    starterScheduleTableItem.setStarted(false);
-                    starterScheduleTableItem.setStarter(starter);
-                    starterScheduleTableItem.setStartTime(starterScheduleKey.scheduledFor);
-                    if (listOfScheduledStarters.get(starterScheduleKey) == null) {
-
-                        listOfScheduledStarters.put(starterScheduleKey, starterScheduleTableItem);
-
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(starterScheduleKey.scheduledFor);
-
-                        LOGGER.trace(starterScheduleKey.starterName + " --> " + calendar.getTime());
-                    }
-                }
-            }
-        }
-    }
-
+ 
     public JSJobStreamStarter getLateStarter(JSJobStreamStarter nextStarter) {
         Long now = new Date().getTime() - 2 * 60 * 120;
         StarterScheduleKey starterScheduleKey = new StarterScheduleKey();
@@ -123,5 +97,34 @@ public class StarterScheduleTable {
         }
         return resultList;
     }
+    
+    public void addStarter(JSJobStreamStarter starter) {
+        Date now = new Date();
+
+        if (starter.getJobStreamScheduler() != null && starter.getJobStreamScheduler().getListOfStartTimes() != null) {
+            for (Long startTime : starter.getJobStreamScheduler().getListOfStartTimes()) {
+                if (startTime > now.getTime()) {
+                    StarterScheduleKey starterScheduleKey = new StarterScheduleKey();
+
+                    starterScheduleKey.scheduledFor = startTime;
+                    starterScheduleKey.starterName = starter.getStarterName();
+                    StarterScheduleTableItem starterScheduleTableItem = new StarterScheduleTableItem();
+                    starterScheduleTableItem.setStarted(false);
+                    starterScheduleTableItem.setStarter(starter);
+                    starterScheduleTableItem.setStartTime(starterScheduleKey.scheduledFor);
+                    if (listOfScheduledStarters.get(starterScheduleKey) == null) {
+
+                        listOfScheduledStarters.put(starterScheduleKey, starterScheduleTableItem);
+
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(starterScheduleKey.scheduledFor);
+
+                        LOGGER.trace(starterScheduleKey.starterName + " --> " + calendar.getTime());
+                    }
+                }
+            }
+        }
+    }
+
 
 }
