@@ -24,7 +24,7 @@ import com.sos.vfs.sftp.sshj.SOSSFTPSSHJ;
 public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
 
     public enum SSHProvider {
-        JCRAFT, SSHJ
+        JSCH, SSHJ
     }
 
     private static final Pattern HAS_WINDOWS_OPENSSH_DRIVER_LETTER_SPECIFIER = Pattern.compile("^/[a-zA-Z]:");
