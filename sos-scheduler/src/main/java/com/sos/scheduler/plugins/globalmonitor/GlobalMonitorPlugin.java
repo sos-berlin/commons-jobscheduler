@@ -1,17 +1,27 @@
 package com.sos.scheduler.plugins.globalmonitor;
 
+import static com.sos.scheduler.engine.common.javautils.ScalaInJava.toScalaSet;
+import static com.sos.scheduler.engine.common.xml.XmlUtils.loadXml;
+import static com.sos.scheduler.engine.common.xml.XmlUtils.toXmlBytes;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import scala.collection.immutable.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.sos.scheduler.engine.data.filebased.AbsolutePath;
 import com.sos.scheduler.engine.data.filebased.FileBasedType;
@@ -19,21 +29,7 @@ import com.sos.scheduler.engine.kernel.plugin.AbstractPlugin;
 import com.sos.scheduler.engine.kernel.plugin.Plugins;
 import com.sos.scheduler.engine.kernel.plugin.XmlConfigurationChangingPlugin;
 
-import static com.sos.scheduler.engine.common.xml.XmlUtils.loadXml;
-import static com.sos.scheduler.engine.common.xml.XmlUtils.toXmlBytes;
-import static com.sos.scheduler.engine.common.javautils.ScalaInJava.toScalaSet;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
+import scala.collection.immutable.Set;
 
 public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurationChangingPlugin {
 
@@ -48,6 +44,9 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         configurationModifierFileSelectorMonitorOptions = setParameters(pluginElement, "monitorparams");
     }
 
+    public GlobalMonitorPlugin() {
+     }
+
     @Override
     public byte[] changeXmlConfiguration(FileBasedType typ, AbsolutePath path, byte[] xmlBytes) {
         LOGGER.debug("---------  changeXmlConfiguration");
@@ -55,11 +54,9 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         if (typ == FileBasedType.Job) {
             doc = xmlBytesToDom(xmlBytes);
         }
-        try {
-            doc = modifyJobElement(doc, path.string());
-        } catch (JDOMException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+
+        doc = modifyJobElement(doc, path.string());
+
         return domToXmlBytes(doc);
     }
 
@@ -92,20 +89,22 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         parameters.put("exclude_file", "");
         parameters.put("recursive", "true");
         parameters.put("regex_selector", "");
-        DOMBuilder domBuilder = new DOMBuilder();
-        org.jdom.Element pluginElement = domBuilder.build(e);
-        List<org.jdom.Element> listOfParams = null;
-        org.jdom.Element paramsElement = pluginElement.getChild(parent);
+
+        NodeList listOfParams = null;
+        NodeList paramsElement = e.getElementsByTagName(parent);
         if (paramsElement != null) {
-            listOfParams = paramsElement.getChildren("param");
-            Iterator<org.jdom.Element> it = listOfParams.iterator();
-            while (it.hasNext()) {
-                org.jdom.Element param = it.next();
-                if (param.getAttributeValue("name") != null) {
-                    String name = param.getAttributeValue("name").toLowerCase();
-                    String value = param.getAttributeValue("value");
-                    LOGGER.debug("---------  " + name + "=" + value);
-                    parameters.put(name, value);
+            listOfParams = paramsElement.item(0).getChildNodes();
+            for (int i = 0; i < listOfParams.getLength(); i++) {
+                Node param = listOfParams.item(i);
+                if (param.getNodeType() == Node.ELEMENT_NODE) {
+                    Element elem = (Element) param;
+
+                    if (elem.getAttribute("name") != null) {
+                        String name = elem.getAttribute("name").toLowerCase();
+                        String value = elem.getAttribute("value");
+                        LOGGER.debug("---------  " + name + "=" + value);
+                        parameters.put(name, value);
+                    }
                 }
             }
             c.setConfigurationDirectory(parameters.get("configuration_directory").replace('\\', '/'));
@@ -115,6 +114,10 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
             c.setRegexSelector(parameters.get("regex_selector"));
         }
         return c;
+    }
+
+    public ConfigurationModifierFileSelectorOptions setParametersTest(Element e, String parent) {
+        return setParameters(e, parent);
     }
 
     private static Document xmlBytesToDom(byte[] xmlBytes) {
@@ -127,12 +130,12 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         return toXmlBytes(node, UTF_8, indent);
     }
 
-    private Document modifyJobElement(Document doc, String jobname) throws JDOMException {
+    private Document modifyJobElement(Document doc, String jobname) {
         LOGGER.debug("---------  modifyJobElement:" + jobname);
         // 1. Create a FileSelector for the jobs that are to be handled
         // depending on the given options.
-        ConfigurationModifierFileSelector configurationModifierFileSelector =
-                new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
+        ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(
+                configurationModifierFileSelectorJobOptions);
         // 2. Set the filter for jobs to an instance of
         // ConfigurationModifierJobFileFilter
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
@@ -160,7 +163,9 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
                 // (and write) the job.xml
                 JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(doc);
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
+
                 doc = jobConfigurationFileChanger.addMonitorUse();
+
                 LOGGER.debug(getStringFromDocument(doc));
                 return doc;
             }
