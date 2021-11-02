@@ -250,6 +250,8 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     @Override
     public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         try {
+            boolean isDebugEnabled = LOGGER.isDebugEnabled();
+            boolean isTraceEnabled = LOGGER.isTraceEnabled();
 
             List<SOSFileEntry> result = new ArrayList<>();
             if (path.isEmpty()) {
@@ -275,26 +277,65 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
                 }
                 return result;
             }
-            if (LOGGER.isTraceEnabled()) {
+            if (isTraceEnabled) {
                 LOGGER.trace(String.format("[%s][ls] %s files or folders", path, list.length));
             }
 
+            int i = 0;
             for (FTPFile file : list) {
+                i++;
                 String name = file.getName();
+                if (isTraceEnabled) {
+                    try {
+                        LOGGER.trace(String.format("[%s][ls result][%s][%s]%s", path, i, name, SOSString.toString(file)));
+                    } catch (Throwable e) {
+                        LOGGER.trace(String.format("[%s][ls result][%s][%s]", path, i, name));
+                        LOGGER.error(e.toString(), e);
+                    }
+                }
+                if (name == null) {
+                    LOGGER.warn(String.format("[%s][ls result][%s][file type=%s][skip][filename can't be evaluated]%s", path, i, getFTPFileType(file),
+                            SOSString.toString(file)));
+                    continue;
+                }
 
                 if (!name.trim().isEmpty() && isNotHiddenFile(name)) {
                     result.add(getFileEntry(file, path));
+                } else {
+                    LOGGER.debug(String.format("[%s][ls result][%s][%s][skip]name is empty or is a hidden file", path, i, name));
                 }
+            }
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[%s][result] %s files or folders", path, result.size()));
             }
             reply = "ls OK";
             return result;
         } catch (Exception e) {
+            LOGGER.error(String.format("[%s]%s", path, e.toString()), e);
             reply = e.toString();
             return null;
         }
     }
 
+    private String getFTPFileType(FTPFile file) {
+        if (file != null) {
+            if (file.isFile()) {
+                return "file";
+            } else if (file.isDirectory()) {
+                return "directory";
+            } else if (file.isSymbolicLink()) {
+                return "symbolic link";
+            } else if (file.isUnknown()) {
+                return "unknown";
+            }
+        }
+        return null;
+    }
+
     private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
+        boolean isTraceEnabled = LOGGER.isTraceEnabled();
+
         if (recLevel == 0) {
             directoryListing = new ArrayList<SOSFileEntry>();
         }
@@ -309,13 +350,23 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             LOGGER.error(e.getMessage(), e);
         }
         if (entries == null) {
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[%s]entries=null", path));
+            }
             return directoryListing;
         }
         for (SOSFileEntry entry : entries) {
+            if (isTraceEnabled) {
+                LOGGER.trace(String.format("[%s][entry]%s", path, SOSString.toString(entry)));
+            }
             if (!isNotHiddenFile(entry.getFilename())) {
+                LOGGER.debug(String.format("[%s][entry is hidden]%s continue", path, entry.getFilename()));
                 continue;
             }
             if (entry.isDirectory()) {
+                if (isTraceEnabled) {
+                    LOGGER.trace(String.format("[%s][entry]%s isDirectory, recursive=%s", path, entry.getFilename(), recursive));
+                }
                 if (recursive) {
                     recLevel++;
                     getFilenames(entry.getFullPath(), recursive, recLevel, checkIfExists);
@@ -330,9 +381,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     @Override
     public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean recursive, boolean checkIfExists,
             String integrityHashType) throws Exception {
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
         List<SOSFileEntry> result = getFilenames(folder, recursive, 0, checkIfExists);
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[%s][total] %s files", folder, result.size()));
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[%s][total] %s files", folder, result.size()));
         }
 
         List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
@@ -350,8 +402,8 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
                 list.add(entry);
             }
         }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[%s][filtered] %s files", folder, list.size()));
+        if (isDebugEnabled) {
+            LOGGER.debug(String.format("[%s][filtered] %s files", folder, list.size()));
         }
         return list;
     }

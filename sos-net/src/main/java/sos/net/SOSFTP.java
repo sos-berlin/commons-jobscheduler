@@ -33,7 +33,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     public SOSFTP(final String host, final int port) throws SocketException, IOException, UnknownHostException {
         connect(host, port);
     }
-   
+
     public SOSFTP(final String ftpHost, final int ftpPort, final String proxyHost, final int proxyPort) throws SocketException, IOException,
             UnknownHostException {
         this.connect(ftpHost, ftpPort);
@@ -248,13 +248,19 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     }
 
     @Override
-    public long size(final String remoteFile) throws Exception {
-        this.sendCommand("SIZE " + remoteFile);
-        if (this.getReplyCode() == FTPReply.FILE_STATUS) {
-            return Long.parseLong(trimResponseCode(this.getReplyString()));
-        } else {
-            return -1L;
+    public int size(final String remoteFile) {
+        try {
+            this.sendCommand("SIZE " + remoteFile);
+            if (this.getReplyCode() == FTPReply.FILE_STATUS) {
+                return Integer.parseInt(trimResponseCode(this.getReplyString()));
+            } else {
+                return -1;
+            }
+        } catch (Throwable e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return -1;
     }
 
     private String trimResponseCode(final String response) throws Exception {
@@ -302,8 +308,8 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                         + ". Perhaps the file does not exist. Reply from ftp server: " + getReplyString());
             }
             if (!isPositiveCommandCompletion()) {
-                throw new JobSchedulerException("..error occurred in getFile() [retrieveFileStream] on the FTP server for file [" + remoteFile
-                        + "]: " + getReplyString());
+                throw new JobSchedulerException("..error occurred in getFile() [retrieveFileStream] on the FTP server for file [" + remoteFile + "]: "
+                        + getReplyString());
             }
             byte[] buffer = new byte[4096];
             out = new FileOutputStream(new File(localFile), append);
