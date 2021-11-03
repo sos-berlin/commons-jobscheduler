@@ -86,11 +86,6 @@
 		</dependency>
 
         <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-        </dependency>
-
-        <dependency>
 		    <groupId>com.hierynomus</groupId>
 		    <artifactId>sshj</artifactId>
 		</dependency>
