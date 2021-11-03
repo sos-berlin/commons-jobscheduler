@@ -703,4 +703,9 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionString return_values = new SOSOptionString(this, CLASS_NAME + ".return-values", "environment variable transfer history", "", "",
             false);
 
+    // see sos.net.ssh.SOSSSHJobOptionsSuperClass ssh_provider
+    // for default value handling see com.sos.vfs.sftp.SOSSFTP
+    @JSOptionDefinition(name = "ssh_provider", description = "ssh provider implementation", key = "ssh_provider", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString ssh_provider = new SOSOptionString(this, CLASS_NAME + ".ssh_provider", "ssh provider", "", "", false);
+
 }

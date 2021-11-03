@@ -58,6 +58,9 @@ public class JSJobStreamStarter {
         return itemJobStreamStarter;
     }
 
+    public String getStarterName() {
+        return itemJobStreamStarter.getStarterName();
+    }
     public RunTime getRunTime() throws JsonParseException, JsonMappingException, IOException {
         if (itemJobStreamStarter.getRunTime() != null) {
             return Globals.objectMapper.readValue(itemJobStreamStarter.getRunTime(), RunTime.class);
@@ -66,7 +69,7 @@ public class JSJobStreamStarter {
     }
  
     public void schedule() throws JsonParseException, JsonMappingException, JsonProcessingException, IOException, ParseException, SOSInvalidDataException, DOMException, TransformerException, ParseException  {
-        LOGGER.debug("schedule for:" + this.getItemJobStreamStarter().getTitle());
+        LOGGER.debug("schedule for:" + this.getItemJobStreamStarter().getStarterName());
         jobStreamScheduler = new JobStreamScheduler(Constants.settings.getTimezone());
         if (this.getRunTime() != null) {
             Calendar c = Calendar.getInstance();
@@ -107,11 +110,7 @@ public class JSJobStreamStarter {
             listOfParameters.put(dbItemJobStreamParameter.getName(), dbItemJobStreamParameter.getValue());
         }
     }
-
-    public com.sos.joc.model.plan.RunTime getPlan() {
-        return jobStreamScheduler.getPlan();
-    }
-
+ 
     public Date getNextStartFromList() {
         
         LOGGER.trace(this.jobStreamName + "--> last start:" + new Date(lastStart));
@@ -219,7 +218,7 @@ public class JSJobStreamStarter {
     }
     
     public void setLastStart(long lastStart) {
-        LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getTitle() + " " + lastStart);
+        LOGGER.debug("set last start for " + this.jobStreamName + ":" + this.itemJobStreamStarter.getStarterName() + " " + lastStart);
         this.lastStart = lastStart;
     }
    

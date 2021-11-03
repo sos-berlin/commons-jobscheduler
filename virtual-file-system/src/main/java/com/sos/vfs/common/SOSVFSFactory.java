@@ -4,25 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.exception.SOSYadeSourceConnectionException;
 import com.sos.exception.SOSYadeTargetConnectionException;
-import com.sos.vfs.ftp.SOSFTP;
-import com.sos.vfs.ftp.SOSFTPS;
-import com.sos.vfs.http.SOSHTTP;
-import com.sos.vfs.common.interfaces.ISOSProvider;
-import com.sos.vfs.common.options.SOSBaseOptions;
-import com.sos.vfs.common.options.SOSProviderOptions;
-import com.sos.vfs.jms.SOSJMS;
-import com.sos.vfs.sftp.SOSSFTP;
-import com.sos.vfs.smb.SOSSMB;
-import com.sos.vfs.webdav.SOSWebDAV;
-import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.vfs.local.SOSLocal;
 import com.sos.i18n.annotation.I18NMessage;
 import com.sos.i18n.annotation.I18NMessages;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.interfaces.ISOSProvider;
+import com.sos.vfs.common.options.SOSBaseOptions;
+import com.sos.vfs.common.options.SOSProviderOptions;
+import com.sos.vfs.ftp.SOSFTP;
+import com.sos.vfs.ftp.SOSFTPS;
+import com.sos.vfs.http.SOSHTTP;
+import com.sos.vfs.jms.SOSJMS;
+import com.sos.vfs.local.SOSLocal;
+import com.sos.vfs.sftp.SOSSFTP;
+import com.sos.vfs.smb.SOSSMB;
+import com.sos.vfs.webdav.SOSWebDAV;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVFSFactory extends SOSVFSMessageCodes {
@@ -49,16 +49,16 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         options = opt;
     }
 
-    public static ISOSProvider getProvider(final SOSOptionTransferType.TransferTypes type) throws Exception {
-        return getProvider(type.name());
+    public static ISOSProvider getProvider(final SOSOptionTransferType.TransferTypes type, SOSOptionString sshProvider) throws Exception {
+        return getProvider(type.name(), sshProvider);
     }
 
-    public static ISOSProvider getProvider(String protocol) throws Exception {
+    public static ISOSProvider getProvider(String protocol, SOSOptionString sshProvider) throws Exception {
         ISOSProvider provider = null;
         protocol = protocol.toLowerCase();
 
         if (protocol.equals(TransferTypes.sftp.name()) || protocol.equals(TransferTypes.ssh.name())) {
-            provider = new SOSSFTP();
+            provider = new SOSSFTP(sshProvider);
         } else if (protocol.equals(TransferTypes.local.name())) {
             provider = new SOSLocal();
         } else if (protocol.equals(TransferTypes.ftp.name())) {
@@ -90,7 +90,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("[%s]%s", providerOptions.getRange(), providerOptions.getProtocol()));
             }
-            provider = getProvider(providerOptions.getProtocol());
+            provider = getProvider(providerOptions.getProtocol(), options.ssh_provider);
             try {
                 handleProviderOptions(providerOptions);
                 provider.setBaseOptions(options);
@@ -108,7 +108,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                     } catch (Exception ce) {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
-                    provider = getProvider(alternative.protocol.getValue());
+                    provider = getProvider(alternative.protocol.getValue(), options.ssh_provider);
                     handleProviderOptions(alternative);
                     provider.connect(alternative);
                     handleOptions(provider, alternative);

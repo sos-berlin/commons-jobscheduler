@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public class JSEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSEvents.class);
+    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
     private Map<JSEventKey, JSEvent> listOfEvents;
 
@@ -32,7 +33,7 @@ public class JSEvents {
     }
 
     public void removeEvent(JSEventKey eventKey) {
-        this.listOfEvents.remove(eventKey);        
+        this.listOfEvents.remove(eventKey);
     }
 
     public JSEvent getEvent(JSEventKey eventKey) {
@@ -70,13 +71,15 @@ public class JSEvents {
 
     public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
         JSEvent returnEvent;
-        if ((jsEventKey.getSession() == null) || (jsEventKey.getEvent() == null)){
+        if ((jsEventKey.getSession() == null) || (jsEventKey.getEvent() == null)) {
             return null;
         }
-        if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey.getSession())) {
+        if (!jsEventKey.getGlobalEvent() && jsEventKey.getJobStream() != null && !jsEventKey.getJobStream().isEmpty() && !"*".equals(jsEventKey
+                .getSession())) {
             returnEvent = this.getEvent(jsEventKey);
-            LOGGER.trace("EventKey:" + SOSString.toString(jsEventKey));
-            LOGGER.debug("Event direct return: " + returnEvent);
+            if (isDebugEnabled) {
+                LOGGER.debug("EventKey:" + SOSString.toString(jsEventKey) + " --> Event direct return: " + returnEvent);
+            }
             return returnEvent;
         } else {
             Map<JSEventKey, JSEvent> collect = this.listOfEvents.entrySet().stream().filter(jsEvent -> jsEventKey.getEvent().equals(jsEvent.getKey()
@@ -88,7 +91,9 @@ public class JSEvents {
                     .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
             try {
                 returnEvent = collect.entrySet().stream().findAny().get().getValue();
-                LOGGER.debug("Event return: " + returnEvent.getEvent());
+                if (isDebugEnabled) {
+                    LOGGER.debug("Event return: " + returnEvent.getEvent());
+                }
                 return returnEvent;
             } catch (NoSuchElementException e) {
                 return null;

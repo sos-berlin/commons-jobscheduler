@@ -231,13 +231,19 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     }
 
     @Override
-    public long size(String remoteFile) throws Exception {
-        this.sendCommand("SIZE " + remoteFile);
-        if (this.getReplyCode() == FTPReply.FILE_STATUS) {
-            return Long.parseLong(trimResponseCode(this.getReplyString()));
-        } else {
-            return -1L;
-        }
+    public int size(String remoteFile) {
+        try {
+			this.sendCommand("SIZE " + remoteFile);
+			if (this.getReplyCode() == FTPReply.FILE_STATUS) {
+			    return Integer.parseInt(trimResponseCode(this.getReplyString()));
+			} else {
+			    return -1;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return -1;
     }
 
     private String trimResponseCode(String response) throws Exception {

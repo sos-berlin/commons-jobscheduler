@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.transform.TransformerException;
 
@@ -61,6 +62,7 @@ import com.sos.jobstreams.classes.CheckHistoryKey;
 import com.sos.jobstreams.classes.CheckHistoryValue;
 import com.sos.jobstreams.classes.CheckRunningResult;
 import com.sos.jobstreams.classes.DurationCalculator;
+import com.sos.jobstreams.classes.EndOfJobStreamReturn;
 import com.sos.jobstreams.classes.EventDate;
 import com.sos.jobstreams.classes.JobStarterOptions;
 import com.sos.jobstreams.classes.StartJobReturn;
@@ -129,49 +131,41 @@ public class JSConditionResolver {
             JsonProcessingException, IOException, SOSHibernateException, SOSInvalidDataException, DOMException, ParseException, TransformerException {
         LOGGER.debug("JSConditionResolver reinit jobstream model");
 
-        JSJobStreams _jsJobStreams = new JSJobStreams();
-        if (jsJobStreams != null && jsJobStreams.listOfJobStreamNames != null) {
-            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
-                _jsJobStreams.listOfJobStreamNames.put(entry.getKey(), entry.getValue());
-            }
-            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
-                _jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
-            }
+        /*
+         * JSJobStreams _jsJobStreams = new JSJobStreams(); if (jsJobStreams != null && jsJobStreams.listOfJobStreamNames != null) { for (Entry<String,
+         * JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) { _jsJobStreams.listOfJobStreamNames.put(entry.getKey(), entry.getValue());
+         * JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey()); if (_jsJobStream == null) {
+         * LOGGER.info("-------> _jsJobStream is null:" + entry.getKey()); } LOGGER.info("--> add:" + entry.getKey()); } for (Entry<Long, JSJobStream> entry :
+         * jsJobStreams.listOfJobStreams.entrySet()) { _jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue()); } }
+         */
+        if (complete) {
+            jsJobInConditions = null;
+            jsJobStreamInConditions = null;
+            jsJobOutConditions = null;
+            jsJobStreamOutConditions = null;
+            jsJobStreams = null;
+            jsEvents = null;
+            listOfHistoryIds = null;
+            listOfCalendarUsages = null;
+            jobStreamContexts = null;
+            checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
+        } else {
+            listOfParameters = null;
         }
-
-        jsJobInConditions = null;
-        jsJobStreamInConditions = null;
-        jsJobOutConditions = null;
-        jsJobStreamOutConditions = null;
-        jsJobStreams = null;
-        jsEvents = null;
-        listOfHistoryIds = null;
-        listOfParameters = null;
-        listOfJobStreamStarter = null;
-        listOfCalendarUsages = null;
-        jobStreamContexts = null;
-        checkHistoryCondition = new CheckHistoryCondition(settings.getSchedulerId());
 
         this.init(sosHibernateSession, complete);
 
-        if (jsJobStreams != null &&_jsJobStreams.listOfJobStreamNames != null) {
-            for (Entry<String, JSJobStream> entry : jsJobStreams.listOfJobStreamNames.entrySet()) {
-                JSJobStream jsJobStream = jsJobStreams.listOfJobStreamNames.get(entry.getKey());
-                jsJobStream.getListOfJobStreamStarter().clear();
-                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey());
-                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
-                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
-                }
-            }
-            for (Entry<Long, JSJobStream> entry : jsJobStreams.listOfJobStreams.entrySet()) {
-                JSJobStream jsJobStream = jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
-                jsJobStream.getListOfJobStreamStarter().clear();
-                JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreams.get(entry.getKey());
-                for (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) {
-                    jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
-                }
-            }
-        }
+        /*
+         * if (jsJobStreams != null && _jsJobStreams.listOfJobStreamNames != null) { for (Entry<String, JSJobStream> entry :
+         * jsJobStreams.listOfJobStreamNames.entrySet()) { JSJobStream jsJobStream = jsJobStreams.listOfJobStreamNames.get(entry.getKey());
+         * jsJobStream.getListOfJobStreamStarter().clear(); JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreamNames.get(entry.getKey()); if (_jsJobStream
+         * == null) { LOGGER.info("--> _jsJobStream is null:" + entry.getKey()); } for (JSJobStreamStarter jsJobStreamStarter :
+         * _jsJobStream.getListOfJobStreamStarter()) { jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter); } } for (Entry<Long, JSJobStream> entry
+         * : jsJobStreams.listOfJobStreams.entrySet()) { JSJobStream jsJobStream = jsJobStreams.listOfJobStreams.put(entry.getKey(), entry.getValue());
+         * jsJobStream.getListOfJobStreamStarter().clear(); JSJobStream _jsJobStream = _jsJobStreams.listOfJobStreams.get(entry.getKey()); for
+         * (JSJobStreamStarter jsJobStreamStarter : _jsJobStream.getListOfJobStreamStarter()) { jsJobStream.getListOfJobStreamStarter().add(jsJobStreamStarter);
+         * } } }
+         */
     }
 
     public void reInitComplete(SOSHibernateSession sosHibernateSession) throws JsonParseException, JsonMappingException, JsonProcessingException,
@@ -277,7 +271,7 @@ public class JSConditionResolver {
     }
 
     private void initHistoryIds(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
-        listOfHistoryIds = new HashMap<UUID, DBItemJobStreamHistory>();
+        listOfHistoryIds = new ConcurrentHashMap<UUID, DBItemJobStreamHistory>();
         FilterJobStreamHistory filterJobStreamHistory = new FilterJobStreamHistory();
         filterJobStreamHistory.setSchedulerId(settings.getSchedulerId());
         filterJobStreamHistory.setRunning(true);
@@ -302,6 +296,14 @@ public class JSConditionResolver {
         List<DBItemJobStream> listOfJobStreams = dbLayerJobStreams.getJobStreamsList(filterJobStreams, 0);
         jsJobStreams = new JSJobStreams();
         jsJobStreams.setListOfJobStreams(settings, listOfJobStreams, listOfJobStreamStarter, listOfCalendarUsages, sosHibernateSession);
+
+    }
+
+    public void reset(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
+        listOfParameters = new HashMap<UUID, Map<String, String>>();
+        initHistoryIds(sosHibernateSession);
+        jsJobStreams.resetListOfJobStreams(sosHibernateSession);
+        initEvents(sosHibernateSession);
 
     }
 
@@ -439,6 +441,23 @@ public class JSConditionResolver {
         }
     }
 
+    public void addEvents(SOSHibernateSession session, String contextId) throws SOSHibernateException {
+        LOGGER.debug("JSConditionResolver::initEvents");
+        if (jsEvents == null) {
+            jsEvents = new JSEvents();
+        }
+        FilterEvents filterEvents = new FilterEvents();
+        filterEvents.setSchedulerId(settings.getSchedulerId());
+        filterEvents.setIncludingGlobalEvent(true);
+        if (contextId != null && !contextId.isEmpty()) {
+            filterEvents.setSession(contextId.toString());
+        }
+        DBLayerEvents dbLayerEvents = new DBLayerEvents(session);
+        List<DBItemOutConditionWithEvent> listOfEvents = dbLayerEvents.getEventsList(filterEvents, 0);
+        jsEvents.setListOfEvents(listOfEvents);
+
+    }
+
     public void reInitConsumedInConditions(SOSHibernateSession sosHibernateSession) throws SOSHibernateException {
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             LOGGER.debug("reInitConsumedInConditions for jobstream" + jobStream.getValue().getJobStream());
@@ -483,6 +502,20 @@ public class JSConditionResolver {
                         }
                     }
                     sosHibernateSession.commit();
+                }
+            }
+        }
+    }
+
+    public void copyConsumedInConditions(JSJobInConditions sourceJobInConditions) throws SOSHibernateException {
+
+        for (Entry<JSJobConditionKey, JSInConditions> entry : jsJobInConditions.getListOfJobInConditions().entrySet()) {
+            JSInConditions soureJSInConditions = sourceJobInConditions.getInConditions(entry.getKey());
+            if (soureJSInConditions != null) {
+                for (JSInCondition inCondition : entry.getValue().getListOfInConditions().values()) {
+                    if (soureJSInConditions.getCondition(inCondition.getId()) != null) {
+                        inCondition.getConsumedForContext().addAll(soureJSInConditions.getCondition(inCondition.getId()).getConsumedForContext());
+                    }
                 }
             }
         }
@@ -558,7 +591,7 @@ public class JSConditionResolver {
         String expressionValue = condition.getExpression() + " ";
         expressionValue = JSConditions.normalizeExpression(expressionValue);
         List<JSCondition> listOfConditions = JSConditions.getListOfConditions(expressionValue);
-        LOGGER.trace("JSConditionResolver::validate");
+        LOGGER.debug("JSConditionResolver::validate " + expressionValue);
         for (JSCondition jsCondition : listOfConditions) {
             LOGGER.trace("JSConditionResolver::validate --> " + jsCondition.getConditionType());
 
@@ -692,10 +725,10 @@ public class JSConditionResolver {
             }
 
         }
-        LOGGER.trace(condition.getExpression() + " after replacement  -->  " + expressionValue);
+        LOGGER.debug(condition.getExpression() + " after replacement  -->  " + expressionValue);
         booleanExpression.setBoolExp(expressionValue);
         boolean evaluatedExpression = booleanExpression.evaluateExpression();
-        LOGGER.trace(condition.getExpression() + " evaluated to: " + evaluatedExpression);
+        LOGGER.debug(condition.getExpression() + " evaluated to: " + evaluatedExpression);
         return evaluatedExpression;
     }
 
@@ -728,6 +761,7 @@ public class JSConditionResolver {
                         continue;
                     }
                     UUID contextId = jsHistoryEntry.getContextId();
+                    Long starterId = this.listOfHistoryIds.get(contextId).getJobStreamStarter();
                     if (jsHistoryEntry.isSkipValidation() && !(instance == null || contextId.equals(instance))) {
                         LOGGER.debug(contextId.toString() + " is running but will be skipped");
                         continue;
@@ -774,8 +808,8 @@ public class JSConditionResolver {
                                     JSJobStream jsJobStream = this.getJsJobStreams().getJobStream(jsHistoryEntry.getItemJobStreamHistory()
                                             .getJobStream());
                                     JobStreamContexts jobStreamContexts = this.getJobStreamContexts();
-                                    boolean endedByJob = jsHistoryEntry.endOfStream(jsJobStream, jobStreamContexts);
-                                    if (!endedByJob) {
+                                    EndOfJobStreamReturn endOfJobStreamReturn = jsHistoryEntry.endOfStream(jsJobStream, starterId, jobStreamContexts);
+                                    if (!endOfJobStreamReturn.endReached) {
 
                                         jsHistoryEntry.setSkipValidation(inCondition.isHaveOnlyInstanceEvents());
 
@@ -1092,20 +1126,27 @@ public class JSConditionResolver {
     public void assign(SOSHibernateSession sosHibernateSession, JSConditionResolver lastConditionResolver) throws SOSHibernateException,
             JsonParseException, JsonMappingException, JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException,
             TransformerException {
-        LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
-        jobStreamContexts = lastConditionResolver.jobStreamContexts;
-        initJobStreams(sosHibernateSession);
-        listOfHistoryIds = lastConditionResolver.listOfHistoryIds;
 
-        this.initJobInConditions(sosHibernateSession);
+        listOfHistoryIds.putAll(lastConditionResolver.listOfHistoryIds); 
+        jobStreamContexts = lastConditionResolver.jobStreamContexts;
         jsEvents = lastConditionResolver.jsEvents;
+        LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
 
         for (UUID uuid : listOfHistoryIds.keySet()) {
             LOGGER.debug("Running sesion: " + uuid.toString());
             checkRunning(sosHibernateSession, uuid);
         }
         this.initCheckHistory(sosHibernateSession);
+        copyConsumedInConditions(lastConditionResolver.getJsJobInConditions());
+        
+    }
 
+    public void initModel(SOSHibernateSession sosHibernateSession) throws SOSHibernateException, JsonParseException, JsonMappingException,
+            JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException, TransformerException {
+
+        initHistoryIds(sosHibernateSession);
+        initJobStreams(sosHibernateSession);
+        this.initJobInConditions(sosHibernateSession);
     }
 
     public List<String> getListOfMissingEvents() {

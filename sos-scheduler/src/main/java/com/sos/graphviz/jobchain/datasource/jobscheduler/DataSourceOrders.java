@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.graphviz.jobchain.interfaces.IDataSourceOrders;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
@@ -44,7 +45,8 @@ public class DataSourceOrders implements IDataSourceOrders {
         reset();
         String liveFolderName = liveFolder.getAbsolutePath();
         try {
-            ISOSProvider objFileSystemHandler = SOSVFSFactory.getProvider("local");
+            SOSBaseOptions vfsOptions = new SOSBaseOptions();
+            ISOSProvider objFileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider);
             ISOSProviderFile objHotFolder = objFileSystemHandler.getFile(liveFolderName);
             SchedulerHotFolder objSchedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(objHotFolder);
             SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.loadOrderObjects();

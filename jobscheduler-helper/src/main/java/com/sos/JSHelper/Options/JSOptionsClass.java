@@ -712,9 +712,13 @@ public class JSOptionsClass extends I18NBase implements Serializable {
                 String key = param.getKey();
                 String value = param.getValue();
                 if (key.startsWith(prefix)) {
-                    key = key.replaceAll(prefix, "");
-                    result.put(key, value);
-                    param.setValue("\n");
+                    if (prefix.equals("ssh_") && key.equals("ssh_provider")) {
+                        result.put(key, value);
+                    } else {
+                        key = key.replaceAll(prefix, "");
+                        result.put(key, value);
+                        param.setValue("\n");
+                    }
                 } else {
                     if (key.contains(longPrefix)) {
                         key = key.replace(longPrefix, "/");

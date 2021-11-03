@@ -617,4 +617,8 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass {
         autoDetectOS = val;
     }
 
+    // see com.sos.vfs.common.options.SOSBaseOptionsSuperClass ssh_provider
+    // for default value handling see com.sos.vfs.sftp.SOSSFTP
+    @JSOptionDefinition(name = "ssh_provider", description = "ssh provider implementation", key = "ssh_provider", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString ssh_provider = new SOSOptionString(this, CLASSNAME + ".ssh_provider", "ssh provider", "", "", false);
 }

@@ -1,4 +1,4 @@
-package com.sos.vfs.sftp.common;
+package com.sos.vfs.sftp.jcraft.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

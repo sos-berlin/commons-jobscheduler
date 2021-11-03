@@ -3,6 +3,7 @@ package com.sos.testframework.h2;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.junit.AfterClass;
@@ -20,7 +21,7 @@ public class H2ConnectionTest {
     private static ResourceList resources;
 
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws IOException {
         SQL_RESOURCE_NAMES.put("com.sos.testframework.h2.Table1DBItem", getSQLFileName("Table1"));
         SQL_RESOURCE_NAMES.put("com.sos.testframework.h2.Table2DBItem", getSQLFileName("Table2"));
         resources = new ResourceList(SQL_RESOURCE_NAMES);

@@ -3,6 +3,7 @@ package com.sos.scheduler.model.objects;
 import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 import java.io.File;
@@ -48,7 +49,8 @@ public class JSObjJobChain extends JobChain {
         setObjectFieldsFrom(jobChain);
         if (super.objVirtualFile == null) {
             try {
-                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local");
+                SOSBaseOptions vfsOptions = new SOSBaseOptions();
+                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider);
                 ISOSProviderFile virtualFile = sosVFSFileTransfer.getFile(file.getAbsolutePath());
                 super.objVirtualFile = virtualFile;
             } catch (Exception e) {

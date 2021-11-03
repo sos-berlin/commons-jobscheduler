@@ -12,6 +12,7 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.scheduler.model.tools.PathResolver;
 
 public class LiveConnector {
@@ -66,7 +67,8 @@ public class LiveConnector {
     private static ISOSProvider connect(String folder) {
         ISOSProvider result = null;
         try {
-            ISOSProvider vfs = SOSVFSFactory.getProvider(folder);
+            SOSBaseOptions vfsOptions = new SOSBaseOptions();
+            ISOSProvider vfs = SOSVFSFactory.getProvider(folder, vfsOptions.ssh_provider);
             if (vfs == null) {
                 throw new JobSchedulerException();
             }

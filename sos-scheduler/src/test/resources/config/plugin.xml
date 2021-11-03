@@ -1,0 +1,16 @@
+	<plugin java_class="com.sos.scheduler.plugins.globalmonitor.GlobalMonitorPlugin">
+            <plugin.config>
+                <jobparams>
+                    <param name="configuration_directory" value="D:/documents/sos-berlin.com/scheduler_joc_cockpit/config"/>
+                    <param name="regex_selector" value="^job_.*\.job.xml$"/>
+                    <param name="exclude_dir" value="sos"/>                          
+                    <param name="exlude_file" value="xxx"/>
+                </jobparams>
+                <monitorparams>
+                    <param name="use_parent_folders" value="true"/>
+                    <param name="recursive" value="true"/>
+                    <param name="regex_selector" value="^global_.*$"/>
+                </monitorparams>
+            </plugin.config>
+        </plugin>		
+		

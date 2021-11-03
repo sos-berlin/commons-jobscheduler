@@ -26,12 +26,13 @@ import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.SOSSFTP;
 import com.sos.vfs.common.SOSCommandResult;
 import com.sos.vfs.common.SOSEnv;
-import com.sos.vfs.sftp.common.SOSSFTPShellInfo;
-import com.sos.vfs.sftp.common.SOSSFTPShellInfo.Shell;
+import com.sos.vfs.sftp.common.SOSSSHServerInfo;
+import com.sos.vfs.sftp.common.SOSSSHServerInfo.Shell;
 import com.sos.exception.SOSSSHAutoDetectionException;
 
 import sos.net.ssh.SOSSSHJobOptions;
@@ -79,8 +80,6 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public SOSSSHJob() {
         super(new SOSSSHJobOptions());
-
-        handler = new SOSSFTP();
 
         UUID uuid = UUID.randomUUID();
         returnValuesFileName = "sos-ssh-return-values-" + uuid + ".txt";
@@ -280,29 +279,33 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
             @Override
             public Void call() throws Exception {
+                long sleepMillis = 1_000;
                 try {
-                    Thread.sleep(1_000);
+                    // first wait
+                    Thread.sleep(sleepMillis);
                 } catch (InterruptedException e) {
                 }
                 while (!commandExecution.isDone()) {
-                    for (int i = 0; i < 10; i++) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                        }
-                    }
                     try {
-                        if (handler.getChannelExec() != null) {
-                            if (handler.getChannelExec().isConnected()) {
-                                handler.getChannelExec().sendSignal("CONT");
+                        if (handler.isExecSessionExists()) {
+                            if (handler.isExecSessionConnected()) {
+                                handler.execSessionSendSignalContinue();
                                 // LOGGER.trace("send signal CONT");
+                                try {
+                                    // next waits
+                                    Thread.sleep(sleepMillis);
+                                } catch (InterruptedException e) {
+                                }
                             } else {
                                 LOGGER.trace("[send signal CONT][skip]channel not connected");
                                 return null;
                             }
+                        } else {
+                            return null;
                         }
                     } catch (Exception e) {
                         LOGGER.warn(String.format("[send signal CONT]%s", e.toString()), e);
+                        return null;
                     }
                 }
                 return null;
@@ -334,6 +337,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void connect(TransferTypes type) {
         try {
             if (handlerOptions == null) {
+                setSSHProvider();
                 setHandlerOptions(objOptions, type);
                 handlerOptions.checkMandatory();
             } else {
@@ -344,6 +348,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     return;
                 }
             }
+            handler = new SOSSFTP(getOptions().ssh_provider);
             handler.connect(handlerOptions);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("handler connection established");
@@ -590,6 +595,18 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         }
     }
 
+    private void setSSHProvider() {
+        if (!objOptions.ssh_provider.isDirty()) {
+            String val = SOSBaseOptions.getSSHProviderFromEnv();
+            if (val != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("set ssh_provider=%s from environment", val));
+                }
+                objOptions.ssh_provider.setValue(val);
+            }
+        }
+    }
+
     private void setHandlerOptions(SOSSSHJobOptions jobOptions, TransferTypes protocol) {
         handlerOptions = new SOSProviderOptions();
         handlerOptions.strictHostKeyChecking.value(jobOptions.strictHostKeyChecking.value());
@@ -668,32 +685,26 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (!forceAutoDetection) {
             LOGGER.info("*** parameter 'auto_detect_os' was set to 'false', only checking without setting commands automatically! ***");
         }
-        SOSSFTPShellInfo info = handler.getShellInfo();
+        SOSSSHServerInfo info = handler.getSSHServerInfo();
+        Shell shell = info.getShell();
+        if (info.getShell().equals(Shell.UNKNOWN)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Can´t detect OS and shell automatically!\r\n");
+            sb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
+            sb.append("preCommand, postCommandRead and postCommandDelete according to your remote shell!\r\n");
+            sb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Can´t detect OS and shell automatically!\r\n");
-        sb.append("Set parameter 'auto_os_detection' to false and specify the parameters ");
-        sb.append("preCommand, postCommandRead and postCommandDelete according to your remote shell!\r\n");
-        sb.append("For further details see knowledge base article https://kb.sos-berlin.com/x/EQaX");
-
-        if (info.getCommandError() != null) {
-            sb.append("\r\n").append(info.getCommandError().toString());
-            if (forceAutoDetection) {
-                throw new SOSSSHAutoDetectionException(sb.toString(), info.getCommandError());
-            }
-            info.setShell(Shell.UNIX);
-        } else if (info.getShell().equals(Shell.UNKNOWN)) {
             if (forceAutoDetection) {
                 throw new SOSSSHAutoDetectionException(sb.toString());
             } else {
                 LOGGER.info(sb.toString());
             }
-            info.setShell(Shell.UNIX);
+            shell = Shell.UNIX;
         } else {
             LOGGER.info(info.toString());
         }
 
-        isWindowsShell = info.getShell().equals(Shell.WINDOWS);
+        isWindowsShell = shell.equals(Shell.WINDOWS);
         delimiter = isWindowsShell ? DEFAULT_WINDOWS_DELIMITER : DEFAULT_LINUX_DELIMITER;
     }
 

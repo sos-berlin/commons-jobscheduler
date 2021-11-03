@@ -114,7 +114,7 @@ public interface SOSFileTransfer {
      * 
      * @param remoteFile the file on remote machine
      * @return the size of remote-file on remote machine */
-    public long size(String remoteFile) throws Exception;
+    public int size(String remoteFile);
 
     /** Retrieves a named file from the ftp server.
      *
