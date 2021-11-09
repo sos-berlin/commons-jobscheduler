@@ -32,8 +32,8 @@ public class CheckHistoryCondition {
         WebserviceCredentials webserviceCredentials = new WebserviceCredentials();
         webserviceCredentials.setSchedulerId(schedulerId);
 
-        jobHistory = new com.sos.jitl.checkhistory.JobHistory("", webserviceCredentials);
-        jobChainHistory = new com.sos.jitl.checkhistory.JobChainHistory("", webserviceCredentials);
+        jobHistory = new com.sos.jitl.checkhistory.JobHistory(webserviceCredentials);
+        jobChainHistory = new com.sos.jitl.checkhistory.JobChainHistory(webserviceCredentials);
         checkHistoryCache = new HashMap<CheckHistoryKey, CheckHistoryValue>();
     }
 
