@@ -123,7 +123,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
 
         for (LocalDate d : this.listOfDates) {
 
-            if (d.isBefore(last) && (d.isAfter(today) || HistoryHelper.isToday(d))) {
+            if (d.isBefore(last) && (d.isAfter(today) || Constants.isToday(d))) {
                 last = d;
                 next = d;
             }
@@ -219,7 +219,7 @@ public class JSInCondition implements IJSJobConditionKey, IJSCondition {
             return true;
         }
         for (LocalDate d : listOfDates) {
-            if (HistoryHelper.isToday(d)) {
+            if (Constants.isToday(d)) {
                 return true;
             }
         }
