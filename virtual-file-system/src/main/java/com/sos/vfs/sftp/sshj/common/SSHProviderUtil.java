@@ -22,7 +22,14 @@ public class SSHProviderUtil {
 
     public static KeyProvider getKeyProviderFromKeepass(Config config, SOSProviderOptions args) throws Exception {
         SOSKeePassDatabase kd = (SOSKeePassDatabase) args.keepass_database.value();
+        if (kd == null) {
+            throw new Exception("[keepass]keepass_database property is null");
+        }
         org.linguafranca.pwdb.Entry<?, ?, ?, ?> ke = (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) args.keepass_database_entry.value();
+        if (ke == null) {
+            throw new Exception(String.format("[keepass][can't find database entry]attachment property name=%s", args.keepass_attachment_property_name
+                    .getValue()));
+        }
         try {
             return getKeyProvider(config, kd.getAttachment(ke, args.keepass_attachment_property_name.getValue()), args.passphrase.getValue());
         } catch (Exception e) {
