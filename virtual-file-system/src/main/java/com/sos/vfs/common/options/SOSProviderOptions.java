@@ -104,12 +104,12 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
                 String keePassPassword = null;
                 Path keePassKeyFile = null;
-                if (credentialStore.credentialStorePassword.isDirty()) {
+                if (!SOSString.isEmpty(credentialStore.credentialStorePassword.getValue())) {
                     keePassPassword = credentialStore.credentialStorePassword.getValue();
                 }
 
                 try {
-                    if (credentialStore.credentialStoreKeyFileName.isDirty()) {
+                    if (!SOSString.isEmpty(credentialStore.credentialStoreKeyFileName.getValue())) {
                         keePassKeyFile = Paths.get(credentialStore.credentialStoreKeyFileName.getValue());
                         if (Files.notExists(keePassKeyFile)) {
                             throw new Exception(String.format("[%s]key file not found", SOSKeePassDatabase.getFilePath(keePassKeyFile)));
@@ -122,8 +122,9 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                                     throw new Exception(String.format("[%s]key file not found. password is empty", SOSKeePassDatabase.getFilePath(
                                             defaultKeyFile)));
                                 }
+                            } else {
+                                keePassKeyFile = defaultKeyFile;
                             }
-                            keePassKeyFile = defaultKeyFile;
                         }
                     }
 
