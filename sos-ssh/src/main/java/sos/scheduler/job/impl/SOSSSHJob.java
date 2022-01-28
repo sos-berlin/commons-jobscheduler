@@ -226,8 +226,10 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         } finally {
             disconnect();
 
-            handler.resetStdOut();
-            handler.resetStdErr();
+            if (handler != null) {
+                handler.resetStdOut();
+                handler.resetStdErr();
+            }
         }
 
     }
@@ -360,7 +362,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     public void disconnect() {
-        if (handler.isConnected()) {
+        if (handler != null && handler.isConnected()) {
             try {
                 handler.disconnect();
             } catch (Exception e) {

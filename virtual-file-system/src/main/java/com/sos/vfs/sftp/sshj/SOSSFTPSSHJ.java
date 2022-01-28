@@ -549,7 +549,9 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     private AuthPublickey getAuthPublickey() throws Exception {
         // TODO Agent support getArguments().getUseKeyAgent().getValue()
         KeyProvider keyProvider = null;
-        if (getProviderOptions().keepass_database.value() != null) {   // from Keepass attachment
+        // from KeePass attachment
+        if (getProviderOptions().keepass_database.value() != null && getProviderOptions().keepass_database_entry.value() != null && !SOSString
+                .isEmpty(getProviderOptions().keepass_attachment_property_name.getValue())) {
             keyProvider = SSHProviderUtil.getKeyProviderFromKeepass(config, getProviderOptions());
         } else {// from File
             if (SOSString.isEmpty(getProviderOptions().authFile.getValue())) {
