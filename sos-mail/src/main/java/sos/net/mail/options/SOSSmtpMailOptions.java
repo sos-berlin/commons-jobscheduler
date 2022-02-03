@@ -53,7 +53,7 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         }
         return objO;
     }
-    
+
     public SOSSmtpMailOptions(final HashMap<String, String> settings) throws Exception {
         super(settings);
         initChildOptions();
