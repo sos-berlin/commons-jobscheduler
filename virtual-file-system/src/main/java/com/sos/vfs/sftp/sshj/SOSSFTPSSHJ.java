@@ -552,7 +552,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
         // from KeePass attachment
         if (getProviderOptions().keepass_database.value() != null && getProviderOptions().keepass_database_entry.value() != null && !SOSString
                 .isEmpty(getProviderOptions().keepass_attachment_property_name.getValue())) {
-            keyProvider = SSHProviderUtil.getKeyProviderFromKeepass(config, getProviderOptions());
+            keyProvider = SSHProviderUtil.getKeyProviderFromKeepass(sshClient, getProviderOptions());
         } else {// from File
             if (SOSString.isEmpty(getProviderOptions().authFile.getValue())) {
                 throw new SOSException("missing required argument \"auth_file\"");
