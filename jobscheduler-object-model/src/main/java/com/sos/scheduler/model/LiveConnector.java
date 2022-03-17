@@ -68,7 +68,7 @@ public class LiveConnector {
         ISOSProvider result = null;
         try {
             SOSBaseOptions vfsOptions = new SOSBaseOptions();
-            ISOSProvider vfs = SOSVFSFactory.getProvider(folder, vfsOptions.ssh_provider);
+            ISOSProvider vfs = SOSVFSFactory.getProvider(folder, vfsOptions.ssh_provider, vfsOptions.webdav_provider);
             if (vfs == null) {
                 throw new JobSchedulerException();
             }

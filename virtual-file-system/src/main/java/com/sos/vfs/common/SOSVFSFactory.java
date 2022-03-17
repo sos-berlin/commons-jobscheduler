@@ -49,11 +49,12 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         options = opt;
     }
 
-    public static ISOSProvider getProvider(final SOSOptionTransferType.TransferTypes type, SOSOptionString sshProvider) throws Exception {
-        return getProvider(type.name(), sshProvider);
+    public static ISOSProvider getProvider(final SOSOptionTransferType.TransferTypes type, SOSOptionString sshProvider,
+            SOSOptionString webDavProvider) throws Exception {
+        return getProvider(type.name(), sshProvider, webDavProvider);
     }
 
-    public static ISOSProvider getProvider(String protocol, SOSOptionString sshProvider) throws Exception {
+    public static ISOSProvider getProvider(String protocol, SOSOptionString sshProvider, SOSOptionString webDavProvider) throws Exception {
         ISOSProvider provider = null;
         protocol = protocol.toLowerCase();
 
@@ -66,7 +67,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
         } else if (protocol.equals(TransferTypes.ftps.name())) {
             provider = new SOSFTPS();
         } else if (protocol.equals(TransferTypes.webdav.name())) {
-            provider = new SOSWebDAV();
+            provider = new SOSWebDAV(webDavProvider);
         } else if (protocol.equals(TransferTypes.http.name())) {
             provider = new SOSHTTP();
         } else if (protocol.equals(TransferTypes.smb.name())) {
@@ -90,7 +91,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("[%s]%s", providerOptions.getRange(), providerOptions.getProtocol()));
             }
-            provider = getProvider(providerOptions.getProtocol(), options.ssh_provider);
+            provider = getProvider(providerOptions.getProtocol(), options.ssh_provider, options.webdav_provider);
             try {
                 handleProviderOptions(providerOptions);
                 provider.setBaseOptions(options);
@@ -108,7 +109,7 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                     } catch (Exception ce) {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()), ce);
                     }
-                    provider = getProvider(alternative.protocol.getValue(), options.ssh_provider);
+                    provider = getProvider(alternative.protocol.getValue(), options.ssh_provider, options.webdav_provider);
                     handleProviderOptions(alternative);
                     provider.connect(alternative);
                     handleOptions(provider, alternative);
