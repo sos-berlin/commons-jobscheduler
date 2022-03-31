@@ -40,12 +40,11 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSFileListEntry.class);
-    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
-    private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private static final Logger JADE_REPORT_LOGGER = LoggerFactory.getLogger(SOSVFSFactory.REPORT_LOGGER_NAME);
 
     private static String ENV_VAR_FILE_TRANSFER_STATUS = "YADE_FILE_TRANSFER_STATUS";
     private static String ENV_VAR_FILE_IS_TRANSFERRED = "YADE_FILE_IS_TRANSFERRED";
+    private static String DEFAULT_CHECKSUM = "N/A";
 
     private TransferStatus transferStatus = TransferStatus.transferUndefined;
     private SOSFileList parent = null;
@@ -59,7 +58,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     private String sourceTransferFileName = null;
     private String sourceFileName = null;
     private String sourceFileNameRenamed = null;
-    private String sourceFileChecksum = "N/A";
+    private String sourceFileChecksum = DEFAULT_CHECKSUM;
     private long sourceFileSize = -1L;
     private long sourceFileModificationDateTime = -1L;
     private long sourceFileLastCheckedFileSize = -1L;
@@ -67,7 +66,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     private String targetTransferFileName = null;
     private String targetFileName = null;
-    private String targetFileChecksum = "N/A";
+    private String targetFileChecksum = DEFAULT_CHECKSUM;
     private String targetAtomicFileName = EMPTY_STRING;
     private boolean targetFileExistsBeforeTransfer = false;
 
@@ -700,6 +699,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     @Override
     public String getMd5() {
+        if (targetFileChecksum == null || targetFileChecksum.equals(DEFAULT_CHECKSUM)) {
+            return sourceFileChecksum;
+        }
         return targetFileChecksum;
     }
 
@@ -880,6 +882,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         if (sourceOptions.replacing.isDirty() && !parent.getBaseOptions().removeFiles.value()) {
             String replaceWith = sourceOptions.replacement.getValue();
             try {
+                boolean isDebugEnabled = LOGGER.isDebugEnabled();
                 String sourceName = new File(sourceFileName).getName();
                 String sourceParent = sourceFileName.substring(0, sourceFileName.length() - sourceName.length());
                 String sourceNameNew = sourceOptions.replacing.doReplace(sourceName, replaceWith).replace('\\', '/');
@@ -1002,7 +1005,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     private void renameSourceFile(final ISOSProviderFile sourceFile) {
         if (sourceFileNameRenamed != null) {
             try {
-                if (isDebugEnabled) {
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(String.format("[%s][source][%s][renamed=%s]", transferNumber, sourceFile.getName(), sourceFileNameRenamed));
                 }
 
@@ -1045,7 +1048,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         String targetFileNewName = targetFile.getName();
         targetFileNewName = resolveDotsInPath(targetFileNewName);
         boolean equals = fileNamesAreEqual(targetTransferFile.getName(), targetFileNewName, false);
-        if (isTraceEnabled) {
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[%s][target][%s][%s]equals=%s", transferNumber, SOSCommonProvider.normalizePath(targetTransferFile.getName()),
                     SOSCommonProvider.normalizePath(targetFileNewName), equals));
         }
@@ -1078,6 +1081,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
     }
 
     private String replaceVariables(final String value, final ISOSProvider provider) {
+        boolean isTraceEnabled = LOGGER.isTraceEnabled();
         if (isTraceEnabled) {
             LOGGER.trace(String.format("[%s][replaceVariables]%s", transferNumber, value));
         }
@@ -1187,7 +1191,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 String fileHandlerTargetFileName = makeFullPathName(parent.getBaseOptions().targetDir.getValue(), targetFileName);
                 doTransfer(sourceTransferFile, fileHandlerSourceFileName, targetTransferFile, fileHandlerTargetFileName);
 
-                if (isDebugEnabled) {
+                if (LOGGER.isDebugEnabled()) {
                     if (parent.getBaseOptions().checkSteadyStateOfFiles.isTrue()) {
                         LOGGER.debug(String.format("[%s][checkSteadyStateOfFiles][sourceFileModificationDateTime]%s", transferNumber,
                                 sourceFileModificationDateTime));
