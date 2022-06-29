@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+//import org.eclipse.swt.widgets.TableItem;
 
-import sos.util.SOSExcelFileWriter;
+//import sos.util.SOSExcelFileWriter;
 
 import com.sos.dialog.components.SOSTableColumn;
 import com.sos.dialog.interfaces.ISOSTable;
@@ -149,30 +149,30 @@ public abstract class SOSTable extends Table implements ISOSTable {
         }
     }
 
-    public void createExcelFile() {
-        SOSExcelFileWriter sosExcelFileWriter = new SOSExcelFileWriter();
-        String[] header = new String[getColumnCount()];
-        TableColumn[] columns = this.getColumns();
-        for (int i = 0; i < columns.length; i++) {
-            header[i] = columns[i].getText();
-        }
-        sosExcelFileWriter.addHeader(header);
-        for (int i = 0; i < getItemCount(); i++) {
-            String[] row = new String[getColumnCount()];
-            TableItem t = getItems()[i];
-            for (int ii = 0; ii < getColumnCount(); ii++) {
-                row[ii] = t.getText(ii);
-            }
-            sosExcelFileWriter.addRow(row);
-        }
-        File f = getExcelFile();
-        if (f != null) {
-            sosExcelFileWriter.createFile(f);
-            msg = String.format("File saved in:%s", f.getName());
-        } else {
-            msg = "File not saved";
-        }
-    }
+//    public void createExcelFile() {
+//        SOSExcelFileWriter sosExcelFileWriter = new SOSExcelFileWriter();
+//        String[] header = new String[getColumnCount()];
+//        TableColumn[] columns = this.getColumns();
+//        for (int i = 0; i < columns.length; i++) {
+//            header[i] = columns[i].getText();
+//        }
+//        sosExcelFileWriter.addHeader(header);
+//        for (int i = 0; i < getItemCount(); i++) {
+//            String[] row = new String[getColumnCount()];
+//            TableItem t = getItems()[i];
+//            for (int ii = 0; ii < getColumnCount(); ii++) {
+//                row[ii] = t.getText(ii);
+//            }
+//            sosExcelFileWriter.addRow(row);
+//        }
+//        File f = getExcelFile();
+//        if (f != null) {
+//            sosExcelFileWriter.createFile(f);
+//            msg = String.format("File saved in:%s", f.getName());
+//        } else {
+//            msg = "File not saved";
+//        }
+//    }
 
     public String getMsg() {
         return msg;

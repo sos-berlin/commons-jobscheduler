@@ -6,8 +6,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -56,6 +54,7 @@ import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
+import com.sos.vfs.common.SOSFileEntryFile;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.sftp.SOSSFTP;
@@ -307,9 +306,8 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
                 LOGGER.trace(String.format("[%s]found", pathname));
             }
 
-            Path tmpPath = Paths.get(pathname);
-            Path parent = tmpPath.getParent();
-            return getFileEntry(attrs, tmpPath.getFileName().toString(), parent == null ? null : parent.toString());
+            SOSFileEntryFile f = new SOSFileEntryFile(pathname);
+            return getFileEntry(attrs, f.getName(), f.getParent());
         }
         return null;
     }

@@ -214,8 +214,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
 
     @JSOptionDefinition(name = "port", description = "title mail server port", key = "port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, CLASSNAME + ".port", "title mail server port", "25", "25", false);
-
-    public SOSOptionPortNumber MailPort = (SOSOptionPortNumber) port.setAlias("mail_port", "smtp_port");
+    public SOSOptionPortNumber MailPort = (SOSOptionPortNumber) port.setAlias("mail_smtp_port", "mail_port", "smtp_port");
 
     @Override
     public SOSOptionPortNumber getPort() {
@@ -229,7 +228,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
 
     @JSOptionDefinition(name = "queue_directory", description = "title Mail queue direc", key = "queue_directory", type = "SOSOptionString", mandatory = false)
     public SOSOptionString queue_directory = new SOSOptionString(this, CLASSNAME + ".queue_directory", "title Mail queue direc", "", "", false);
-    public SOSOptionString MailQueueDir = (SOSOptionString) queue_directory.setAlias("mail_queue_dir");
+    public SOSOptionString MailQueueDir = (SOSOptionString) queue_directory.setAlias("mail_queue_dir", "mail_queue_directory");
 
     @Override
     public SOSOptionString getQueueDirectory() {
@@ -256,6 +255,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
 
     @JSOptionDefinition(name = "smtp_password", description = "title smtp user passwo", key = "smtp_password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword smtp_password = new SOSOptionPassword(this, CLASSNAME + ".smtp_password", "title smtp user passwo", "", "", false);
+    public SOSOptionPassword MailSmtpPassword = (SOSOptionPassword) smtp_password.setAlias("mail_smtp_password");
 
     @Override
     public SOSOptionPassword getSmtpPassword() {
@@ -269,6 +269,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
 
     @JSOptionDefinition(name = "smtp_user", description = "title smtp username", key = "smtp_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionString smtp_user = new SOSOptionString(this, CLASSNAME + ".smtp_user", "title smtp username", "", "", false);
+    public SOSOptionString MailSmtpUser = (SOSOptionString) smtp_user.setAlias("mail_smtp_user");
 
     @Override
     public SOSOptionString getSmtpUser() {

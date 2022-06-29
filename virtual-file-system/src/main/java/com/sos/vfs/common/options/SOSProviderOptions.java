@@ -116,14 +116,11 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                         }
                     } else {
                         if ("privatekey".equals(credentialStore.credentialStoreAuthenticationMethod.getValue())) {
-                            Path defaultKeyFile = SOSKeePassDatabase.getDefaultKeyFile(databaseFile);
-                            if (Files.notExists(defaultKeyFile)) {
+                            keePassKeyFile = SOSKeePassDatabase.getDefaultKeyFile(databaseFile);
+                            if (keePassKeyFile == null) {
                                 if (SOSString.isEmpty(keePassPassword)) {
-                                    throw new Exception(String.format("[%s]key file not found. password is empty", SOSKeePassDatabase.getFilePath(
-                                            defaultKeyFile)));
+                                    throw new Exception(String.format("default key file not found. password is empty"));
                                 }
-                            } else {
-                                keePassKeyFile = defaultKeyFile;
                             }
                         }
                     }

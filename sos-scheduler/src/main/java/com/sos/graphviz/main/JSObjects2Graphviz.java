@@ -42,7 +42,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.liveFolderName.getValue();
         SOSBaseOptions vfsOptions = new SOSBaseOptions();
-        fileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider);
+        fileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider, vfsOptions.webdav_provider);
         schedulerObjectFactory = new SchedulerObjectFactory();
         schedulerObjectFactory.initMarshaller(Spooler.class);
         ISOSProviderFile hotFolder = fileSystemHandler.getFile(liveFolderName);

@@ -36,6 +36,7 @@ import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
+import com.sos.vfs.common.SOSFileEntryFile;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.exception.SOSAuthenticationFailedException;
@@ -552,7 +553,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
         // from KeePass attachment
         if (getProviderOptions().keepass_database.value() != null && getProviderOptions().keepass_database_entry.value() != null && !SOSString
                 .isEmpty(getProviderOptions().keepass_attachment_property_name.getValue())) {
-            keyProvider = SSHProviderUtil.getKeyProviderFromKeepass(config, getProviderOptions());
+            keyProvider = SSHProviderUtil.getKeyProviderFromKeepass(sshClient, getProviderOptions());
         } else {// from File
             if (SOSString.isEmpty(getProviderOptions().authFile.getValue())) {
                 throw new SOSException("missing required argument \"auth_file\"");
@@ -575,9 +576,8 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 LOGGER.trace(String.format("[%s]found", pathname));
             }
 
-            Path tmpPath = Paths.get(pathname);
-            Path parent = tmpPath.getParent();
-            return getFileEntry(attrs, tmpPath.getFileName().toString(), parent == null ? null : parent.toString());
+            SOSFileEntryFile f = new SOSFileEntryFile(pathname);
+            return getFileEntry(attrs, f.getName(), f.getParent());
         }
         return null;
     }
