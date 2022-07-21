@@ -59,7 +59,10 @@ public class SOSFileList extends SOSVFSMessageCodes {
 
     public void create(final List<SOSFileEntry> entries, int maxFiles) {
         fileListEntries.clear();
-        if (maxFiles > entries.size()) {
+        if (maxFiles == 0) {
+            return;
+        }
+        if (maxFiles > 0 && maxFiles < entries.size()) {
             int i = 0;
             for (SOSFileEntry entry : entries) {
                 add(entry);
