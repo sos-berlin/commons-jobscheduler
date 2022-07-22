@@ -3,22 +3,28 @@ package com.sos.vfs.local;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSProviderFile;
-import com.sos.vfs.common.options.SOSProviderOptions;
-import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSFileEntry.EntryType;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
+import com.sos.vfs.common.SOSFileEntry;
+import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSShell;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSProviderOptions;
 
 import sos.util.SOSFile;
 
@@ -209,7 +215,13 @@ public class SOSLocal extends SOSCommonProvider {
 
     @Override
     public void rmdir(final String folderName) throws IOException {
-        new File(folderName).delete();
+        try (Stream<Path> stream = Files.walk(Paths.get(folderName))) {
+            for (Path p : stream.sorted(Comparator.reverseOrder()).collect(Collectors.toList())) {
+                Files.delete(p);
+            }
+        }
+        reply = "rmdir OK";
+        LOGGER.info(String.format("[rmdir][%s]%s", folderName, reply));
     }
 
 }

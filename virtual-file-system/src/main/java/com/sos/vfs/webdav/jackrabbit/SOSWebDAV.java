@@ -249,6 +249,7 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
                 LOGGER.debug(String.format("[rmdir][%s]removed", path));
             }
             reply = "rmdir OK";
+            LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Throwable e) {
             reply = e.toString();
             throw new JobSchedulerException(String.format("[%s] rmdir failed", path), e);

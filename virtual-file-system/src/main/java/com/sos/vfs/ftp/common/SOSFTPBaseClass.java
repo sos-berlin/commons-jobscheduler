@@ -16,6 +16,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +34,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
@@ -751,18 +754,47 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
 
     @Override
     public final void rmdir(final String path) throws IOException {
-        final String method = CLASS_NAME + "::rmdir";
         try {
-            SOSOptionFolderName folderName = new SOSOptionFolderName(path);
-            for (String folder : folderName.getSubFolderArrayReverse()) {
-                String folderPath = folder + "/";
-                getClient().removeDirectory(folderPath);
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(getHostID(SOSVfs_E_0106.params(method, folderPath, getReplyString())));
+            if (SOSString.isEmpty(path)) {
+                throw new SOSMissingDataException("path");
+            }
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[rmdir][%s]try to remove ...", path));
+            }
+            final Deque<SOSFileEntry> toRemove = new LinkedList<>();
+            dirInfo(path, toRemove, true);
+            boolean isDebugEnabled = LOGGER.isDebugEnabled();
+            while (!toRemove.isEmpty()) {
+                SOSFileEntry resource = toRemove.pop();
+                String resourcePath = resource.getFullPath();
+                if (isDebugEnabled) {
+                    LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", resourcePath)));
+                }
+                if (resource.isDirectory()) {
+                    getClient().removeDirectory(resourcePath);
+                } else {
+                    getClient().deleteFile(resourcePath);
+                }
+                if (isDebugEnabled) {
+                    LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, getReplyString())));
                 }
             }
+            getClient().removeDirectory(path);
+            reply = "rmdir OK";
+            LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            reply = e.toString();
+            throw new JobSchedulerException(String.format("[%s]rmdir failed", path), e);
+        }
+    }
+
+    private void dirInfo(String path, Deque<SOSFileEntry> result, boolean recursive) throws Exception {
+        List<SOSFileEntry> infos = listNames(path, false, false);
+        for (SOSFileEntry resource : infos) {
+            result.push(resource);
+            if (recursive && resource.isDirectory()) {
+                dirInfo(resource.getFullPath(), result, recursive);
+            }
         }
     }
 

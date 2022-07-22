@@ -6,12 +6,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod.enuAuthenticationMethods;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.credentialstore.options.SOSCredentialStoreOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
 public class SOSSFTPSSHJTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSFTPSSHJTest.class);
+
+    @Ignore
+    @Test
+    public void testExecuteMethods() {
+        SOSSFTPSSHJ p = new SOSSFTPSSHJ();
+        try {
+            SOSProviderOptions o = new SOSProviderOptions();
+            o.protocol.setValue(TransferTypes.sftp);
+            o.host.setValue("localhost");
+            o.port.setValue("22");
+            o.authMethod.setValue(enuAuthenticationMethods.password);
+
+            o.user.setValue("user");
+            o.password.setValue("password");
+
+            p.connect(o);
+
+            p.mkdir("/home/sos/yade/test/a/b/c");
+            p.rmdir("/home/sos/yade/test/a");
+
+        } catch (Throwable e) {
+            LOGGER.error(e.toString(), e);
+        } finally {
+            p.disconnect();
+        }
+    }
 
     @Ignore
     @Test

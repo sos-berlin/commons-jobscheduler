@@ -1,4 +1,4 @@
-package com.sos.vfs.webdav;
+package com.sos.vfs.sftp.jcraft;
 
 import java.util.List;
 
@@ -8,26 +8,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod.enuAuthenticationMethods;
+import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
 import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
 import sos.util.SOSString;
 
-public class SOSWebDAVTest {
+public class SOSSFTPJCraftTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSWebDAVTest.class);
-
-    private SOSBaseOptions getBaseOptions() {
-        SOSBaseOptions o = new SOSBaseOptions();
-        o.webdav_provider.setValue(SOSWebDAV.WebDAVProvider.JACKRABBIT.name());
-        return o;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSSFTPJCraftTest.class);
 
     private SOSProviderOptions getOptions() {
         SOSProviderOptions o = new SOSProviderOptions();
-        o.host.setValue("http://localhost:8080");
-        o.authMethod.setValue(enuAuthenticationMethods.url);
+        o.protocol.setValue(TransferTypes.sftp);
+        o.host.setValue("localhost");
+        o.port.setValue("22");
+        o.authMethod.setValue(enuAuthenticationMethods.password);
 
         o.user.setValue("user");
         o.password.setValue("password");
@@ -37,7 +33,7 @@ public class SOSWebDAVTest {
     @Ignore
     @Test
     public void testInfoMethods() {
-        SOSWebDAV p = new SOSWebDAV(getBaseOptions().webdav_provider);
+        SOSSFTPJCraft p = new SOSSFTPJCraft();
         try {
             p.connect(getOptions());
 
@@ -69,18 +65,13 @@ public class SOSWebDAVTest {
     @Ignore
     @Test
     public void testExecuteMethods() {
-        SOSWebDAV p = new SOSWebDAV(getBaseOptions().webdav_provider);
+        SOSSFTPJCraft p = new SOSSFTPJCraft();
         try {
             p.connect(getOptions());
 
-            p.mkdir("test/a/b/c");
-            p.copy("transfer-1/test.sh", "test/a/test.sh");
-            p.copy("transfer-1/test.sh", "test/a/b/test.sh");
-            p.copy("transfer-1/test.sh", "test/a/b/c/test.sh");
-            p.rename("test/a/b/c/test.sh", "test/a/b/c/test.sh_renamed");
-            p.delete("test/a/b/c/test.sh_renamed", true);
+            p.mkdir("/home/sos/yade/test/a/b/c");
+            p.rmdir("/home/sos/yade/test/a");
 
-            p.rmdir("test/a");
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
         } finally {

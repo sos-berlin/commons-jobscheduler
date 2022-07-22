@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,14 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSProviderFile;
-import com.sos.vfs.common.options.SOSProviderOptions;
-import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.SOSFileEntry.EntryType;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSEnv;
+import com.sos.vfs.common.SOSFileEntry;
+import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.SOSShell;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSProviderOptions;
 
 import jcifs.CIFSContext;
 import jcifs.CIFSException;
@@ -40,8 +41,6 @@ import sos.util.SOSString;
 public class SOSSMB extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSSMB.class);
-    private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
-    private static final boolean isTraceEnabled = LOGGER.isTraceEnabled();
     private static final int DEFAULT_PORT = 445;
     private CIFSContext context = null;
     private boolean isConnected = false;
@@ -65,6 +64,7 @@ public class SOSSMB extends SOSCommonProvider {
         super.connect(options);
 
         try {
+            isConnected = false;
             domain = getProviderOptions().domain.getValue();
             port = getProviderOptions().port.isDirty() ? port : DEFAULT_PORT;
             setLogPrefix();
@@ -73,11 +73,37 @@ public class SOSSMB extends SOSCommonProvider {
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
+            checkConnection();
+            isConnected = true;
             reply = "OK";
             LOGGER.info(logPrefix);
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
+    }
+
+    private void checkConnection() throws Exception {
+        try {
+            getFileEntry("/");
+        } catch (Throwable e) {
+            Exception ex = findConnectionException(e);
+            if (ex != null) {
+                throw e;
+            }
+        }
+    }
+
+    public static Exception findConnectionException(Throwable cause) {
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof java.net.UnknownHostException) {
+                return (java.net.UnknownHostException) e;
+            } else if (e instanceof java.net.ConnectException) {
+                return (java.net.ConnectException) e;
+            }
+            e = e.getCause();
+        }
+        return null;
     }
 
     @Override
@@ -87,7 +113,7 @@ public class SOSSMB extends SOSCommonProvider {
             try {
                 context.close();
             } catch (CIFSException e) {
-                if (isDebugEnabled) {
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(String.format("%s[disconnect]%s", logPrefix, e.toString()), e);
                 }
             }
@@ -98,7 +124,6 @@ public class SOSSMB extends SOSCommonProvider {
     }
 
     private void createContext(String domain, String host, int port, String user, String password) throws Exception {
-        isConnected = false;
         Properties properties = new Properties();
         properties.put("jcifs.smb.client.disableSMB1", "false");
         properties.put("jcifs.smb.client.enableSMB2", "true");
@@ -106,11 +131,11 @@ public class SOSSMB extends SOSCommonProvider {
         BaseContext bc = new BaseContext(new PropertyConfiguration(setConfigFromFiles(properties)));
         NtlmPasswordAuthentication creds = new NtlmPasswordAuthentication(bc, domain, user, password);
         context = bc.withCredentials(creds);
-        isConnected = true;
     }
 
     private Properties setConfigFromFiles(Properties properties) {
         if (!SOSString.isEmpty(getProviderOptions().configuration_files.getValue())) {
+            boolean isDebugEnabled = LOGGER.isDebugEnabled();
             String[] files = getProviderOptions().configuration_files.getValue().split(";");
             for (int i = 0; i < files.length; i++) {
                 String file = files[i].trim();
@@ -156,8 +181,8 @@ public class SOSSMB extends SOSCommonProvider {
         try {
             smbFile = getSmbFile(normalizePath(filename));
             boolean result = smbFile.exists();
-            if (isTraceEnabled) {
-                LOGGER.trace(String.format("%s[fileExists][%s]%s", logPrefix, filename, result));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[fileExists][%s]%s", logPrefix, filename, result));
             }
             return result;
         } catch (Exception e) {
@@ -172,9 +197,6 @@ public class SOSSMB extends SOSCommonProvider {
 
     @Override
     public boolean directoryExists(String filename) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s]directoryExists", filename));
-        }
         return isDirectory(filename);
     }
 
@@ -187,8 +209,8 @@ public class SOSSMB extends SOSCommonProvider {
             if (smbFile.exists()) {
                 size = smbFile.length();
             }
-            if (isTraceEnabled) {
-                LOGGER.trace(String.format("%s[size][%s]%s", logPrefix, path, size));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[size][%s]%s", logPrefix, path, size));
             }
         } catch (Exception e) {
             throw new JobSchedulerException(String.format("%s[size][%s][failed]%s", logPrefix, path, e.toString()), e);
@@ -206,8 +228,8 @@ public class SOSSMB extends SOSCommonProvider {
         try {
             smbFile = getSmbFile(normalizePath(path));
             boolean result = smbFile.isDirectory();
-            if (isTraceEnabled) {
-                LOGGER.trace(String.format("%s[isDirectory][%s]%s", logPrefix, path, result));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[isDirectory][%s]%s", logPrefix, path, result));
             }
             return result;
         } catch (Exception e) {
@@ -225,7 +247,7 @@ public class SOSSMB extends SOSCommonProvider {
         try {
             smbFile = getSmbFile(normalizePath(path));
             boolean result = smbFile.isHidden();
-            if (isTraceEnabled) {
+            if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(String.format("%s[isHidden][%s]%s", logPrefix, path, result));
             }
             return result;
@@ -243,6 +265,7 @@ public class SOSSMB extends SOSCommonProvider {
     public void mkdir(final String path) {
         SmbFile smbFile = null;
         try {
+            boolean isDebugEnabled = LOGGER.isDebugEnabled();
             reply = "OK";
             smbFile = getSmbFile(normalizePath(path));
             if (smbFile.exists()) {
@@ -269,7 +292,7 @@ public class SOSSMB extends SOSCommonProvider {
     public void rmdir(String path) {
         SmbFile smbFile = null;
         try {
-            reply = "OK";
+            reply = "rmdir OK";
             path = normalizePath(path);
             if (!path.endsWith("/")) {
                 path += "/";
@@ -307,7 +330,10 @@ public class SOSSMB extends SOSCommonProvider {
         }
         String parent = "/";
         try {
-            parent = SOSCommonProvider.normalizePath(Paths.get(pathname).getParent().toString());
+            Path p = Paths.get(pathname).getParent();
+            if (p != null) {
+                parent = SOSCommonProvider.normalizePath(p.toString());
+            }
         } catch (Exception e) {
             LOGGER.error(String.format("[%s][can't get parent path]%s", pathname, e.toString()), e);
         }
@@ -377,7 +403,7 @@ public class SOSSMB extends SOSCommonProvider {
             if (checkIsDirectory && smbFile.isDirectory()) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
-            if (isDebugEnabled) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[delete]%s", logPrefix, path));
             }
             smbFile.delete();
@@ -398,7 +424,7 @@ public class SOSSMB extends SOSCommonProvider {
         SmbFile smbFileFrom = null;
         SmbFile smbFileTo = null;
         try {
-            if (isDebugEnabled) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[rename][%s]%s", logPrefix, from, to));
             }
             smbFileFrom = getSmbFile(normalizePath(from));

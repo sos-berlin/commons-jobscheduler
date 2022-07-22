@@ -202,6 +202,9 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             }
             sftpClient.mkdirs(path);
             reply = "mkdir OK";
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[mkdir][%s]created", p));
+            }
         } catch (Exception e) {
             reply = e.toString();
             throw new JobSchedulerException(String.format("[%s] mkdir failed", path), e);
@@ -231,11 +234,14 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 }
                 if (resource.isDirectory()) {
                     sftpClient.rmdir(resourcePath);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rmdir OK")));
+                    }
                 } else if (resource.isRegularFile()) {
                     sftpClient.rm(resourcePath);
-                }
-                if (isDebugEnabled) {
-                    LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, getReplyString())));
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rm OK")));
+                    }
                 }
             }
             sftpClient.rmdir(path);
@@ -243,7 +249,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("[%s] rmdir failed", path), e);
+            throw new JobSchedulerException(String.format("[%s]rmdir failed", path), e);
         }
     }
 
