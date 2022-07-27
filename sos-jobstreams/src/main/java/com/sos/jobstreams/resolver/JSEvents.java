@@ -68,7 +68,7 @@ public class JSEvents {
 
     }
 
-    public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
+	public JSEvent getEventByJobStream(JSEventKey jsEventKey) {
         JSEvent returnEvent;
         if ((jsEventKey.getSession() == null) || (jsEventKey.getEvent() == null)){
             return null;

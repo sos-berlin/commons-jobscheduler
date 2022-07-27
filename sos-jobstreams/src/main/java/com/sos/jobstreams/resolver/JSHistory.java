@@ -1,7 +1,7 @@
 package com.sos.jobstreams.resolver;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class JSHistory {
 
     public JSHistory() {
         super();
-        this.listOfHistoryEntries = new ArrayList<JSHistoryEntry>();
+        this.listOfHistoryEntries = new CopyOnWriteArrayList <JSHistoryEntry>();
     }
 
     public void addHistoryEntry(JSHistoryEntry historyEntry,SOSHibernateSession session) throws SOSHibernateException {
