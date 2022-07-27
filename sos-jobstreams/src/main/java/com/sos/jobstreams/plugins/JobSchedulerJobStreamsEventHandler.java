@@ -97,9 +97,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private Timer publishEventTimer;
     private PublishEventTask publishEventTask;
     private Timer checkEventTimer;
-    CheckEventTask checkEventTask;
+    private CheckEventTask checkEventTask;
     private Timer jobStreamCheckIntervalTimer;
-    JobStreamCheckIntervalTask jobStreamCheckIntervalTask;
+    private JobStreamCheckIntervalTask jobStreamCheckIntervalTask;
 
     private JSJobStreamStarter nextStarter;
     private StarterScheduleTable starterScheduleTable;
@@ -124,12 +124,18 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void resetPublishEventTimer() {
-        publishEventTimer = new Timer();
+        if (publishEventTimer != null) {
+            publishEventTimer.cancel();
+            publishEventTimer.purge();
+            publishEventTimer = null;
+        }
 
         if (publishEventTask != null) {
             publishEventTask.cancel();
             publishEventTask = null;
         }
+
+        publishEventTimer = new Timer();
         publishEventTask = new PublishEventTask();
 
         publishEventTimer.schedule(publishEventTask, 0, 1000);
@@ -138,28 +144,37 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
     public void resetJobStreamCheckIntervalTimer() {
 
-        jobStreamCheckIntervalTimer = new Timer();
-
         if (jobStreamCheckIntervalTask != null) {
             jobStreamCheckIntervalTask.cancel();
             jobStreamCheckIntervalTask = null;
         }
+        if (jobStreamCheckIntervalTimer != null) {
+            jobStreamCheckIntervalTimer.cancel();
+            jobStreamCheckIntervalTimer.purge();
+            jobStreamCheckIntervalTimer = null;
+        }
+
+        jobStreamCheckIntervalTimer = new Timer();
         jobStreamCheckIntervalTask = new JobStreamCheckIntervalTask();
 
         if (Constants.jobstreamCheckInterval > 0) {
             jobStreamCheckIntervalTimer.schedule(new JobStreamCheckIntervalTask(), 1000 * 60 * Constants.jobstreamCheckInterval, 1000 * 60
                     * Constants.jobstreamCheckInterval);
         }
-        LOGGER.debug("Number of threads " + Thread.activeCount());
-    }
+     }
 
     public void resetCheckInitTimer() {
-        checkEventTimer = new Timer();
 
         if (checkEventTask != null) {
             checkEventTask.cancel();
             checkEventTask = null;
         }
+        if (checkEventTimer != null) {
+            checkEventTimer.cancel();
+            checkEventTimer.purge();
+            checkEventTimer = null;
+        }
+        checkEventTimer = new Timer();
         checkEventTask = new CheckEventTask();
 
         checkEventTimer.schedule(checkEventTask, 1000, 1000);
@@ -229,12 +244,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.info("resetNextJobStartTimer interrupted");
 
         }
-        nextJobStartTimer = new Timer();
 
         if (jobStartTask != null) {
             jobStartTask.cancel();
             jobStartTask = null;
         }
+        nextJobStartTimer = new Timer();
         jobStartTask = new JobStartTask();
 
         Long delay = -1L;
@@ -353,7 +368,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         public void run() {
             MDC.put("plugin", getIdentifier());
-
+            LOGGER.debug("run CheckEventTask");
             if (initEvents) {
                 initEvents = false;
 
@@ -378,9 +393,12 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     public class JobStreamCheckIntervalTask extends TimerTask {
 
         public void run() {
+
             MDC.put("plugin", getIdentifier());
             SOSHibernateSession sosHibernateSession = null;
             try {
+                LOGGER.debug("run JobStreamCheckIntervalTask");
+                LOGGER.debug("Number of threads " + Thread.activeCount());
 
                 LOGGER.debug("Reset PublishEventTimer");
                 resetPublishEventTimer();
@@ -433,6 +451,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             } catch (SOSHibernateInvalidSessionException e) {
                 // ignore.
             } catch (Exception e) {
+                e.printStackTrace();
                 LOGGER.error("Timer Task Error in JobStreamCheckIntervalTask", e);
             } finally {
                 Globals.disconnect(sosHibernateSession);
@@ -445,6 +464,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         public void run() {
             MDC.put("plugin", getIdentifier());
+            LOGGER.debug("Run PublishEventTask");
             boolean published = false;
             if (listOfPublishEventOrders == null) {
                 listOfPublishEventOrders = Collections.synchronizedCollection(new ArrayList<>());
@@ -455,7 +475,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                         if (!publishEventOrder.isPublished()) {
 
                             if (isDebugEnabled) {
-                                LOGGER.trace("Publish custom event:" + publishEventOrder.asString());
+                                LOGGER.debug("Publish custom event:" + publishEventOrder.asString());
                             }
                             publishCustomEvent(publishEventOrder.getEventKey(), publishEventOrder.getValues());
 
@@ -469,15 +489,17 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
                 if (!published || listOfPublishEventOrders.size() > 1000) {
                     listOfPublishEventOrders.clear();
-                 }
-
+                    publishEventTask.cancel();
+                    publishEventTask = null;
+                }
             } catch (
 
             Exception e) {
                 listOfPublishEventOrders.clear();
                 LOGGER.error("Timer Task Error in PublishEventTask", e);
+            } finally {
+                 
             }
-
         }
     }
 
@@ -699,7 +721,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             resolveConditionsSemaphore.release();
             LOGGER.error(e.getMessage(), e);
         } finally {
-            resetJobStreamCheckIntervalTimer();
+            // resetJobStreamCheckIntervalTimer();
             Globals.disconnect(sosHibernateSession);
 
         }
@@ -1045,7 +1067,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.debug("release:2b resolveConditionsSemaphore");
             resolveConditionsSemaphore.release();
         } finally {
-            resetJobStreamCheckIntervalTimer();
+            // resetJobStreamCheckIntervalTimer();
         }
     }
 
@@ -1107,7 +1129,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
             } finally {
                 resetNextJobStartTimer();
-                resetJobStreamCheckIntervalTimer();
+                // resetJobStreamCheckIntervalTimer();
                 resetCheckInitTimer();
                 if (nextStarter == null) {
                     try {
@@ -1205,7 +1227,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
                         performTaskEnd(sosHibernateSession, taskEndEvent);
 
-                        resetJobStreamCheckIntervalTimer();
+                        // resetJobStreamCheckIntervalTimer();
                         resolveInConditions(sosHibernateSession, taskEndUuid);
 
                         addPublishEventOrder(CUSTOM_EVENT_KEY, values);
@@ -1435,7 +1457,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 }
             }
             if (resolveInConditions) {
-                resetJobStreamCheckIntervalTimer();
+                // resetJobStreamCheckIntervalTimer();
                 resolveInConditions(sosHibernateSession, taskEndUuid);
             }
         } catch (
