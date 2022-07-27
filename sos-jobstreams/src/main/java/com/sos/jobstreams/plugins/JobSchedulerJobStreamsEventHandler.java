@@ -124,9 +124,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void resetPublishEventTimer() {
-        if (publishEventTimer == null) {
-            publishEventTimer = new Timer();
-        }
+        publishEventTimer = new Timer();
 
         if (publishEventTask != null) {
             publishEventTask.cancel();
@@ -139,9 +137,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void resetJobStreamCheckIntervalTimer() {
-        if (jobStreamCheckIntervalTimer == null) {
-            jobStreamCheckIntervalTimer = new Timer();
-        }
+
+        jobStreamCheckIntervalTimer = new Timer();
 
         if (jobStreamCheckIntervalTask != null) {
             jobStreamCheckIntervalTask.cancel();
@@ -157,9 +154,7 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     }
 
     public void resetCheckInitTimer() {
-        if (checkEventTimer == null) {
-            checkEventTimer = new Timer();
-        }
+        checkEventTimer = new Timer();
 
         if (checkEventTask != null) {
             checkEventTask.cancel();
@@ -234,9 +229,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             LOGGER.info("resetNextJobStartTimer interrupted");
 
         }
-        if (nextJobStartTimer == null) {
-            nextJobStartTimer = new Timer();
-        }
+        nextJobStartTimer = new Timer();
+
         if (jobStartTask != null) {
             jobStartTask.cancel();
             jobStartTask = null;
@@ -474,11 +468,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     }
                 }
                 if (!published || listOfPublishEventOrders.size() > 1000) {
-                    if (publishEventTask != null) {
-                        publishEventTask.cancel();
-                    }
                     listOfPublishEventOrders.clear();
-                }
+                 }
 
             } catch (
 
@@ -670,6 +661,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                     .getJobStream()));
             jobStream.getJsHistory().addHistoryEntry(historyEntry, sosHibernateSession);
             sosHibernateSession.commit();
+            LOGGER.debug("release:1 resolveConditionsSemaphore");
+            resolveConditionsSemaphore.release();
 
             for (JobStarterOptions handledJob : listOfHandledJobs) {
                 if (handledJob.isSkipped() && !handledJob.isSkipOutCondition()) {
@@ -702,10 +695,10 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
             getConditionResolver().getListOfHistoryIds().put(contextId, historyEntry.getItemJobStreamHistory());
         } catch (Exception e) {
+            LOGGER.debug("release:1b resolveConditionsSemaphore");
+            resolveConditionsSemaphore.release();
             LOGGER.error(e.getMessage(), e);
         } finally {
-            LOGGER.debug("release:1 resolveConditionsSemaphore");
-            resolveConditionsSemaphore.release();
             resetJobStreamCheckIntervalTimer();
             Globals.disconnect(sosHibernateSession);
 
@@ -1003,7 +996,6 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
         }
 
         LOGGER.debug("acquire:2 resolveConditionsSemaphore");
-        resolveConditionsSemaphore.acquire();
         try {
 
             boolean eventCreated = false;
@@ -1011,7 +1003,11 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 changeSession();
                 eventCreated = false;
 
+                resolveConditionsSemaphore.acquire();
                 List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession, forInstance);
+                LOGGER.debug("release:2a resolveConditionsSemaphore");
+                resolveConditionsSemaphore.release();
+
                 if (listOfValidatedInconditions != null) {
                     for (JSInCondition jsInCondition : listOfValidatedInconditions) {
                         LOGGER.debug("checking whether to execute out conditions for skipped jobs");
@@ -1046,9 +1042,9 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 
         } catch (Exception e) {
             LOGGER.error("Could not resolve In Conditions", e);
-        } finally {
-            LOGGER.debug("release:2 resolveConditionsSemaphore");
+            LOGGER.debug("release:2b resolveConditionsSemaphore");
             resolveConditionsSemaphore.release();
+        } finally {
             resetJobStreamCheckIntervalTimer();
         }
     }
