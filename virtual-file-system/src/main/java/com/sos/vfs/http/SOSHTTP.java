@@ -9,6 +9,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -52,6 +54,7 @@ public class SOSHTTP extends SOSCommonProvider {
     private HttpURL rootUrl = null;
     private HashMap<String, Long> fileSizes = null;
     private HashMap<String, PutMethod> putMethods = null;
+    private Properties headers;
 
     private String proxyHost = null;
     private int proxyPort = 0;
@@ -128,6 +131,7 @@ public class SOSHTTP extends SOSCommonProvider {
     @Override
     public boolean fileExists(final String path) {
         GetMethod method = new GetMethod(normalizeHttpPath(path));
+        setHttpMethodHeaders(method);
         try {
             httpClient.executeMethod(method);
             return isSuccessStatusCode(method.getStatusCode());
@@ -162,6 +166,7 @@ public class SOSHTTP extends SOSCommonProvider {
     private void checkConnection() throws Exception {
         String uri = rootUrl.getURI();
         GetMethod method = new GetMethod(uri);
+        setHttpMethodHeaders(method);
         try {
             if (isServerErrorStatusCode(httpClient.executeMethod(method))) {
                 throw new Exception(getHttpMethodExceptionText(method, uri));
@@ -224,6 +229,7 @@ public class SOSHTTP extends SOSCommonProvider {
                 connectionManager = new MultiThreadedHttpConnectionManager();
                 httpClient = new HttpClient(connectionManager);
                 httpClient.setHostConfiguration(hc);
+                setHeaders();
                 setProxyCredentionals();
                 logReply();
             } catch (Exception ex) {
@@ -231,6 +237,17 @@ public class SOSHTTP extends SOSCommonProvider {
             }
         } else {
             LOGGER.warn(SOSVfs_D_0103.params(host, port));
+        }
+    }
+
+    private void setHeaders() throws IOException {
+        if (!SOSString.isEmpty(getProviderOptions().http_headers.getValue())) {
+            headers = toProperties(getProviderOptions().http_headers.getValue());
+            if (LOGGER.isDebugEnabled()) {
+                headers.forEach((k, v) -> {
+                    LOGGER.debug(String.format("[RequestHeader]%s=%s", k, v));
+                });
+            }
         }
     }
 
@@ -269,6 +286,7 @@ public class SOSHTTP extends SOSCommonProvider {
         InputStream is = null;
         try {
             m = new PutMethod(to);
+            setHttpMethodHeaders(m);
             is = getInputStream(from);
             m.setRequestEntity(new InputStreamRequestEntity(is));
             httpClient.executeMethod(m);
@@ -313,6 +331,7 @@ public class SOSHTTP extends SOSCommonProvider {
                 throw new JobSchedulerException(SOSVfs_E_186.params(uri));
             }
             m = new DeleteMethod(uri);
+            setHttpMethodHeaders(m);
             httpClient.executeMethod(m);
             if (!isSuccessStatusCode(m.getStatusCode())) {
                 throw new Exception(getHttpMethodExceptionText(m, uri));
@@ -339,6 +358,7 @@ public class SOSHTTP extends SOSCommonProvider {
         try {
             uri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
             m = new TraceMethod(uri);
+            setHttpMethodHeaders(m);
             httpClient.executeMethod(m);
             if (m.getStatusCode() <= 400) {
                 return true;
@@ -429,7 +449,7 @@ public class SOSHTTP extends SOSCommonProvider {
         if (m == null) {
             throw new Exception(String.format("[%s]PutMethod is null", uri));
         }
-
+        setHttpMethodHeaders(m);
         try {
             httpClient.executeMethod(m);
             if (!isSuccessStatusCode(m.getStatusCode())) {
@@ -481,6 +501,7 @@ public class SOSHTTP extends SOSCommonProvider {
         Long size = new Long(-1);
         String uri = normalizeHttpPath(path);
         GetMethod method = new GetMethod(uri);
+        setHttpMethodHeaders(method);
         try {
             httpClient.executeMethod(method);
             if (!isSuccessStatusCode(method.getStatusCode())) {
@@ -545,6 +566,7 @@ public class SOSHTTP extends SOSCommonProvider {
         try {
             String uri = normalizeHttpPath(fileName);
             lastInputStreamGetMethod = new GetMethod(uri);
+            setHttpMethodHeaders(lastInputStreamGetMethod);
             httpClient.executeMethod(lastInputStreamGetMethod);
             if (!isSuccessStatusCode(lastInputStreamGetMethod.getStatusCode())) {
                 throw new Exception(getHttpMethodExceptionText(lastInputStreamGetMethod, uri));
@@ -571,6 +593,25 @@ public class SOSHTTP extends SOSCommonProvider {
         } else {
             return String.format("HTTP %s[%s][%s][%s] = %s", method.getName(), uri, code, text, ex);
         }
+    }
+
+    private void setHttpMethodHeaders(HttpMethod method) {
+        if (headers != null && headers.size() > 0) {
+            headers.forEach((k, v) -> {
+                method.setRequestHeader(k.toString(), v.toString());
+            });
+        }
+    }
+
+    private Properties toProperties(final String val) throws IOException {
+        final Properties p = new Properties();
+        Stream.of(val.split(";")).forEach(e -> {
+            String[] arr = e.trim().split("=");
+            if (arr.length > 0) {
+                p.put(arr[0].trim(), arr.length > 1 ? arr[1].trim() : "");
+            }
+        });
+        return p;
     }
 
     private int getMethodStatusCode(HttpMethod method) {
