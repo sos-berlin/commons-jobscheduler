@@ -40,10 +40,10 @@ public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
             sshProviderOption = vfsOptions.ssh_provider;
         }
         String sshPovider = sshProviderOption.getValue().toUpperCase();
-        if (sshPovider.equals(SSHProvider.SSHJ.name())) {
-            provider = new SOSSFTPSSHJ();
-        } else {
+        if (sshPovider.equals(SSHProvider.JSCH.name())) {
             provider = new SOSSFTPJCraft();
+        } else {
+            provider = new SOSSFTPSSHJ();
         }
     }
 
