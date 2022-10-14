@@ -72,4 +72,6 @@ public interface ISOSProvider {
 
     public boolean isSFTP();
 
+    public boolean isHTTP();
+
 }

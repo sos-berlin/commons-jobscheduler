@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -519,19 +518,15 @@ public class SOSHTTP extends SOSCommonProvider {
             LOGGER.trace(String.format("[%s]found", path));
         }
 
-        Path tmpPath = Paths.get(path);
         SOSFileEntry entry = new SOSFileEntry(EntryType.HTTP);
         entry.setDirectory(false);
-        entry.setFilename(tmpPath.getFileName().toString());
+        String fileName = getBaseNameFromPath(path);
+        entry.setFilename(fileName);
+        // e.g. for HTTP(s) transfers with the file names like SET-217?filter=13400
+        entry.setNormalizedFilename(URLEncoder.encode(fileName, "UTF-8"));
         entry.setFilesize(size);
-
-        String parent = "/";
-        try {
-            parent = SOSCommonProvider.normalizePath(tmpPath.getParent().toString());
-        } catch (Exception e) {
-            LOGGER.error(String.format("[%s][can't get parent path]%s", path, e.toString()), e);
-        }
-        entry.setParentPath(parent);
+        String p = path.startsWith("/") ? path : "/" + path;
+        entry.setParentPath(getFullParentFromPath(p));
 
         return entry;
     }
@@ -604,6 +599,11 @@ public class SOSHTTP extends SOSCommonProvider {
             }
             lastInputStreamGetMethod = null;
         }
+    }
+
+    @Override
+    public boolean isHTTP() {
+        return true;
     }
 
 }

@@ -153,6 +153,9 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     }
 
     public static String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
         return path.replace('\\', '/');
     }
 
@@ -169,6 +172,27 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
             return dir + subPath;
         }
         return dir + subPath;
+    }
+
+    public static String normalizeDirectoryPath(String path) {
+        String p = normalizePath(path);
+        if (p == null) {
+            return null;
+        }
+        return p.endsWith("/") ? p.substring(0, p.length() - 1) : p;
+    }
+
+    public static String getFullParentFromPath(String path) {
+        if (path == null || path.equals("/")) {
+            return null;
+        }
+        int li = path.lastIndexOf("/");
+        return li > -1 ? path.substring(0, li) : null;
+    }
+
+    public static String getBaseNameFromPath(String path) {
+        int li = path.lastIndexOf("/");
+        return li > -1 ? path.substring(li + 1) : path;
     }
 
     @Override
@@ -314,6 +338,11 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     @Override
     public boolean isSFTP() {
+        return false;
+    }
+
+    @Override
+    public boolean isHTTP() {
         return false;
     }
 

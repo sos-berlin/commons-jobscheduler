@@ -1036,4 +1036,9 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         baseOptions = val;
     }
 
+    @Override
+    public boolean isHTTP() {
+        return false;
+    }
+
 }
