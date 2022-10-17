@@ -53,6 +53,7 @@ public class SOSHTTP extends SOSCommonProvider {
     private MultiThreadedHttpConnectionManager connectionManager;
     private HttpClient httpClient;
     private HttpURL rootUrl = null;
+    private String configuredRootUrl = null;
     private HashMap<String, Long> fileSizes = null;
     private HashMap<String, PutMethod> putMethods = null;
     private LinkedHashMap<String, String> headers;
@@ -113,17 +114,20 @@ public class SOSHTTP extends SOSCommonProvider {
             } else if (path.startsWith("https:/")) {
                 return path.replace("https:/", "https://");
             }
-            if (!path.startsWith("/")) {
-                path = "/" + path;
+            String root = configuredRootUrl;
+            if (!root.endsWith("/")) {
+                root = root + "/";
             }
-            path = httpClient.getHostConfiguration().getHostURL() + path;
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            path = root + path;
         }
         return path;
     }
 
     @Override
     public ISOSProviderFile getFile(String fileName) {
-        fileName = adjustFileSeparator(fileName);
         ISOSProviderFile file = new SOSHTTPFile(fileName);
         file.setProvider(this);
         return file;
@@ -192,6 +196,7 @@ public class SOSHTTP extends SOSCommonProvider {
                     if (url.getPort() != -1) {
                         port = url.getPort();
                     }
+                    configuredRootUrl = host;
                     host = url.getHost();
                     String _rootUrl = url.getProtocol() + "://" + host + ":" + port + url.getPath();
                     if (!url.getPath().endsWith("/")) {
@@ -224,7 +229,11 @@ public class SOSHTTP extends SOSCommonProvider {
                     }
                 } else {
                     rootUrl = new HttpURL(host, port, "/");
+                    configuredRootUrl = rootUrl.getURI();
                     hc.setHost(new HttpHost(host, port));
+                }
+                if (!configuredRootUrl.endsWith("/")) {
+                    configuredRootUrl = configuredRootUrl + "/";
                 }
                 LOGGER.info(SOSVfs_D_0101.params(host, port));
                 connectionManager = new MultiThreadedHttpConnectionManager();
@@ -528,6 +537,8 @@ public class SOSHTTP extends SOSCommonProvider {
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {
         reply = "get OK";
+
+        path = normalizeHttpPath(path);
         long size = size(path);
         if (size < 0) {
             return null;
@@ -543,8 +554,7 @@ public class SOSHTTP extends SOSCommonProvider {
         // e.g. for HTTP(s) transfers with the file names like SET-217?filter=13400
         entry.setNormalizedFilename(URLEncoder.encode(fileName, "UTF-8"));
         entry.setFilesize(size);
-        String p = path.startsWith("/") ? path : "/" + path;
-        entry.setParentPath(getFullParentFromPath(p));
+        entry.setParentPath(getFullParentFromPath(path));
 
         return entry;
     }

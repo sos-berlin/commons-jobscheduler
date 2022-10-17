@@ -289,7 +289,6 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     }
                 }
             }
-
             LOGGER.info(String.format("[%s][transferred]Source=%s, Target=%s, Bytes=%s %s", transferNumber, SOSCommonProvider.normalizePath(source
                     .getName()), SOSCommonProvider.normalizePath(target.getName()), totalBytesTransferred, getDateTimeInfos(startTime, endTime)));
 
@@ -1177,8 +1176,14 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             }
 
             sourceTransferFileName = getFileNameWithoutPath(sourceTransferFileName);
-            String fileHandlerSourceFileName = makeFullPathName(getPathWithoutFileName(parent.getSourceProvider(), sourceFileName),
-                    sourceTransferFileName);
+            String fileHandlerSourceFileName = null;
+            if (parent.getSourceProvider().isHTTP()) {
+                fileHandlerSourceFileName = sourceFileName;
+            } else {
+                fileHandlerSourceFileName = makeFullPathName(getPathWithoutFileName(parent.getSourceProvider(), sourceFileName),
+                        sourceTransferFileName);
+            }
+
             sourceTransferFile = parent.getSourceProvider().getFile(fileHandlerSourceFileName);
             if (transferStatus.equals(TransferStatus.ignoredDueToZerobyteConstraint)) {
                 String msg = String.format("[%s][skip][TransferZeroByteFiles=relaxed]Source=%s, Bytes=0", transferNumber, SOSCommonProvider
@@ -1548,7 +1553,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
         private void setHttp(final String baseDirPath, final String filePath) throws Exception {
             String baseDir = SOSString.isEmpty(baseDirPath) ? null : SOSCommonProvider.normalizeDirectoryPath(baseDirPath);
-            fullName = SOSCommonProvider.normalizePath(baseDir == null ? "" : baseDir, filePath);
+            fullName = SOSCommonProvider.normalizePath(filePath);// SOSCommonProvider.normalizePath(baseDir == null ? "" : baseDir, filePath);
             baseName = SOSCommonProvider.getBaseNameFromPath(fullName);
             String parentDir = SOSCommonProvider.getFullParentFromPath(fullName);
             if (parentDir != null) {
