@@ -8,8 +8,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Stream;
 
 import org.apache.commons.httpclient.Credentials;
@@ -30,6 +30,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.ssl.TrustMaterial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class SOSHTTP extends SOSCommonProvider {
     private HttpURL rootUrl = null;
     private HashMap<String, Long> fileSizes = null;
     private HashMap<String, PutMethod> putMethods = null;
-    private Properties headers;
+    private LinkedHashMap<String, String> headers;
 
     private String proxyHost = null;
     private int proxyPort = 0;
@@ -242,12 +243,8 @@ public class SOSHTTP extends SOSCommonProvider {
 
     private void setHeaders() throws IOException {
         if (!SOSString.isEmpty(getProviderOptions().http_headers.getValue())) {
-            headers = toProperties(getProviderOptions().http_headers.getValue());
-            if (LOGGER.isDebugEnabled()) {
-                headers.forEach((k, v) -> {
-                    LOGGER.debug(String.format("[RequestHeader]%s=%s", k, v));
-                });
-            }
+            headers = readHeaders(getProviderOptions().http_headers.getValue());
+            LOGGER.info(String.format("[HTTPHeaders]%s", StringUtils.stripEnd(StringUtils.stripStart(headers.toString(), "{"), "}")));
         }
     }
 
@@ -603,15 +600,22 @@ public class SOSHTTP extends SOSCommonProvider {
         }
     }
 
-    private Properties toProperties(final String val) throws IOException {
-        final Properties p = new Properties();
+    private LinkedHashMap<String, String> readHeaders(final String val) throws IOException {
+        final LinkedHashMap<String, String> m = new LinkedHashMap<>();
         Stream.of(val.split(";")).forEach(e -> {
-            String[] arr = e.trim().split("=");
+            String arrS = e.trim();
+            if (arrS.indexOf("=") == -1) {
+                arrS = arrS.replaceAll("\\s+", "=");
+            }
+            String[] arr = arrS.split("=");
             if (arr.length > 0) {
-                p.put(arr[0].trim(), arr.length > 1 ? arr[1].trim() : "");
+                String k = arr[0].trim();
+                if (k.length() > 0) {
+                    m.put(k, arr.length > 1 ? arr[1].trim() : "");
+                }
             }
         });
-        return p;
+        return m;
     }
 
     private int getMethodStatusCode(HttpMethod method) {
