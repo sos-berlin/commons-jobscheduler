@@ -511,17 +511,14 @@ public class SOSHTTP extends SOSCommonProvider {
         try {
             httpClient.executeMethod(method);
             if (!isSuccessStatusCode(method.getStatusCode())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(getHttpMethodExceptionText(method, uri));
-                }
-                return size;
-                // throw new Exception(this.getHttpMethodExceptionText(method, uri));
+                throw new Exception(this.getHttpMethodExceptionText(method, uri));
             }
             size = method.getResponseContentLength();
             if (size < 0) {
                 size = getInputStreamLen(method.getResponseBodyAsStream());
             }
         } catch (Exception ex) {
+            reply = ex.toString();
             throw ex;
         } finally {
             fileSizes.put(path, size);
