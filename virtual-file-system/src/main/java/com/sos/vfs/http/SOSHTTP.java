@@ -510,12 +510,21 @@ public class SOSHTTP extends SOSCommonProvider {
         setHttpMethodHeaders(method);
         try {
             httpClient.executeMethod(method);
-            if (!isSuccessStatusCode(method.getStatusCode())) {
-                throw new Exception(this.getHttpMethodExceptionText(method, uri));
+            int sc = method.getStatusCode();
+            boolean success = isSuccessStatusCode(sc);
+            if (!success) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(getHttpMethodExceptionText(method, uri));
+                }
+                if (sc != 404) {// because of DisableErrorOnNoFilesFound=true
+                    throw new Exception(getHttpMethodExceptionText(method, uri));
+                }
             }
-            size = method.getResponseContentLength();
-            if (size < 0) {
-                size = getInputStreamLen(method.getResponseBodyAsStream());
+            if (success) {
+                size = method.getResponseContentLength();
+                if (size < 0) {
+                    size = getInputStreamLen(method.getResponseBodyAsStream());
+                }
             }
         } catch (Exception ex) {
             reply = ex.toString();
