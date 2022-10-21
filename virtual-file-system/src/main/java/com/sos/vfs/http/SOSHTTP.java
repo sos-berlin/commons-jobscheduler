@@ -618,12 +618,10 @@ public class SOSHTTP extends SOSCommonProvider {
 
     private LinkedHashMap<String, String> readHeaders(final String val) throws IOException {
         final LinkedHashMap<String, String> m = new LinkedHashMap<>();
-        Stream.of(val.split(";")).forEach(e -> {
+        // see JadeXml2IniConverter DELIMITER_MERGED_CHILDS_HEADERS
+        Stream.of(val.split("\\|")).forEach(e -> {
             String arrS = e.trim();
-            if (arrS.indexOf("=") == -1) {
-                arrS = arrS.replaceAll("\\s+", "=");
-            }
-            String[] arr = arrS.split("=");
+            String[] arr = arrS.split(":");
             if (arr.length > 0) {
                 String k = arr[0].trim();
                 if (k.length() > 0) {
