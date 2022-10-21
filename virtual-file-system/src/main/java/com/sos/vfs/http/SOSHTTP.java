@@ -620,13 +620,16 @@ public class SOSHTTP extends SOSCommonProvider {
         final LinkedHashMap<String, String> m = new LinkedHashMap<>();
         // see JadeXml2IniConverter DELIMITER_MERGED_CHILDS_HEADERS
         Stream.of(val.split("\\|")).forEach(e -> {
-            String arrS = e.trim();
-            String[] arr = arrS.split(":");
-            if (arr.length > 0) {
-                String k = arr[0].trim();
-                if (k.length() > 0) {
-                    m.put(k, arr.length > 1 ? arr[1].trim() : "");
-                }
+            // https://www.rfc-editor.org/rfc/rfc7230#section-3.2.4
+            // No whitespace is allowed between the header field-name and colon.
+            String header = e.trim();
+            int p = header.indexOf(" ");
+            if (p == -1) {
+                m.put(header, "");
+            } else {
+                String name = header.substring(0, p);
+                String value = header.substring(p);
+                m.put(name, value.trim());
             }
         });
         return m;
