@@ -116,6 +116,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
     private static Semaphore synchronizeNextStart = new Semaphore(1, true);
     private static Semaphore eventHandlerSemaphore = new Semaphore(1, true);
     private static Semaphore resolveConditionsSemaphore = new Semaphore(1, true);
+    private static Semaphore reinitSemaphore = new Semaphore(1, true);
+
 
     public static enum CustomEventType {
         InconditionValidated, EventCreated, EventRemoved, JobStreamRemoved, JobStreamStarted, StartTime, TaskEnded, InConditionConsumed, IsAlive, JobStreamCompleted
@@ -1092,15 +1094,15 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
 //            jobStreamCheckIntervalTask.cancel();
 //        }
 
-        LOGGER.debug("acquire:2 resolveConditionsSemaphore");
         try {
 
             boolean eventCreated = false;
             do {
+                LOGGER.debug("acquire:2 resolveConditionsSemaphore");
+                resolveConditionsSemaphore.acquire();
                 changeSession();
                 eventCreated = false;
 
-                resolveConditionsSemaphore.acquire();
                 List<JSInCondition> listOfValidatedInconditions = getConditionResolver().resolveInConditions(sosHibernateSession, forInstance);
                 LOGGER.debug("release:2a resolveConditionsSemaphore");
                 resolveConditionsSemaphore.release();
@@ -1188,6 +1190,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
             }
 
             try {
+                LOGGER.debug("acquire: reinitSemaphore");
+                reinitSemaphore.acquire();
 
                 this.session = Constants.getSession();
                 this.today = Constants.getToday();
@@ -1203,6 +1207,8 @@ public class JobSchedulerJobStreamsEventHandler extends LoopEventHandler {
                 throw new RuntimeException(e);
 
             } finally {
+                LOGGER.debug("release: reinitSemaphore");
+                reinitSemaphore.release();
                 resetNextJobStartTimer();
                 // resetJobStreamCheckIntervalTimer();
                 //resetCheckInitTimer();
