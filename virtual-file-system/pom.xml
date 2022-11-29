@@ -106,6 +106,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.hierynomus</groupId>
+			<artifactId>smbj</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>eu.agno3.jcifs</groupId>
 			<artifactId>jcifs-ng</artifactId>
 		</dependency>
@@ -130,7 +135,7 @@
 			<groupId>org.apache.jackrabbit</groupId>
 			<artifactId>jackrabbit-webdav</artifactId>
 		</dependency>
-		
+
 		<!-- to remove -->
 		<dependency>
 			<groupId>webdavclient4j</groupId>

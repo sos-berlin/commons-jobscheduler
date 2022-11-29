@@ -46,7 +46,8 @@ public class DataSourceOrders implements IDataSourceOrders {
         String liveFolderName = liveFolder.getAbsolutePath();
         try {
             SOSBaseOptions vfsOptions = new SOSBaseOptions();
-            ISOSProvider objFileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider, vfsOptions.webdav_provider);
+            ISOSProvider objFileSystemHandler = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider, vfsOptions.webdav_provider,
+                    vfsOptions.smb_provider);
             ISOSProviderFile objHotFolder = objFileSystemHandler.getFile(liveFolderName);
             SchedulerHotFolder objSchedulerHotFolder = schedulerObjectFactory.createSchedulerHotFolder(objHotFolder);
             SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.loadOrderObjects();

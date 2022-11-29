@@ -34,7 +34,7 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     private void setProvider(SOSOptionString providerOption) {
         if (providerOption == null) {
             SOSBaseOptions baseOptions = new SOSBaseOptions();
-            providerOption = baseOptions.ssh_provider;
+            providerOption = baseOptions.webdav_provider;
         }
         String webDavProvider = providerOption.getValue().toUpperCase();
         if (webDavProvider.equals(WebDAVProvider.WEBDAVCLIENT4J.name())) {

@@ -712,4 +712,8 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     @JSOptionDefinition(name = "webdav_provider", description = "webdav provider implementation", key = "webdav_provider", type = "SOSOptionString", mandatory = false)
     public SOSOptionString webdav_provider = new SOSOptionString(this, CLASS_NAME + ".webdav_provider", "webdav provider", "", "", false);
 
+    // for default value handling see com.sos.vfs.smb.SOSSMB
+    @JSOptionDefinition(name = "smb_provider", description = "smb provider implementation", key = "smb_provider", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString smb_provider = new SOSOptionString(this, CLASS_NAME + ".smb_provider", "smb provider", "", "", false);
+
 }
