@@ -1206,6 +1206,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 }
 
                 if (parent.getBaseOptions().keepModificationDate.isTrue()) {
+                    if (sourceFileModificationDateTime <= 0) {
+                        sourceFileModificationDateTime = sourceTransferFile.getModificationDateTime();
+                    }
                     if (sourceFileModificationDateTime != -1) {
                         targetFile.setModificationDateTime(sourceFileModificationDateTime);
                     }
