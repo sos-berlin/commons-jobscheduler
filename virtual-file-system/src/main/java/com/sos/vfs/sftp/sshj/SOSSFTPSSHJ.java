@@ -844,11 +844,12 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     @Override
     public OutputStream getOutputStream(String fileName, boolean append, boolean resume) {
         try {
-            EnumSet<OpenMode> set = EnumSet.of(OpenMode.WRITE, OpenMode.CREAT, OpenMode.TRUNC);
+            EnumSet<OpenMode> set = EnumSet.of(OpenMode.WRITE, OpenMode.CREAT);
             if (append) {
                 set.add(OpenMode.APPEND);
-            } else if (resume) {
+            } else {
                 // transferMode = ChannelSftp.RESUME; //TODO?
+                set.add(OpenMode.TRUNC);
             }
             RemoteFile remoteFile = sftpClient.open(fileName, set);
             return createOutputStream(remoteFile);
