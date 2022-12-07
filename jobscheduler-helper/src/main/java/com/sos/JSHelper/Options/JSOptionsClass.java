@@ -798,7 +798,7 @@ public class JSOptionsClass extends I18NBase implements Serializable {
 
     @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName",
-            "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
+            "Name of the LOG4J Property File", "env:log4j.configurationFile", "../lib/log4j2.xml", false);
 
     public String getPrefix() {
         return alternativePrefix;

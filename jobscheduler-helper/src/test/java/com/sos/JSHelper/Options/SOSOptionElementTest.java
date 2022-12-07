@@ -112,7 +112,7 @@ public class SOSOptionElementTest {
     }
 
     public void testSystemProperty() {
-        System.setProperty("log4j.configuration", "test-config.properties");
+        System.setProperty("log4j.configurationFile", "test-config.properties");
         JSOptionsClass objO = new JSOptionsClass();
         assertEquals("propertyfile name", "test-config.properties", objO.log4jPropertyFileName.getValue());
     }
