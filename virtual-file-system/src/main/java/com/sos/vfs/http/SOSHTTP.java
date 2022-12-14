@@ -1,10 +1,10 @@
 package com.sos.vfs.http;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,26 +12,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpHost;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpURL;
-import org.apache.commons.httpclient.HttpsURL;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.ssl.TrustMaterial;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpTrace;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +32,9 @@ import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.SOSFileEntry.EntryType;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSProviderOptions;
-import com.sos.vfs.http.common.SOSHTTPRequestEntity;
+import com.sos.vfs.http.common.SOSHTTPClient;
+import com.sos.vfs.http.common.SOSHTTPInputStream;
+import com.sos.vfs.http.common.SOSHTTPOutputStream;
 
 import sos.util.SOSString;
 
@@ -50,517 +42,113 @@ import sos.util.SOSString;
 public class SOSHTTP extends SOSCommonProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHTTP.class);
-    private MultiThreadedHttpConnectionManager connectionManager;
-    private HttpClient httpClient;
-    private HttpURL rootUrl = null;
-    private String configuredRootUrl = null;
+
+    private SOSHTTPClient client;
+
     private HashMap<String, Long> fileSizes = null;
-    private HashMap<String, PutMethod> putMethods = null;
     private LinkedHashMap<String, String> headers;
-
-    private String proxyHost = null;
-    private int proxyPort = 0;
-    private String proxyUser = null;
-    private String proxyPassword = null;
-    private int lastStatusCode = -1;
-
-    private boolean raiseJobSchedulerException = true;
-    private GetMethod lastInputStreamGetMethod = null;
 
     public SOSHTTP() {
         super();
         fileSizes = new HashMap<String, Long>();
-        putMethods = new HashMap<String, PutMethod>();
-    }
-
-    @Override
-    public boolean isConnected() {
-        return httpClient != null && connectionManager != null;
     }
 
     @Override
     public void connect(final SOSProviderOptions options) throws Exception {
         super.connect(options);
-        proxyHost = getProviderOptions().proxyHost.getValue();
-        proxyPort = getProviderOptions().proxyPort.value();
-        proxyUser = getProviderOptions().proxyUser.getValue();
-        proxyPassword = getProviderOptions().proxyPassword.getValue();
-        doConnect();
-        doLogin(getProviderOptions().user.getValue(), getProviderOptions().password.getValue());
+
+        client = new SOSHTTPClient(options, false);
+
+        host = client.getBaseURI().getHost();
+        port = client.getPort();
+        setHeaders();
+
+        checkConnection();
+
+        LOGGER.info(SOSVfs_D_0102.params(host, port));
+        this.logReply();
     }
 
     @Override
     public void disconnect() {
         reply = "disconnect OK";
-        fileSizes = new HashMap<String, Long>();
-        putMethods = new HashMap<String, PutMethod>();
-        lastStatusCode = -1;
-        if (connectionManager != null) {
+
+        fileSizes = new HashMap<>();
+        headers = new LinkedHashMap<>();
+
+        if (client != null) {
             try {
-                connectionManager.shutdown();
-            } catch (Exception ex) {
+                client.close();
+                client = null;
+            } catch (Throwable ex) {
                 reply = "disconnect: " + ex;
             }
-            connectionManager = null;
-            httpClient = null;
         }
         LOGGER.info(reply);
     }
 
-    private String normalizeHttpPath(String path) {
-        if (!path.toLowerCase().startsWith("http://") && !path.toLowerCase().startsWith("https://")) {
-            if (path.startsWith("http:/")) {
-                return path.replace("http:/", "http://");
-            } else if (path.startsWith("https:/")) {
-                return path.replace("https:/", "https://");
-            }
-            String root = configuredRootUrl;
-            if (!root.endsWith("/")) {
-                root = root + "/";
-            }
-            if (path.startsWith("/")) {
-                path = path.substring(1);
-            }
-            path = root + path;
-        }
-        return path;
-    }
-
     @Override
-    public ISOSProviderFile getFile(String fileName) {
-        ISOSProviderFile file = new SOSHTTPFile(fileName);
-        file.setProvider(this);
-        return file;
-    }
-
-    @Override
-    public boolean fileExists(final String path) {
-        GetMethod method = new GetMethod(normalizeHttpPath(path));
-        setHttpMethodHeaders(method);
-        try {
-            httpClient.executeMethod(method);
-            return isSuccessStatusCode(method.getStatusCode());
-        } catch (Exception ex) {
-        } finally {
-            try {
-                method.releaseConnection();
-            } catch (Exception ex) {
-                //
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean directoryExists(final String path) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s]directoryExists", path));
-        }
-        return isDirectory(path);
-    }
-
-    private void doLogin(final String user, final String password) throws Exception {
-        LOGGER.debug(SOSVfs_D_132.params(user));
-        if (!SOSString.isEmpty(user)) {
-            Credentials credentials = new UsernamePasswordCredentials(user, password);
-            httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        }
-        checkConnection();
+    public boolean isConnected() {
+        return client != null;
     }
 
     private void checkConnection() throws Exception {
-        String uri = rootUrl.getURI();
-        GetMethod method = new GetMethod(uri);
-        setHttpMethodHeaders(method);
-        try {
-            if (isServerErrorStatusCode(httpClient.executeMethod(method))) {
-                throw new Exception(getHttpMethodExceptionText(method, uri));
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            try {
-                method.releaseConnection();
-            } catch (Exception ex) {
-                //
-            }
+        HttpGet request = new HttpGet(client.getBaseURI());
+        setHttpHeaders(request);
+
+        try (CloseableHttpResponse response = client.execute(request)) {
+            checkForServerError(response);
+        } catch (Throwable e) {
+            throwException(request, e);
         }
-    }
-
-    private void doConnect() {
-        if (!this.isConnected()) {
-            try {
-                HostConfiguration hc = new HostConfiguration();
-                if (host.toLowerCase().startsWith("https://") || host.toLowerCase().startsWith("http://")) {
-                    URL url = new URL(host);
-                    if (url.getPort() != -1) {
-                        port = url.getPort();
-                    }
-                    configuredRootUrl = host;
-                    host = url.getHost();
-                    String _rootUrl = url.getProtocol() + "://" + host + ":" + port + url.getPath();
-                    if (!url.getPath().endsWith("/")) {
-                        _rootUrl += "/";
-                    }
-                    if ("https".equalsIgnoreCase(url.getProtocol())) {
-                        rootUrl = new HttpsURL(_rootUrl);
-                        StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(getProviderOptions().verifyCertificateHostname.value());
-                        if (!psf.getCheckHostname()) {
-                            LOGGER.info(
-                                    "*********************** Security warning *********************************************************************");
-                            LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
-                            LOGGER.info(
-                                    "The certificate verification process will not verify the DNS name of the certificate presented by the server,");
-                            LOGGER.info("with the hostname of the server in the URL used by the Yade client.");
-                            LOGGER.info(
-                                    "**************************************************************************************************************");
-                        }
-                        if (getProviderOptions().acceptUntrustedCertificate.value()) {
-                            psf.useDefaultJavaCiphers();
-                            psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
-                        }
-                        Protocol p = new Protocol("https", (ProtocolSocketFactory) psf, port);
-                        Protocol.registerProtocol("https", p);
-                        hc.setHost(host, port, p);
-                    } else {
-                        rootUrl = new HttpURL(_rootUrl);
-                        hc.setHost(new HttpHost(host, port));
-                    }
-                } else {
-                    rootUrl = new HttpURL(host, port, "/");
-                    configuredRootUrl = rootUrl.getURI();
-                    hc.setHost(new HttpHost(host, port));
-                }
-                if (!configuredRootUrl.endsWith("/")) {
-                    configuredRootUrl = configuredRootUrl + "/";
-                }
-                LOGGER.info(SOSVfs_D_0101.params(host, port));
-                connectionManager = new MultiThreadedHttpConnectionManager();
-                httpClient = new HttpClient(connectionManager);
-                httpClient.setHostConfiguration(hc);
-                setHeaders();
-                setProxyCredentionals();
-                logReply();
-            } catch (Exception ex) {
-                throw new JobSchedulerException(ex);
-            }
-        } else {
-            LOGGER.warn(SOSVfs_D_0103.params(host, port));
-        }
-    }
-
-    private void setHeaders() throws IOException {
-        if (!SOSString.isEmpty(getProviderOptions().http_headers.getValue())) {
-            headers = readHeaders(getProviderOptions().http_headers.getValue());
-            LOGGER.info(String.format("[HTTPHeaders]%s", StringUtils.stripEnd(StringUtils.stripStart(headers.toString(), "{"), "}")));
-        }
-    }
-
-    private void setProxyCredentionals() throws Exception {
-        if (!SOSString.isEmpty(proxyHost)) {
-            LOGGER.info(String.format("using proxy: host = %s, port = %s, user = %s, pass = ?", proxyHost, proxyPort, proxyUser));
-            httpClient.getHostConfiguration().setProxy(proxyHost, proxyPort);
-            Credentials credentials = new UsernamePasswordCredentials(proxyUser, proxyPassword);
-            AuthScope authScope = new AuthScope(proxyHost, proxyPort);
-            httpClient.getState().setProxyCredentials(authScope, credentials);
-        }
-    }
-
-    private boolean isSuccessStatusCode(int statusCode) {
-        lastStatusCode = statusCode;
-        if (statusCode >= 200 && statusCode < 300) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isServerErrorStatusCode(int statusCode) {
-        lastStatusCode = statusCode;
-        if (statusCode >= 500) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void rename(String from, String to) {
-        from = normalizeHttpPath(from);
-        to = normalizeHttpPath(to);
-
-        PutMethod m = null;
-        InputStream is = null;
-        try {
-            m = new PutMethod(to);
-            setHttpMethodHeaders(m);
-            is = getInputStream(from);
-            m.setRequestEntity(new InputStreamRequestEntity(is));
-            httpClient.executeMethod(m);
-            try {
-                is.close();
-                is = null;
-            } catch (Exception ex) {
-            }
-            if (!isSuccessStatusCode(m.getStatusCode())) {
-                throw new Exception(getHttpMethodExceptionText(m, to));
-            }
-            delete(from, false);
-        } catch (Exception e) {
-            reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
-            }
-            resetLastInputStreamGetMethod();
-            if (m != null) {
-                try {
-                    m.releaseConnection();
-                } catch (Exception e) {
-                }
-            }
-        }
-        reply = "mv OK";
-        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
-    }
-
-    @Override
-    public void delete(String path, boolean checkIsDirectory) {
-        String uri = normalizeHttpPath(path);
-        DeleteMethod m = null;
-
-        try {
-            if (checkIsDirectory && this.isDirectory(uri)) {
-                throw new JobSchedulerException(SOSVfs_E_186.params(uri));
-            }
-            m = new DeleteMethod(uri);
-            setHttpMethodHeaders(m);
-            httpClient.executeMethod(m);
-            if (!isSuccessStatusCode(m.getStatusCode())) {
-                throw new Exception(getHttpMethodExceptionText(m, uri));
-            }
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(SOSVfs_E_187.params("delete", uri), ex);
-        } finally {
-            if (m != null) {
-                try {
-                    m.releaseConnection();
-                } catch (Exception e) {
-                }
-            }
-        }
-        reply = "rm OK";
-        LOGGER.info(getHostID(SOSVfs_D_181.params("delete", uri, getReplyString())));
-    }
-
-    @Override
-    public boolean isDirectory(final String path) {
-        String uri = normalizeHttpPath(path);
-        TraceMethod m = null;
-        try {
-            uri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
-            m = new TraceMethod(uri);
-            setHttpMethodHeaders(m);
-            httpClient.executeMethod(m);
-            if (m.getStatusCode() <= 400) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
-        } finally {
-            if (m != null) {
-                try {
-                    m.releaseConnection();
-                } catch (Exception e) {
-                }
-            }
-        }
-    }
-
-    private ByteArrayOutputStream getOutputStream4Append(String path) throws Exception {
-        // @TODO original Name
-        path = path.replace(getBaseOptions().atomicPrefix.getValue(), "");
-        path = path.replace(getBaseOptions().atomicSuffix.getValue(), "");
-
-        InputStream source = null;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            raiseJobSchedulerException = false;
-            source = getInputStream(path);
-        } catch (RuntimeException ex) {
-            raiseJobSchedulerException = true;
-            if (lastStatusCode == 404) {
-                return out;
-            } else {
-                throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", path), ex);
-            }
-        } finally {
-            raiseJobSchedulerException = true;
-        }
-
-        try {
-            if (source != null) {
-                byte[] buffer = new byte[getBaseOptions().bufferSize.value()];
-                int bytesTransferred;
-                while ((bytesTransferred = source.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesTransferred);
-                }
-                source.close();
-                source = null;
-
-                out.flush();
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            resetLastInputStreamGetMethod();
-        }
-
-        return out;
-    }
-
-    @Override
-    public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
-        String uri = normalizeHttpPath(path);
-        try {
-            PutMethod m = new PutMethod(uri);
-            SOSHTTPRequestEntity re = null;
-            if (append) {
-                re = new SOSHTTPRequestEntity(getOutputStream4Append(path));
-            } else {
-                re = new SOSHTTPRequestEntity();
-            }
-            m.setRequestEntity(re);
-
-            putMethods.put(uri, m);
-            return re.getOutputStream();
-        } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", uri), ex);
-        }
-    }
-
-    protected void put(String path) throws Exception {
-        String uri = normalizeHttpPath(path);
-
-        PutMethod m = putMethods.get(uri);
-        if (m == null) {
-            throw new Exception(String.format("[%s]PutMethod is null", uri));
-        }
-        setHttpMethodHeaders(m);
-        try {
-            httpClient.executeMethod(m);
-            if (!isSuccessStatusCode(m.getStatusCode())) {
-                throw new Exception(getHttpMethodExceptionText(m, uri));
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            putMethods.remove(uri);
-
-            try {
-                m.releaseConnection();
-            } catch (Exception e) {
-            }
-        }
-
-    }
-
-    public static Long getInputStreamLen(InputStream is) throws IOException {
-        long total = 0;
-        try {
-            int intBytesTransferred = 0;
-            byte[] buffer = new byte[1024];
-            while ((intBytesTransferred = is.read(buffer)) != -1) {
-                total += intBytesTransferred;
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            try {
-                is.close();
-            } catch (Exception ex) {
-                //
-            }
-        }
-        return new Long(total);
     }
 
     @Override
     public void mkdir(final String pathname) throws IOException {
-        // LOGGER.info("not implemented yet");
+        LOGGER.info("[mkdir][not implemented yet]" + pathname);
     }
 
     @Override
-    public long size(final String path) throws Exception {
-        if (fileSizes.containsKey(path)) {
-            return fileSizes.get(path);
-        }
-        Long size = new Long(-1);
-        String uri = normalizeHttpPath(path);
-        GetMethod method = new GetMethod(uri);
-        setHttpMethodHeaders(method);
+    public void rmdir(final String pathname) throws IOException {
+        LOGGER.info("[rmdir][not implemented yet]" + pathname);
+    }
+
+    @Override
+    public boolean isDirectory(final String path) {
+        boolean isDirectory = false;
         try {
-            httpClient.executeMethod(method);
-            int sc = method.getStatusCode();
-            boolean success = isSuccessStatusCode(sc);
-            if (!success) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(getHttpMethodExceptionText(method, uri));
-                }
-                if (sc != 404) {// because of DisableErrorOnNoFilesFound=true
-                    throw new Exception(getHttpMethodExceptionText(method, uri));
-                }
+            // http://test.sos:9080/my_file.txt/
+            URI uri = client.normalizeURI(path.endsWith("/") ? path : (path + "/"));
+
+            HttpTrace request = new HttpTrace(uri);
+            setHttpHeaders(request);
+
+            try (CloseableHttpResponse response = client.execute(request)) {
+                isDirectory = response.getStatusLine().getStatusCode() <= 400;
             }
-            if (success) {
-                size = method.getResponseContentLength();
-                if (size < 0) {
-                    size = getInputStreamLen(method.getResponseBodyAsStream());
-                }
-            }
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw ex;
-        } finally {
-            fileSizes.put(path, size);
-            try {
-                method.releaseConnection();
-            } catch (Exception ex) {
-                //
-            }
+        } catch (Throwable e) {
+            // LOGGER.error(e.toString(), e);
         }
-        return size;
+        return isDirectory;
     }
 
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {
-        reply = "get OK";
-
-        path = normalizeHttpPath(path);
         long size = size(path);
         if (size < 0) {
             return null;
         }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[%s]found", path));
-        }
 
+        String fileName = getBaseNameFromPath(path);
         SOSFileEntry entry = new SOSFileEntry(EntryType.HTTP);
         entry.setDirectory(false);
-        String fileName = getBaseNameFromPath(path);
         entry.setFilename(fileName);
         // e.g. for HTTP(s) transfers with the file names like SET-217?filter=13400
         entry.setNormalizedFilename(URLEncoder.encode(fileName, "UTF-8"));
         entry.setFilesize(size);
-        entry.setParentPath(getFullParentFromPath(path));
+        // entry.setParentPath(getFullParentFromPath(path));
+        // http://test.sos:9080/my_file.txt
+        entry.setParentPath(client.getRelativeDirectoryPath(client.normalizeURI(path)));
 
         return entry;
     }
@@ -575,43 +163,237 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     @Override
-    public InputStream getInputStream(final String fileName) {
-        try {
-            String uri = normalizeHttpPath(fileName);
-            lastInputStreamGetMethod = new GetMethod(uri);
-            setHttpMethodHeaders(lastInputStreamGetMethod);
-            httpClient.executeMethod(lastInputStreamGetMethod);
-            if (!isSuccessStatusCode(lastInputStreamGetMethod.getStatusCode())) {
-                throw new Exception(getHttpMethodExceptionText(lastInputStreamGetMethod, uri));
-            }
-            return lastInputStreamGetMethod.getResponseBodyAsStream();
-        } catch (Exception ex) {
-            if (raiseJobSchedulerException) {
-                throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", fileName), ex);
+    public long size(final String path) throws Exception {
+        if (fileSizes.containsKey(path)) {
+            return fileSizes.get(path);
+        }
+        long size = -1;
+
+        URI uri = client.normalizeURI(path);
+        HttpGet request = new HttpGet(uri);
+        setHttpHeaders(request);
+
+        try (CloseableHttpResponse response = client.execute(request)) {
+            StatusLine sl = response.getStatusLine();
+            boolean success = isSuccessStatusCode(sl);
+            if (success) {
+                BufferedHttpEntity re = new BufferedHttpEntity(response.getEntity());
+                size = re.getContentLength();
             } else {
-                throw new RuntimeException(ex);
+                if (sl.getStatusCode() != 404) {
+                    throw new Exception(getResponseStatus(sl));
+                }
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[size][%s]%s", uri, SOSString.toString(sl)));
+            }
+        } catch (Throwable e) {
+            throwException(request, e);
+        } finally {
+            fileSizes.put(path, size);
+        }
+        return size;
+    }
+
+    @Override
+    public void delete(String path, boolean checkIsDirectory) {
+        if (checkIsDirectory && this.isDirectory(path)) {
+            throw new JobSchedulerException(SOSVfs_E_186.params(path));
+        }
+
+        URI uri;
+        try {
+            uri = client.normalizeURI(path);
+        } catch (URISyntaxException e) {
+            throw new JobSchedulerException(String.format("[%s]%s", path, e.toString()), e);
+        }
+        HttpDelete request = new HttpDelete(uri);
+        setHttpHeaders(request);
+
+        try (CloseableHttpResponse response = client.execute(request)) {
+            StatusLine sl = response.getStatusLine();
+            if (!isSuccessStatusCode(sl)) {
+                throw new Exception(getResponseStatus(sl));
+            }
+        } catch (Throwable e) {
+            reply = e.toString();
+            throwJobSchedulerException(request, e);
+        }
+        reply = "rm OK";
+        LOGGER.info(getHostID(SOSVfs_D_181.params("delete", uri, getReplyString())));
+    }
+
+    @Override
+    public void rename(String from, String to) {
+        URI uriTo;
+        try {
+            uriTo = client.normalizeURI(to);
+        } catch (URISyntaxException e) {
+            throw new JobSchedulerException(String.format("[to=%s]%s", to, e.toString()), e);
+        }
+
+        InputStream is = null;
+
+        try {
+            is = getInputStream(from);
+
+            HttpPut requestTo = new HttpPut(uriTo);
+            setHttpHeaders(requestTo);
+            requestTo.setEntity(new InputStreamEntity(is));
+            try (CloseableHttpResponse response = client.execute(requestTo)) {
+                try {
+                    is.close();
+                    is = null;
+                } catch (Throwable ex) {
+                }
+                StatusLine sl = response.getStatusLine();
+                if (!isSuccessStatusCode(sl)) {
+                    throw new Exception(getResponseStatus(sl));
+                }
+                delete(from, false);
+            } catch (Throwable e) {
+                reply = e.toString();
+                throwJobSchedulerException(requestTo, e);
+            }
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Throwable e) {
+                }
             }
         }
+        reply = "mv OK";
+        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
-    private String getHttpMethodExceptionText(HttpMethod method, String uri) throws Exception {
-        return getHttpMethodExceptionText(method, uri, null);
-    }
+    @Override
+    public ISOSProviderFile getFile(String fileName) {
+        try {
+            fileName = adjustFileSeparator(fileName);
+            if (!client.isAbsolute(fileName)) {
+                fileName = (client.getBaseURIPath() + fileName).replaceAll("//+", "/");
+            }
+            ISOSProviderFile file = new SOSHTTPFile(fileName);
+            file.setProvider(this);
 
-    private String getHttpMethodExceptionText(HttpMethod method, String uri, Exception ex) throws Exception {
-        int code = getMethodStatusCode(method);
-        String text = getMethodStatusText(method);
-        if (ex == null) {
-            return String.format("HTTP %s[%s][%s] = %s", method.getName(), uri, code, text);
-        } else {
-            return String.format("HTTP %s[%s][%s][%s] = %s", method.getName(), uri, code, text, ex);
+            return file;
+        } catch (Throwable e) {
+            LOGGER.error(String.format("[getFile][%s]%s", fileName, e.toString()), e);
+            return null;
         }
     }
 
-    private void setHttpMethodHeaders(HttpMethod method) {
+    @Override
+    public boolean fileExists(final String path) {
+        try {
+            return size(path) > -1;
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
+    @Override
+    public boolean directoryExists(final String path) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]directoryExists", path));
+        }
+        return isDirectory(path);
+    }
+
+    private void setHeaders() throws IOException {
+        if (!SOSString.isEmpty(getProviderOptions().http_headers.getValue())) {
+            headers = readHeaders(getProviderOptions().http_headers.getValue());
+            LOGGER.info(String.format("[HTTPHeaders]%s", StringUtils.stripEnd(StringUtils.stripStart(headers.toString(), "{"), "}")));
+        }
+    }
+
+    @Override
+    public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
+        try {
+            HttpPut request = new HttpPut(client.normalizeURI(path));
+            setHttpHeaders(request);
+
+            return new SOSHTTPOutputStream(client.getClient(), request);
+        } catch (Throwable ex) {
+            throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", path), ex);
+        }
+    }
+
+    @Override
+    public InputStream getInputStream(String path) {
+
+        try {
+            URI uri = client.normalizeURI(path);
+            CloseableHttpResponse response = null;
+            try {
+                HttpGet request = new HttpGet(uri);
+                setHttpHeaders(request);
+
+                response = client.execute(request);
+
+                StatusLine statusLine = response.getStatusLine();
+                int status = statusLine.getStatusCode();
+                if (status / 100 != 2) {
+                    throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+                }
+                return new SOSHTTPInputStream(response);
+            } catch (Throwable e) {
+                if (response != null) {
+                    try {
+                        response.close();
+                    } catch (Throwable ee) {
+                    }
+                }
+                throw e;
+            }
+        } catch (Throwable ex) {
+            throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", path), ex);
+        }
+    }
+
+    private boolean isSuccessStatusCode(StatusLine statusLine) {
+        int sc = statusLine.getStatusCode();
+        if (sc >= 200 && sc < 300) {
+            return true;
+        }
+        return false;
+    }
+
+    private void checkForServerError(CloseableHttpResponse response) throws Exception {
+        StatusLine statusLine = response.getStatusLine();
+        int sc = statusLine.getStatusCode();
+        if (sc >= 500) {
+            throw new Exception(getResponseStatus(statusLine));
+        }
+    }
+
+    private String getResponseStatus(StatusLine statusLine) throws Exception {
+        return getResponseStatus(statusLine, null);
+    }
+
+    private String getResponseStatus(StatusLine statusLine, Exception ex) throws Exception {
+        int code = -1;
+        String text = "";
+        try {
+            code = statusLine.getStatusCode();
+            text = statusLine.getReasonPhrase();
+
+        } catch (Throwable e) {
+
+        }
+        if (ex == null) {
+            return String.format("HTTP[%s]%s", code, text);
+        } else {
+            return String.format("HTTP[%s][%s]%s", code, text, ex);
+        }
+    }
+
+    private void setHttpHeaders(HttpRequestBase request) {
         if (headers != null && headers.size() > 0) {
             headers.forEach((k, v) -> {
-                method.setRequestHeader(k.toString(), v.toString());
+                request.addHeader(k.toString(), v.toString());
             });
         }
     }
@@ -635,32 +417,12 @@ public class SOSHTTP extends SOSCommonProvider {
         return m;
     }
 
-    private int getMethodStatusCode(HttpMethod method) {
-        try {
-            return method.getStatusCode();
-        } catch (Exception ex) {
-            //
-        }
-        return -1;
+    private void throwException(HttpRequestBase request, Throwable e) throws Exception {
+        throw new Exception(String.format("[%s]%s", request.getURI(), e.toString()), e);
     }
 
-    private String getMethodStatusText(HttpMethod method) {
-        try {
-            return method.getStatusText();
-        } catch (Exception ex) {
-            //
-        }
-        return "";
-    }
-
-    public void resetLastInputStreamGetMethod() {
-        if (lastInputStreamGetMethod != null) {
-            try {
-                lastInputStreamGetMethod.releaseConnection();
-            } catch (Exception ex) {
-            }
-            lastInputStreamGetMethod = null;
-        }
+    private void throwJobSchedulerException(HttpRequestBase request, Throwable e) throws JobSchedulerException {
+        throw new JobSchedulerException(String.format("[%s]%s", request.getURI(), e.toString()), e);
     }
 
     @Override

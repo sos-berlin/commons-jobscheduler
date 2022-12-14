@@ -3,50 +3,85 @@ package com.sos.vfs.http.common;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.apache.commons.ssl.Base64;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.DefaultSchemePortResolver;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
+import org.apache.jackrabbit.webdav.DavConstants;
+import org.apache.jackrabbit.webdav.client.methods.HttpPropfind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.vfs.common.SOSProxySelector;
+import com.sos.vfs.common.options.SOSProviderOptions;
+
+import sos.util.SOSKeyStoreReader;
+import sos.util.SOSString;
 
 public class SOSHTTPClient {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHTTPClient.class);
+
     private CloseableHttpClient client = null;
-    private final URI baseUri;
+    private HttpClientContext context;
+    private final URI baseURI;
+    private final String baseURIPath;
     private final String user; // test, MAIN\test
     private final String password;
 
-    public SOSHTTPClient(URI baseUri) {
-        this(baseUri, null, null);
+    private boolean isHTTPS;
+
+    public SOSHTTPClient(final SOSProviderOptions options, boolean ntCredentials) throws Exception {
+        this.baseURI = getBaseURI(options);
+        this.baseURIPath = baseURI.getPath();
+        this.user = normalizeValue(options.user.getValue());
+        this.password = normalizeValue(options.password.getValue());
+        create(getProxySelector(options), getSSL(options), ntCredentials);
     }
 
-    public SOSHTTPClient(URI baseUri, String user, String password) {
-        this.baseUri = baseUri;
-        this.user = user;
-        this.password = password;
+    public CloseableHttpResponse execute(HttpRequestBase request) throws Exception {
+        // make sure request path is absolute
+        // handleURI(request);
+        // execute request and return response
+        if (client == null) {
+            throw new Exception("HTTPClient is null");
+        }
+        // setAuthHeader(request);
+        // request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 Firefox/26.0");
+        return client.execute(request, context);
     }
 
-    public void create() throws Exception {
-        create(null, null);
+    @SuppressWarnings("unused")
+    private void setAuthHeader(HttpRequestBase request) {
+        String auth = user + ":" + password;
+        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+        String authHeader = "Basic " + new String(encodedAuth);
+        request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
     }
 
-    public void create(SOSProxySelector proxy) throws Exception {
-        create(proxy, null);
+    private String normalizeValue(String val) {
+        return SOSString.isEmpty(val) ? null : val;
     }
 
-    public void create(SOSHTTPClientSSL ssl) throws Exception {
-        create(null, ssl);
-    }
-
-    public void create(SOSProxySelector proxy, SOSHTTPClientSSL ssl) throws Exception {
-        if (baseUri == null) {
+    private void create(SOSProxySelector proxy, SOSHTTPClientSSL ssl, boolean ntCredentials) throws Exception {
+        if (baseURI == null) {
             return;
         }
         close();
@@ -62,16 +97,32 @@ public class SOSHTTPClient {
             } else {
                 userName = user;
             }
-            // UsernamePasswordCredentials ???
-            provider.setCredentials(AuthScope.ANY, (Credentials) new NTCredentials(userName, password, getWorkstation(), domain));
+
+            if (ntCredentials) {
+                provider.setCredentials(AuthScope.ANY, new NTCredentials(userName, password, getWorkstation(), domain));
+            } else {
+                HttpHost targetHost = new HttpHost(baseURI.getHost());
+                provider.setCredentials(new AuthScope(targetHost), new UsernamePasswordCredentials(userName, password));
+
+                AuthCache authCache = new BasicAuthCache();
+                authCache.put(targetHost, new BasicScheme());
+
+                // Add AuthCache to the execution context
+                context = HttpClientContext.create();
+                context.setCredentialsProvider(provider);
+                context.setAuthCache(authCache);
+            }
         }
         if (proxy != null) {
             provider.setCredentials(proxy.getAuthScope(), proxy.getCredentials());
-            builder.setRoutePlanner(new SystemDefaultRoutePlanner(new DefaultSchemePortResolver(), proxy));
+            // builder.setRoutePlanner(new SystemDefaultRoutePlanner(new DefaultSchemePortResolver(), proxy));
+            builder.setProxy(proxy.getHttpHost());
         }
         builder.setDefaultCredentialsProvider(provider);
 
-        if (baseUri.getScheme().equalsIgnoreCase("https")) {
+        isHTTPS = false;
+        if (baseURI.getScheme().equalsIgnoreCase("https")) {
+            isHTTPS = true;
             if (ssl != null) {
                 builder.setSSLContext(ssl.getSSLContext());
                 builder.setSSLHostnameVerifier(ssl.getHostnameVerifier());
@@ -79,6 +130,90 @@ public class SOSHTTPClient {
         }
         // builder.setDefaultRequestConfig(RequestConfig.custom().setExpectContinueEnabled(true).build());
         client = builder.build();
+    }
+
+    public int getPort() {
+        int p = baseURI.getPort();
+        if (p == -1) {
+            if (isHTTPS) {
+                p = 443;
+            } else {
+                p = 80;
+            }
+        }
+        return p;
+    }
+
+    private URI getBaseURI(final SOSProviderOptions options) throws URISyntaxException {
+        StringBuilder sb = new StringBuilder();
+        String hostParam = options.host.getValue();
+        if (options.authMethod.isURL()) {
+            sb.append(hostParam);
+            if (!hostParam.endsWith("/")) {
+                sb.append("/");
+            }
+        } else {
+            if (hostParam.toLowerCase().startsWith("https://") || hostParam.toLowerCase().startsWith("http://")) {
+                sb.append(hostParam);
+                if (!hostParam.endsWith("/")) {
+                    sb.append("/");
+                }
+            } else {
+                sb.append("http://").append(hostParam);
+                if (!SOSString.isEmpty(options.port.getValue())) {
+                    sb.append(":").append(options.port.getValue());
+                }
+                sb.append("/");
+            }
+        }
+        return new URI(sb.toString());
+    }
+
+    private SOSHTTPClientSSL getSSL(final SOSProviderOptions options) {
+        SOSHTTPClientSSL ssl = null;
+        if (baseURI.getScheme().equalsIgnoreCase("https")) {
+            SOSKeyStoreReader ksr = getKeyStoreReader(options);
+            ssl = new SOSHTTPClientSSL(ksr, ksr, options.verifyCertificateHostname.value(), options.acceptUntrustedCertificate.value());
+            if (!ssl.getCheckHostname()) {
+                LOGGER.info("*********************** Security warning *********************************************************************");
+                LOGGER.info("Yade option \"verify_certificate_hostname\" is currently \"false\". ");
+                LOGGER.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
+                LOGGER.info("with the hostname of the server in the URL used by the Yade client.");
+                LOGGER.info("**************************************************************************************************************");
+            }
+        }
+        return ssl;
+    }
+
+    private SOSKeyStoreReader getKeyStoreReader(final SOSProviderOptions options) {
+        SOSKeyStoreReader ksr = null;
+        if (!options.acceptUntrustedCertificate.value()) {
+            String kf = options.keystoreFile.getValue();
+            String kp = options.keystorePassword.getValue();
+            String kt = options.keystoreType.getValue();
+
+            Path path = SOSString.isEmpty(kf) ? null : Paths.get(kf);
+            String password = SOSString.isEmpty(kp) ? null : kp;
+            String type = SOSString.isEmpty(kt) ? null : kt;
+            ksr = new SOSKeyStoreReader(SOSKeyStoreReader.Type.KeyTrustStore, path, password, type);
+        }
+        return ksr;
+    }
+
+    private SOSProxySelector getProxySelector(final SOSProviderOptions options) {
+        SOSProxySelector selector = null;
+        String host = options.proxyHost.getValue();
+        if (!SOSString.isEmpty(host)) {
+            int port = options.proxyPort.value();
+            String user = options.proxyUser.getValue();
+            String password = options.proxyPassword.getValue();
+            selector = new SOSProxySelector(options.proxyProtocol.getValue(), host, port, SOSString.isEmpty(user) ? null : user, SOSString.isEmpty(
+                    password) ? null : password);
+
+            // only protocol=http is supported. socks protocol usage throws no error but the socks settings are completely ignored
+            LOGGER.info(String.format("[using proxy]protocol=%s, host=%s:%s, user=%s", options.proxyProtocol.getValue(), host, port, user));
+        }
+        return selector;
     }
 
     public void close() {
@@ -89,10 +224,47 @@ public class SOSHTTPClient {
 
             }
         }
+        context = null;
     }
 
     public CloseableHttpClient getClient() {
         return client;
+    }
+
+    public URI getBaseURI() {
+        return baseURI;
+    }
+
+    public String getBaseURIPath() {
+        return baseURIPath;
+    }
+
+    public boolean isAbsolute(String fileName) {
+        return fileName.startsWith(baseURIPath);
+    }
+
+    public URI normalizeURI(String rel) throws URISyntaxException {
+        return baseURI.resolve(new URI(rel)).normalize();
+    }
+
+    public HttpPropfind getConnectRequestMethod() throws IOException {
+        return new HttpPropfind(baseURI, null, DavConstants.DEPTH_0);
+    }
+
+    public String getRelativeDirectoryPath(URI uri) {
+        String p = "/" + uri.toString().substring(baseURI.toString().length());
+        if (!p.equals("/")) {
+            if (p.endsWith("/")) {// /transfer-1/
+                // /transfer-1
+                p = p.substring(0, p.length() - 1);
+            } else {
+                // /transfer-1/myfile.txt
+                final int i = p.lastIndexOf("/");
+                p = ((i >= 0) ? p.substring(0, i) : "");
+                p = SOSString.isEmpty(p) ? "/" : p;
+            }
+        }
+        return p;
     }
 
     private String getWorkstation() {

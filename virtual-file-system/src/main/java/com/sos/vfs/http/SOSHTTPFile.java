@@ -58,27 +58,4 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
         }
     }
 
-    @Override
-    public void closeInput() {
-        super.closeInput();
-        ((SOSHTTP) getProvider()).resetLastInputStreamGetMethod();
-    }
-
-    @Override
-    public void closeOutput() {
-        try {
-            if (getOutputStream() != null) {
-                getOutputStream().flush();
-                getOutputStream().close();
-
-                ((SOSHTTP) getProvider()).put(fileName);
-            }
-        } catch (JobSchedulerException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JobSchedulerException(e);
-        } finally {
-            setOutputStream(null);
-        }
-    }
 }

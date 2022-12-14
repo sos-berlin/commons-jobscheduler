@@ -12,10 +12,14 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.util.SOSKeyStoreReader;
 
 public class SOSHTTPClientSSL {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHTTPClientSSL.class);
 
     static final TrustStrategy TRUST_ALL_STRATEGY = new TrustStrategy() {
 
@@ -46,9 +50,13 @@ public class SOSHTTPClientSSL {
     }
 
     public SSLContext getSSLContext() throws Exception {
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
         if (acceptUntrustedCertificate) {
             SSLContextBuilder builder = SSLContexts.custom();
             builder.loadTrustMaterial(TRUST_ALL_STRATEGY);
+            if (isDebugEnabled) {
+                LOGGER.debug("[getSSLContext][acceptUntrustedCertificate=true]TRUST_ALL_STRATEGY");
+            }
             return builder.build();
         }
 
@@ -62,13 +70,23 @@ public class SOSHTTPClientSSL {
                         commonKeyStore = keyStoreReader.read();
                         builder.loadKeyMaterial(commonKeyStore, keyStoreReader.getPassword());
                         builder.loadTrustMaterial(commonKeyStore, null);
+
+                        if (isDebugEnabled) {
+                            LOGGER.debug("[getSSLContext]loadKeyMaterial,loadTrustMaterial");
+                        }
                     }
                 }
                 if (commonKeyStore == null) {
                     if (keyStoreReader != null) {
+                        if (isDebugEnabled) {
+                            LOGGER.debug("[getSSLContext]loadKeyMaterial");
+                        }
                         builder.loadKeyMaterial(keyStoreReader.read(), keyStoreReader.getPassword());
                     }
                     if (trustStoreReader != null) {
+                        if (isDebugEnabled) {
+                            LOGGER.debug("[getSSLContext]loadTrustMaterial");
+                        }
                         builder.loadTrustMaterial(trustStoreReader.read(), null);
                     }
                 }
