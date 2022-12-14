@@ -35,7 +35,7 @@ public class SOSSMBTest {
     private SOSProviderOptions getProviderOptions() {
         if (providerOptions == null) {
             providerOptions = new SOSProviderOptions();
-            providerOptions.host.setValue("centos7-test-js2.sos");
+            providerOptions.host.setValue("localhost");
             providerOptions.authMethod.setValue(enuAuthenticationMethods.password);
 
             providerOptions.user.setValue("sos");
