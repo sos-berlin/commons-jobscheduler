@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.ssl.Base64;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -66,14 +63,6 @@ public class SOSHTTPClient {
         // setAuthHeader(request);
         // request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 Firefox/26.0");
         return client.execute(request, context);
-    }
-
-    @SuppressWarnings("unused")
-    private void setAuthHeader(HttpRequestBase request) {
-        String auth = user + ":" + password;
-        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-        String authHeader = "Basic " + new String(encodedAuth);
-        request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
     }
 
     private String normalizeValue(String val) {
