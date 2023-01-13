@@ -233,6 +233,10 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return mailOptions;
     }
 
+    public void setMailOptions(SOSSmtpMailOptions opt) {
+        mailOptions = opt;
+    }
+
     public void setChildClasses(final HashMap<String, String> settings) {
         try {
             if (transfer == null) {
