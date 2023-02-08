@@ -649,6 +649,11 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         return filePath.isNotEmpty() || fileListName.isNotEmpty();
     }
 
+    // YADE-600
+    public boolean isRecursiveAllowed() {
+        return !filePath.isNotEmpty();
+    }
+
     private void changeDirValues() throws Exception {
         changeValue(sourceDir, localDir);
         changeValue(targetDir, remoteDir);
