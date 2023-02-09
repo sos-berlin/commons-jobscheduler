@@ -148,6 +148,12 @@ public class SOSVFSFactory extends SOSVFSMessageCodes {
                 options.remoteDir = providerOptions.directory;
             }
         }
+        if (providerOptions.excluded_directories.isDirty()) {
+            if (providerOptions.isSource()) {
+                options.sourceExcludedDirectories = providerOptions.excluded_directories;
+            } else {
+            }
+        }
     }
 
     private void handleProviderOptions(SOSProviderOptions providerOptions) throws Exception {

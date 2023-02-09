@@ -604,7 +604,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         path = normalizePath(path);
         try {
             if (sftpClient == null) {

@@ -789,8 +789,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         if (parent.getBaseOptions().isAtomicTransfer() || parent.getBaseOptions().transactionMode.isTrue()) {
             targetTransferFileName = getTargetAtomicFileName(parent.getBaseOptions());
         }
-        boolean recursive = parent.getBaseOptions().recursive.value() && parent.getBaseOptions().isRecursiveAllowed();
-        if (recursive) {
+        // YADE-600
+        if (parent.getBaseOptions().recursive.value()) {
             String sourceDir = getPathWithoutFileName(parent.getSourceProvider(), sourceFile.getName());
             String sourceDirOrig = parent.getSourceProvider().getFile(parent.getBaseOptions().sourceDir.getValue()).getName();
 

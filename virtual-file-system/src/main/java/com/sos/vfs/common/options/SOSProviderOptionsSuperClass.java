@@ -63,6 +63,10 @@ public class SOSProviderOptionsSuperClass extends JSOptionsClass {
             "", "", false);
     public SOSOptionFolderName folderName = (SOSOptionFolderName) directory.setAlias("Folder_Name");
 
+    @JSOptionDefinition(name = "excluded_directories", description = "source_excluded_directories regexp", key = "excluded_directories", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString excluded_directories = new SOSOptionString(this, CLASS_NAME + ".excluded_directories",
+            "source_excluded_directories regexp", "", "", false);
+
     @JSOptionDefinition(name = "replacement", description = "String for replacement of matching character seque", key = "replacement", type = "SOSOptionString", mandatory = false)
     public SOSOptionString replacement = new SOSOptionString(this, CLASS_NAME + ".replacement", "String for replacement of matching character seque",
             null, null, false);

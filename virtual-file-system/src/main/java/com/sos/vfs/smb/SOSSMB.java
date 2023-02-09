@@ -99,8 +99,8 @@ public class SOSSMB extends SOSCommonProvider implements ISOSSMB {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
-        return provider.listNames(path, checkIfExists, checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
+        return provider.listNames(path, maxFiles, checkIfExists, checkIfIsDirectory);
     }
 
     @Override

@@ -265,7 +265,7 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         SmbFile smbFile = null;
         try {
             List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();

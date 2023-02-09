@@ -308,13 +308,15 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionOutFileName resultSetFileName = new SOSOptionOutFileName(this, CLASS_NAME + ".Result_Set_File_Name",
             "Name of a File with a filelist or a resultlist", "", "", false);
 
-    @JSOptionDefinition(name = "source_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName sourceDir = new SOSOptionFolderName(this, CLASS_NAME + ".source_dir",
-            "local_dir Local directory into which or from which", "", "", false);
+    @JSOptionDefinition(name = "source_dir", description = "Source directory", key = "account", type = "SOSOptionString", mandatory = false)
+    public SOSOptionFolderName sourceDir = new SOSOptionFolderName(this, CLASS_NAME + ".source_dir", "source_dir directory", "", "", false);
 
-    @JSOptionDefinition(name = "target_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName targetDir = new SOSOptionFolderName(this, CLASS_NAME + ".target_dir", "target_dir directory into which or from which",
-            "", "", false);
+    @JSOptionDefinition(name = "source_excluded_directories", description = "source_excluded_directories regexp", key = "source_excluded_directories", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString sourceExcludedDirectories = new SOSOptionString(this, CLASS_NAME + ".source_excluded_directories",
+            "source_excluded_directories regexp", "", "", false);
+
+    @JSOptionDefinition(name = "target_dir", description = "Target directory", key = "account", type = "SOSOptionString", mandatory = false)
+    public SOSOptionFolderName targetDir = new SOSOptionFolderName(this, CLASS_NAME + ".target_dir", "target_dir directory", "", "", false);
 
     @JSOptionDefinition(name = "append_files", description = "This parameter specifies whether the content of a", key = "append_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean appendFiles = new SOSOptionBoolean(this, CLASS_NAME + ".append_files",

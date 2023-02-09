@@ -35,7 +35,7 @@ public class SOSFTPTest {
         try {
             p.connect(getOptions());
 
-            List<SOSFileEntry> r = p.listNames("/transfer-1", true, true);
+            List<SOSFileEntry> r = p.listNames("/transfer-1", -1, true, true);
             LOGGER.info(p.getReplyString());
             if (r != null) {
                 LOGGER.info("found=" + r.size());

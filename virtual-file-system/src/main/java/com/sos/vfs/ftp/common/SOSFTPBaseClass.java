@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.net.ftp.FTP;
@@ -61,8 +60,13 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     private SOSFTPServerReply ftpReply = null;
     private SOSOptionTransferMode transferMode = null;
     private SOSFTPClientLogger commandListener = null;
-    private List<SOSFileEntry> directoryListing = null;
     private FTPClient ftpClient = null;
+
+    private List<SOSFileEntry> directoryFiles = null;
+    private int directoryFilesCount = 0;
+    private boolean directoryFilesCountExceeded = false;
+    private List<SOSFileEntry> directorySubFolders = null;
+
     private String host = EMPTY_STRING;
     private int port = 0;
     private String user = EMPTY_STRING;
@@ -251,7 +255,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
+    public List<SOSFileEntry> listNames(String path, final int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         try {
             boolean isDebugEnabled = LOGGER.isDebugEnabled();
             boolean isTraceEnabled = LOGGER.isTraceEnabled();
@@ -320,6 +324,92 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         }
     }
 
+    @Override
+    public List<SOSFileEntry> getFileList(final String folder, final int maxFiles, final boolean recursive, final Pattern fileNamePattern,
+            Pattern excludedDirectoriesPattern, boolean checkIfExists, String integrityHashType, int recLevel) throws Exception {
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
+        boolean isTraceEnabled = LOGGER.isTraceEnabled();
+
+        if (recLevel == 0) {
+            directoryFiles = new ArrayList<SOSFileEntry>();
+            directoryFilesCount = 0;
+            directoryFilesCountExceeded = false;
+        } else {
+            if (maxFiles > 0 && directoryFilesCount >= maxFiles) {
+                if (!directoryFilesCountExceeded) {
+                    LOGGER.info(String.format("[skip]maxFiles=%s exceeded", maxFiles));
+                    directoryFilesCountExceeded = true;
+                }
+                return directoryFiles;
+            }
+        }
+        List<SOSFileEntry> entries = null;
+        String path = folder.trim();
+        if (path.isEmpty()) {
+            path = ".";
+        }
+        try {
+            entries = listNames(path, maxFiles, checkIfExists, checkIfExists);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        if (entries == null) {
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[%s]entries=null", path));
+            }
+            return directoryFiles;
+        }
+
+        for (SOSFileEntry entry : entries) {
+            if (maxFiles > 0 && directoryFilesCount >= maxFiles) {
+                if (!directoryFilesCountExceeded) {
+                    LOGGER.info(String.format("[skip]maxFiles=%s exceeded", maxFiles));
+                    directoryFilesCountExceeded = true;
+                }
+                return directoryFiles;
+            }
+
+            if (!isNotHiddenFile(entry.getFilename())) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][entry is hidden]%s continue", path, entry.getFilename()));
+                }
+                continue;
+            }
+            if (entry.isDirectory()) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][directory]%s", path, SOSString.toString(entry)));
+                }
+                if (recursive) {
+                    if (excludedDirectoriesPattern != null) {
+                        if (excludedDirectoriesPattern.matcher(entry.getDirectoryPath()).find()) {
+                            if (isDebugEnabled) {
+                                LOGGER.debug(String.format("[%s][directory][match][excludedDirectories=%s]%s", path, excludedDirectoriesPattern
+                                        .pattern(), entry.getFullPath()));
+                            }
+                            continue;
+                        }
+                    }
+                    recLevel++;
+                    getFileList(entry.getFullPath(), maxFiles, recursive, fileNamePattern, excludedDirectoriesPattern, checkIfExists,
+                            integrityHashType, recLevel);
+                }
+            } else {
+                if (isTraceEnabled) {
+                    LOGGER.trace(String.format("[%s][file]%s", path, SOSString.toString(entry)));
+                }
+                // file list should not contain the checksum files
+                if (integrityHashType != null && entry.getFilename().endsWith(integrityHashType)) {
+                    continue;
+                }
+                if (fileNamePattern.matcher(entry.getFilename()).find()) {
+                    directoryFiles.add(entry);
+                    directoryFilesCount++;
+                }
+            }
+        }
+        return directoryFiles;
+    }
+
     private String getFTPFileType(FTPFile file) {
         if (file != null) {
             if (file.isFile()) {
@@ -335,98 +425,41 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         return null;
     }
 
-    private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
-        boolean isDebugEnabled = LOGGER.isDebugEnabled();
-        boolean isTraceEnabled = LOGGER.isTraceEnabled();
-
+    /** used only by com.sos.scheduler.model.SchedulerHotFolder */
+    @Override
+    public List<SOSFileEntry> getSubFolders(final String folder, final int maxFiles, final boolean recursive, final Pattern pattern, int recLevel)
+            throws Exception {
         if (recLevel == 0) {
-            directoryListing = new ArrayList<SOSFileEntry>();
+            directorySubFolders = new ArrayList<SOSFileEntry>();
         }
+
         List<SOSFileEntry> entries = null;
-        path = path.trim();
+        String path = folder.trim();
         if (path.isEmpty()) {
             path = ".";
         }
         try {
-            entries = listNames(path, checkIfExists, checkIfExists);
+            entries = listNames(path, maxFiles, false, false);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
         if (entries == null) {
-            if (isDebugEnabled) {
-                LOGGER.debug(String.format("[%s]entries=null", path));
-            }
-            return directoryListing;
+            return directorySubFolders;
         }
+
         for (SOSFileEntry entry : entries) {
-            if (isTraceEnabled) {
-                LOGGER.trace(String.format("[%s][entry]%s", path, SOSString.toString(entry)));
-            }
-            if (!isNotHiddenFile(entry.getFilename())) {
-                LOGGER.debug(String.format("[%s][entry is hidden]%s continue", path, entry.getFilename()));
-                continue;
-            }
-            if (entry.isDirectory()) {
-                if (isTraceEnabled) {
-                    LOGGER.trace(String.format("[%s][entry]%s isDirectory, recursive=%s", path, entry.getFilename(), recursive));
-                }
-                if (recursive) {
-                    recLevel++;
-                    getFilenames(entry.getFullPath(), recursive, recLevel, checkIfExists);
-                }
-            } else {
-                directoryListing.add(entry);
-            }
-        }
-        return directoryListing;
-    }
-
-    @Override
-    public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean recursive, boolean checkIfExists,
-            String integrityHashType) throws Exception {
-        boolean isDebugEnabled = LOGGER.isDebugEnabled();
-        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, checkIfExists);
-        if (isDebugEnabled) {
-            LOGGER.debug(String.format("[%s][total] %s files", folder, result.size()));
-        }
-
-        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
-        Pattern pattern = Pattern.compile(regexp, flag);
-        for (SOSFileEntry entry : result) {
-            if (entry.isDirectory()) {
-                continue;
-            }
-            // file list should not contain the checksum files
-            if (integrityHashType != null && entry.getFilename().endsWith(integrityHashType)) {
-                continue;
-            }
-            Matcher matcher = pattern.matcher(entry.getFilename());
-            if (matcher.find()) {
-                list.add(entry);
-            }
-        }
-        if (isDebugEnabled) {
-            LOGGER.debug(String.format("[%s][filtered] %s files", folder, list.size()));
-        }
-        return list;
-    }
-
-    @Override
-    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean recursive) throws Exception {
-        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, false);
-
-        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
-        Pattern pattern = Pattern.compile(regexp, flag);
-        for (SOSFileEntry entry : result) {
             if (!entry.isDirectory()) {
                 continue;
             }
-            Matcher matcher = pattern.matcher(entry.getFilename());
-            if (matcher.find()) {
-                list.add(entry);
+            if (pattern.matcher(entry.getFilename()).find()) {
+                directorySubFolders.add(entry);
+            }
+            if (recursive) {
+                recLevel++;
+                getSubFolders(entry.getFullPath(), maxFiles, recursive, pattern, recLevel);
             }
         }
-        return list;
+        return directorySubFolders;
     }
 
     private FTPFile getFTPFile(final String fileName) {
@@ -789,7 +822,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     private void dirInfo(String path, Deque<SOSFileEntry> result, boolean recursive) throws Exception {
-        List<SOSFileEntry> infos = listNames(path, false, false);
+        List<SOSFileEntry> infos = listNames(path, -1, false, false);
         for (SOSFileEntry resource : infos) {
             result.push(resource);
             if (recursive && resource.isDirectory()) {

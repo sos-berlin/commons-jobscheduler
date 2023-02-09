@@ -154,7 +154,7 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) throws IOException {
         if (path.isEmpty()) {
             path = "/";
         }

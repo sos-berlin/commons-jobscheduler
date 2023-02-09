@@ -32,7 +32,7 @@ public interface ISOSSMB {
 
     public SOSFileEntry getFileEntry(String pathname) throws Exception;
 
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory);
 
     public void delete(final String path, boolean checkIsDirectory);
 

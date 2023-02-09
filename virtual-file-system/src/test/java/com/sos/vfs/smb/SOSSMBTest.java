@@ -52,7 +52,7 @@ public class SOSSMBTest {
         try {
             p.connect(getProviderOptions());
 
-            List<SOSFileEntry> r = p.listNames("/sos/yade/", true, true);
+            List<SOSFileEntry> r = p.listNames("/sos/yade/", -1, true, true);
             LOGGER.info(p.getReplyString());
             if (r != null) {
                 LOGGER.info("found=" + r.size());

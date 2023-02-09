@@ -250,7 +250,7 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
     }
 
     private void dirInfo(String path, Deque<SOSFileEntry> result, boolean recursive) throws Exception {
-        List<SOSFileEntry> infos = listNames(path, false, false);
+        List<SOSFileEntry> infos = listNames(path, -1, false, false);
         for (SOSFileEntry resource : infos) {
             result.push(resource);
             if (recursive && resource.isDirectory()) {
@@ -355,7 +355,7 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         path = normalizePath(path);
         try {
             List<SOSFileEntry> result = new ArrayList<>();

@@ -30,7 +30,7 @@ public interface ISOSWebDAV {
 
     public SOSFileEntry getFileEntry(String pathname) throws Exception;
 
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory);
 
     public void delete(final String path, boolean checkIsDirectory);
 
@@ -43,7 +43,7 @@ public interface ISOSWebDAV {
     public String getModificationDateTime(final String path);
 
     public ISOSProviderFile getFile(String fileName);
-    
+
     public long copy(final String source, final String target);
 
 }

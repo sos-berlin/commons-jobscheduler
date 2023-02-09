@@ -33,7 +33,7 @@ public interface ISOSSFTP {
 
     public SOSFileEntry getFileEntry(String pathname) throws Exception;
 
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory);
 
     public void delete(final String path, boolean checkIsDirectory);
 
@@ -52,7 +52,7 @@ public interface ISOSSFTP {
     public long putFile(final String source, final String target);
 
     public void putFile(File source, String target, int chmod) throws Exception;
-    
+
     public void get(final String source, final String target);
 
     public ISOSProviderFile getFile(String fileName);
