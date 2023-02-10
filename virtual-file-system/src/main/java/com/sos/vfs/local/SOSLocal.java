@@ -182,16 +182,16 @@ public class SOSLocal extends SOSCommonProvider {
                     return result;
                 }
                 if (!Files.isDirectory(path)) {
-                    File f = path.toAbsolutePath().toFile();
                     if (isTraceEnabled) {
-                        LOGGER.trace(String.format("[%s]", f));
+                        LOGGER.trace(String.format("[%s]", path));
                     }
+                    String fn = path.getFileName().toString();
                     boolean add = true;
-                    if (integrityHashType != null && f.getName().endsWith(integrityHashType)) {
+                    if (integrityHashType != null && fn.endsWith(integrityHashType)) {
                         add = false;
                     }
-                    if (add && fileNamePattern.matcher(f.getName()).find()) {
-                        result.add(getFileEntry(f));
+                    if (add && fileNamePattern.matcher(fn).find()) {
+                        result.add(getFileEntry(path.toFile()));
                         directoryFilesCount++;
                     }
                 }
@@ -230,22 +230,22 @@ public class SOSLocal extends SOSCommonProvider {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                FileVisitResult fvr = checkMaxFiles(maxFiles);
-                if (fvr != null) {
-                    LOGGER.info(String.format("[skip]maxFiles=%s exceeded", maxFiles));
-                    return fvr;
-                }
-                if (!Files.isDirectory(file)) {
+                if (!attrs.isDirectory()) {
+                    FileVisitResult fvr = checkMaxFiles(maxFiles);
+                    if (fvr != null) {
+                        LOGGER.info(String.format("[skip]maxFiles=%s exceeded", maxFiles));
+                        return fvr;
+                    }
                     if (isTraceEnabled) {
                         LOGGER.trace(String.format("[%s][visitFile]", file));
                     }
-                    File f = file.toAbsolutePath().toFile();
+                    String fn = file.getFileName().toString();
                     boolean add = true;
-                    if (integrityHashType != null && f.getName().endsWith(integrityHashType)) {
+                    if (integrityHashType != null && fn.endsWith(integrityHashType)) {
                         add = false;
                     }
-                    if (add && fileNamePattern.matcher(f.getName()).find()) {
-                        result.add(getFileEntry(f));
+                    if (add && fileNamePattern.matcher(fn).find()) {
+                        result.add(getFileEntry(file.toFile()));
                         directoryFilesCount++;
                     }
                 }
