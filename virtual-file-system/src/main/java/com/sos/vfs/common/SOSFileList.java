@@ -36,6 +36,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private final HashMap<String, String> subFolders = new HashMap<>();
 
     private String lastErrorMessage;
+    private Boolean isFullPathSelection = null;
     private long sumFileSizes = 0L;
     private long counterSuccessfulTransfers = 0;
     private long counterFailedTransfers = 0;
@@ -588,6 +589,13 @@ public class SOSFileList extends SOSVFSMessageCodes {
             }
         }
         retryCountMax = options.connection_error_retry_count_max.value() < 0 ? 0 : options.connection_error_retry_count_max.value();
+    }
+
+    public boolean isFullPathSelection() {
+        if (isFullPathSelection == null) {
+            isFullPathSelection = !SOSString.isEmpty(options.fileListName.getValue()) || !SOSString.isEmpty(options.filePath.getValue());
+        }
+        return isFullPathSelection;
     }
 
     public int getRetryCountMax() {

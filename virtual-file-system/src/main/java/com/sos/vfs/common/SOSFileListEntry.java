@@ -13,8 +13,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -797,6 +799,14 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             if (!fileNamesAreEqual(sourceDir, sourceDirOrig, true) && sourceDir.length() > sourceDirOrig.length()) {
                 String subFolder = sourceDir.substring(sourceDirOrig.length());
                 subFolder = adjustFileSeparator(addFileSeparator(subFolder));
+                if (parent.isFullPathSelection()) {
+                    // YADE-600
+                    int w = subFolder.indexOf(":");
+                    if (w > -1) {
+                        subFolder = subFolder.substring(w + 1);
+                        subFolder = StringUtils.stripStart(subFolder, "/");
+                    }
+                }
                 targetFileName = targetFileName.replaceFirst("([^/]*)$", subFolder + "$1");
                 targetTransferFileName = subFolder + targetTransferFileName;
 
