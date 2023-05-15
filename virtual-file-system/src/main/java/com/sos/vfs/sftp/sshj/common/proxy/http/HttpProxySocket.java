@@ -20,11 +20,17 @@ import sos.util.SOSString;
 
 public class HttpProxySocket extends Socket {
 
+    private static final String SYSTEM_PROPERTY_CONNECT_HTTP_VERSION = "yade.sshj.proxy.http.connect_http_version";
+    private static final String DEFAULT_CONNECT_HTTP_VERSION = "1.0";
+    private static final String NEW_LINE = "\r\n";
+
     private final Proxy proxy;
+    private final String connectHttpVersion;
 
     public HttpProxySocket(final Proxy proxy) throws UnknownHostException, IOException {
         super();
         this.proxy = proxy;
+        this.connectHttpVersion = getConnectHttpVersion();
     }
 
     @Override
@@ -38,13 +44,14 @@ public class HttpProxySocket extends Socket {
 
         InetSocketAddress address = (InetSocketAddress) endpoint;
         OutputStream out = this.getOutputStream();
-        IOUtils.write(String.format("CONNECT %s:%s HTTP/1.0\r\n", address.getHostName(), address.getPort()), out, proxy.getCharset());
+        IOUtils.write(String.format("CONNECT %s:%s HTTP/%s%s", address.getHostName(), address.getPort(), connectHttpVersion, NEW_LINE), out, proxy
+                .getCharset());
         if (basicAuth != null) {
             IOUtils.write("Proxy-Authorization: Basic ", out, proxy.getCharset());
             IOUtils.write(basicAuth, out, proxy.getCharset());
+            IOUtils.write(NEW_LINE, out, proxy.getCharset());
         }
-        IOUtils.write("\r\n", out, proxy.getCharset());
-        IOUtils.write("\r\n", out, proxy.getCharset());
+        IOUtils.write(NEW_LINE, out, proxy.getCharset());
         out.flush();
 
         InputStream in = this.getInputStream();
@@ -58,5 +65,17 @@ public class HttpProxySocket extends Socket {
             throw new SocketException(String.format("[%s][invalid response]%s", ((InetSocketAddress) proxy.getProxy().address()).getHostName(),
                     response));
         }
+    }
+
+    private String getConnectHttpVersion() {
+        String v = null;
+        try {
+            v = System.getProperty(SYSTEM_PROPERTY_CONNECT_HTTP_VERSION);
+        } catch (Throwable e) {
+        }
+        if (SOSString.isEmpty(v)) {
+            v = DEFAULT_CONNECT_HTTP_VERSION;
+        }
+        return v;
     }
 }
