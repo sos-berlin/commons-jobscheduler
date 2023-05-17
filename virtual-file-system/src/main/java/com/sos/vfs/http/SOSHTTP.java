@@ -20,7 +20,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpTrace;
-import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +96,7 @@ public class SOSHTTP extends SOSCommonProvider {
         setHttpHeaders(request);
 
         try (CloseableHttpResponse response = client.execute(request)) {
-            checkForServerError(response);
+            checkConnectResponse(response);
         } catch (Throwable e) {
             throwException(request, e);
         }
@@ -177,8 +176,7 @@ public class SOSHTTP extends SOSCommonProvider {
             StatusLine sl = response.getStatusLine();
             boolean success = isSuccessStatusCode(sl);
             if (success) {
-                BufferedHttpEntity re = new BufferedHttpEntity(response.getEntity());
-                size = re.getContentLength();
+                size = response.getEntity().getContentLength();
             } else {
                 if (sl.getStatusCode() != 404) {
                     throw new Exception(getResponseStatus(sl));
@@ -361,11 +359,13 @@ public class SOSHTTP extends SOSCommonProvider {
         return false;
     }
 
-    private void checkForServerError(CloseableHttpResponse response) throws Exception {
+    private void checkConnectResponse(CloseableHttpResponse response) throws Exception {
         StatusLine statusLine = response.getStatusLine();
         int sc = statusLine.getStatusCode();
         if (sc >= 500) {
             throw new Exception(getResponseStatus(statusLine));
+        } else if (sc == 404) {
+            client.setBaseUriOnNotExists();
         }
     }
 

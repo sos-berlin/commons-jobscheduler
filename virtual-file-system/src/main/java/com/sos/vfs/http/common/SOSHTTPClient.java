@@ -13,6 +13,8 @@ import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -38,11 +40,11 @@ public class SOSHTTPClient {
 
     private CloseableHttpClient client = null;
     private HttpClientContext context;
-    private final URI baseURI;
-    private final String baseURIPath;
     private final String user; // test, MAIN\test
     private final String password;
 
+    private URI baseURI;
+    private String baseURIPath;
     private boolean isHTTPS;
 
     public SOSHTTPClient(final SOSProviderOptions options, boolean ntCredentials) throws Exception {
@@ -51,6 +53,18 @@ public class SOSHTTPClient {
         this.user = normalizeValue(options.user.getValue());
         this.password = normalizeValue(options.password.getValue());
         create(getProxySelector(options), getSSL(options), ntCredentials);
+    }
+
+    public void setBaseUriOnNotExists() {
+        if (this.baseURI != null && this.baseURIPath != null) {
+            try {
+                String bu = this.baseURI.toString();
+                this.baseURI = new URI(bu.substring(0, bu.indexOf(baseURIPath)) + "/");
+                this.baseURIPath = baseURI.getPath();
+            } catch (URISyntaxException e) {
+                LOGGER.error(String.format("[setBaseUriOnNotExists][%s]%s", this.baseURI, e.toString()), e);
+            }
+        }
     }
 
     public CloseableHttpResponse execute(HttpRequestBase request) throws Exception {
@@ -117,7 +131,7 @@ public class SOSHTTPClient {
                 builder.setSSLHostnameVerifier(ssl.getHostnameVerifier());
             }
         }
-        // builder.setDefaultRequestConfig(RequestConfig.custom().setExpectContinueEnabled(true).build());
+        builder.setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build());
         client = builder.build();
     }
 
@@ -229,10 +243,17 @@ public class SOSHTTPClient {
     }
 
     public boolean isAbsolute(String fileName) {
-        return fileName.startsWith(baseURIPath);
+        if (fileName == null) {
+            return false;
+        }
+        String f = fileName.toLowerCase();
+        return f.startsWith("https://") || f.startsWith("http://");
     }
 
     public URI normalizeURI(String rel) throws URISyntaxException {
+        if (isAbsolute(rel)) {
+            return new URI(rel).normalize();
+        }
         return baseURI.resolve(new URI(rel)).normalize();
     }
 
@@ -241,7 +262,9 @@ public class SOSHTTPClient {
     }
 
     public String getRelativeDirectoryPath(URI uri) {
-        String p = "/" + uri.toString().substring(baseURI.toString().length());
+        int bul = baseURI.toString().length();
+        String u = uri.toString();
+        String p = bul >= u.length() ? "/" : "/" + u.substring(bul);
         if (!p.equals("/")) {
             if (p.endsWith("/")) {// /transfer-1/
                 // /transfer-1
