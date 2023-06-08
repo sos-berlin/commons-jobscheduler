@@ -125,7 +125,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                         }
                     }
 
-                    kpd = new SOSKeePassDatabase(databaseFile);
+                    kpd = new SOSKeePassDatabase(databaseFile, SOSKeePassDatabase.getModule(credentialStore.credentialStoreModule.getValue()));
                     if (keePassKeyFile == null) {
                         kpd.load(keePassPassword);
                     } else {
@@ -137,7 +137,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                 }
             } else {
                 kpd = (SOSKeePassDatabase) keepass_database.value();
-                LOGGER.debug(String.format("use already loaded KeePass from %s", kpd.getFile().toString()));
+                LOGGER.debug(String.format("use already loaded KeePass from %s", kpd.getHandler().getKeePassFile().toString()));
             }
             try {
                 setKeePassOptions4Provider(kpd, null, null);
@@ -170,7 +170,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
             List<String> resolvedNames = new ArrayList<String>();
             List<String> skippedNames = new ArrayList<String>();
             for (String varName : varNames) {
-                SOSKeePassPath path = new SOSKeePassPath(kpd.isKDBX(), varName);
+                SOSKeePassPath path = new SOSKeePassPath(kpd.getHandler().isKdbx(), varName);
                 if (path.isValid()) {
                     String entryKey = path.getEntryPath().toLowerCase();
                     Entry<?, ?, ?, ?> entry = null;
@@ -224,7 +224,8 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
         Entry<?, ?, ?, ?> entry = keePass2OptionsByKeePassSyntax(kpd);
         if (sshAuthFile.isNotEmpty()) {
             String optionName = sshAuthFile.getShortKey();
-            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), sshAuthFile.getValue(), credentialStore.credentialStoreKeyPath.getValue());
+            SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.getHandler().isKdbx(), sshAuthFile.getValue(), credentialStore.credentialStoreKeyPath
+                    .getValue());
             if (keePassPath.isValid()) {
                 LOGGER.debug(String.format("[%s]set from %s", optionName, keePassPath.toString()));
                 if (entry == null || !keePassPath.getEntryPath().equals(entry.getPath())) {
@@ -259,7 +260,8 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
 
     private Entry<?, ?, ?, ?> keePass2OptionByKeePassSyntax(final SOSKeePassDatabase kpd, final SOSOptionElement option, Entry<?, ?, ?, ?> lastEntry)
             throws Exception {
-        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.isKDBX(), option.getValue(), credentialStore.credentialStoreKeyPath.getValue());
+        SOSKeePassPath keePassPath = new SOSKeePassPath(kpd.getHandler().isKdbx(), option.getValue(), credentialStore.credentialStoreKeyPath
+                .getValue());
         Entry<?, ?, ?, ?> entry = null;
         String fileName = credentialStore.credentialStoreFileName.getValue();
         String optionName = option.getShortKey();

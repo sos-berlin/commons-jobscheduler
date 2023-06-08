@@ -35,6 +35,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.Options.SOSOptionZeroByteTransfer;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.keepass.SOSKeePassDatabase;
 
 @JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -553,6 +554,10 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
 
     @JSOptionDefinition(name = "jump_CredentialStore_KeyPath", description = "", key = "jump_CredentialStore_KeyPath", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_CredentialStore_KeyPath = new SOSOptionString(this, CLASS_NAME + ".jump_CredentialStore_KeyPath", "", "", "", false);
+
+    @JSOptionDefinition(name = "jump_CredentialStore_Module", description = "", key = "jump_CredentialStore_Module", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_CredentialStore_Module = new SOSOptionString(this, CLASS_NAME + ".jump_CredentialStore_Module", "",
+            SOSKeePassDatabase.DEFAULT_MODULE.name(), SOSKeePassDatabase.DEFAULT_MODULE.name(), false);
 
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionTime pollInterval = new SOSOptionTime(this, CLASS_NAME + ".poll_interval", "This parameter specifies the interval in seconds",
