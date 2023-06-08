@@ -42,8 +42,8 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
     @JSOptionDefinition(name = "credential_store_entry_path", description = "", key = "credential_store_entry_path", type = "SOSOptionString", mandatory = false)
     public SOSOptionString credential_store_entry_path = new SOSOptionString(this, CLASS_NAME + ".credential_store_entry_path", "", "", "", false);
 
-    @JSOptionDefinition(name = "credential_store_module", description = "", key = "credential_store_module", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString credential_store_module = new SOSOptionString(this, CLASS_NAME + ".credential_store_module", "",
+    @JSOptionDefinition(name = "credential_store_keepass_module", description = "", key = "credential_store_keepass_module", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString credential_store_keepass_module = new SOSOptionString(this, CLASS_NAME + ".credential_store_keepass_module", "",
             SOSKeePassDatabase.DEFAULT_MODULE.name(), SOSKeePassDatabase.DEFAULT_MODULE.name(), false);
 
     @Override

@@ -635,7 +635,7 @@ public class SOSSSHJob extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             csOptions.credentialStoreKeyFileName.setValue(jobOptions.credential_store_key_filename.getValue());
             csOptions.credentialStorePassword.setValue(jobOptions.credential_store_password.getValue());
             csOptions.credentialStoreKeyPath.setValue(jobOptions.credential_store_entry_path.getValue());
-            csOptions.credentialStoreModule.setValue(jobOptions.credential_store_module.getValue());
+            csOptions.credentialStoreKeePassModule.setValue(jobOptions.credential_store_keepass_module.getValue());
             handlerOptions.setCredentialStore(csOptions);
             handlerOptions.checkCredentialStoreOptions();
 

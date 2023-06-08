@@ -125,7 +125,7 @@ public class SOSProviderOptions extends SOSProviderOptionsSuperClass {
                         }
                     }
 
-                    kpd = new SOSKeePassDatabase(databaseFile, SOSKeePassDatabase.getModule(credentialStore.credentialStoreModule.getValue()));
+                    kpd = new SOSKeePassDatabase(databaseFile, SOSKeePassDatabase.getModule(credentialStore.credentialStoreKeePassModule.getValue()));
                     if (keePassKeyFile == null) {
                         kpd.load(keePassPassword);
                     } else {
