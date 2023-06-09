@@ -699,7 +699,7 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
                 SOSKeePassDatabase kpd = (SOSKeePassDatabase) kd;
                 org.linguafranca.pwdb.Entry<?, ?, ?, ?> entry = (org.linguafranca.pwdb.Entry<?, ?, ?, ?>) ke;
                 try {
-                    byte[] pr = kpd.getHandler().getAttachment(entry, getProviderOptions().keepass_attachment_property_name.getValue());
+                    byte[] pr = kpd.getAttachment(entry, getProviderOptions().keepass_attachment_property_name.getValue());
                     String keePassPath = entry.getPath() + SOSKeePassPath.PROPERTY_PREFIX + getProviderOptions().keepass_attachment_property_name
                             .getValue();
                     if (getProviderOptions().passphrase.isNotEmpty()) {

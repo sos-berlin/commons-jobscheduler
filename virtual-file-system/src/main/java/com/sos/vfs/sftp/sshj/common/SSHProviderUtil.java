@@ -23,7 +23,7 @@ public class SSHProviderUtil {
                     .getValue()));
         }
         try {
-            String pk = new String(kd.getHandler().getAttachment(ke, args.keepass_attachment_property_name.getValue()), "UTF-8");
+            String pk = new String(kd.getAttachment(ke, args.keepass_attachment_property_name.getValue()), "UTF-8");
             return sshClient.loadKeys(pk, null, SOSString.isEmpty(args.passphrase.getValue()) ? null : getPasswordFinder(args.passphrase.getValue()));
         } catch (Exception e) {
             String keePassPath = ke.getPath() + SOSKeePassPath.PROPERTY_PREFIX + args.keepass_attachment_property_name.getValue();
