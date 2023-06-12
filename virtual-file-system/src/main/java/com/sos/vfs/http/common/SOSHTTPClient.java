@@ -55,34 +55,6 @@ public class SOSHTTPClient {
         create(getProxySelector(options), getSSL(options), ntCredentials);
     }
 
-    public void setBaseUriOnNotExists() {
-        if (this.baseURI != null && this.baseURIPath != null) {
-            try {
-                String bu = this.baseURI.toString();
-                this.baseURI = new URI(bu.substring(0, bu.indexOf(baseURIPath)) + "/");
-                this.baseURIPath = baseURI.getPath();
-            } catch (URISyntaxException e) {
-                LOGGER.error(String.format("[setBaseUriOnNotExists][%s]%s", this.baseURI, e.toString()), e);
-            }
-        }
-    }
-
-    public CloseableHttpResponse execute(HttpRequestBase request) throws Exception {
-        // make sure request path is absolute
-        // handleURI(request);
-        // execute request and return response
-        if (client == null) {
-            throw new Exception("HTTPClient is null");
-        }
-        // setAuthHeader(request);
-        // request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 Firefox/26.0");
-        return client.execute(request, context);
-    }
-
-    private String normalizeValue(String val) {
-        return SOSString.isEmpty(val) ? null : val;
-    }
-
     private void create(SOSProxySelector proxy, SOSHTTPClientSSL ssl, boolean ntCredentials) throws Exception {
         if (baseURI == null) {
             return;
@@ -104,7 +76,8 @@ public class SOSHTTPClient {
             if (ntCredentials) {
                 provider.setCredentials(AuthScope.ANY, new NTCredentials(userName, password, getWorkstation(), domain));
             } else {
-                HttpHost targetHost = new HttpHost(baseURI.getHost());
+                // HttpHost targetHost = new HttpHost(baseURI.getHost());
+                HttpHost targetHost = new HttpHost(baseURI.getHost(), baseURI.getPort(), baseURI.getScheme());
                 provider.setCredentials(new AuthScope(targetHost), new UsernamePasswordCredentials(userName, password));
 
                 AuthCache authCache = new BasicAuthCache();
@@ -133,6 +106,37 @@ public class SOSHTTPClient {
         }
         builder.setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build());
         client = builder.build();
+    }
+
+    public CloseableHttpResponse execute(HttpRequestBase request) throws Exception {
+        // make sure request path is absolute
+        // handleURI(request);
+        // execute request and return response
+        if (client == null) {
+            throw new Exception("HTTPClient is null");
+        }
+        // setAuthHeader(request);
+        // request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 Firefox/26.0");
+        return client.execute(request, context);
+    }
+
+    public void setBaseUriOnNotExists() {
+        if (this.baseURI != null && this.baseURIPath != null) {
+            try {
+                String bu = this.baseURI.toString();
+                this.baseURI = new URI(bu.substring(0, bu.indexOf(baseURIPath)) + "/");
+                this.baseURIPath = baseURI.getPath();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("[setBaseUriOnNotExists][old=%s][new=%s]baseURIPath=%s", bu, baseURI, baseURIPath));
+                }
+            } catch (URISyntaxException e) {
+                LOGGER.error(String.format("[setBaseUriOnNotExists][%s]%s", this.baseURI, e.toString()), e);
+            }
+        }
+    }
+
+    private String normalizeValue(String val) {
+        return SOSString.isEmpty(val) ? null : val;
     }
 
     public int getPort() {

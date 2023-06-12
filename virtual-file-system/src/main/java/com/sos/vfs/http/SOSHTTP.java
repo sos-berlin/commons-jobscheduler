@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -148,7 +149,9 @@ public class SOSHTTP extends SOSCommonProvider {
         // entry.setParentPath(getFullParentFromPath(path));
         // http://test.sos:9080/my_file.txt
         entry.setParentPath(client.getRelativeDirectoryPath(client.normalizeURI(path)));
-
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[getFileEntry=%s]%s", path, SOSString.toString(entry)));
+        }
         return entry;
     }
 
@@ -176,14 +179,21 @@ public class SOSHTTP extends SOSCommonProvider {
             StatusLine sl = response.getStatusLine();
             boolean success = isSuccessStatusCode(sl);
             if (success) {
-                size = response.getEntity().getContentLength();
+                HttpEntity en = response.getEntity();
+                size = en.getContentLength();
+                if (size < 0) {// e.g. Transfer-Encoding: chunked
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format("[%s][size=%s]use getInputStreamLen", uri, size));
+                    }
+                    size = getInputStreamLen(en.getContent());
+                }
             } else {
                 if (sl.getStatusCode() != 404) {
                     throw new Exception(getResponseStatus(sl));
                 }
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[size][%s]%s", uri, SOSString.toString(sl)));
+                LOGGER.debug(String.format("[%s][size=%s]%s", uri, size, SOSString.toString(sl)));
             }
         } catch (Throwable e) {
             throwException(request, e);
@@ -191,6 +201,26 @@ public class SOSHTTP extends SOSCommonProvider {
             fileSizes.put(path, size);
         }
         return size;
+    }
+
+    private long getInputStreamLen(InputStream is) throws Exception {
+        long total = 0;
+        try {
+            int readed = 0;
+            byte[] buffer = new byte[1024];
+            while ((readed = is.read(buffer)) != -1) {
+                total += readed;
+            }
+        } catch (Throwable ex) {
+            throw ex;
+        } finally {
+            try {
+                is.close();
+            } catch (Throwable exx) {
+                //
+            }
+        }
+        return total;
     }
 
     @Override
@@ -268,11 +298,20 @@ public class SOSHTTP extends SOSCommonProvider {
     @Override
     public ISOSProviderFile getFile(String fileName) {
         try {
-            fileName = adjustFileSeparator(fileName);
-            if (!client.isAbsolute(fileName)) {
-                fileName = (client.getBaseURIPath() + fileName).replaceAll("//+", "/");
+            String fn = adjustFileSeparator(fileName);
+            if (!client.isAbsolute(fn)) {
+                String tfn = fileName.startsWith("/") ? fn : "/" + fn;
+                if (client.getBaseURIPath().endsWith(tfn + "/")) {// workaround host=https://<host>/myfile.txt and /myfile.txt
+                    fn = client.getBaseURIPath().substring(0, client.getBaseURIPath().length() - 1);
+                } else {
+                    fn = (client.getBaseURIPath() + fn).replaceAll("//+", "/");
+                }
             }
-            ISOSProviderFile file = new SOSHTTPFile(fileName);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[getFile][%s]%s", fileName, fn));
+            }
+
+            ISOSProviderFile file = new SOSHTTPFile(fn);
             file.setProvider(this);
 
             return file;
@@ -310,7 +349,11 @@ public class SOSHTTP extends SOSCommonProvider {
     @Override
     public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
         try {
-            HttpPut request = new HttpPut(client.normalizeURI(path));
+            URI uri = client.normalizeURI(path);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[getOutputStream][path=%s]uri=%s", path, uri));
+            }
+            HttpPut request = new HttpPut(uri);
             setHttpHeaders(request);
 
             return new SOSHTTPOutputStream(client.getClient(), request);
@@ -321,9 +364,12 @@ public class SOSHTTP extends SOSCommonProvider {
 
     @Override
     public InputStream getInputStream(String path) {
-
         try {
             URI uri = client.normalizeURI(path);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[getInputStream][path=%s]uri=%s", path, uri));
+            }
+
             CloseableHttpResponse response = null;
             try {
                 HttpGet request = new HttpGet(uri);
