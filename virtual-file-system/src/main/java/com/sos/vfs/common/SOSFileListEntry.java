@@ -28,6 +28,7 @@ import com.sos.vfs.common.interfaces.ISOSProviderFile;
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 import com.sos.vfs.common.options.SOSTransfer;
+import com.sos.vfs.local.SOSLocal;
 import com.sos.vfs.sftp.SOSSFTP;
 
 import sos.util.SOSDate;
@@ -256,7 +257,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     closed = true;
                     run = false;
                     endTime = Instant.now();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (parent.getRetryCountMax() < 1) {
                         throw e;
                     }
@@ -267,7 +268,6 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                         throw e;
                     }
 
-                    // LOGGER.error(String.format("[%s]%s", source.getName(), e.toString()), e);
                     JobSchedulerException.LastErrorMessage = "";
                     parent.setLastErrorMessage(e.toString());
                     LOGGER.warn(String.format("[%s][source=%s][target=%s]%s", transferNumber, source.getName(), target.getName(), e.toString()), e);
@@ -277,11 +277,15 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                         closed = true;
                     }
 
-                    ISOSProviderFile vfs = tryReconnect(parent.getSourceProvider(), source, retryCountSource);
+                    ReconnectResult rvfs = tryReconnect("Source", parent.getSourceProvider(), source, retryCountSource);
+                    retryCountSource = rvfs.counter;
+                    ISOSProviderFile vfs = rvfs.providerFile;
                     if (vfs != null) {
                         source = vfs;
                     }
-                    ISOSProviderFile vft = tryReconnect(parent.getTargetProvider(), target, retryCountTarget);
+                    ReconnectResult rvft = tryReconnect("Target", parent.getTargetProvider(), target, retryCountTarget);
+                    retryCountTarget = rvft.counter;
+                    ISOSProviderFile vft = rvft.providerFile;
                     if (vft != null) {
                         target = vft;
                     }
@@ -340,9 +344,14 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         }
     }
 
-    private ISOSProviderFile tryReconnect(ISOSProvider provider, ISOSProviderFile file, int retryCount) {
+    private ReconnectResult tryReconnect(String range, ISOSProvider provider, ISOSProviderFile file, int retryCount) {
+        ReconnectResult r = new ReconnectResult();
+        r.counter = retryCount;
+
         if (provider.isConnected()) {
-            return null;
+            if (!(provider instanceof SOSLocal)) {
+                return r;
+            }
         }
 
         boolean run = true;
@@ -350,11 +359,11 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             try {
                 JobSchedulerException.LastErrorMessage = "";
 
-                retryCount++;
+                r.counter++;
                 LOGGER.info("----------------------------------------------------");
-                LOGGER.info(String.format("[%s][%s][%s] connection lost. wait %s and try reconnect %s of %s ...", transferNumber, provider
-                        .getProviderOptions().getRange(), file.getName(), parent.getBaseOptions().connection_error_retry_interval.getValue(),
-                        retryCount, parent.getBaseOptions().connection_error_retry_count_max.value()));
+                LOGGER.info(String.format("[%s][%s][%s]wait %s and try reconnect %s of %s ...", transferNumber, range, file.getName(), parent
+                        .getBaseOptions().connection_error_retry_interval.getValue(), r.counter, parent
+                                .getBaseOptions().connection_error_retry_count_max.value()));
                 LOGGER.info("----------------------------------------------------");
                 if (parent.getRetryInterval() > 0) {
                     try {
@@ -364,10 +373,10 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     }
                 }
                 provider.reconnect();
-                return provider.getFile(file.getName());
+                r.providerFile = provider.getFile(file.getName());
+                return r;
             } catch (Throwable e) {
-                LOGGER.warn(e.toString(), e);
-                if (retryCount == parent.getRetryCountMax()) {
+                if (r.counter == parent.getRetryCountMax()) {
                     run = false;
                     throw e;
                 } else {
@@ -375,7 +384,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 }
             }
         }
-        return null;
+        return r;
     }
 
     private void updateDb(Long id, String type, Map<String, String> values) {
@@ -432,7 +441,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                             if (targetFile.fileExists()) {
                                 targetFile.delete(false);
                             }
-                        } catch (Exception ex) {
+                        } catch (Throwable ex) {
                             LOGGER.debug(ex.toString(), ex);
                         }
                         setStatus(TransferStatus.transfer_aborted);
@@ -763,7 +772,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     public ISOSProviderFile getTargetFile() throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s]-------------------------------------", transferNumber));
+            LOGGER.debug(String.format("[%s][sourceFileName=%s]-------------------------------------", transferNumber, sourceFileName));
         }
         ISOSProviderFile sourceFile = parent.getSourceProvider().getFile(sourceFileName);
         sourceTransferFileName = sourceFile.getName();
@@ -881,7 +890,6 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                         targetFile.getName())));
             }
         }
-
         return targetFile;
     }
 
@@ -1238,7 +1246,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                         sourceFile.delete(false);
                         transferStatus = TransferStatus.moved;
                         logSourceFileDeleted();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         transferStatus = TransferStatus.transfer_aborted;
                         targetFile.delete(false);
                         String msg = String.format("[%s][transfer_aborted]Target=%s deleted", transferNumber, SOSCommonProvider.normalizePath(
@@ -1250,12 +1258,20 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 }
             }
         } catch (JobSchedulerException e) {
+            setTransferredStatusAborted();
             LOGGER.error(SOSVfs_E_229.params(e));
             throw e;
         } catch (Exception e) {
+            setTransferredStatusAborted();
             String msg = SOSVfs_E_229.params(e);
             LOGGER.error(msg);
             throw new JobSchedulerException(msg, e);
+        }
+    }
+
+    private void setTransferredStatusAborted() {
+        if (transferStatus == null || transferStatus.equals(TransferStatus.transferred)) {
+            transferStatus = TransferStatus.transfer_aborted;
         }
     }
 
@@ -1479,6 +1495,12 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
     public long getTransferNumber() {
         return transferNumber;
+    }
+
+    private class ReconnectResult {
+
+        private ISOSProviderFile providerFile;
+        private int counter;
     }
 
     private class EntryPaths {

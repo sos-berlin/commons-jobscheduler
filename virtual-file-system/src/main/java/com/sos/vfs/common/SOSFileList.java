@@ -444,7 +444,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                 entry.rollbackRenameSourceFile();
             }
         } else {
-            String msg = "Set transfer status";
+            String msg = "Set transfer status " + TransferStatus.transfer_aborted + " for files not transferred";
             LOGGER.info(msg);
             JADE_REPORT_LOGGER.info(msg);
             for (SOSFileListEntry entry : fileListEntries) {
