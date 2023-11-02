@@ -66,7 +66,8 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
 
         HttpPropfind request = client.getConnectRequestMethod();
         try (CloseableHttpResponse response = client.execute(request)) {
-            getMuiltiStatus(request, response);
+            // getMuiltiStatus(request, response);
+            SOSHTTPClient.checkConnectResponse(client.getBaseURI(), response);
         } catch (Throwable e) {
             throwException(request, e);
         }
@@ -137,10 +138,9 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     private void mkSingleDir(final String path) throws Exception {
         URI uri = client.normalizeURI(path.endsWith("/") ? path : (path + "/"));
         try (CloseableHttpResponse response = client.execute(new HttpMkcol(uri))) {
-            StatusLine statusLine = response.getStatusLine();
-            int status = statusLine.getStatusCode();
-            if (status / 100 != 2) {
-                throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+            StatusLine sl = response.getStatusLine();
+            if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
             }
         }
     }
@@ -163,10 +163,9 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     private void executeDeleteMethod(final String path) throws Exception {
         URI uri = client.normalizeURI(path);
         try (CloseableHttpResponse response = client.execute(new HttpDelete(uri))) {
-            StatusLine statusLine = response.getStatusLine();
-            int status = statusLine.getStatusCode();
-            if (status / 100 != 2) {
-                throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+            StatusLine sl = response.getStatusLine();
+            if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
             }
         }
     }
@@ -269,9 +268,6 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
 
             // http://test.sos:9080/transfer-1/
             URI uri = client.normalizeURI(path);
-            // /transfer-1
-            String parentPath = client.getRelativeDirectoryPath(uri);
-
             HttpPropfind request = getFileInfoRequestMethod(uri, DavConstants.DEPTH_1);
             try (CloseableHttpResponse response = client.execute(request)) {
                 MultiStatus multiStatus = getMuiltiStatus(request, response);
@@ -289,7 +285,7 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
                             }
                             // ignore first entry
                         } else {
-                            result.add(getFileEntry(parentPath, r));
+                            result.add(getFileEntry(path, r));
                         }
 
                         i++;
@@ -349,11 +345,13 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     @Override
     public void rename(String from, String to) {
         try {
-            try (CloseableHttpResponse response = client.execute(new HttpMove(client.normalizeURI(from), client.normalizeURI(to), true))) {
-                StatusLine statusLine = response.getStatusLine();
-                int status = statusLine.getStatusCode();
-                if (status / 100 != 2) {
-                    throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+            URI ufrom = client.normalizeURI(from);
+            URI uto = client.normalizeURI(to);
+
+            try (CloseableHttpResponse response = client.execute(new HttpMove(ufrom, uto, true))) {
+                StatusLine sl = response.getStatusLine();
+                if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                    throw new Exception(SOSHTTPClient.getResponseStatus(ufrom, uto, sl));
                 }
             }
         } catch (Throwable e) {
@@ -373,10 +371,9 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
             try {
                 response = client.execute(new HttpGet(uri));
 
-                StatusLine statusLine = response.getStatusLine();
-                int status = statusLine.getStatusCode();
-                if (status / 100 != 2) {
-                    throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+                StatusLine sl = response.getStatusLine();
+                if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                    throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
                 }
                 return new SOSWebDAVInputStream(response);
             } catch (Throwable e) {
@@ -404,17 +401,24 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
 
     @Override
     public ISOSProviderFile getFile(String fileName) {
+        String fn = "";
         try {
-            fileName = adjustFileSeparator(fileName);
-            if (!client.isAbsolute(fileName)) {
-                fileName = (client.getBaseURIPath() + fileName).replaceAll("//+", "/");
+            fn = adjustFileSeparator(fileName);
+            if (!client.isAbsolute(fn)) {
+                if (!fn.startsWith(client.getBaseURIPath())) {
+                    fn = (client.getBaseURIPath() + fn).replaceAll("//+", "/");
+                }
             }
-            ISOSProviderFile file = new SOSWebDAVFile(fileName);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[getFile][%s]%s", fileName, fn));
+            }
+
+            ISOSProviderFile file = new SOSWebDAVFile(fn);
             file.setProvider(this);
 
             return file;
         } catch (Throwable e) {
-            LOGGER.error(String.format("[getFile][%s]%s", fileName, e.toString()), e);
+            LOGGER.error(String.format("[getFile][%s][%s]%s", fileName, fn, e.toString()), e);
             return null;
         }
     }
@@ -497,12 +501,11 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
         try {
             Instant start = Instant.now();
 
-            try (CloseableHttpResponse response = client.execute(new HttpCopy(client.normalizeURI(source), client.normalizeURI(target), true,
-                    false))) {
-                StatusLine statusLine = response.getStatusLine();
-                int status = statusLine.getStatusCode();
-                if (status / 100 != 2) {
-                    throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+            URI nu = client.normalizeURI(target);
+            try (CloseableHttpResponse response = client.execute(new HttpCopy(client.normalizeURI(source), nu, true, false))) {
+                StatusLine sl = response.getStatusLine();
+                if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                    throw new Exception(SOSHTTPClient.getResponseStatus(nu, sl));
                 }
             }
             Instant end = Instant.now();

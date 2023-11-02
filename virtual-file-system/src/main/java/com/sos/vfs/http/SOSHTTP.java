@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,11 +92,12 @@ public class SOSHTTP extends SOSCommonProvider {
     }
 
     private void checkConnection() throws Exception {
-        HttpGet request = new HttpGet(client.getBaseURI());
+        URI uri = client.getBaseURI();
+        HttpGet request = new HttpGet(uri);
         setHttpHeaders(request);
 
         try (CloseableHttpResponse response = client.execute(request)) {
-            checkConnectResponse(response);
+            checkConnectResponse(uri, response);
         } catch (Throwable e) {
             throwException(request, e);
         }
@@ -177,7 +177,7 @@ public class SOSHTTP extends SOSCommonProvider {
 
         try (CloseableHttpResponse response = client.execute(request)) {
             StatusLine sl = response.getStatusLine();
-            boolean success = isSuccessStatusCode(sl);
+            boolean success = SOSHTTPClient.isSuccessStatusCode(sl);
             if (success) {
                 HttpEntity en = response.getEntity();
                 size = en.getContentLength();
@@ -189,7 +189,7 @@ public class SOSHTTP extends SOSCommonProvider {
                 }
             } else {
                 if (sl.getStatusCode() != 404) {
-                    throw new Exception(getResponseStatus(sl));
+                    throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
                 }
             }
             if (LOGGER.isDebugEnabled()) {
@@ -232,7 +232,7 @@ public class SOSHTTP extends SOSCommonProvider {
         URI uri;
         try {
             uri = client.normalizeURI(path);
-        } catch (URISyntaxException e) {
+        } catch (Throwable e) {
             throw new JobSchedulerException(String.format("[%s]%s", path, e.toString()), e);
         }
         HttpDelete request = new HttpDelete(uri);
@@ -240,8 +240,8 @@ public class SOSHTTP extends SOSCommonProvider {
 
         try (CloseableHttpResponse response = client.execute(request)) {
             StatusLine sl = response.getStatusLine();
-            if (!isSuccessStatusCode(sl)) {
-                throw new Exception(getResponseStatus(sl));
+            if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
             }
         } catch (Throwable e) {
             reply = e.toString();
@@ -256,7 +256,7 @@ public class SOSHTTP extends SOSCommonProvider {
         URI uriTo;
         try {
             uriTo = client.normalizeURI(to);
-        } catch (URISyntaxException e) {
+        } catch (Throwable e) {
             throw new JobSchedulerException(String.format("[to=%s]%s", to, e.toString()), e);
         }
 
@@ -275,8 +275,8 @@ public class SOSHTTP extends SOSCommonProvider {
                 } catch (Throwable ex) {
                 }
                 StatusLine sl = response.getStatusLine();
-                if (!isSuccessStatusCode(sl)) {
-                    throw new Exception(getResponseStatus(sl));
+                if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                    throw new Exception(SOSHTTPClient.getResponseStatus(uriTo, sl));
                 }
                 delete(from, false);
             } catch (Throwable e) {
@@ -297,8 +297,9 @@ public class SOSHTTP extends SOSCommonProvider {
 
     @Override
     public ISOSProviderFile getFile(String fileName) {
+        String fn = "";
         try {
-            String fn = adjustFileSeparator(fileName);
+            fn = adjustFileSeparator(fileName);
             if (!client.isAbsolute(fn)) {
                 String tfn = fileName.startsWith("/") ? fn : "/" + fn;
                 if (client.getBaseURIPath().endsWith(tfn + "/")) {// workaround host=https://<host>/myfile.txt and /myfile.txt
@@ -316,7 +317,7 @@ public class SOSHTTP extends SOSCommonProvider {
 
             return file;
         } catch (Throwable e) {
-            LOGGER.error(String.format("[getFile][%s]%s", fileName, e.toString()), e);
+            LOGGER.error(String.format("[getFile][%s][%s]%s", fileName, fn, e.toString()), e);
             return null;
         }
     }
@@ -325,7 +326,7 @@ public class SOSHTTP extends SOSCommonProvider {
     public boolean fileExists(final String path) {
         try {
             return size(path) > -1;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
 
@@ -356,7 +357,7 @@ public class SOSHTTP extends SOSCommonProvider {
             HttpPut request = new HttpPut(uri);
             setHttpHeaders(request);
 
-            return new SOSHTTPOutputStream(client.getClient(), request);
+            return new SOSHTTPOutputStream(client.getClient(), request, uri);
         } catch (Throwable ex) {
             throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", path), ex);
         }
@@ -377,10 +378,9 @@ public class SOSHTTP extends SOSCommonProvider {
 
                 response = client.execute(request);
 
-                StatusLine statusLine = response.getStatusLine();
-                int status = statusLine.getStatusCode();
-                if (status / 100 != 2) {
-                    throw new Exception(String.format("[%s]%s", status, statusLine.getReasonPhrase()));
+                StatusLine sl = response.getStatusLine();
+                if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                    throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
                 }
                 return new SOSHTTPInputStream(response);
             } catch (Throwable e) {
@@ -397,42 +397,10 @@ public class SOSHTTP extends SOSCommonProvider {
         }
     }
 
-    private boolean isSuccessStatusCode(StatusLine statusLine) {
-        int sc = statusLine.getStatusCode();
-        if (sc >= 200 && sc < 300) {
-            return true;
-        }
-        return false;
-    }
-
-    private void checkConnectResponse(CloseableHttpResponse response) throws Exception {
-        StatusLine statusLine = response.getStatusLine();
-        int sc = statusLine.getStatusCode();
-        if (sc >= 500) {
-            throw new Exception(getResponseStatus(statusLine));
-        } else if (sc == 404) {
+    private void checkConnectResponse(URI uri, CloseableHttpResponse response) throws Exception {
+        int sc = SOSHTTPClient.checkConnectResponse(uri, response);
+        if (sc == 404) {
             client.setBaseUriOnNotExists();
-        }
-    }
-
-    private String getResponseStatus(StatusLine statusLine) throws Exception {
-        return getResponseStatus(statusLine, null);
-    }
-
-    private String getResponseStatus(StatusLine statusLine, Exception ex) throws Exception {
-        int code = -1;
-        String text = "";
-        try {
-            code = statusLine.getStatusCode();
-            text = statusLine.getReasonPhrase();
-
-        } catch (Throwable e) {
-
-        }
-        if (ex == null) {
-            return String.format("HTTP[%s]%s", code, text);
-        } else {
-            return String.format("HTTP[%s][%s]%s", code, text, ex);
         }
     }
 

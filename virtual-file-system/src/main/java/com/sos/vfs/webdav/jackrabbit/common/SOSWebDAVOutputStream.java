@@ -11,6 +11,9 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HTTP;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.vfs.http.common.SOSHTTPClient;
+
 public class SOSWebDAVOutputStream extends ByteArrayOutputStream {
 
     private CloseableHttpClient client;
@@ -26,12 +29,15 @@ public class SOSWebDAVOutputStream extends ByteArrayOutputStream {
     public void close() throws IOException {
         try {
             executePutMethod(this.toByteArray());
+        } catch (Throwable e) {
+            // throw run time exception
+            throw new JobSchedulerException(e);
         } finally {
             super.close();
         }
     }
 
-    private boolean executePutMethod(byte[] data) throws IOException {
+    private void executePutMethod(byte[] data) throws Exception {
         HttpPut p = new HttpPut(uri);
 
         p.addHeader(HTTP.EXPECT_DIRECTIVE, HTTP.EXPECT_CONTINUE);
@@ -39,12 +45,10 @@ public class SOSWebDAVOutputStream extends ByteArrayOutputStream {
         p.setEntity(new ByteArrayEntity(data));
 
         try (CloseableHttpResponse response = client.execute(p)) {
-            StatusLine statusLine = response.getStatusLine();
-            int status = statusLine.getStatusCode();
-            if (status / 100 != 2) {
-                return false;
+            StatusLine sl = response.getStatusLine();
+            if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
+                throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));
             }
         }
-        return true;
     }
 }

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.http.HttpHost;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -258,7 +259,11 @@ public class SOSHTTPClient {
         if (isAbsolute(rel)) {
             return new URI(rel).normalize();
         }
-        return baseURI.resolve(new URI(rel)).normalize();
+        try {
+            return baseURI.resolve(new URI(rel)).normalize();
+        } catch (Throwable e) {
+            return baseURI.resolve(new URI(rel.replaceAll(" ", "%20"))).normalize();
+        }
     }
 
     public HttpPropfind getConnectRequestMethod() throws IOException {
@@ -289,6 +294,64 @@ public class SOSHTTPClient {
         } catch (Throwable e) {
             return "unknown";
         }
+    }
+
+    public static boolean isSuccessStatusCode(StatusLine statusLine) {
+        int sc = statusLine.getStatusCode();
+        if (sc >= 200 && sc < 300) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void checkForServerError(String uri, CloseableHttpResponse response) throws Exception {
+        StatusLine statusLine = response.getStatusLine();
+        int sc = statusLine.getStatusCode();
+        if (sc >= 500) {
+            throw new Exception(getResponseStatus(uri, statusLine));
+        }
+    }
+
+    public static String getResponseStatus(String uri, StatusLine statusLine) throws Exception {
+        return getResponseStatus(uri, statusLine, null);
+    }
+
+    public static String getResponseStatus(URI uri, StatusLine statusLine) throws Exception {
+        String u = uri == null ? "" : uri.toString();
+        return getResponseStatus(u, statusLine, null);
+    }
+
+    public static String getResponseStatus(URI from, URI to, StatusLine statusLine) throws Exception {
+        String u = from == null ? "" : from.toString();
+        if (to != null) {
+            u = u + "-" + to.toString();
+        }
+        return getResponseStatus(u, statusLine, null);
+    }
+
+    public static String getResponseStatus(String uri, StatusLine statusLine, Exception ex) throws Exception {
+        int code = -1;
+        String text = "";
+        try {
+            code = statusLine.getStatusCode();
+            text = statusLine.getReasonPhrase();
+        } catch (Throwable e) {
+
+        }
+        if (ex == null) {
+            return String.format("[%s][%s]%s", uri, code, text);
+        } else {
+            return String.format("[%s][%s][%s]%s", uri, code, text, ex);
+        }
+    }
+
+    public static int checkConnectResponse(URI uri, CloseableHttpResponse response) throws Exception {
+        StatusLine sl = response.getStatusLine();
+        int sc = sl.getStatusCode();
+        if (sc >= 500) {
+            throw new Exception(getResponseStatus(uri, sl));
+        }
+        return sc;
     }
 
 }
