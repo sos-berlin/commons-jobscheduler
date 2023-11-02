@@ -3,12 +3,14 @@ package com.sos.vfs.local;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -53,9 +55,41 @@ public class SOSLocal extends SOSCommonProvider {
     }
 
     @Override
-    public void delete(final String pathname, boolean checkIsDirectory) throws IOException {
-        File file = new File(pathname);
-        file.delete();
+    public void delete(final String pathname, boolean checkIsDirectory) {
+        Path path = null;
+        try {
+            path = Paths.get(pathname).toAbsolutePath();
+            Files.delete(path);
+        } catch (Throwable ex) {
+            reply = ex.toString();
+            throw new JobSchedulerException(SOSVfs_E_187.params("delete", pathname), ex);
+        }
+        reply = "rm OK";
+        LOGGER.info(getHostID(SOSVfs_D_181.params("delete", path, getReplyString())));
+    }
+
+    @Override
+    public void rename(String oldpath, String newpath) {
+        Path source = null;
+        Path dest = null;
+        try {
+            source = Paths.get(oldpath).toAbsolutePath();
+            dest = Paths.get(newpath).toAbsolutePath();
+            if (!Files.exists(dest)) {
+                try {
+                    Files.move(source, dest, StandardCopyOption.ATOMIC_MOVE);
+                } catch (AtomicMoveNotSupportedException e) {
+                    Files.move(source, dest);
+                }
+            } else {
+                Files.move(source, dest, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Throwable e) {
+            reply = e.toString();
+            throw new JobSchedulerException(SOSVfs_E_188.params("rename", oldpath, newpath), e);
+        }
+        reply = "mv OK";
+        LOGGER.info(getHostID(SOSVfs_I_189.params(source, dest, getReplyString())));
     }
 
     @Override
@@ -335,7 +369,7 @@ public class SOSLocal extends SOSCommonProvider {
     public void mkdir(final String pathname) throws IOException {
         File dir = new File(pathname);
         if (!dir.exists()) {
-            dir.mkdirs();
+            Files.createDirectories(dir.toPath().toAbsolutePath());
         } else {
             if (!dir.isDirectory()) {
                 throw new JobSchedulerException(SOSVfs_E_277.params(pathname));
