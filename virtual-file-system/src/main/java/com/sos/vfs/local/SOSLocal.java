@@ -62,7 +62,7 @@ public class SOSLocal extends SOSCommonProvider {
             Files.delete(path);
         } catch (Throwable ex) {
             reply = ex.toString();
-            throw new JobSchedulerException(SOSVfs_E_187.params("delete", pathname), ex);
+            throw new JobSchedulerException("[delete]" + reply, ex);
         }
         reply = "rm OK";
         LOGGER.info(getHostID(SOSVfs_D_181.params("delete", path, getReplyString())));
@@ -86,7 +86,7 @@ public class SOSLocal extends SOSCommonProvider {
             }
         } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_188.params("rename", oldpath, newpath), e);
+            throw new JobSchedulerException("[rename]" + reply, e);
         }
         reply = "mv OK";
         LOGGER.info(getHostID(SOSVfs_I_189.params(source, dest, getReplyString())));

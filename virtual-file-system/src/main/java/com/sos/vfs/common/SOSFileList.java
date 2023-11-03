@@ -457,7 +457,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
         if (!options.transactional.value()) {
             try {
                 deleteSourceFiles();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOGGER.error(e.toString());
             }
         }
