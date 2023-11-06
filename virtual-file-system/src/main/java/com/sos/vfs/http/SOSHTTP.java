@@ -105,7 +105,7 @@ public class SOSHTTP extends SOSCommonProvider {
 
     @Override
     public void mkdir(final String pathname) throws IOException {
-        LOGGER.info("[mkdir][not implemented yet]" + pathname);
+        LOGGER.debug("[mkdir][not implemented yet]" + pathname);
     }
 
     @Override
@@ -127,7 +127,9 @@ public class SOSHTTP extends SOSCommonProvider {
                 isDirectory = response.getStatusLine().getStatusCode() <= 400;
             }
         } catch (Throwable e) {
-            // LOGGER.error(e.toString(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[" + path + "]" + e.toString(), e);
+            }
         }
         return isDirectory;
     }

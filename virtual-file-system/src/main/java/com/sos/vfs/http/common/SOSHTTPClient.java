@@ -125,7 +125,7 @@ public class SOSHTTPClient {
         if (this.baseURI != null && this.baseURIPath != null) {
             try {
                 String bu = this.baseURI.toString();
-                this.baseURI = new URI(bu.substring(0, bu.indexOf(baseURIPath)) + "/");
+                this.baseURI = createURI(bu.substring(0, bu.indexOf(baseURIPath)) + "/");
                 this.baseURIPath = baseURI.getPath();
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(String.format("[setBaseUriOnNotExists][old=%s][new=%s]baseURIPath=%s", bu, baseURI, baseURIPath));
@@ -174,7 +174,7 @@ public class SOSHTTPClient {
                 sb.append("/");
             }
         }
-        return new URI(sb.toString());
+        return createURI(sb.toString());
     }
 
     private SOSHTTPClientSSL getSSL(final SOSProviderOptions options) {
@@ -256,13 +256,23 @@ public class SOSHTTPClient {
     }
 
     public URI normalizeURI(String rel) throws URISyntaxException {
+        URI uri = null;
         if (isAbsolute(rel)) {
-            return new URI(rel).normalize();
+            uri = createURI(rel).normalize();
+        } else {
+            uri = baseURI.resolve(createURI(rel)).normalize();
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("[normalizeURI]" + uri);
+        }
+        return uri;
+    }
+
+    private URI createURI(String uri) throws URISyntaxException {
         try {
-            return baseURI.resolve(new URI(rel)).normalize();
+            return new URI(uri);
         } catch (Throwable e) {
-            return baseURI.resolve(new URI(rel.replaceAll(" ", "%20"))).normalize();
+            return new URI(uri.replaceAll(" ", "%20"));
         }
     }
 

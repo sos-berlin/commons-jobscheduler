@@ -1277,7 +1277,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         } catch (JobSchedulerException e) {
             setTransferredStatusAborted();
             Throwable t = e.getCause() == null ? e : e.getCause();
-            LOGGER.error("[" + transferNumber + "][" + transferStatus + "][Source=" + sourceFileName + "]" + e.toString(), t);
+            LOGGER.error("[" + transferNumber + "][" + transferStatus + "][Source=" + sourceFileName + "]" + e.getMessage(), t);
             throw e;
         } catch (Throwable e) {
             setTransferredStatusAborted();
