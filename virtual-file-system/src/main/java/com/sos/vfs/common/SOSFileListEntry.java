@@ -328,10 +328,18 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             // e.printStackTrace();
             setEntryErrorMessage(parent.getSourceProvider(), parent.getTargetProvider(), e);
             throw e;
-        } catch (Exception e) {
-            // e.printStackTrace();
-            parent.setLastErrorMessage(e.toString());
-            throw new JobSchedulerException(e);
+        } catch (Throwable e) {
+            StringBuilder sb = new StringBuilder("[").append(transferNumber).append("]");
+            if (parent.getSourceProvider() != null) {
+                sb.append("[source=").append(sourceFileName).append("]");
+            }
+            if (parent.getTargetProvider() != null) {
+                sb.append("[target=").append(targetTransferFileName).append("]");
+            }
+            sb.append(e.toString());
+            String msg = sb.toString();
+            parent.setLastErrorMessage(msg);
+            throw new JobSchedulerException(msg, e);
         } finally {
             if (endTime == null) {
                 endTime = Instant.now();
@@ -791,7 +799,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 try {
                     targetFileName = parent.getBaseOptions().getReplacing().doReplace(targetFileName, parent.getBaseOptions().getReplacement()
                             .getValue());
-                } catch (Exception e) {
+                } catch (JobSchedulerException e) {
+                    throw e;
+                } catch (Throwable e) {
                     throw new JobSchedulerException(SOSVfs_E_0150.get() + " " + e.toString(), e);
                 }
             }
@@ -928,7 +938,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
 
             } catch (JobSchedulerException e) {
                 throw e;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
             }
         }
@@ -989,8 +999,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         String replacement = parent.getBaseOptions().getReplacement().getValue();
         try {
             name = parent.getBaseOptions().getReplacing().doReplace(name, replacement);
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
         }
         return name;
@@ -1034,7 +1045,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     parent.getSourceProvider().mkdir(parentName);
                 }
                 sourceFile.rename(sourceFileNameRenamed);
-            } catch (Exception e) {
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Throwable e) {
                 throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
             }
         }
@@ -1048,7 +1061,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 if (!sourceFile.fileExists() && sourceFileRenamed.fileExists()) {
                     sourceFileRenamed.rename(sourceFileName);
                 }
-            } catch (Exception e) {
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Throwable e) {
                 throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
             }
         }
@@ -1090,7 +1105,9 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                 targetTransferFile.rename(targetFileNewName);
                 LOGGER.info(String.format("[%s]%s", transferNumber, SOSVFSMessageCodes.SOSVfs_I_150.params(targetFileOldName, SOSCommonProvider
                         .normalizePath(targetFileNewName))));
-            } catch (Exception e) {
+            } catch (JobSchedulerException e) {
+                throw e;
+            } catch (Throwable e) {
                 throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
             }
         }
@@ -1259,19 +1276,45 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
             }
         } catch (JobSchedulerException e) {
             setTransferredStatusAborted();
-            LOGGER.error(SOSVfs_E_229.params(e));
+            Throwable t = e.getCause() == null ? e : e.getCause();
+            LOGGER.error("[" + transferNumber + "][" + transferStatus + "][Source=" + sourceFileName + "]" + e.getMessage(), t);
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             setTransferredStatusAborted();
-            String msg = SOSVfs_E_229.params(e);
+            String msg = "[" + transferNumber + "][" + transferStatus + "][Source=" + sourceFileName + "]" + e.toString();
             LOGGER.error(msg);
             throw new JobSchedulerException(msg, e);
         }
     }
 
     private void setTransferredStatusAborted() {
-        if (transferStatus == null || transferStatus.equals(TransferStatus.transferred)) {
-            transferStatus = TransferStatus.transfer_aborted;
+        if (transferStatus == null) {
+            setStatus(TransferStatus.transfer_aborted);
+            return;
+        }
+
+        switch (transferStatus) {
+        case deleted:
+        case ignoredDueToZerobyteConstraint:
+        case moved:
+        case notOverwritten:
+            break;
+        case polling:
+        case renamed:
+        case compressed:
+        case setBack:
+        case transferInProgress:
+        case transferUndefined:
+        case transfer_aborted:
+        case transfer_has_errors:
+        case transfer_skipped:
+        case transferred:
+        case transferring:
+        case waiting4transfer:
+            setStatus(TransferStatus.transfer_aborted);
+            break;
+        default:
+            break;
         }
     }
 

@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.interfaces.ISOSProvider;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSCommonProviderFile extends SOSCommonFile {
@@ -45,7 +45,9 @@ public class SOSCommonProviderFile extends SOSCommonFile {
     public boolean delete(boolean checkIsDirectory) {
         try {
             getProvider().delete(fileName, checkIsDirectory);
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             SOSVfs_E_158.get();
             throw new JobSchedulerException(SOSVfs_E_158.params("delete()", fileName), e);
         }
@@ -59,7 +61,9 @@ public class SOSCommonProviderFile extends SOSCommonFile {
                 fileName = adjustRelativePathName(fileName);
                 setInputStream(getProvider().getInputStream(fileName));
             }
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             throw new JobSchedulerException(SOSVfs_E_158.params("getFileInputStream()", fileName), e);
         }
         return getInputStream();
@@ -74,7 +78,9 @@ public class SOSCommonProviderFile extends SOSCommonFile {
         long lngFileSize = -1;
         try {
             lngFileSize = getProvider().getFileSize(fileName);
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
         }
         return lngFileSize;
@@ -105,10 +111,15 @@ public class SOSCommonProviderFile extends SOSCommonFile {
         try {
             if (getInputStream() != null) {
                 getInputStream().close();
-                setInputStream(null);
             }
-        } catch (Exception ex) {
-            //
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable ex) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(ex.toString(), ex);
+            }
+        } finally {
+            setInputStream(null);
         }
     }
 
@@ -118,10 +129,15 @@ public class SOSCommonProviderFile extends SOSCommonFile {
             if (getOutputStream() != null) {
                 getOutputStream().flush();
                 getOutputStream().close();
-                setOutputStream(null);
             }
-        } catch (Exception ex) {
-            //
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable ex) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(ex.toString(), ex);
+            }
+        } finally {
+            setOutputStream(null);
         }
     }
 
