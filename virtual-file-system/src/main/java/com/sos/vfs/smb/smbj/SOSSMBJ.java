@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msdtyp.FileTime;
 import com.hierynomus.mserref.NtStatus;
+import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileAllInformation;
 import com.hierynomus.msfscc.fileinformation.FileBasicInformation;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
@@ -37,7 +38,7 @@ import com.hierynomus.smbj.SmbConfig.Builder;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
-import com.hierynomus.smbj.share.Directory;
+import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import com.hierynomus.smbj.utils.SmbFiles;
@@ -63,6 +64,7 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     private Session session = null;
     private DiskShare diskShare;
     private String shareName;
+    boolean accessMaskMaximumAllowed = false;
 
     public SOSSMBJ() {
         super();
@@ -77,7 +79,6 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         } catch (Throwable ex) {
             throw new JobSchedulerException(getLogPrefix(), ex);
         }
-
     }
 
     @Override
@@ -109,10 +110,13 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
 
     @Override
     public boolean fileExists(String path) {
-        if (!connectShare(path)) {
-            return false;
+        tryConnectShare("fileExists", path);
+
+        boolean result = diskShare.fileExists(getSmbPath(path));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]fileExists=%s", path, result));
         }
-        return diskShare.fileExists(getSmbPath(path));
+        return result;
     }
 
     @Override
@@ -122,23 +126,15 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
 
     @Override
     public long size(final String path) throws Exception {
-        long size = -1;
+        tryConnectShare("size", path);
 
+        long size = -1;
         try (File f = openFile2Read(path)) {
             if (f != null) {
                 size = getSize(f.getFileInformation());
             }
         } catch (SMBApiException e) {
             switch (NtStatus.valueOf(e.getStatusCode())) {
-            case STATUS_FILE_IS_A_DIRECTORY:
-                try (Directory d = openDirectoryForRead(path)) {
-                    if (d != null) {
-                        size = getSize(d.getFileInformation());
-                    }
-                } catch (Throwable ee) {
-                    LOGGER.warn(String.format("%s[%s][size][directory]%s", getLogPrefix(), path, ee.toString()), ee);
-                }
-                break;
             case STATUS_OBJECT_NAME_NOT_FOUND:
                 break;
             default:
@@ -153,9 +149,8 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
 
     @Override
     public boolean isDirectory(final String path) {
-        if (!connectShare(path)) {
-            return false;
-        }
+        tryConnectShare("isDirectory", path);
+
         try {
             return diskShare.getFileInformation(getSmbPath(path)).getStandardInformation().isDirectory();
         } catch (Throwable e) {
@@ -169,27 +164,26 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     @Override
     public void mkdir(final String path) {
         try {
-            if (!connectShare(path)) {
-                return;
-            }
+            tryConnectShare("mkdir", path);
 
             new SmbFiles().mkdirs(diskShare, getSmbPath(path));
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[mkdir][%s]created", getLogPrefix(), path));
             }
             reply = "OK";
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[mkdir][%s]", getLogPrefix(), path), e);
+            throw e;
+        } catch (Throwable e) {
+            reply = e.toString();
+            throw new JobSchedulerException(String.format("%s[mkdir][%s]%s", getLogPrefix(), path, reply), e);
         }
     }
 
     @Override
     public void rmdir(String path) {
         try {
-            if (!connectShare(path)) {
-                return;
-            }
+            tryConnectShare("rmdir", path);
 
             diskShare.rmdir(getSmbPath(path), true);
             reply = "rmdir OK";
@@ -197,18 +191,16 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[rmdir][%s]", getLogPrefix(), path), e);
+            throw new JobSchedulerException(String.format("%s[rmdir][%s]%s", getLogPrefix(), path, reply), e);
         }
     }
 
     @Override
     public void delete(final String path, boolean checkIsDirectory) {
         try {
-            if (!connectShare(path)) {
-                return;
-            }
+            tryConnectShare("delete", path);
 
             diskShare.rm(getSmbPath(path));
             reply = "rm OK";
@@ -216,37 +208,35 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[rm][%s]", getLogPrefix(), path), e);
+            throw new JobSchedulerException(String.format("%s[rm][%s]%s", getLogPrefix(), path, reply), e);
         }
     }
 
     @Override
     public void rename(final String from, final String to) {
         try {
-            try (File f = openExistingFile2Write(from)) {
-                if (f != null) {
-                    // TODO check - rename with OVERWRITE?
-                    f.rename(getSmbPath(to));
-                }
+            tryConnectShare("rename", from);
+
+            try (DiskEntry f = openExistingFile4Rename(from)) {
+                f.rename(getSmbPath(to));
             }
             reply = "rename OK";
             LOGGER.info(String.format("%s[rename][%s][%s]%s", getLogPrefix(), from, to, getReplyString()));
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[rename][%s][%s]", getLogPrefix(), from, to), e);
+            throw new JobSchedulerException(String.format("%s[rename][%s][%s]%s", getLogPrefix(), from, to, reply), e);
         }
     }
 
     @Override
     public SOSFileEntry getFileEntry(String path) throws Exception {
-        if (!connectShare(path)) {
-            return null;
-        }
+        tryConnectShare("getFileEntry", path);
+
         try (File f = openFile2Read(path)) {
             if (f != null) {
                 return getFileEntry(f.getFileInformation(), getParent(path));
@@ -275,9 +265,7 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
 
     @Override
     public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
-        if (!connectShare(path)) {
-            return null;
-        }
+        tryConnectShare("listNames", path);
 
         try {
             List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
@@ -304,9 +292,9 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(e);
+            throw new JobSchedulerException(reply, e);
         }
     }
 
@@ -323,27 +311,14 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     @Override
     public String getModificationDateTime(final String path) {
         String r = null;
-
-        try (File f = openFile2Read(path)) {
-            if (f != null) {
+        try {
+            tryConnectShare("getModificationDateTime", path);
+            try (File f = openFile2Read(path)) {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 r = df.format(f.getFileInformation().getBasicInformation().getLastWriteTime().toDate());
             }
-        } catch (SMBApiException e) {
-            switch (NtStatus.valueOf(e.getStatusCode())) {
-            case STATUS_FILE_IS_A_DIRECTORY:
-                try (Directory d = openDirectoryForRead(path)) {
-                    if (d != null) {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        r = df.format(d.getFileInformation().getBasicInformation().getLastWriteTime().toDate());
-                    }
-                } catch (Throwable ee) {
-                    LOGGER.warn(String.format("%s[%s][getModificationDateTime][directory]%s", getLogPrefix(), path, ee.toString()), ee);
-                }
-                break;
-            default:
-                throw e;
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[getModificationDateTime][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("%s[%s]getModificationDateTime=%s", getLogPrefix(), path, r));
@@ -354,25 +329,14 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     @Override
     public long getModificationTimeStamp(final String path) throws Exception {
         long r = -1L;
+        try {
+            tryConnectShare("getModificationTimeStamp", path);
 
-        try (File f = openFile2Read(path)) {
-            if (f != null) {
+            try (File f = openFile2Read(path)) {
                 r = f.getFileInformation().getBasicInformation().getLastWriteTime().toEpochMillis();
             }
-        } catch (SMBApiException e) {
-            switch (NtStatus.valueOf(e.getStatusCode())) {
-            case STATUS_FILE_IS_A_DIRECTORY:
-                try (Directory d = openDirectoryForRead(path)) {
-                    if (d != null) {
-                        r = d.getFileInformation().getBasicInformation().getLastWriteTime().toEpochMillis();
-                    }
-                } catch (Throwable ee) {
-                    LOGGER.warn(String.format("%s[%s][getModificationTimeStamp][directory]%s", getLogPrefix(), path, ee.toString()), ee);
-                }
-                break;
-            default:
-                throw e;
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[getModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s]getModificationTimeStamp=%s", path, r));
@@ -384,19 +348,15 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s]setModificationTimeStamp=%s", path, timeStamp));
         }
-        try (File f = openExistingFile2Write(path)) {
-            if (f != null) {
+        try {
+            tryConnectShare("setModificationTimeStamp", path);
+            try (File f = openExistingFile2Write(path)) {
                 FileBasicInformation current = f.getFileInformation().getBasicInformation();
                 FileTime ft = FileTime.ofEpochMillis(timeStamp);
                 f.setFileInformation(new FileBasicInformation(current.getCreationTime(), ft, ft, ft, current.getFileAttributes()));
             }
-        } catch (SMBApiException e) {
-            switch (NtStatus.valueOf(e.getStatusCode())) {
-            case STATUS_OBJECT_NAME_NOT_FOUND:
-                break;
-            default:
-                throw e;
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[setModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
     }
 
@@ -420,13 +380,39 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     // FILE_OPEN_IF - Open the file if it already exists; otherwise, create the file.
     // FILE_OVERWRITE_IF - Overwrite the file if it already exists; otherwise, create the file.
     protected File openFile2Write(String path, boolean append) {
+        tryConnectShare("openFile2Write", path);
+
         SMB2CreateDisposition cd = append ? SMB2CreateDisposition.FILE_OPEN_IF : SMB2CreateDisposition.FILE_OVERWRITE_IF;
         return openFile(path, AccessMask.GENERIC_WRITE, cd);
     }
 
+    private DiskEntry openExistingFile4Rename(String path) {
+        Set<AccessMask> ams = new HashSet<>();
+        if (accessMaskMaximumAllowed) {
+            ams.add(AccessMask.MAXIMUM_ALLOWED);
+        } else {
+            ams.add(AccessMask.FILE_WRITE_ATTRIBUTES);
+            ams.add(AccessMask.DELETE);
+        }
+
+        Set<FileAttributes> fa = new HashSet<>();
+        fa.add(FileAttributes.FILE_ATTRIBUTE_NORMAL);
+
+        Set<SMB2ShareAccess> sa = new HashSet<>();
+        sa.addAll(SMB2ShareAccess.ALL);
+
+        Set<SMB2CreateOptions> co = new HashSet<>();
+        co.add(SMB2CreateOptions.FILE_NON_DIRECTORY_FILE);
+
+        return diskShare.open(getSmbPath(path), ams, fa, sa, SMB2CreateDisposition.FILE_OPEN, co);
+    }
+
     private File openFile(String path, AccessMask accessMask, SMB2CreateDisposition createDisposition) {
-        if (!connectShare(path)) {
-            return null;
+        Set<AccessMask> ams = new HashSet<>();
+        if (accessMaskMaximumAllowed) {
+            ams.add(AccessMask.MAXIMUM_ALLOWED);
+        } else {
+            ams.add(accessMask);
         }
 
         Set<SMB2ShareAccess> sa = new HashSet<>();
@@ -435,31 +421,19 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         Set<SMB2CreateOptions> co = new HashSet<>();
         co.add(SMB2CreateOptions.FILE_WRITE_THROUGH);
 
-        Set<AccessMask> ams = new HashSet<>();
-        ams.add(accessMask);
-
         return diskShare.openFile(getSmbPath(path), ams, null, sa, createDisposition, co);
     }
 
-    private Directory openDirectoryForRead(String path) {
-        return openDirectory(path, AccessMask.FILE_READ_ATTRIBUTES, SMB2CreateDisposition.FILE_OPEN);
-    }
-
-    private Directory openDirectory(String path, AccessMask accessMask, SMB2CreateDisposition createDisposition) {
-        Set<SMB2ShareAccess> sa = new HashSet<SMB2ShareAccess>();
-        sa.addAll(SMB2ShareAccess.ALL);
-
-        Set<AccessMask> ams = new HashSet<AccessMask>();
-        ams.add(accessMask);
-
-        return diskShare.openDirectory(getSmbPath(path), ams, null, sa, createDisposition, null);
-    }
-
-    private boolean connectShare(String path) {
-        if (diskShare == null || !diskShare.isConnected()) {
-            diskShare = (DiskShare) session.connectShare(getShareName(path));
+    private void tryConnectShare(String caller, String path) {
+        try {
+            if (diskShare == null || !diskShare.isConnected()) {
+                diskShare = (DiskShare) session.connectShare(getShareName(path));
+            }
+        } catch (Throwable e) {
+            String msg = "[" + caller + "][tryConnectShare][" + path + "]" + e.toString();
+            LOGGER.error(msg, e);
+            throw new JobSchedulerException(msg, e);
         }
-        return diskShare != null;
     }
 
     private String getShareName(String path) {
@@ -522,6 +496,7 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         return new AuthenticationContext(user, p, getDomain());
     }
 
+    @SuppressWarnings("deprecation")
     private Properties setConfigFromFiles(Builder b) {
         Properties p = getConfigFromFiles(new Properties());
         if (p.size() > 0) {
@@ -587,6 +562,9 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
                         break;
                     case "encryptData":// Default: false
                         b.withEncryptData(Boolean.parseBoolean(val));
+                        break;
+                    case "sossmbj.accessMaskMaximumAllowed":
+                        accessMaskMaximumAllowed = Boolean.parseBoolean(val);
                         break;
                     }
                 } catch (Throwable te) {
