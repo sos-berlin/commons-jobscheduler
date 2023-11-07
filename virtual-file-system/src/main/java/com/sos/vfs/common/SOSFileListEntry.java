@@ -1243,8 +1243,8 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
                     if (sourceFileModificationDateTime <= 0) {
                         sourceFileModificationDateTime = sourceTransferFile.getModificationDateTime();
                     }
-                    if (sourceFileModificationDateTime != -1) {
-                        targetFile.setModificationDateTime(sourceFileModificationDateTime);
+                    if (sourceFileModificationDateTime != -1 && targetTransferFile != null) {
+                        targetTransferFile.setModificationDateTime(sourceFileModificationDateTime);
                     }
                 }
                 if ((parent.getBaseOptions().isAtomicTransfer() || parent.getBaseOptions().getReplacing().isNotEmpty()) && parent

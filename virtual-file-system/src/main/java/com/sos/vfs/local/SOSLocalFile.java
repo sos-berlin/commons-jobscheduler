@@ -8,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
@@ -255,11 +258,12 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
     public long setModificationDateTime(final long dateTime) {
         long result = 0L;
         try {
-            File file = new File(strFileName);
-            file.setLastModified(dateTime);
+            // File file = new File(strFileName);
+            // file.setLastModified(dateTime);
+            Files.setLastModifiedTime(Paths.get(strFileName), FileTime.fromMillis(dateTime));
             result = dateTime;
         } catch (Throwable e) {
-            LOGGER.error("[" + strFileName + "]" + e.getMessage(), e);
+            LOGGER.error("[setModificationDateTime=" + dateTime + "][" + strFileName + "]" + e.getMessage(), e);
             result = -1L;
         }
         return result;

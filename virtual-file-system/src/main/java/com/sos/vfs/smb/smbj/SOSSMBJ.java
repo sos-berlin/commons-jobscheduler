@@ -345,6 +345,12 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
     }
 
     public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception {
+        if (timeStamp <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationTimeStamp=%s", path, timeStamp));
+            }
+            return;
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s]setModificationTimeStamp=%s", path, timeStamp));
         }
@@ -463,7 +469,7 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         // smbPath=yade/test/a/b/c
         p = p.endsWith("/") ? p.substring(0, p.length() - 1) : p;
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[path=%s]smbPath=%s", path, p));
+            LOGGER.debug(String.format("[getSmbPath][path=%s]smbPath=%s", path, p));
         }
         return p;
     }
