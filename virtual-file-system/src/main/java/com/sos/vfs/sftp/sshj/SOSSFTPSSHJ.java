@@ -583,14 +583,18 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
-        FileAttributes attrs = getFileAttributes(pathname);
-        if (attrs != null && !FileMode.Type.DIRECTORY.equals(attrs.getType())) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(String.format("[%s]found", pathname));
-            }
+        try {
+            FileAttributes attrs = getFileAttributes(pathname);
+            if (attrs != null && !FileMode.Type.DIRECTORY.equals(attrs.getType())) {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace(String.format("[%s]found", pathname));
+                }
 
-            SOSFileEntryFile f = new SOSFileEntryFile(pathname);
-            return getFileEntry(attrs, f.getName(), f.getParent());
+                SOSFileEntryFile f = new SOSFileEntryFile(pathname);
+                return getFileEntry(attrs, f.getName(), f.getParent());
+            }
+        } catch (Throwable e) {
+            throw new Exception(String.format("[getFileEntry][%s]%s", pathname, e.toString()), e);
         }
         return null;
     }
