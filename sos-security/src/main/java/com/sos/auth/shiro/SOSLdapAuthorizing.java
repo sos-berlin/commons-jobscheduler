@@ -254,48 +254,48 @@ public class SOSLdapAuthorizing {
         LdapUtils.closeContext(ldapContext);
     }
 
-    public void getRoleNamesForUserTest(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm, String username) throws Exception {
-
-        // String ldapAdServer = "ldap://ldap.andrew.cmu.edu:389";
-        String ldapAdServer = "ldap://localhost:389";
-        Hashtable<String, Object> env = new Hashtable<String, Object>();
-        env.put(Context.PROVIDER_URL, ldapAdServer);
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-        env.put(Context.SECURITY_PRINCIPAL, "CN=ur,CN=sos,DC=berlin,DC=com");
-        env.put(Context.SECURITY_CREDENTIALS, "aplsos");
-
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, ldapAdServer);
-        env.put("java.naming.ldap.attributes.binary", "objectSID");
-
-        InitialDirContext ldapContext = new InitialDirContext(env);
-
-        SearchControls searchCtls = new SearchControls();
-        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-        String userPrincipalName = username;
-
-        if (sosLdapAuthorizingRealm.getSearchBase() != null && sosLdapAuthorizingRealm.getUserSearchFilter() != null) {
-            LOGGER.debug("user_search_filter=" + sosLdapAuthorizingRealm.getUserSearchFilter());
-
-            String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
-            LOGGER.debug(String.format("getting groups from ldap using user search filter %s with search base %s", sosLdapAuthorizingRealm
-                    .getSearchBase(), searchFilter));
-
-            NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
-            ArrayList<String> rolesForGroups = new ArrayList<String>();
-            LOGGER.debug("Retrieving group names for user [" + userPrincipalName + "]");
-
-            while (answer.hasMoreElements()) {
-                SearchResult result = answer.next();
-                String groupNameAttribute;
-                groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
-                Attribute g = result.getAttributes().get(groupNameAttribute);
-                rolesForGroups.add(g.get().toString());
-            }
-        }
-    }
+//    public void getRoleNamesForUserTest(SOSLdapAuthorizingRealm sosLdapAuthorizingRealm, String username) throws Exception {
+//
+//        // String ldapAdServer = "ldap://ldap.andrew.cmu.edu:389";
+//        String ldapAdServer = "ldap://localhost:389";
+//        Hashtable<String, Object> env = new Hashtable<String, Object>();
+//        env.put(Context.PROVIDER_URL, ldapAdServer);
+//        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+//
+//        env.put(Context.SECURITY_PRINCIPAL, "CN=ur,CN=sos,DC=berlin,DC=com");
+//        env.put(Context.SECURITY_CREDENTIALS, "aplsos");
+//
+//        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+//        env.put(Context.PROVIDER_URL, ldapAdServer);
+//        env.put("java.naming.ldap.attributes.binary", "objectSID");
+//
+//        InitialDirContext ldapContext = new InitialDirContext(env);
+//
+//        SearchControls searchCtls = new SearchControls();
+//        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+//
+//        String userPrincipalName = username;
+//
+//        if (sosLdapAuthorizingRealm.getSearchBase() != null && sosLdapAuthorizingRealm.getUserSearchFilter() != null) {
+//            LOGGER.debug("user_search_filter=" + sosLdapAuthorizingRealm.getUserSearchFilter());
+//
+//            String searchFilter = substituteUserName(sosLdapAuthorizingRealm.getUserSearchFilter());
+//            LOGGER.debug(String.format("getting groups from ldap using user search filter %s with search base %s", sosLdapAuthorizingRealm
+//                    .getSearchBase(), searchFilter));
+//
+//            NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
+//            ArrayList<String> rolesForGroups = new ArrayList<String>();
+//            LOGGER.debug("Retrieving group names for user [" + userPrincipalName + "]");
+//
+//            while (answer.hasMoreElements()) {
+//                SearchResult result = answer.next();
+//                String groupNameAttribute;
+//                groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
+//                Attribute g = result.getAttributes().get(groupNameAttribute);
+//                rolesForGroups.add(g.get().toString());
+//            }
+//        }
+//    }
 
     protected void getRoleNamesForGroups(Collection<String> groupNames) {
         if (sosLdapAuthorizingRealm.getGroupRolesMap() != null) {
