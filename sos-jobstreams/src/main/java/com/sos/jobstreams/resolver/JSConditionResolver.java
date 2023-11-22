@@ -661,6 +661,7 @@ public class JSConditionResolver {
             }
             case "global":
             case "event": {
+                LOGGER.debug("==> validating events for session " + contextId.toString());
                 String event = jsCondition.getEventName();
 
                 JSEventKey jsEventKey = new JSEventKey();
@@ -725,6 +726,7 @@ public class JSConditionResolver {
             }
 
         }
+
         LOGGER.debug(condition.getExpression() + " after replacement  -->  " + expressionValue);
         booleanExpression.setBoolExp(expressionValue);
         boolean evaluatedExpression = booleanExpression.evaluateExpression();
@@ -849,6 +851,8 @@ public class JSConditionResolver {
         for (Map.Entry<Long, JSJobStream> jobStream : jsJobStreams.getListOfJobStreams().entrySet()) {
             if (jobStream.getValue() != null && jobStream.getValue().getListOfJobStreamHistory() != null) {
                 List<JSHistoryEntry> toRemove = new ArrayList<JSHistoryEntry>();
+                List<UUID> toRemoveParameters = new ArrayList<UUID>();
+
                 for (JSHistoryEntry jsHistoryEntry : jobStream.getValue().getListOfJobStreamHistory()) {
                     if (jsHistoryEntry.getContextId().toString().equals(contextId.toString()) && jsHistoryEntry.isRunning()) {
                         LOGGER.debug(String.format("Running JobStream: %s with contextId %s found", jsHistoryEntry.getItemJobStreamHistory()
@@ -881,7 +885,7 @@ public class JSConditionResolver {
                                     dbLayerJobStreamHistory.update(dbItemJobStreamHistory);
                                     sosHibernateSession.commit();
                                     toRemove.add(jsHistoryEntry);
-                                    this.listOfParameters.remove(contextId);
+                                    toRemoveParameters.add(contextId);
                                 }
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
@@ -889,6 +893,9 @@ public class JSConditionResolver {
                             }
                         }
                     }
+                }
+                for (UUID uiid : toRemoveParameters) {
+                    this.listOfParameters.remove(uiid);
                 }
                 jobStream.getValue().getListOfJobStreamHistory().removeAll(toRemove);
             }
@@ -1127,7 +1134,7 @@ public class JSConditionResolver {
             JsonParseException, JsonMappingException, JsonProcessingException, SOSInvalidDataException, DOMException, IOException, ParseException,
             TransformerException {
 
-        listOfHistoryIds.putAll(lastConditionResolver.listOfHistoryIds); 
+        listOfHistoryIds.putAll(lastConditionResolver.listOfHistoryIds);
         jobStreamContexts = lastConditionResolver.jobStreamContexts;
         jsEvents = lastConditionResolver.jsEvents;
         LOGGER.debug(lastConditionResolver.getListOfHistoryIds().size() + " Running job streams found in old model");
@@ -1138,7 +1145,7 @@ public class JSConditionResolver {
         }
         this.initCheckHistory(sosHibernateSession);
         copyConsumedInConditions(lastConditionResolver.getJsJobInConditions());
-        
+
     }
 
     public void initModel(SOSHibernateSession sosHibernateSession) throws SOSHibernateException, JsonParseException, JsonMappingException,

@@ -44,6 +44,12 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
     private static final String ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_1X = "SCHEDULER_VFS_SSH_PROVIDER";
     private static final String ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_JS7 = "JS7_VFS_SSH_PROVIDER";
 
+    private static final String ENV_VAR_WEBDAV_PROVIDER_JOBSCHEDULER_1X = "SCHEDULER_VFS_WEBDAV_PROVIDER";
+    private static final String ENV_VAR_WEBDAV_PROVIDER_JOBSCHEDULER_JS7 = "JS7_VFS_WEBDAV_PROVIDER";
+
+    private static final String ENV_VAR_SMB_PROVIDER_JOBSCHEDULER_1X = "SCHEDULER_VFS_SMB_PROVIDER";
+    private static final String ENV_VAR_SMB_PROVIDER_JOBSCHEDULER_JS7 = "JS7_VFS_SMB_PROVIDER";
+
     private SOSSmtpMailOptions mailOptions;
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private SOSTransfer transfer;// source/target options
@@ -95,6 +101,22 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
         String val = System.getenv(ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_1X);
         if (val == null) {
             val = System.getenv(ENV_VAR_SSH_PROVIDER_JOBSCHEDULER_JS7);
+        }
+        return val;
+    }
+
+    public static String getWEBDAVProviderFromEnv() {
+        String val = System.getenv(ENV_VAR_WEBDAV_PROVIDER_JOBSCHEDULER_1X);
+        if (val == null) {
+            val = System.getenv(ENV_VAR_WEBDAV_PROVIDER_JOBSCHEDULER_JS7);
+        }
+        return val;
+    }
+
+    public static String getSMBProviderFromEnv() {
+        String val = System.getenv(ENV_VAR_SMB_PROVIDER_JOBSCHEDULER_1X);
+        if (val == null) {
+            val = System.getenv(ENV_VAR_SMB_PROVIDER_JOBSCHEDULER_JS7);
         }
         return val;
     }
@@ -209,6 +231,10 @@ public class SOSBaseOptions extends SOSBaseOptionsSuperClass {
             mailOptions = new SOSSmtpMailOptions();
         }
         return mailOptions;
+    }
+
+    public void setMailOptions(SOSSmtpMailOptions opt) {
+        mailOptions = opt;
     }
 
     public void setChildClasses(final HashMap<String, String> settings) {

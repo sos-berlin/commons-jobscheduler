@@ -7,6 +7,7 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.keepass.SOSKeePassDatabase;
 
 public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 
@@ -40,6 +41,10 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 
     @JSOptionDefinition(name = "credential_store_entry_path", description = "", key = "credential_store_entry_path", type = "SOSOptionString", mandatory = false)
     public SOSOptionString credential_store_entry_path = new SOSOptionString(this, CLASS_NAME + ".credential_store_entry_path", "", "", "", false);
+
+    @JSOptionDefinition(name = "credential_store_keepass_module", description = "", key = "credential_store_keepass_module", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString credential_store_keepass_module = new SOSOptionString(this, CLASS_NAME + ".credential_store_keepass_module", "",
+            SOSKeePassDatabase.DEFAULT_MODULE.name(), SOSKeePassDatabase.DEFAULT_MODULE.name(), false);
 
     @Override
     public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {

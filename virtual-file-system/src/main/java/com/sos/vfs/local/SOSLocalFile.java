@@ -8,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
@@ -15,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
+import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.vfs.common.SOSVFSMessageCodes;
 import com.sos.vfs.common.interfaces.ISOSProvider;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
-import com.sos.vfs.common.SOSVFSMessageCodes;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSLocalFile extends JSFile implements ISOSProviderFile {
@@ -45,10 +48,14 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
     public boolean directoryExists() throws Exception {
         return super.exists();
     }
-    
+
     @Override
     public boolean delete(boolean checkIsDirectory) {
-        super.delete();
+        try {
+            getProvider().delete(getAbsolutePath(), checkIsDirectory);
+        } catch (Throwable e) {
+            throw new JobSchedulerException(e);
+        }
         return true;
     }
 
@@ -61,7 +68,6 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
             }
         } catch (FileNotFoundException e) {
             String msg = SOSVFSMessageCodes.SOSVfs_E_134.params(method);
-            LOGGER.error(msg, e);
             throw new JobSchedulerException(msg + " / " + strFileName, e);
         }
         return is;
@@ -74,7 +80,8 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
                 os = new FileOutputStream(new File(strFileName), append);
             }
         } catch (FileNotFoundException e) {
-            throw new JobSchedulerException(SOSVFSMessageCodes.SOSVfs_E_134.params(method), e);
+            String msg = SOSVFSMessageCodes.SOSVfs_E_134.params(method);
+            throw new JobSchedulerException(msg + " / " + strFileName, e);
         }
         return os;
     }
@@ -106,7 +113,7 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
 
     @Override
     public void rename(final String newFileName) {
-        super.renameTo(new File(newFileName));
+        getProvider().rename(getAbsolutePath(), newFileName);
     }
 
     public void compressFile(final File outputFile) throws Exception {
@@ -153,7 +160,6 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
                 is.close();
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVFSMessageCodes.SOSVfs_E_134.params(method), e);
         } finally {
             is = null;
@@ -241,8 +247,8 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
         long result = 0L;
         try {
             result = new File(strFileName).lastModified();
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
+        } catch (Throwable e) {
+            LOGGER.error("[" + strFileName + "]" + e.getMessage(), e);
             result = -1L;
         }
         return result;
@@ -252,11 +258,12 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
     public long setModificationDateTime(final long dateTime) {
         long result = 0L;
         try {
-            File file = new File(strFileName);
-            file.setLastModified(dateTime);
+            // File file = new File(strFileName);
+            // file.setLastModified(dateTime);
+            Files.setLastModifiedTime(Paths.get(strFileName), FileTime.fromMillis(dateTime));
             result = dateTime;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Throwable e) {
+            LOGGER.error("[setModificationDateTime=" + dateTime + "][" + strFileName + "]" + e.getMessage(), e);
             result = -1L;
         }
         return result;

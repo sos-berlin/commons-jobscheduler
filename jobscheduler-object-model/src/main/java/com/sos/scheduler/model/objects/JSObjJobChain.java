@@ -50,7 +50,8 @@ public class JSObjJobChain extends JobChain {
         if (super.objVirtualFile == null) {
             try {
                 SOSBaseOptions vfsOptions = new SOSBaseOptions();
-                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider, vfsOptions.webdav_provider);
+                ISOSProvider sosVFSFileTransfer = SOSVFSFactory.getProvider("local", vfsOptions.ssh_provider, vfsOptions.webdav_provider,
+                        vfsOptions.smb_provider);
                 ISOSProviderFile virtualFile = sosVFSFileTransfer.getFile(file.getAbsolutePath());
                 super.objVirtualFile = virtualFile;
             } catch (Exception e) {

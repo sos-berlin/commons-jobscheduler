@@ -1,14 +1,16 @@
-package com.sos.vfs.webdav.common;
+package com.sos.vfs.smb.common;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.sos.vfs.common.SOSEnv;
 import com.sos.vfs.common.SOSFileEntry;
 import com.sos.vfs.common.interfaces.ISOSProviderFile;
+import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
-public interface ISOSWebDAV {
+public interface ISOSSMB {
 
     public boolean isConnected();
 
@@ -42,8 +44,18 @@ public interface ISOSWebDAV {
 
     public String getModificationDateTime(final String path);
 
+    public long getModificationTimeStamp(final String path) throws Exception;
+
+    public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception;
+
     public ISOSProviderFile getFile(String fileName);
 
-    public long copy(final String source, final String target);
+    public SOSBaseOptions getBaseOptions();
+
+    public void setBaseOptions(SOSBaseOptions val);
+
+    public void executeCommand(final String cmd) throws Exception;
+
+    public void executeCommand(final String cmd, SOSEnv env) throws Exception;
 
 }

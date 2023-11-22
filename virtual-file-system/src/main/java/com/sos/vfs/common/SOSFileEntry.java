@@ -14,7 +14,10 @@ public class SOSFileEntry {
     private EntryType type;
     private String parentPath;
     private String fullPath;
+    private String directoryPath;
     private String filename;
+    // e.g. for HTTP(s) transfers with the file names like SET-217?filter=13400
+    private String normalizedFilename;
     private long filesize;
     private boolean directory;
     // private long lastModified; last modified info is currently used only by YADE check steady state - get the current timestamp after an interval
@@ -31,6 +34,14 @@ public class SOSFileEntry {
         filename = val;
     }
 
+    public String getNormalizedFilename() {
+        return normalizedFilename;
+    }
+
+    public void setNormalizedFilename(String val) {
+        normalizedFilename = val;
+    }
+
     public long getFilesize() {
         return filesize;
     }
@@ -40,6 +51,7 @@ public class SOSFileEntry {
     }
 
     public boolean isDirectory() {
+        setDirectoryPath();
         return directory;
     }
 
@@ -87,6 +99,23 @@ public class SOSFileEntry {
             }
         }
         return fullPath;
+    }
+
+    private String setDirectoryPath() {
+        if (directoryPath == null) {
+            String fp = getFullPath();
+            if (directory) {
+                directoryPath = fp;
+            } else {
+                directoryPath = SOSCommonProvider.getFullParentFromPath(fp);
+            }
+        }
+        return directoryPath;
+    }
+
+    public String getDirectoryPath() {
+        setDirectoryPath();
+        return directoryPath;
     }
 
     public boolean isDirUp() {

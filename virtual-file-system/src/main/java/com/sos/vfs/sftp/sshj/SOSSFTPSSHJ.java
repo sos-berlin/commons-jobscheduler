@@ -129,7 +129,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             printConnectionInfos();
         } catch (JobSchedulerException ex) {
             throw ex;
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             throw new JobSchedulerException(ex);
         }
     }
@@ -202,7 +202,10 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             }
             sftpClient.mkdirs(path);
             reply = "mkdir OK";
-        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[mkdir][%s]created", p));
+            }
+        } catch (Throwable e) {
             reply = e.toString();
             throw new JobSchedulerException(String.format("[%s] mkdir failed", path), e);
         }
@@ -231,19 +234,22 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 }
                 if (resource.isDirectory()) {
                     sftpClient.rmdir(resourcePath);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rmdir OK")));
+                    }
                 } else if (resource.isRegularFile()) {
                     sftpClient.rm(resourcePath);
-                }
-                if (isDebugEnabled) {
-                    LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, getReplyString())));
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rm OK")));
+                    }
                 }
             }
             sftpClient.rmdir(path);
             reply = "rmdir OK";
             LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("[%s] rmdir failed", path), e);
+            throw new JobSchedulerException(String.format("[%s]rmdir failed", path), e);
         }
     }
 
@@ -282,9 +288,10 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public long size(String path) throws Exception {
-        path = normalizePath(path);
         long size = -1;
         try {
+            path = normalizePath(path);
+
             FileAttributes attr = getFileAttributes(path);
             if (attr != null) {
                 size = attr.getSize();
@@ -293,6 +300,9 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             try {
                 throwException(e, path);
             } catch (SOSNoSuchFileException ex) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(String.format("[%s]%s", path, e.toString()));
+                }
             }
         }
         if (LOGGER.isDebugEnabled()) {
@@ -308,6 +318,9 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 return type.equals(attr.getType());
             }
         } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[is][%s]%s", path, e.toString()), e);
+            }
         }
         return false;
     }
@@ -362,7 +375,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 if (!SOSString.isEmpty(sacm)) {
                     r.setMaxAliveCount(Integer.parseInt(sacm));
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 LOGGER.warn(String.format("[setKeepAlive]%s", ex.toString()), ex);
             }
         }
@@ -395,7 +408,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 if (connectTimeout > 0) {
                     sshClient.setConnectTimeout(connectTimeout);
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 LOGGER.warn(String.format("[setConnectTimeout][%s]%s", t, ex.toString()), ex);
             }
 
@@ -407,7 +420,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 if (socketTimeout > 0) {
                     sshClient.setTimeout(socketTimeout);
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 LOGGER.warn(String.format("[setTimeout][%s]%s", t, ex.toString()), ex);
             }
         }
@@ -570,14 +583,18 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public SOSFileEntry getFileEntry(String pathname) throws Exception {
-        FileAttributes attrs = getFileAttributes(pathname);
-        if (attrs != null && !FileMode.Type.DIRECTORY.equals(attrs.getType())) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(String.format("[%s]found", pathname));
-            }
+        try {
+            FileAttributes attrs = getFileAttributes(pathname);
+            if (attrs != null && !FileMode.Type.DIRECTORY.equals(attrs.getType())) {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace(String.format("[%s]found", pathname));
+                }
 
-            SOSFileEntryFile f = new SOSFileEntryFile(pathname);
-            return getFileEntry(attrs, f.getName(), f.getParent());
+                SOSFileEntryFile f = new SOSFileEntryFile(pathname);
+                return getFileEntry(attrs, f.getName(), f.getParent());
+            }
+        } catch (Throwable e) {
+            throw new Exception(String.format("[getFileEntry][%s]%s", pathname, e.toString()), e);
         }
         return null;
     }
@@ -598,9 +615,10 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
-        path = normalizePath(path);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         try {
+            path = normalizePath(path);
+
             if (sftpClient == null) {
                 throw new SOSSFTPClientNotInitializedException();
             }
@@ -635,7 +653,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
             reply = "ls OK";
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
             return null;
         }
@@ -650,7 +668,6 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             if (SOSString.isEmpty(path)) {
                 throw new SOSMissingDataException("path");
             }
-
             if (checkIsDirectory && this.isDirectory(path)) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
@@ -659,7 +676,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             } catch (SFTPException e) {
                 throwException(e, path);
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             reply = ex.toString();
             throw new JobSchedulerException(SOSVfs_E_187.params("delete", path), ex);
         }
@@ -669,9 +686,10 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public void rename(String oldpath, String newpath) {
-        oldpath = normalizePath(oldpath);
-        newpath = normalizePath(newpath);
         try {
+            oldpath = normalizePath(oldpath);
+            newpath = normalizePath(newpath);
+
             if (sftpClient == null) {
                 throw new SOSSFTPClientNotInitializedException();
             }
@@ -683,7 +701,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             } catch (SFTPException e) {
                 throwException(e, oldpath);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
             throw new JobSchedulerException(SOSVfs_E_188.params("rename", oldpath, newpath), e);
         }
@@ -830,7 +848,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     public InputStream getInputStream(final String fileName) {
         try {
             return createInputStream(sftpClient.open(fileName));
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             throw new JobSchedulerException(SOSVfs_E_193.params("getInputStream()", fileName), ex);
         }
     }
@@ -838,15 +856,16 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     @Override
     public OutputStream getOutputStream(String fileName, boolean append, boolean resume) {
         try {
-            EnumSet<OpenMode> set = EnumSet.of(OpenMode.WRITE, OpenMode.CREAT, OpenMode.TRUNC);
+            EnumSet<OpenMode> set = EnumSet.of(OpenMode.WRITE, OpenMode.CREAT);
             if (append) {
                 set.add(OpenMode.APPEND);
-            } else if (resume) {
+            } else {
                 // transferMode = ChannelSftp.RESUME; //TODO?
+                set.add(OpenMode.TRUNC);
             }
             RemoteFile remoteFile = sftpClient.open(fileName, set);
             return createOutputStream(remoteFile);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             throw new JobSchedulerException(SOSVfs_E_193.params("getOutputStream()", fileName), ex);
         }
     }
@@ -963,7 +982,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 LOGGER.debug(String.format("[put][%s]size=%s", target, size));
             }
             return size;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
             throw new JobSchedulerException(SOSVfs_E_185.params("putFile()", source, target), e);
         }
@@ -989,7 +1008,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
             reply = new StringBuilder("get OK (").append(SOSDate.getDuration(start, end)).append(")").toString();
             LOGGER.info(getHostID(SOSVfs_I_183.params("get", source, target, getReplyString())));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
             throw new JobSchedulerException(SOSVfs_E_185.params("get()", source, target), e);
         }

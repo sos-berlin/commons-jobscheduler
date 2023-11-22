@@ -35,6 +35,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.Options.SOSOptionZeroByteTransfer;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.keepass.SOSKeePassDatabase;
 
 @JSOptionClass(name = "SOSBaseOptionsSuperClass", description = "SOSBaseOptionsSuperClass")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -308,13 +309,15 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     public SOSOptionOutFileName resultSetFileName = new SOSOptionOutFileName(this, CLASS_NAME + ".Result_Set_File_Name",
             "Name of a File with a filelist or a resultlist", "", "", false);
 
-    @JSOptionDefinition(name = "source_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName sourceDir = new SOSOptionFolderName(this, CLASS_NAME + ".source_dir",
-            "local_dir Local directory into which or from which", "", "", false);
+    @JSOptionDefinition(name = "source_dir", description = "Source directory", key = "account", type = "SOSOptionString", mandatory = false)
+    public SOSOptionFolderName sourceDir = new SOSOptionFolderName(this, CLASS_NAME + ".source_dir", "source_dir directory", "", "", false);
 
-    @JSOptionDefinition(name = "target_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName targetDir = new SOSOptionFolderName(this, CLASS_NAME + ".target_dir", "target_dir directory into which or from which",
-            "", "", false);
+    @JSOptionDefinition(name = "source_excluded_directories", description = "source_excluded_directories regexp", key = "source_excluded_directories", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString sourceExcludedDirectories = new SOSOptionString(this, CLASS_NAME + ".source_excluded_directories",
+            "source_excluded_directories regexp", "", "", false);
+
+    @JSOptionDefinition(name = "target_dir", description = "Target directory", key = "account", type = "SOSOptionString", mandatory = false)
+    public SOSOptionFolderName targetDir = new SOSOptionFolderName(this, CLASS_NAME + ".target_dir", "target_dir directory", "", "", false);
 
     @JSOptionDefinition(name = "append_files", description = "This parameter specifies whether the content of a", key = "append_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean appendFiles = new SOSOptionBoolean(this, CLASS_NAME + ".append_files",
@@ -552,6 +555,10 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     @JSOptionDefinition(name = "jump_CredentialStore_KeyPath", description = "", key = "jump_CredentialStore_KeyPath", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_CredentialStore_KeyPath = new SOSOptionString(this, CLASS_NAME + ".jump_CredentialStore_KeyPath", "", "", "", false);
 
+    @JSOptionDefinition(name = "jump_CredentialStore_KeePass_Module", description = "", key = "jump_CredentialStore_KeePass_Module", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString jump_CredentialStore_KeePass_Module = new SOSOptionString(this, CLASS_NAME + ".jump_CredentialStore_KeePass_Module", "",
+            SOSKeePassDatabase.DEFAULT_MODULE.name(), SOSKeePassDatabase.DEFAULT_MODULE.name(), false);
+
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionTime pollInterval = new SOSOptionTime(this, CLASS_NAME + ".poll_interval", "This parameter specifies the interval in seconds",
             "60", "60", false);
@@ -711,5 +718,9 @@ public abstract class SOSBaseOptionsSuperClass extends JSOptionsClass {
     // for default value handling see com.sos.vfs.webdav.SOSWebDAV
     @JSOptionDefinition(name = "webdav_provider", description = "webdav provider implementation", key = "webdav_provider", type = "SOSOptionString", mandatory = false)
     public SOSOptionString webdav_provider = new SOSOptionString(this, CLASS_NAME + ".webdav_provider", "webdav provider", "", "", false);
+
+    // for default value handling see com.sos.vfs.smb.SOSSMB
+    @JSOptionDefinition(name = "smb_provider", description = "smb provider implementation", key = "smb_provider", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString smb_provider = new SOSOptionString(this, CLASS_NAME + ".smb_provider", "smb provider", "", "", false);
 
 }

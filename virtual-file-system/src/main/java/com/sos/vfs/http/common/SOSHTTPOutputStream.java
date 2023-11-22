@@ -1,4 +1,4 @@
-package com.sos.vfs.webdav.jackrabbit.common;
+package com.sos.vfs.http.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,16 +12,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HTTP;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.vfs.http.common.SOSHTTPClient;
 
-public class SOSWebDAVOutputStream extends ByteArrayOutputStream {
+public class SOSHTTPOutputStream extends ByteArrayOutputStream {
 
     private CloseableHttpClient client;
+    private HttpPut request;
     private URI uri;
 
-    public SOSWebDAVOutputStream(CloseableHttpClient client, URI uri) {
+    public SOSHTTPOutputStream(CloseableHttpClient client, HttpPut request, URI uri) {
         super();
         this.client = client;
+        this.request = request;
         this.uri = uri;
     }
 
@@ -38,13 +39,11 @@ public class SOSWebDAVOutputStream extends ByteArrayOutputStream {
     }
 
     private void executePutMethod(byte[] data) throws Exception {
-        HttpPut p = new HttpPut(uri);
-
-        p.addHeader(HTTP.EXPECT_DIRECTIVE, HTTP.EXPECT_CONTINUE);
+        request.addHeader(HTTP.EXPECT_DIRECTIVE, HTTP.EXPECT_CONTINUE);
         // p.addHeader(HTTP.CONTENT_TYPE,HTTP.DEF_CONTENT_CHARSET.name());
-        p.setEntity(new ByteArrayEntity(data));
+        request.setEntity(new ByteArrayEntity(data));
 
-        try (CloseableHttpResponse response = client.execute(p)) {
+        try (CloseableHttpResponse response = client.execute(request)) {
             StatusLine sl = response.getStatusLine();
             if (!SOSHTTPClient.isSuccessStatusCode(sl)) {
                 throw new Exception(SOSHTTPClient.getResponseStatus(uri, sl));

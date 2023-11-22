@@ -1,6 +1,7 @@
 package com.sos.scheduler.model;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,8 @@ public class SchedulerHotFolder extends JSObjBase {
             throw exception;
         }
         ISOSProvider provider = providerFile.getProvider();
-        List<SOSFileEntry> entries = provider.getFolderlist(providerFile.getName(), ".*", 0, false);
+        // case sensitive
+        List<SOSFileEntry> entries = provider.getSubFolders(providerFile.getName(), -1, false, Pattern.compile(".*", 0), 0);
         result.setHotFolderSrc(providerFile);
         for (SOSFileEntry entry : entries) {
             if (!entry.getFilename().contains(".svn")) {
@@ -114,7 +116,8 @@ public class SchedulerHotFolder extends JSObjBase {
             }
         }
         LOGGER.debug("getFilelist from: " + providerFile.getName());
-        entries = provider.getFilelist(providerFile.getName(), regex, 0, false, true, null);
+        // case sensitive
+        entries = provider.getFileList(providerFile.getName(), -1, false, Pattern.compile(regex, 0), null, true, null, 0);
         for (SOSFileEntry entry : entries) {
             ISOSProviderFile pf = provider.getFile(entry.getFullPath());
             String lowerFilename = entry.getFilename().toLowerCase();

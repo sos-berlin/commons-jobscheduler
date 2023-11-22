@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -46,6 +48,7 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferType.TransferTypes;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.keepass.SOSKeePassDatabase;
 import com.sos.keepass.SOSKeePassPath;
@@ -210,23 +213,49 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
     @Override
     public void rmdir(final String path) {
         try {
+            if (SOSString.isEmpty(path)) {
+                throw new SOSMissingDataException("path");
+            }
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(String.format("[rmdir][%s]try to remove ...", path));
+            }
+            final Deque<SOSFileEntry> toRemove = new LinkedList<>();
+            dirInfo(path, toRemove, true);
             boolean isDebugEnabled = LOGGER.isDebugEnabled();
-            SOSOptionFolderName objF = new SOSOptionFolderName(path);
-            reply = "rmdir OK";
-            for (String subfolder : objF.getSubFolderArrayReverse()) {
+            while (!toRemove.isEmpty()) {
+                SOSFileEntry resource = toRemove.pop();
+                String resourcePath = resource.getFullPath();
                 if (isDebugEnabled) {
-                    LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", subfolder)));
+                    LOGGER.debug(getHostID(SOSVfs_D_179.params("rmdir", resourcePath)));
                 }
-                channelSftp.rmdir(subfolder);
-                reply = "rmdir OK";
-                if (isDebugEnabled) {
-                    LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", subfolder, getReplyString())));
+                if (resource.isDirectory()) {
+                    channelSftp.rmdir(resourcePath);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rmdir OK")));
+                    }
+                } else {
+                    channelSftp.rm(resourcePath);
+                    if (isDebugEnabled) {
+                        LOGGER.debug(getHostID(SOSVfs_D_181.params("rmdir", resourcePath, "rm OK")));
+                    }
                 }
             }
+            channelSftp.rmdir(path);
+            reply = "rmdir OK";
             LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_134.params("[rmdir]"), e);
+            throw new JobSchedulerException(String.format("[%s]rmdir failed", path), e);
+        }
+    }
+
+    private void dirInfo(String path, Deque<SOSFileEntry> result, boolean recursive) throws Exception {
+        List<SOSFileEntry> infos = listNames(path, -1, false, false);
+        for (SOSFileEntry resource : infos) {
+            result.push(resource);
+            if (recursive && resource.isDirectory()) {
+                dirInfo(resource.getFullPath(), result, recursive);
+            }
         }
     }
 
@@ -326,7 +355,7 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         path = normalizePath(path);
         try {
             List<SOSFileEntry> result = new ArrayList<>();

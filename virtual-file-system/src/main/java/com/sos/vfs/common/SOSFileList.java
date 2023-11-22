@@ -36,6 +36,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
     private final HashMap<String, String> subFolders = new HashMap<>();
 
     private String lastErrorMessage;
+    private Boolean isFullPathSelection = null;
     private long sumFileSizes = 0L;
     private long counterSuccessfulTransfers = 0;
     private long counterFailedTransfers = 0;
@@ -59,7 +60,10 @@ public class SOSFileList extends SOSVFSMessageCodes {
 
     public void create(final List<SOSFileEntry> entries, int maxFiles) {
         fileListEntries.clear();
-        if (maxFiles > entries.size()) {
+        if (maxFiles == 0) {
+            return;
+        }
+        if (maxFiles > 0 && maxFiles < entries.size()) {
             int i = 0;
             for (SOSFileEntry entry : entries) {
                 add(entry);
@@ -440,7 +444,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
                 entry.rollbackRenameSourceFile();
             }
         } else {
-            String msg = "Set transfer status";
+            String msg = "Set transfer status " + TransferStatus.transfer_aborted + " for files not transferred";
             LOGGER.info(msg);
             JADE_REPORT_LOGGER.info(msg);
             for (SOSFileListEntry entry : fileListEntries) {
@@ -453,7 +457,7 @@ public class SOSFileList extends SOSVFSMessageCodes {
         if (!options.transactional.value()) {
             try {
                 deleteSourceFiles();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOGGER.error(e.toString());
             }
         }
@@ -585,6 +589,13 @@ public class SOSFileList extends SOSVFSMessageCodes {
             }
         }
         retryCountMax = options.connection_error_retry_count_max.value() < 0 ? 0 : options.connection_error_retry_count_max.value();
+    }
+
+    public boolean isFullPathSelection() {
+        if (isFullPathSelection == null) {
+            isFullPathSelection = !SOSString.isEmpty(options.fileListName.getValue()) || !SOSString.isEmpty(options.filePath.getValue());
+        }
+        return isFullPathSelection;
     }
 
     public int getRetryCountMax() {

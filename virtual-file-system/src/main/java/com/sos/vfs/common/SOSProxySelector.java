@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -71,10 +72,14 @@ public class SOSProxySelector extends ProxySelector {
     }
 
     public AuthScope getAuthScope() {
-        return new AuthScope(host, port, AuthScope.ANY_REALM);
+        return new AuthScope(host, port);
     }
 
-    public Credentials getCredentials() {  // or NTCredentials???
+    public HttpHost getHttpHost() {
+        return new HttpHost(host, port);
+    }
+
+    public Credentials getCredentials() {
         return new UsernamePasswordCredentials(user == null ? "" : user, password);
     }
 

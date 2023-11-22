@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
@@ -27,14 +28,15 @@ public interface ISOSProvider {
     public SOSProviderOptions getProviderOptions();
 
     // files and folders - not recursive
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) throws Exception;
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) throws Exception;
 
     // only files
-    public List<SOSFileEntry> getFilelist(String path, String regexp, int flag, boolean recursive, boolean checkIfExists, String integrityHashType)
-            throws Exception;
+    public List<SOSFileEntry> getFileList(String folder, int maxFiles, boolean recursive, Pattern fileNamePattern, Pattern excludedDirectoriesPattern,
+            boolean checkIfExists, String integrityHashType, int recLevel) throws Exception;
 
     // only folders
-    public List<SOSFileEntry> getFolderlist(String path, String regexp, int flag, boolean recursive) throws Exception;
+    /** used only by com.sos.scheduler.model.SchedulerHotFolder */
+    public List<SOSFileEntry> getSubFolders(String folder, int maxFiles, boolean recursive, Pattern pattern, int recLevel) throws Exception;
 
     public SOSFileEntry getFileEntry(String path) throws Exception;
 
@@ -71,5 +73,7 @@ public interface ISOSProvider {
     public void executeCommand(String cmd, SOSEnv env) throws Exception;
 
     public boolean isSFTP();
+
+    public boolean isHTTP();
 
 }

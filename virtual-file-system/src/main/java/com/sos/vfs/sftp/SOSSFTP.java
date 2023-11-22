@@ -40,10 +40,10 @@ public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
             sshProviderOption = vfsOptions.ssh_provider;
         }
         String sshPovider = sshProviderOption.getValue().toUpperCase();
-        if (sshPovider.equals(SSHProvider.SSHJ.name())) {
-            provider = new SOSSFTPSSHJ();
-        } else {
+        if (sshPovider.equals(SSHProvider.JSCH.name())) {
             provider = new SOSSFTPJCraft();
+        } else {
+            provider = new SOSSFTPSSHJ();
         }
     }
 
@@ -98,8 +98,8 @@ public class SOSSFTP extends SOSCommonProvider implements ISOSSFTP {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
-        return provider.listNames(path, checkIfExists, checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
+        return provider.listNames(path, maxFiles, checkIfExists, checkIfIsDirectory);
     }
 
     @Override

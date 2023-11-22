@@ -3,6 +3,7 @@ package com.sos.vfs.http;
 import java.io.InputStream;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.vfs.common.SOSCommonProvider;
 import com.sos.vfs.common.SOSCommonProviderFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -10,7 +11,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSHTTPFile extends SOSCommonProviderFile {
 
     public SOSHTTPFile(final String path) {
-        super(path);
+        fileName = SOSCommonProvider.normalizePath(path);
     }
 
     @Override
@@ -57,27 +58,4 @@ public class SOSHTTPFile extends SOSCommonProviderFile {
         }
     }
 
-    @Override
-    public void closeInput() {
-        super.closeInput();
-        ((SOSHTTP) getProvider()).resetLastInputStreamGetMethod();
-    }
-
-    @Override
-    public void closeOutput() {
-        try {
-            if (getOutputStream() != null) {
-                getOutputStream().flush();
-                getOutputStream().close();
-
-                ((SOSHTTP) getProvider()).put(fileName);
-            }
-        } catch (JobSchedulerException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JobSchedulerException(e);
-        } finally {
-            setOutputStream(null);
-        }
-    }
 }

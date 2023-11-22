@@ -1,4 +1,4 @@
-package com.sos.vfs.webdav;
+package com.sos.vfs.http;
 
 import java.util.List;
 
@@ -9,35 +9,30 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod.enuAuthenticationMethods;
 import com.sos.vfs.common.SOSFileEntry;
-import com.sos.vfs.common.options.SOSBaseOptions;
 import com.sos.vfs.common.options.SOSProviderOptions;
 
 import sos.util.SOSString;
 
-public class SOSWebDAVTest {
+public class SOSHTTPTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSWebDAVTest.class);
-
-    private SOSBaseOptions getBaseOptions() {
-        SOSBaseOptions o = new SOSBaseOptions();
-        o.webdav_provider.setValue(SOSWebDAV.WebDAVProvider.JACKRABBIT.name());
-        return o;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHTTPTest.class);
 
     private SOSProviderOptions getOptions() {
         SOSProviderOptions o = new SOSProviderOptions();
         o.host.setValue("http://localhost:8080");
+        // o.acceptUntrustedCertificate.setTrue();
         o.authMethod.setValue(enuAuthenticationMethods.url);
 
-        o.user.setValue("user");
-        o.password.setValue("password");
+        // o.user.setValue("user");
+        // o.password.setValue("password");
+        LOGGER.info(System.getProperty("java.version"));
         return o;
     }
 
     @Ignore
     @Test
     public void testInfoMethods() {
-        SOSWebDAV p = new SOSWebDAV(getBaseOptions().webdav_provider);
+        SOSHTTP p = new SOSHTTP();
         try {
             p.connect(getOptions());
 
@@ -69,18 +64,15 @@ public class SOSWebDAVTest {
     @Ignore
     @Test
     public void testExecuteMethods() {
-        SOSWebDAV p = new SOSWebDAV(getBaseOptions().webdav_provider);
+        SOSHTTP p = new SOSHTTP();
         try {
             p.connect(getOptions());
 
-            p.mkdir("test/a/b/c");
-            p.copy("transfer-1/test.sh", "test/a/test.sh");
-            p.copy("transfer-1/test.sh", "test/a/b/test.sh");
-            p.copy("transfer-1/test.sh", "test/a/b/c/test.sh");
-            p.rename("test/a/b/c/test.sh", "test/a/b/c/test.sh_renamed");
-            p.delete("test/a/b/c/test.sh_renamed", true);
+            p.mkdir("yade_test/a/b/c");
+            // p.rename("yade_http/test/test.txt", "yade_http/test/test.txt_renamed");
+            // p.delete("yade_http/test/to_remove.txt", true);
 
-            p.rmdir("test/a");
+            p.rmdir("yade_test/a");
         } catch (Throwable e) {
             LOGGER.error(e.toString(), e);
         } finally {

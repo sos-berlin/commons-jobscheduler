@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -30,7 +29,10 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     protected int port = 0;
     protected String reply = "OK";
 
-    private List<SOSFileEntry> directoryListing = null;
+    private List<SOSFileEntry> directoryFiles = null;
+    private int directoryFilesCount = 0;
+    private boolean directoryFilesCountExceeded = false;
+    private List<SOSFileEntry> directorySubFolders = null;
     private SOSBaseOptions baseOptions = null;
     private SOSProviderOptions providerOptions = null;
 
@@ -72,87 +74,125 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
     public void disconnect() {
     }
 
-    private List<SOSFileEntry> getFilenames(String path, final boolean recursive, int recLevel, boolean checkIfExists) throws Exception {
+    @Override
+    public List<SOSFileEntry> getFileList(final String folder, final int maxFiles, final boolean recursive, final Pattern fileNamePattern,
+            Pattern excludedDirectoriesPattern, boolean checkIfExists, String integrityHashType, int recLevel) throws Exception {
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
+        boolean isTraceEnabled = LOGGER.isTraceEnabled();
+
         if (recLevel == 0) {
-            directoryListing = new ArrayList<SOSFileEntry>();
+            directoryFiles = new ArrayList<SOSFileEntry>();
+            directoryFilesCount = 0;
+            directoryFilesCountExceeded = false;
         }
         List<SOSFileEntry> entries = null;
-        path = path.trim();
+        String path = folder.trim();
         if (path.isEmpty()) {
             path = ".";
         }
         try {
-            entries = listNames(path, checkIfExists, checkIfExists);
+            entries = listNames(path, maxFiles, checkIfExists, checkIfExists);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
         if (entries == null) {
-            return directoryListing;
+            if (isDebugEnabled) {
+                LOGGER.debug(String.format("[%s]entries=null", path));
+            }
+            return directoryFiles;
         }
+
         for (SOSFileEntry entry : entries) {
+            if (maxFiles > 0 && directoryFilesCount >= maxFiles) {
+                if (!directoryFilesCountExceeded) {
+                    LOGGER.info(String.format("[skip]maxFiles=%s exceeded", maxFiles));
+                    directoryFilesCountExceeded = true;
+                }
+                return directoryFiles;
+            }
+
             if (!isNotHiddenFile(entry.getFilename())) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][entry is hidden]%s continue", path, entry.getFilename()));
+                }
                 continue;
             }
             if (entry.isDirectory()) {
+                if (isDebugEnabled) {
+                    LOGGER.debug(String.format("[%s][directory]%s", path, SOSString.toString(entry)));
+                }
                 if (recursive) {
+                    if (excludedDirectoriesPattern != null) {
+                        if (excludedDirectoriesPattern.matcher(entry.getDirectoryPath()).find()) {
+                            if (isDebugEnabled) {
+                                LOGGER.debug(String.format("[%s][directory][match][excludedDirectories=%s]%s", path, excludedDirectoriesPattern
+                                        .pattern(), entry.getFullPath()));
+                            }
+                            continue;
+                        }
+                    }
                     recLevel++;
-                    getFilenames(entry.getFullPath(), recursive, recLevel, checkIfExists);
+                    getFileList(entry.getFullPath(), maxFiles, recursive, fileNamePattern, excludedDirectoriesPattern, checkIfExists,
+                            integrityHashType, recLevel);
                 }
             } else {
-                directoryListing.add(entry);
+                if (isTraceEnabled) {
+                    LOGGER.trace(String.format("[%s][file]%s", path, SOSString.toString(entry)));
+                }
+                // file list should not contain the checksum files
+                if (integrityHashType != null && entry.getFilename().endsWith(integrityHashType)) {
+                    continue;
+                }
+                if (fileNamePattern.matcher(entry.getFilename()).find()) {
+                    directoryFiles.add(entry);
+                    directoryFilesCount++;
+                }
             }
         }
-        return directoryListing;
+        return directoryFiles;
     }
 
+    /** used only by com.sos.scheduler.model.SchedulerHotFolder */
     @Override
-    public List<SOSFileEntry> getFilelist(final String folder, final String regexp, final int flag, final boolean recursive, boolean checkIfExists,
-            String integrityHashType) throws Exception {
-        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, checkIfExists);
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[%s][total] %s files", folder, result.size()));
+    public List<SOSFileEntry> getSubFolders(final String folder, final int maxFiles, final boolean recursive, final Pattern pattern, int recLevel)
+            throws Exception {
+        if (recLevel == 0) {
+            directorySubFolders = new ArrayList<SOSFileEntry>();
         }
 
-        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
-        Pattern pattern = Pattern.compile(regexp, flag);
-        for (SOSFileEntry entry : result) {
-            if (entry.isDirectory()) {
-                continue;
-            }
-            // file list should not contain the checksum files
-            if (integrityHashType != null && entry.getFilename().endsWith(integrityHashType)) {
-                continue;
-            }
-            Matcher matcher = pattern.matcher(entry.getFilename());
-            if (matcher.find()) {
-                list.add(entry);
-            }
+        List<SOSFileEntry> entries = null;
+        String path = folder.trim();
+        if (path.isEmpty()) {
+            path = ".";
         }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(String.format("[%s][filtered] %s files", folder, list.size()));
+        try {
+            entries = listNames(path, maxFiles, false, false);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
         }
-        return list;
-    }
+        if (entries == null) {
+            return directorySubFolders;
+        }
 
-    @Override
-    public List<SOSFileEntry> getFolderlist(final String folder, final String regexp, final int flag, final boolean recursive) throws Exception {
-        List<SOSFileEntry> result = getFilenames(folder, recursive, 0, false);
-
-        List<SOSFileEntry> list = new ArrayList<SOSFileEntry>();
-        Pattern pattern = Pattern.compile(regexp, flag);
-        for (SOSFileEntry entry : result) {
+        for (SOSFileEntry entry : entries) {
             if (!entry.isDirectory()) {
                 continue;
             }
-            Matcher matcher = pattern.matcher(entry.getFilename());
-            if (matcher.find()) {
-                list.add(entry);
+            if (pattern.matcher(entry.getFilename()).find()) {
+                directorySubFolders.add(entry);
+            }
+            if (recursive) {
+                recLevel++;
+                getSubFolders(entry.getFullPath(), maxFiles, recursive, pattern, recLevel);
             }
         }
-        return list;
+        return directorySubFolders;
     }
 
     public static String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
         return path.replace('\\', '/');
     }
 
@@ -169,6 +209,27 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
             return dir + subPath;
         }
         return dir + subPath;
+    }
+
+    public static String normalizeDirectoryPath(String path) {
+        String p = normalizePath(path);
+        if (p == null) {
+            return null;
+        }
+        return p.endsWith("/") ? p.substring(0, p.length() - 1) : p;
+    }
+
+    public static String getFullParentFromPath(String path) {
+        if (path == null || path.equals("/")) {
+            return null;
+        }
+        int li = path.lastIndexOf("/");
+        return li > -1 ? path.substring(0, li) : null;
+    }
+
+    public static String getBaseNameFromPath(String path) {
+        int li = path.lastIndexOf("/");
+        return li > -1 ? path.substring(li + 1) : path;
     }
 
     @Override
@@ -314,6 +375,11 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
 
     @Override
     public boolean isSFTP() {
+        return false;
+    }
+
+    @Override
+    public boolean isHTTP() {
         return false;
     }
 

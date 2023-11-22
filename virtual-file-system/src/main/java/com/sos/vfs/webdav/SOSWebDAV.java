@@ -34,7 +34,7 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     private void setProvider(SOSOptionString providerOption) {
         if (providerOption == null) {
             SOSBaseOptions baseOptions = new SOSBaseOptions();
-            providerOption = baseOptions.ssh_provider;
+            providerOption = baseOptions.webdav_provider;
         }
         String webDavProvider = providerOption.getValue().toUpperCase();
         if (webDavProvider.equals(WebDAVProvider.WEBDAVCLIENT4J.name())) {
@@ -98,8 +98,8 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
-        return provider.listNames(path, checkIfExists, checkIfIsDirectory);
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
+        return provider.listNames(path, maxFiles, checkIfExists, checkIfIsDirectory);
     }
 
     @Override

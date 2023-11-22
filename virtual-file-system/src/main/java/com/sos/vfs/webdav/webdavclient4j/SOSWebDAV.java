@@ -213,7 +213,7 @@ public class SOSWebDAV extends SOSCommonProvider implements ISOSWebDAV {
     }
 
     @Override
-    public List<SOSFileEntry> listNames(String path, boolean checkIfExists, boolean checkIfIsDirectory) {
+    public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
         WebdavResource res = null;
         try {
             List<SOSFileEntry> result = new ArrayList<>();
