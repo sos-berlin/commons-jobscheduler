@@ -130,9 +130,17 @@
 			<artifactId>xercesImpl</artifactId>
 		</dependency>
 
+		<!-- dependencies for third party libraries -->
+		<!-- old 
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
+		</dependency>
+		-->
+		<!-- new -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
 		</dependency>
 
  
