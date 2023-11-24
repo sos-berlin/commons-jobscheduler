@@ -152,7 +152,11 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         tryConnectShare("isDirectory", path);
 
         try {
-            return diskShare.getFileInformation(getSmbPath(path)).getStandardInformation().isDirectory();
+            boolean r = diskShare.getFileInformation(getSmbPath(path)).getStandardInformation().isDirectory();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[isDirectory][%s]%s", getLogPrefix(), path, r));
+            }
+            return r;
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[isDirectory][%s][exception]%s", getLogPrefix(), path, e.toString()));

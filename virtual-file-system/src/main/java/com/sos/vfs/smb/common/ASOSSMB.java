@@ -52,8 +52,10 @@ public abstract class ASOSSMB extends SOSCommonProvider {
 
             isConnected = true;
             reply = "OK";
-            LOGGER.info(getLogPrefix());
-        } catch (Exception ex) {
+            LOGGER.info(String.format("%s%s[connect]%s", getLogPrefix(), getLogProviderClass(), reply));
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable ex) {
             throw new JobSchedulerException(ex);
         }
     }
@@ -72,7 +74,7 @@ public abstract class ASOSSMB extends SOSCommonProvider {
             reply = e.toString();
         }
         if (isConnected) {
-            LOGGER.info(String.format("%s[disconnect]%s", getLogPrefix(), getReplyString()));
+            LOGGER.info(String.format("%s%s[disconnect]%s", getLogPrefix(), getLogProviderClass(), reply));
         }
         isConnected = false;
     }
@@ -188,6 +190,10 @@ public abstract class ASOSSMB extends SOSCommonProvider {
 
     public String getLogPrefix() {
         return logPrefix;
+    }
+
+    private String getLogProviderClass() {
+        return "[" + getClass().getSimpleName() + "]";
     }
 
 }

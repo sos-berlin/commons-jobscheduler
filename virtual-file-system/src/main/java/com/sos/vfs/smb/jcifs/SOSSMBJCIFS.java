@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -21,14 +22,15 @@ import com.sos.vfs.smb.common.ISOSSMB;
 
 import jcifs.CIFSContext;
 import jcifs.CIFSException;
+import jcifs.DialectVersion;
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
+import sos.util.SOSString;
 
-@SuppressWarnings("deprecation")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
 
@@ -89,32 +91,34 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
     }
 
     private void createContext(String domain, String host, int port, String user, String password) throws Exception {
-        Properties properties = new Properties();
-        properties.put("jcifs.smb.client.disableSMB1", "false");
-        properties.put("jcifs.smb.client.enableSMB2", "true");
+        Properties p = new Properties();
+        // p.put("jcifs.smb.client.disableSMB1", "false");
+        // p.put("jcifs.smb.client.enableSMB2", "true");
+        p.put("jcifs.smb.client.minVersion", DialectVersion.SMB202.name());
+        p.put("jcifs.smb.client.maxVersion", DialectVersion.SMB311.name());
 
-        BaseContext bc = new BaseContext(new PropertyConfiguration(getConfigFromFiles(properties)));
-        NtlmPasswordAuthentication creds = new NtlmPasswordAuthentication(bc, domain, user, password);
-        context = bc.withCredentials(creds);
+        PropertyConfiguration pc = new PropertyConfiguration(getConfigFromFiles(p));
+        BaseContext bc = new BaseContext(pc);
+        if (LOGGER.isDebugEnabled()) {
+            List<String> excluded = Arrays.asList("minVersion;maxVersion;localTimeZone;random;machineId".split(";"));
+            LOGGER.debug(String.format("%s[createContext][config][minVersion=%s,maxVersion=%s]%s", getLogPrefix(), pc.getMinimumVersion(), pc
+                    .getMaximumVersion(), SOSString.toString(pc, excluded)));
+        }
+        context = bc.withCredentials(new NtlmPasswordAuthenticator(domain, user, password));
     }
 
     @Override
     public boolean fileExists(String path) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             boolean result = smbFile.exists();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[fileExists][%s]%s", getLogPrefix(), path, result));
             }
             return result;
-        } catch (Exception e) {
-            path = smbFile == null ? path : smbFile.getCanonicalPath();
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             throw new JobSchedulerException(SOSVfs_E_226.params(path), e);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
         }
     }
 
@@ -126,59 +130,47 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
     @Override
     public long size(final String path) throws Exception {
         long size = -1;
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (smbFile.exists()) {
                 size = smbFile.length();
             }
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("%s[size][%s]%s", getLogPrefix(), path, size));
             }
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable e) {
             throw new JobSchedulerException(String.format("%s[size][%s][failed]%s", getLogPrefix(), path, e.toString()), e);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
         }
         return size;
     }
 
     @Override
     public boolean isDirectory(final String path) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
-            boolean result = smbFile.isDirectory();
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
+            boolean r = smbFile.isDirectory();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("%s[isDirectory][%s]%s", getLogPrefix(), path, result));
+                LOGGER.debug(String.format("%s[isDirectory][%s]%s", getLogPrefix(), path, r));
             }
-            return result;
-        } catch (Exception e) {
-            //
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
+            return r;
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[isDirectory][%s][exception]%s", getLogPrefix(), path, e.toString()));
             }
         }
         return false;
     }
 
     public boolean isHidden(final String path) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             boolean result = smbFile.isHidden();
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(String.format("%s[isHidden][%s]%s", getLogPrefix(), path, result));
             }
             return result;
-        } catch (Exception e) {
-            //
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("%s[isHidden][%s][exception]%s", getLogPrefix(), path, e.toString()));
             }
         }
         return false;
@@ -186,11 +178,10 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
 
     @Override
     public void mkdir(final String path) {
-        SmbFile smbFile = null;
-        try {
-            boolean isDebugEnabled = LOGGER.isDebugEnabled();
-            reply = "OK";
-            smbFile = getSmbFile(normalizePath(path));
+        boolean isDebugEnabled = LOGGER.isDebugEnabled();
+        reply = "OK";
+
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (smbFile.exists()) {
                 if (isDebugEnabled) {
                     LOGGER.debug(String.format("%s[mkdir][%s]already exists", getLogPrefix(), path));
@@ -201,26 +192,24 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
             if (isDebugEnabled) {
                 LOGGER.debug(String.format("%s[mkdir][%s]created", getLogPrefix(), path));
             }
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[mkdir][%s]%s", getLogPrefix(), path, e.toString()), e);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+            throw e;
+        } catch (Throwable e) {
+            reply = e.toString();
+            throw new JobSchedulerException(String.format("%s[mkdir][%s]%s", getLogPrefix(), path, reply), e);
         }
     }
 
     @Override
     public void rmdir(String path) {
-        SmbFile smbFile = null;
-        try {
-            reply = "rmdir OK";
-            path = normalizePath(path);
-            if (!path.endsWith("/")) {
-                path += "/";
-            }
-            smbFile = getSmbFile(path);
+        reply = "rmdir OK";
+        path = normalizePath(path);
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
+
+        try (SmbFile smbFile = getSmbFile(path)) {
             if (!smbFile.exists()) {
                 throw new JobSchedulerException(String.format("%s[rmdir][%s][failed]filepath does not exist", getLogPrefix(), smbFile.getPath()));
             }
@@ -232,13 +221,9 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(SOSVfs_E_134.params("[rmdir] " + path), e);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+            throw new JobSchedulerException(String.format("%s[rmdir][%s]%s", getLogPrefix(), path, reply), e);
         }
     }
 
@@ -266,13 +251,12 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
 
     @Override
     public List<SOSFileEntry> listNames(String path, int maxFiles, boolean checkIfExists, boolean checkIfIsDirectory) {
-        SmbFile smbFile = null;
-        try {
-            List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
-            if (path.isEmpty()) {
-                path = ".";
-            }
-            smbFile = getSmbFile(normalizePath(path));
+        List<SOSFileEntry> result = new ArrayList<SOSFileEntry>();
+        if (path.isEmpty()) {
+            path = ".";
+        }
+
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (checkIfExists && !smbFile.exists()) {
                 return result;
             }
@@ -291,28 +275,21 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
             for (int i = 0; i < list.length; i++) {
                 SmbFile file = list[i];
                 result.add(getFileEntry(file, path));
-
             }
             reply = "ls OK";
             return result;
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             reply = e.toString();
-            throw new JobSchedulerException(e);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+            throw new JobSchedulerException(reply, e);
         }
     }
 
     @Override
     public void delete(final String path, boolean checkIsDirectory) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (checkIsDirectory && smbFile.isDirectory()) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
@@ -320,13 +297,12 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
                 LOGGER.debug(String.format("%s[delete]%s", getLogPrefix(), path));
             }
             smbFile.delete();
-        } catch (Exception ex) {
-            reply = ex.toString();
-            throw new JobSchedulerException(String.format("%s[delete][%s][failed]%s", getLogPrefix(), path, ex.toString()), ex);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+        } catch (JobSchedulerException e) {
+            reply = e.toString();
+            throw e;
+        } catch (Throwable e) {
+            reply = e.toString();
+            throw new JobSchedulerException(String.format("%s[rm][%s]%s", getLogPrefix(), path, reply), e);
         }
         reply = "rm OK";
         LOGGER.info(String.format("%s[delete][%s]%s", getLogPrefix(), path, getReplyString()));
@@ -343,9 +319,12 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
             smbFileFrom = getSmbFile(normalizePath(from));
             smbFileTo = getSmbFile(normalizePath(to));
             smbFileFrom.renameTo(smbFileTo);
-        } catch (Exception e) {
+        } catch (JobSchedulerException e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("%s[rename][%s][%s][failed]%s", getLogPrefix(), from, to, e.toString()), e);
+            throw e;
+        } catch (Throwable e) {
+            reply = e.toString();
+            throw new JobSchedulerException(String.format("%s[rename][%s][%s]%s", getLogPrefix(), from, to, reply), e);
         } finally {
             if (smbFileFrom != null) {
                 smbFileFrom.close();
@@ -360,86 +339,76 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
 
     @Override
     public InputStream getInputStream(final String path) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             return new SmbFileInputStream(smbFile);
-        } catch (Exception ex) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable ex) {
             throw new JobSchedulerException(String.format("%s[getInputStream][%s][failed]%s", getLogPrefix(), path, ex.toString()), ex);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
         }
     }
 
     @Override
     public OutputStream getOutputStream(final String path, boolean append, boolean resume) {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             return new SmbFileOutputStream(smbFile);
-        } catch (Exception ex) {
+        } catch (JobSchedulerException e) {
+            throw e;
+        } catch (Throwable ex) {
             throw new JobSchedulerException(String.format("%s[getOutputStream][%s][failed]%s", getLogPrefix(), path, ex.toString()), ex);
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
         }
     }
 
     @Override
     public String getModificationDateTime(final String path) {
-        String dateTime = null;
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        String r = null;
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (smbFile.exists()) {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                dateTime = df.format(new Date(smbFile.getLastModified()));
+                r = df.format(new Date(smbFile.getLastModified()));
             }
-        } catch (Exception ex) {
-            //
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[getModificationDateTime][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
-        return dateTime;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("%s[%s]getModificationDateTime=%s", getLogPrefix(), path, r));
+        }
+        return r;
     }
 
     @Override
     public long getModificationTimeStamp(final String path) throws Exception {
-        long timestamp = -1L;
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        long r = -1L;
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (smbFile.exists()) {
-                timestamp = smbFile.getLastModified();
+                r = smbFile.getLastModified();
             }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[getModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
-        return timestamp;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]getModificationTimeStamp=%s", path, r));
+        }
+        return r;
     }
 
     public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception {
-        SmbFile smbFile = null;
-        try {
-            smbFile = getSmbFile(normalizePath(path));
+        if (timeStamp <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationTimeStamp=%s", path, timeStamp));
+            }
+            return;
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("[%s]setModificationTimeStamp=%s", path, timeStamp));
+        }
+
+        try (SmbFile smbFile = getSmbFile(normalizePath(path))) {
             if (smbFile.exists()) {
                 smbFile.setLastModified(timeStamp);
             }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            if (smbFile != null) {
-                smbFile.close();
-            }
+        } catch (Throwable e) {
+            LOGGER.error(String.format("%s[setModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
         }
     }
 
