@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -99,7 +100,6 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
 
     @Override
     public void connect(final SOSProviderOptions options) throws Exception {
-        final String method = CLASS_NAME + "::Connect";
         providerOptions = options;
         try {
             host = providerOptions.host.getValue();
@@ -110,10 +110,11 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             proxyUser = providerOptions.proxyUser.getValue();
             proxyPassword = providerOptions.proxyPassword.getValue();
             doConnect();
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
-
         login();
     }
 
@@ -183,15 +184,15 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(SOSVfs_D_0101.params(host, port));
             }
-
             setConnectTimeout();
             getClient().connect(host, port);
             logReply("connect");
             LOGGER.info(SOSVfs_D_0102.params(host, port));
-            getClient().setControlKeepAliveTimeout(180);
-
+            getClient().setControlKeepAliveTimeout(Duration.ofSeconds(180));
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 
@@ -276,7 +277,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             try {
                 list = getClient().listFiles(path);
             } catch (IOException e) {
-                throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("getFilenames")), e);
+                throw new JobSchedulerException("[" + path + "]" + e.toString(), e);
             }
             if (list == null || list.length <= 0) {
                 if (isNegativeCommandCompletion()) {
@@ -317,9 +318,11 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             }
             reply = "ls OK";
             return result;
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.error(String.format("[%s]%s", path, e.toString()), e);
-            reply = e.toString();
+            reply = "[" + path + "]" + e.toString();
             return null;
         }
     }
@@ -351,7 +354,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         try {
             entries = listNames(path, maxFiles, checkIfExists, checkIfExists);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("[" + path + "]" + e.toString(), e);
         }
         if (entries == null) {
             if (isDebugEnabled) {
@@ -463,15 +466,16 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     private FTPFile getFTPFile(final String fileName) {
-        final String method = CLASS_NAME + "::getFTPFile";
         FTPFile file = null;
         try {
             FTPFile[] list = getClient().listFiles(fileName);
             if (isNotNull(list) && list.length > 0) {
                 file = list[0];
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return file;
     }
@@ -489,10 +493,12 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             }
             x = cd(path);
             logReply("cd][" + path);
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (SocketException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("doCD")), e);
+            throw new JobSchedulerException("[cd][" + folderName + "]" + e.toString(), e);
         } catch (IOException e) {
-            LOGGER.debug(e.toString(), e);
+            LOGGER.debug("[" + folderName + "]" + e.toString(), e);
         }
         return x;
     }
@@ -505,8 +511,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
                 disconnect();
                 throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
         if (isNegativeCommandCompletion()) {
             throw new JobSchedulerException(SOSVfs_E_124.params(getReplyString()));
@@ -514,7 +522,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     }
 
     private void doPostLoginOperations() {
-        getClient().setControlKeepAliveTimeout(180);
+        getClient().setControlKeepAliveTimeout(Duration.ofSeconds(180));
         String msg;
         try {
             msg = getClient().getSystemType();
@@ -573,7 +581,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         try {
             getClient().sendCommand(command);
         } catch (IOException e) {
-            throw new JobSchedulerException("command failed: " + command, e);
+            throw new JobSchedulerException("[sendCommand][" + command + "]" + e.toString(), e);
         }
         logReply("sendCommand][" + command);
     }
@@ -588,7 +596,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             }
             return pwd.replaceFirst("^[^\"]*\"([^\"]*)\".*", "$1");
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 
@@ -635,12 +643,13 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
 
     @Override
     public long getFileSize(final String fileName) {
-        final String method = CLASS_NAME + "::getFileSize";
         long size = -1;
         try {
             size = size(fileName);
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_153.params(method, e));
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[%s]%s", fileName, size));
@@ -666,17 +675,15 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
 
     @Override
     public String getModificationDateTime(final String strFileName) {
-        final String method = CLASS_NAME + "::getModificationTime";
         try {
             return getClient().getModificationTime(strFileName);
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException("[" + strFileName + "]" + e.toString(), e);
         }
     }
 
     @Override
     public InputStream getInputStream(String fileName) {
-        final String method = CLASS_NAME + "::getInputStream";
         InputStream is = null;
         try {
             fileName = fileName.replaceAll("\\\\", "/");
@@ -687,7 +694,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         } catch (JobSchedulerException e) {
             throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         } finally {
             logReply("getInputStream][" + fileName);
         }
@@ -701,18 +708,17 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             os = getClient().storeFileStream(fileName);
             logReply("getOutputStream][" + fileName);
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("getOutputStream", e.toString())), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return os;
     }
 
     public OutputStream getAppendFileStream(final String fileName) {
-        final String method = CLASS_NAME + "::getAppendFileStream";
         OutputStream os = null;
         try {
             os = getClient().appendFileStream(fileName);
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return os;
     }
@@ -728,8 +734,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             if (isNegativeCommandCompletion()) {
                 throw new JobSchedulerException(SOSVfs_E_144.params("delete()", path, getReplyString()));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("delete()"), e);
+            throw new JobSchedulerException("[" + path + "]" + e.toString(), e);
         }
     }
 
@@ -766,8 +774,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
                     }
                 }
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException("[mkdir][" + path + "]" + e.toString(), e);
         }
     }
 
@@ -776,12 +786,14 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
         try {
             getClient().rename(from, to);
             if (isNegativeCommandCompletion()) {
-                throw new JobSchedulerException(SOSVfs_E_144.params("rename()", from, getReplyString()));
+                throw new JobSchedulerException("[rename][from=" + from + "][to=" + to + "]" + getReplyString());
             } else {
                 LOGGER.info(String.format(SOSVfs_I_150.params(from, to)));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("rename()"), e);
+            throw new JobSchedulerException("[rename][from=" + from + "][to=" + to + "]" + e.toString(), e);
         }
     }
 
@@ -815,9 +827,11 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             getClient().removeDirectory(path);
             reply = "rmdir OK";
             LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
             reply = e.toString();
-            throw new JobSchedulerException(String.format("[%s]rmdir failed", path), e);
+            throw new JobSchedulerException(String.format("[rmdir][%s]%s", path, reply), e);
         }
     }
 
@@ -869,8 +883,6 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
 
     // @Override
     private final int passive() {
-        final String method = CLASS_NAME + "::passive";
-
         try {
             int i = getClient().pasv();
             if (isPositiveCommandCompletion() == false) {
@@ -880,8 +892,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
                 getClient().enterLocalPassiveMode();
             }
             return i;
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params(method)), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 
@@ -901,8 +915,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             if (!getClient().setFileType(FTP.ASCII_FILE_TYPE)) {
                 throw new JobSchedulerException(SOSVfs_E_149.params(getReplyString()));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_130.params("ascii", e));
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 
@@ -911,8 +927,10 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             if (!getClient().setFileType(FTP.BINARY_FILE_TYPE)) {
                 throw new JobSchedulerException(SOSVfs_E_149.params(getReplyString()));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_130.params("setFileType to binary"), e);
+            throw new JobSchedulerException(e.toString(), e);
         }
     }
 

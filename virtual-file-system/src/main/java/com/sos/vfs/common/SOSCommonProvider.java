@@ -237,7 +237,7 @@ public abstract class SOSCommonProvider extends SOSVFSMessageCodes implements IS
         try {
             return size(normalizePath(fileName));
         } catch (Exception e) {
-            LOGGER.trace(SOSVfs_E_134.params("getFileSize") + ":" + e.getMessage(), e);
+            LOGGER.trace(SOSVfs_E_134.params("getFileSize") + ":" + e.toString(), e);
         }
         return -1;
     }

@@ -61,8 +61,10 @@ public class SOSFTPFile extends SOSCommonFile {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(String.format("[%s]deleted", fileName));
             }
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::delete"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return true;
     }
@@ -76,7 +78,7 @@ public class SOSFTPFile extends SOSCommonFile {
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileInputStream"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return getInputStream();
     }
@@ -92,7 +94,7 @@ public class SOSFTPFile extends SOSCommonFile {
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::getFileOutputStream"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return getOutputStream();
     }
@@ -102,8 +104,10 @@ public class SOSFTPFile extends SOSCommonFile {
         long result = -1;
         try {
             result = getProvider().getFileSize(fileName);
+        } catch (JobSchedulerException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params("getFileSize()"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(String.format("[%s]fileSize=%s", fileName, result));
@@ -142,7 +146,7 @@ public class SOSFTPFile extends SOSCommonFile {
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::closeInput"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         } finally {
             setInputStream(null);
         }
@@ -162,7 +166,7 @@ public class SOSFTPFile extends SOSCommonFile {
         } catch (JobSchedulerException e) {
             throw e;
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::closeOutput"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         } finally {
             setOutputStream(null);
         }
@@ -177,7 +181,7 @@ public class SOSFTPFile extends SOSCommonFile {
                 bytes = is.read(buffer);
             }
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.params(CLASSNAME + "::read"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
         return bytes;
     }
@@ -190,7 +194,7 @@ public class SOSFTPFile extends SOSCommonFile {
             }
             this.getFileOutputStream().write(buffer, offset, length);
         } catch (IOException e) {
-            throw new JobSchedulerException(String.format("%1$s failed for file %2$s", CLASSNAME + "::write", fileName), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
     }
 
@@ -199,7 +203,7 @@ public class SOSFTPFile extends SOSCommonFile {
         try {
             this.getFileOutputStream().write(buffer);
         } catch (IOException e) {
-            throw new JobSchedulerException(SOSVfs_E_134.get(CLASSNAME + "::write"), e);
+            throw new JobSchedulerException("[" + fileName + "]" + e.toString(), e);
         }
     }
 
@@ -232,7 +236,7 @@ public class SOSFTPFile extends SOSCommonFile {
             handler.getClient().setModificationTime(fileName, df.format(d));
             return dateTime;
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("[" + fileName + "]" + e.toString(), e);
             return -1L;
         }
     }
