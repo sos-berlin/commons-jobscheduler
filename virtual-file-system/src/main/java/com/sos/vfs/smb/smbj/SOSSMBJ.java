@@ -487,7 +487,7 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
             SmbConfig config = b.build();
             if (LOGGER.isDebugEnabled()) {
                 List<String> excluded = Arrays.asList(
-                        "authenticators;socketFactory;random;securityProvider;transportLayerFactory;clientGSSContextConfig".split(";"));
+                        "authenticators;socketFactory;random;securityProvider;transportLayerFactory;clientGSSContextConfig;ntlmConfig".split(";"));
                 LOGGER.debug(String.format("%s[createClient][config]%s", getLogPrefix(), SOSString.toString(config, excluded)));
             }
 
