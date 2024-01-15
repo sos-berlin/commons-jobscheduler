@@ -210,33 +210,36 @@ public class SOSFTPFile extends SOSCommonFile {
     @Override
     public long getModificationDateTime() {
         String dateTime = getProvider().getModificationDateTime(fileName);
-        long result = -1;
         if (dateTime != null) {
+            // return code (e.g. 213) and the space
             if (dateTime.startsWith("213 ")) {
                 dateTime = dateTime.substring(3);
             }
             try {
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-                result = df.parse(dateTime.trim()).getTime();
+                return df.parse(dateTime.trim()).getTime();
             } catch (Exception e) {
-                result = -1L;
             }
-        } else {
-            result = -1L;
         }
-        return result;
+        return -1L;
     }
 
     @Override
-    public long setModificationDateTime(final long dateTime) {
+    public long setModificationDateTime(final long millis) {
+        if (millis <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", fileName, millis));
+            }
+            return millis;
+        }
         try {
             SOSFTP handler = (SOSFTP) getProvider();
-            Date d = new Date(dateTime);
+            Date d = new Date(millis);
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
             handler.getClient().setModificationTime(fileName, df.format(d));
-            return dateTime;
+            return millis;
         } catch (IOException e) {
-            LOGGER.error("[" + fileName + "]" + e.toString(), e);
+            LOGGER.error(String.format("[%s][%s]%s", fileName, millis, e.toString()), e);
             return -1L;
         }
     }

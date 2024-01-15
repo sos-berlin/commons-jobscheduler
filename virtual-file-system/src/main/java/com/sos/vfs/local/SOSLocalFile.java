@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
@@ -244,29 +245,33 @@ public class SOSLocalFile extends JSFile implements ISOSProviderFile {
 
     @Override
     public long getModificationDateTime() {
-        long result = 0L;
         try {
-            result = new File(strFileName).lastModified();
+            // result = new File(strFileName).lastModified();
+            FileTime ft = Files.getLastModifiedTime(Paths.get(strFileName));
+            return ft.to(TimeUnit.MILLISECONDS);
         } catch (Throwable e) {
-            LOGGER.error("[" + strFileName + "]" + e.getMessage(), e);
-            result = -1L;
+            LOGGER.error(String.format("[%s]%s", strFileName, e.toString()), e);
+            return -1L;
         }
-        return result;
     }
 
     @Override
-    public long setModificationDateTime(final long dateTime) {
-        long result = 0L;
+    public long setModificationDateTime(final long millis) {
+        if (millis <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", strFileName, millis));
+            }
+            return millis;
+        }
         try {
             // File file = new File(strFileName);
             // file.setLastModified(dateTime);
-            Files.setLastModifiedTime(Paths.get(strFileName), FileTime.fromMillis(dateTime));
-            result = dateTime;
+            Files.setLastModifiedTime(Paths.get(strFileName), FileTime.fromMillis(millis));
+            return millis;
         } catch (Throwable e) {
-            LOGGER.error("[setModificationDateTime=" + dateTime + "][" + strFileName + "]" + e.getMessage(), e);
-            result = -1L;
+            LOGGER.error(String.format("[%s][%s]%s", strFileName, millis, e.toString()), e);
+            return -1L;
         }
-        return result;
     }
 
     @Override

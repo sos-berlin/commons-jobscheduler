@@ -40,6 +40,7 @@ public class SOSSFTPTest {
             providerOptions.protocol.setValue(TransferTypes.sftp);
 
             providerOptions.host.setValue("localhost");
+            providerOptions.port.setValue("22");
 
             usePassword();
             // usePublicKey();
@@ -85,8 +86,12 @@ public class SOSSFTPTest {
         try {
             p.connect(getProviderOptions());
 
-            List<SOSFileEntry> r = p.listNames("/sos/yade/", -1, true, true);
-            LOGGER.info(p.getReplyString());
+            LOGGER.info("  getModificationDateTime=" + p.getFile("/home/sos/file.txt").getModificationDateTime());
+            LOGGER.info("  fileExists=" + p.fileExists("/home/sos/1.txt"));
+            LOGGER.info("  isDirectory=" + p.isDirectory("/home/sos/ddd"));
+
+            List<SOSFileEntry> r = p.listNames("/home/sos", -1, true, true);
+            LOGGER.info("[reply]" + p.getReplyString());
             if (r != null) {
                 LOGGER.info("found=" + r.size());
                 for (SOSFileEntry e : r) {

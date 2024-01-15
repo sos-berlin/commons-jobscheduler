@@ -22,9 +22,11 @@ public class SOSFTPTest {
         o.host.setValue("localhost");
         o.port.setValue("21");
         o.authMethod.setValue(enuAuthenticationMethods.password);
+        o.passiveMode.value(true);
+        o.transferMode.setValue("binary");
 
-        o.user.setValue("user");
-        o.password.setValue("password");
+        o.user.setValue("test");
+        o.password.setValue("test");
         return o;
     }
 
@@ -35,8 +37,8 @@ public class SOSFTPTest {
         try {
             p.connect(getOptions());
 
-            List<SOSFileEntry> r = p.listNames("/transfer-1", -1, true, true);
-            LOGGER.info(p.getReplyString());
+            List<SOSFileEntry> r = p.listNames("/home/test/in", -1, false, true);
+            LOGGER.info("[reply]" + p.getReplyString());
             if (r != null) {
                 LOGGER.info("found=" + r.size());
                 for (SOSFileEntry e : r) {
@@ -45,6 +47,7 @@ public class SOSFTPTest {
                     LOGGER.info("  isDirecory=" + p.isDirectory(path) + ", directoryExists=" + p.directoryExists(path));
                     LOGGER.info("  fileExists=" + p.fileExists(path) + ",  size=" + p.size(path));
                     LOGGER.info("  getModificationDateTime=" + p.getModificationDateTime(path));
+                    LOGGER.info("  getModificationDateTime=" + p.getFile(path).getModificationDateTime());
 
                     if (!e.isDirectory()) {
                         SOSFileEntry f = p.getFileEntry(e.getFullPath());

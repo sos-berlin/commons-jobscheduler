@@ -265,7 +265,27 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public boolean fileExists(final String path) {
-        boolean result = is(path, FileMode.Type.REGULAR);
+        boolean result = false;
+        try {
+            FileAttributes attributes = getFileAttributes(path);
+            if (attributes == null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[fileExists][" + path + "]FileAttributes is null");
+                }
+            } else {
+                result = attributes.getType().equals(FileMode.Type.REGULAR) || attributes.getType().equals(FileMode.Type.DIRECTORY);
+            }
+        } catch (SFTPException e) {
+            if (!isNoSuchFileException(e)) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[fileExists][" + path + "]" + e.toString(), e);
+                }
+            }
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[fileExists][" + path + "]" + e.toString(), e);
+            }
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s]fileExists=%s", path, result));
         }
@@ -279,7 +299,27 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
 
     @Override
     public boolean isDirectory(final String path) {
-        boolean result = is(path, FileMode.Type.DIRECTORY);
+        boolean result = false;
+        try {
+            FileAttributes attributes = getFileAttributes(path);
+            if (attributes == null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[isDirectory][" + path + "]FileAttributes is null");
+                }
+            } else {
+                result = attributes.getType().equals(FileMode.Type.DIRECTORY);
+            }
+        } catch (SFTPException e) {
+            if (!isNoSuchFileException(e)) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("[isDirectory][" + path + "]" + e.toString(), e);
+                }
+            }
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[isDirectory][" + path + "]" + e.toString(), e);
+            }
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("[%s]isDirectory=%s", path, result));
         }
@@ -291,7 +331,6 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
         long size = -1;
         try {
             path = normalizePath(path);
-
             FileAttributes attr = getFileAttributes(path);
             if (attr != null) {
                 size = attr.getSize();
@@ -301,7 +340,7 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
                 throwException(e, path);
             } catch (SOSNoSuchFileException ex) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(String.format("[%s]%s", path, e.toString()));
+                    LOGGER.debug(String.format("[%s]%s", path, e.getMessage()));
                 }
             }
         }
@@ -309,20 +348,6 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             LOGGER.debug(String.format("[%s]size=%s", path, size));
         }
         return size;
-    }
-
-    private boolean is(String path, FileMode.Type type) {
-        try {
-            FileAttributes attr = getFileAttributes(path);
-            if (attr != null) {
-                return type.equals(attr.getType());
-            }
-        } catch (Throwable e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[is][%s]%s", path, e.toString()), e);
-            }
-        }
-        return false;
     }
 
     protected FileAttributes getFileAttributes(String path) throws Exception {
@@ -928,15 +953,15 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
             try {
                 FileAttributes attr = getFileAttributes(path);
                 if (attr != null) {
-                    long mt = attr.getMtime();
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    dateTime = df.format(new Date(mt));
+                    dateTime = df.format(new Date(attr.getMtime() * 1_000L));
                 }
             } catch (SFTPException e) {
                 throwException(e, path);
             }
         } catch (Throwable e) {
             //
+            LOGGER.error(e.toString(), e);
         }
         return dateTime;
     }
@@ -1047,13 +1072,23 @@ public class SOSSFTPSSHJ extends SOSCommonProvider implements ISOSSFTP {
     }
 
     private void throwException(SFTPException e, String msg) throws Exception {
+        if (isNoSuchFileException(e)) {
+            throw new SOSNoSuchFileException(msg, e);
+        }
+        throw e;
+    }
+
+    private boolean isNoSuchFileException(SFTPException e) {
+        if (e == null) {
+            return false;
+        }
         StatusCode sc = e.getStatusCode();
         if (sc != null) {
             if (sc.equals(StatusCode.NO_SUCH_FILE) || sc.equals(StatusCode.NO_SUCH_PATH)) {
-                throw new SOSNoSuchFileException(msg, e);
+                return true;
             }
         }
-        throw e;
+        return false;
     }
 
     @Override

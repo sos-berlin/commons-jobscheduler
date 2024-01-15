@@ -348,25 +348,25 @@ public class SOSSMBJ extends ASOSSMB implements ISOSSMB {
         return r;
     }
 
-    public void setModificationTimeStamp(final String path, final long timeStamp) throws Exception {
-        if (timeStamp <= 0) {
+    public void setModificationTimeStamp(final String path, final long millis) throws Exception {
+        if (millis <= 0) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[%s][skip]setModificationTimeStamp=%s", path, timeStamp));
+                LOGGER.debug(String.format("[%s][skip]setModificationTimeStamp=%s", path, millis));
             }
             return;
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("[%s]setModificationTimeStamp=%s", path, timeStamp));
+            LOGGER.debug(String.format("[%s]setModificationTimeStamp=%s", path, millis));
         }
         try {
             tryConnectShare("setModificationTimeStamp", path);
             try (File f = openExistingFile2Write(path)) {
                 FileBasicInformation current = f.getFileInformation().getBasicInformation();
-                FileTime ft = FileTime.ofEpochMillis(timeStamp);
+                FileTime ft = FileTime.ofEpochMillis(millis);
                 f.setFileInformation(new FileBasicInformation(current.getCreationTime(), ft, ft, ft, current.getFileAttributes()));
             }
         } catch (Throwable e) {
-            LOGGER.error(String.format("%s[setModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
+            LOGGER.error(String.format("%s[setModificationTimeStamp][%s][%s]%s", getLogPrefix(), path, millis, e.toString()), e);
         }
     }
 

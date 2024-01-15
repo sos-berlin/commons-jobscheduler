@@ -93,7 +93,7 @@ public class SOSSFTPFileSSHJ extends SOSCommonProviderFile {
             if (attrs == null) {
                 throw new Exception("FileAttributes is null");
             }
-            return attrs.getMtime() * 1000L;
+            return attrs.getMtime() * 1_000L;
         } catch (Exception e) {
             LOGGER.error(String.format("[%s]%s", path, e.toString()), e);
             return -1L;
@@ -101,22 +101,26 @@ public class SOSSFTPFileSSHJ extends SOSCommonProviderFile {
     }
 
     @Override
-    public long setModificationDateTime(final long timestamp) {
+    public long setModificationDateTime(final long millis) {
+        if (millis <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", fileName, millis));
+            }
+            return millis;
+        }
         try {
             SOSSFTPSSHJ handler = (SOSSFTPSSHJ) getProvider();
-            int mTime = (int) (timestamp / 1000L);
-
             String path = adjustRelativePathName(fileName);
             FileAttributes attrs = handler.getFileAttributes(path);
             if (attrs == null) {
                 throw new Exception("FileAttributes is null");
             }
-            // TODO Test
-            FileAttributes newattrs = new FileAttributes.Builder().withAtimeMtime(attrs.getAtime(), mTime).build();
+            long seconds = millis / 1_000L;
+            FileAttributes newattrs = new FileAttributes.Builder().withAtimeMtime(attrs.getAtime(), seconds).build();
             handler.getSFTPClient().setattr(path, newattrs);
-            return timestamp;
+            return millis;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(String.format("[%s][%s]%s", fileName, millis, e.toString()), e);
             return -1L;
         }
     }

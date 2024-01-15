@@ -281,7 +281,7 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
             }
             if (list == null || list.length <= 0) {
                 if (isNegativeCommandCompletion()) {
-                    throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("getFilenames")) + ":" + getReplyString());
+                    throw new JobSchedulerException("[" + path + "]" + getReplyString());
                 }
                 return result;
             }

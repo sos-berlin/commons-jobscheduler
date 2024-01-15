@@ -100,7 +100,7 @@ public class SOSSFTPFileJCraft extends SOSCommonProviderFile {
             if (attrs == null) {
                 throw new Exception("SftpATTRS is null");
             }
-            return attrs.getMTime() * 1000L;
+            return Long.valueOf(attrs.getMTime()) * 1_000L;
         } catch (Exception e) {
             LOGGER.error(String.format("[%s]%s", path, e.toString()), e);
             return -1L;
@@ -108,14 +108,20 @@ public class SOSSFTPFileJCraft extends SOSCommonProviderFile {
     }
 
     @Override
-    public long setModificationDateTime(final long timestamp) {
+    public long setModificationDateTime(final long millis) {
+        if (millis <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", fileName, millis));
+            }
+            return millis;
+        }
         try {
             SOSSFTPJCraft handler = (SOSSFTPJCraft) getProvider();
-            int mTime = (int) (timestamp / 1000L);
-            handler.getChannelSftp().setMtime(adjustRelativePathName(fileName), mTime);
-            return timestamp;
+            int seconds = (int) (millis / 1_000L);
+            handler.getChannelSftp().setMtime(adjustRelativePathName(fileName), seconds);
+            return millis;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(String.format("[%s][%s]%s", fileName, millis, e.toString()), e);
             return -1L;
         }
     }

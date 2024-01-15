@@ -636,7 +636,7 @@ public class SOSSFTPJCraft extends SOSCommonProvider implements ISOSSFTP {
         try {
             SftpATTRS objAttr = channelSftp.stat(path);
             if (objAttr != null) {
-                int mt = objAttr.getMTime();
+                long mt = Long.valueOf(objAttr.getMTime()) * 1_000;
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 dateTime = df.format(new Date(mt));
             }

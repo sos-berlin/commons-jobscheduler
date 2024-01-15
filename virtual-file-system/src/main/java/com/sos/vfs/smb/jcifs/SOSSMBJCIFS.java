@@ -408,7 +408,7 @@ public class SOSSMBJCIFS extends ASOSSMB implements ISOSSMB {
                 smbFile.setLastModified(timeStamp);
             }
         } catch (Throwable e) {
-            LOGGER.error(String.format("%s[setModificationTimeStamp][%s]%s", getLogPrefix(), path, e.toString()), e);
+            LOGGER.error(String.format("%s[setModificationTimeStamp][%s][%s]%s", getLogPrefix(), path, timeStamp, e.toString()), e);
         }
     }
 
