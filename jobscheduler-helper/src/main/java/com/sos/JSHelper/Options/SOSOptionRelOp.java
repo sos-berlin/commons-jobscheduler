@@ -13,7 +13,7 @@ public class SOSOptionRelOp extends SOSOptionString {
     private static final String JSH_T_0010 = "JSH_T_0010";
     private static final String JSJ_E_0017 = "JSJ_E_0017";
     private static HashMap<String, Integer> objRelOp = null;
- 
+
     public SOSOptionRelOp(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
             boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
@@ -57,7 +57,7 @@ public class SOSOptionRelOp extends SOSOptionString {
         } else {
             Integer iOp = objRelOp.get(pstrValue.toLowerCase());
             if (isNotNull(iOp)) {
-                this.strValue = pstrValue;
+                super.setValue(pstrValue);
             } else {
                 throw new JobSchedulerException(Messages.getMsg(JSJ_E_0017, pstrValue));
             }
