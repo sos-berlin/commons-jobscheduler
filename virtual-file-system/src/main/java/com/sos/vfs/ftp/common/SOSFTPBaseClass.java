@@ -15,8 +15,10 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -971,6 +973,24 @@ public class SOSFTPBaseClass extends SOSVFSMessageCodes implements ISOSProvider 
     public boolean isNegativeCommandCompletion() {
         int x = getClient().getReplyCode();
         return x > 300;
+    }
+
+    public long setModificationDateTime(final String fileName, final long millis) {
+        if (millis <= 0) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", fileName, millis));
+            }
+            return millis;
+        }
+        try {
+            Date d = new Date(millis);
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+            getClient().setModificationTime(fileName, df.format(d));
+            return millis;
+        } catch (Throwable e) {
+            LOGGER.error(String.format("[%s][%s]%s", fileName, millis, e.toString()), e);
+            return -1L;
+        }
     }
 
     public boolean isNotHiddenFile(final String fileName) {

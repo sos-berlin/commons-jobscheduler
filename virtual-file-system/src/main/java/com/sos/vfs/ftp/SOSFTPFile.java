@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.vfs.common.SOSCommonFile;
 import com.sos.vfs.common.SOSVFSFactory;
 import com.sos.vfs.ftp.common.SOSFTPBaseClass;
-import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFTPFile extends SOSCommonFile {
@@ -226,22 +225,7 @@ public class SOSFTPFile extends SOSCommonFile {
 
     @Override
     public long setModificationDateTime(final long millis) {
-        if (millis <= 0) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(String.format("[%s][skip]setModificationDateTime=%s", fileName, millis));
-            }
-            return millis;
-        }
-        try {
-            SOSFTP handler = (SOSFTP) getProvider();
-            Date d = new Date(millis);
-            SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-            handler.getClient().setModificationTime(fileName, df.format(d));
-            return millis;
-        } catch (IOException e) {
-            LOGGER.error(String.format("[%s][%s]%s", fileName, millis, e.toString()), e);
-            return -1L;
-        }
+        return ((SOSFTPBaseClass) getProvider()).setModificationDateTime(fileName, millis);
     }
 
 }

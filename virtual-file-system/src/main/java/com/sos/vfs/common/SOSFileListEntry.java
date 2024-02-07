@@ -1282,7 +1282,7 @@ public class SOSFileListEntry extends SOSVFSMessageCodes implements Runnable, IJ
         } catch (Throwable e) {
             setTransferredStatusAborted();
             String msg = "[" + transferNumber + "][" + transferStatus + "][Source=" + sourceFileName + "]" + e.toString();
-            LOGGER.error(msg);
+            LOGGER.error(msg, e);
             throw new JobSchedulerException(msg, e);
         }
     }
